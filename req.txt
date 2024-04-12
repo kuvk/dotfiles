@@ -1,0 +1,17 @@
+# Neovim build Debian prerequisites or install with brew, AppImage...
+sudo apt install ninja-build gettext cmake unzip build-essential curl git wget
+
+# Neccessary for neovim plugins
+sudo apt install python3 python3-dev python3-venv python3-pip
+sudo apt install fd-find ripgrep fzf fswatch
+sudo apt install nodejs npm
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+curl https://sh.rustup.rs -sSf | sh
+
+# For zsh plugins
+brew install zsh-vi-mode
+brew install zsh-autosuggestions
+brew install zsh-history-substring-search
+brew install zsh-syntax-highlighting
+mkdir ~/src
+git clone https://github.com/zsh-users/zsh-completions.git ~/src/zsh-completions

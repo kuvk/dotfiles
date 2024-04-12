@@ -1,0 +1,93 @@
+return {
+  "nvimtools/none-ls.nvim",
+  dependencies = {
+    "nvimtools/none-ls-extras.nvim",
+    "gbprod/none-ls-shellcheck.nvim",
+    "jay-babu/mason-null-ls.nvim",
+  },
+  config = function()
+    require("mason-null-ls").setup({
+      ensure_installed = {
+        "stylua",
+        "prettier",
+        "djlint",
+        "black",
+        "ruff",
+        "shellcheck",
+        "shellharden",
+        "mypy",
+        "beautysh",
+      },
+    })
+    local null_ls = require("null-ls")
+    null_ls.setup({
+      debug = true, -- Turn on debug for :NullLsLog
+      sources = {
+        require("none-ls.diagnostics.ruff").with({
+          -- Ignore unaccessed imports and variables double diagnostics
+          extra_args = {
+            "--ignore",
+            "F401,F841",
+          },
+        }),
+        require("none-ls.formatting.ruff"),
+        require("none-ls.formatting.beautysh"),
+        -- Shellcheck diagnostics not neccessary if using bashls
+        require("none-ls-shellcheck.diagnostics"),
+        require("none-ls-shellcheck.code_actions"),
+        null_ls.builtins.formatting.shellharden,
+        null_ls.builtins.formatting.stylua.with({
+          extra_args = {
+            "--indent-type",
+            "Spaces",
+            "--indent-width",
+            "2",
+          },
+        }),
+        -- Jinja formatting setup
+        null_ls.builtins.formatting.djlint.with({
+          extra_args = {
+            "--indent",
+            "2",
+            "--max-blank-lines",
+            "1",
+            "--max-attribute-length",
+            "20",
+            "--profile",
+            "jinja",
+            "--quiet",
+          },
+        }),
+        null_ls.builtins.diagnostics.djlint,
+
+        -- Prettier
+        null_ls.builtins.formatting.prettier.with({
+          disabled_filetypes = {
+            "htmldjango",
+            "jinja.html",
+          },
+        }),
+
+        -- Python formatting
+        null_ls.builtins.formatting.black,
+
+        -- Mypy diagnostics setup
+        null_ls.builtins.diagnostics.mypy.with({
+          extra_args = function()
+            local virtual = os.getenv("VIRTUAL_ENV") or os.getenv("CONDA_PREFIX") or "/usr"
+            return {
+              "--python-executable",
+              virtual .. "/bin/python3",
+              "--disable-error-code=import-untyped",
+            }
+          end,
+        }),
+      },
+    })
+
+    -- Timeout used mostly for djlint, jinja files longer than 150 lines often trigger LSP timeout
+    vim.keymap.set("n", "<leader>gf", function()
+      vim.lsp.buf.format({ timeout_ms = 3200 })
+    end)
+  end,
+}
