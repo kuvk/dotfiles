@@ -15,3 +15,10 @@ brew install zsh-history-substring-search
 brew install zsh-syntax-highlighting
 mkdir ~/src
 git clone https://github.com/zsh-users/zsh-completions.git ~/src/zsh-completions
+
+# For i3wm
+Build and install picom - https://github.com/yshui/picom
+
+# Make executable and add to bin
+autotiling - https://github.com/nwg-piotr/autotiling
+xborders - https://github.com/deter0/xborder

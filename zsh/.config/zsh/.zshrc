@@ -47,8 +47,6 @@ bindkey '^[[B' history-substring-search-down
 
 #bindkey '^I' autosuggest-accept
 
-export EDITOR="nvim"
-
 if [[ -d "$HOME/.tmux/plugins/tmuxifier" ]]; then
     export PATH="$HOME/.tmux/plugins/tmuxifier/bin:$PATH"
     eval "$(tmuxifier init -)"
@@ -67,6 +65,7 @@ alias ll="lsd -la"
 alias ls="lsd"
 alias cat="bat --paging=never"
 alias top="htop"
+alias nv="nvim"
 
 # Syntax highlighting plugin goes last
 source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

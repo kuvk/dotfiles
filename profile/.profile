@@ -26,13 +26,21 @@ if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
 
+# include gem installed packages
+if [ -d "$HOME/.local/share/gem/ruby/3.1.0/bin" ] ; then
+    PATH="$HOME/.local/share/gem/ruby/3.1.0/bin:$PATH"
+fi
+
 # Homebrew and Cargo
 eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
 . "$HOME/.cargo/env"
 
+export XCURSOR_PATH=${XCURSOR_PATH}:~/.local/share/icons
 # XDG Paths
 export XDG_CONFIG_HOME="$HOME/.config"
 export XDG_CACHE_HOME="$HOME/.cache"
 export XDG_DATA_HOME="$HOME/.local/share"
 # zsh config dir
 export ZDOTDIR="$HOME/.config/zsh"
+# editor
+export EDITOR="nvim"

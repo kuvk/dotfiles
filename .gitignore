@@ -4,3 +4,4 @@
 old/
 error.log
 lazy-lock.json
+.mypy_cache/

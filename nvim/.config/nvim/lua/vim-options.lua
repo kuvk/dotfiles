@@ -38,20 +38,25 @@ opt.clipboard:append("unnamedplus")
 opt.backspace = "indent,eol,start"
 
 -- Hide cmdline and strech status line
-opt.cmdheight = 0
+-- opt.cmdheight = 0
 opt.laststatus = 3
 
 -- Add height to cmdline when recording macros
-vim.cmd([[
-  augroup cmd_macro
-    autocmd!
-    autocmd RecordingEnter * set cmdheight=1
-    autocmd RecordingLeave * set cmdheight=0
-  augroup END
-]])
+-- vim.cmd([[
+--   augroup cmd_macro
+--     autocmd!
+--     autocmd RecordingEnter * set cmdheight=1
+--     autocmd RecordingLeave * set cmdheight=0
+--   augroup END
+-- ]])
 
 -- colocolumn for python
-vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead", "WinEnter" }, {
-  pattern = "*.py",
-  command = "set colorcolumn=80",
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter", "BufRead", "BufNewFile" }, {
+  callback = function ()
+    if vim.bo.filetype == "python" then
+      vim.cmd("set colorcolumn=80")
+    else
+      vim.cmd("set colorcolumn=0")
+    end
+  end
 })

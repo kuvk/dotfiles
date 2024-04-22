@@ -25,6 +25,9 @@ return {
     config = function()
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
       local lspconfig = require("lspconfig")
+      require("lspconfig.ui.windows").default_options = {
+        border = "rounded",
+      }
 
       local signs = { Error = " ", Warn = " ", Hint = "󰌵 ", Info = " " }
       for type, icon in pairs(signs) do
@@ -40,6 +43,7 @@ return {
           pyright = { autoImportCompletion = true },
           python = {
             analysis = {
+              autoImportCompletion = true,
               autoSearchPaths = true,
               diagnosticMode = "openFilesOnly",
               useLibraryCodeForTypes = true,
@@ -66,6 +70,9 @@ return {
       vim.cmd([[highlight DiagnosticVirtualTextWarn guibg=none]])
       vim.cmd([[highlight DiagnosticVirtualTextInfo guibg=none]])
       vim.cmd([[highlight DiagnosticVirtualTextHint guibg=none]])
+      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+        border = "rounded",
+      })
     end,
   },
 }

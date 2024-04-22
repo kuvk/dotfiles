@@ -11,6 +11,7 @@ return {
         "stylua",
         "prettier",
         "djlint",
+        "isort",
         "black",
         "ruff",
         "shellcheck",
@@ -24,10 +25,10 @@ return {
       debug = true, -- Turn on debug for :NullLsLog
       sources = {
         require("none-ls.diagnostics.ruff").with({
-          -- Ignore unaccessed imports and variables double diagnostics
+          -- Ignore imports not at the top and already provided diagnostics by mypy
           extra_args = {
             "--ignore",
-            "F401,F841",
+            "F401,F403,F405,F841,E402",
           },
         }),
         require("none-ls.formatting.ruff"),
@@ -69,6 +70,7 @@ return {
         }),
 
         -- Python formatting
+        null_ls.builtins.formatting.isort,
         null_ls.builtins.formatting.black,
 
         -- Mypy diagnostics setup
