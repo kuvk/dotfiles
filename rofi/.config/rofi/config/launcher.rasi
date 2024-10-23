@@ -38,7 +38,7 @@ textbox-prompt-colon {
     background-color:               @BGA;
     text-color:                     @SEL;
     padding:                        8px 12px 8px 12px;
-    font:			                "FiraCode Nerd Font 12";
+    font:			                "SF Pro Display Regular 12";
 }
 
 entry {

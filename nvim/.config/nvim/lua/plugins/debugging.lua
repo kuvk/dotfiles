@@ -28,7 +28,7 @@ return {
     vim.keymap.set("n", "<Leader>db", dap.toggle_breakpoint, {})
     vim.keymap.set("n", "<Leader>dc", dap.continue, {})
 
-    vim.fn.sign_define("DapBreakpoint", { text = " ", texthl = "DapBreakpoint" })
+    vim.fn.sign_define("DapBreakpoint", { text = "", texthl = "DapBreakpoint" })
     vim.fn.sign_define("DapBreakpointCondition", { text = "ﳁ ", texthl = "DapBreakpoint" })
     vim.fn.sign_define("DapBreakpointRejected", { text = " ", texthl = "DapBreakpoint" })
     vim.fn.sign_define("DapLogPoint", { text = " ", texthl = "DapLogPoint" })

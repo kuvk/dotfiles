@@ -15,7 +15,7 @@ SAVEHIST=100000
 HISTFILE=${ZDOTDIR}/.zsh_history
 
 # Use modern completion system
-fpath=($HOME/src/zsh-completions/src $fpath)
+fpath=($HOME/.local/share/zsh-plugins/zsh-completions/src $fpath)
 autoload -U compinit
 zstyle ':completion:*' menu select
 zmodload zsh/complist
@@ -28,7 +28,7 @@ zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
 ## ZSH VI MODE
-source $(brew --prefix)/opt/zsh-vi-mode/share/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+source $HOME/.local/share/zsh-plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
 # ## cursor style for vi mode
 ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BEAM
 ZVM_NORMAL_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
@@ -38,8 +38,8 @@ ZVM_VISUAL_LINE_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
 ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
 
 # HISTORY AND AUTOSUGGESTIONS
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $(brew --prefix)/share/zsh-history-substring-search/zsh-history-substring-search.zsh
+source $HOME/.local/share/zsh-plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $HOME/.local/share/zsh-plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
 
 # Mappings
 bindkey '^[[A' history-substring-search-up
@@ -68,7 +68,7 @@ alias top="htop"
 alias nv="nvim"
 
 # Syntax highlighting plugin goes last
-source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $HOME/.local/share/zsh-plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 (( ${+ZSH_HIGHLIGHT_STYLES} )) || typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[path]=fg=blue
 ZSH_HIGHLIGHT_STYLES[path_prefix]=fg=blue
@@ -83,3 +83,5 @@ ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
 
 # Set up fzf key bindings and fuzzy completion
 eval "$(fzf --zsh)"
+
+export PATH=$PATH:$HOME.spicetify

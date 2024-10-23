@@ -18,6 +18,7 @@ return {
         "shellharden",
         "mypy",
         "beautysh",
+        "debugpy",
       },
     })
     local null_ls = require("null-ls")
