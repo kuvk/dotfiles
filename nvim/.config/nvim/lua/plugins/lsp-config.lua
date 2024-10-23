@@ -12,7 +12,7 @@ return {
       require("mason-lspconfig").setup({
         ensure_installed = {
           "lua_ls",
-          "tsserver",
+          "ts_ls",
           "pyright",
           "jinja_lsp",
           "bashls",
@@ -52,7 +52,7 @@ return {
           },
         },
       })
-      lspconfig.tsserver.setup({ capabilities = capabilities })
+      lspconfig.ts_ls.setup({ capabilities = capabilities })
       lspconfig.bashls.setup({
         capabilities = capabilities,
         settings = {

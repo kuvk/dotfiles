@@ -1,6 +1,6 @@
 {
-    "border-rgba": "#fab387cc",
-    "border-radius": 15,
+    "border-rgba": "#fab387",
+    "border-radius": 12,
     "border-width": 2,
     "border-mode": "outside",
     "disable-version-warning": false,

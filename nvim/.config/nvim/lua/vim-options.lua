@@ -52,11 +52,11 @@ opt.laststatus = 3
 
 -- colocolumn for python
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter", "BufRead", "BufNewFile" }, {
-  callback = function ()
+  callback = function()
     if vim.bo.filetype == "python" then
       vim.cmd("set colorcolumn=80")
     else
       vim.cmd("set colorcolumn=0")
     end
-  end
+  end,
 })

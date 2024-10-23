@@ -15,9 +15,10 @@ return {
         "black",
         "ruff",
         "shellcheck",
-        "shellharden",
+        "shfmt",
         "mypy",
         "beautysh",
+        "debugpy",
       },
     })
     local null_ls = require("null-ls")
@@ -36,7 +37,12 @@ return {
         -- Shellcheck diagnostics not neccessary if using bashls
         require("none-ls-shellcheck.diagnostics"),
         require("none-ls-shellcheck.code_actions"),
-        null_ls.builtins.formatting.shellharden,
+        null_ls.builtins.formatting.shfmt.with({
+          extra_args = {
+            "-i",
+            "4",
+          },
+        }),
         null_ls.builtins.formatting.stylua.with({
           extra_args = {
             "--indent-type",

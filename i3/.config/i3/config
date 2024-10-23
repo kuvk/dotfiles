@@ -1,6 +1,6 @@
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
 set $mod Mod1
-font pango:SF Pro Display 10
+font pango:SFPRODISPLAYREGULAR 10
 
 # Start XDG autostart .desktop files using dex. See also
 # https://wiki.archlinux.org/index.php/XDG_Autostart
@@ -12,8 +12,11 @@ exec --no-startup-id dex --autostart --environment i3
 # screen before suspend. Use loginctl lock-session to lock your screen.
 # exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 # exec --no-startup-id xss-lock --transfer-sleep-lock -- ./.config/i3/screensaver.sh
+
+# Screen lock
 exec --no-startup-id xset s off dpms 3600 3600 3600
-exec --no-startup-id xautolock -time 5 -locker '~/.config/i3/scripts/screensaver.sh'
+exec --no-startup-id xautolock -time 10 -locker '~/.config/i3/scripts/matrix_sc'
+bindsym $mod+Control+l exec ~/.config/i3/scripts/matrix_sc
 
 # NetworkManager is the most popular way to manage wireless networks on Linux,
 # and nm-applet is a desktop environment-independent system tray GUI for it.
@@ -36,10 +39,11 @@ focus_follows_mouse no
 # or left-clicking anywhere into the window while holding the floating modifier.
 tiling_drag modifier titlebar
 
-bindsym $mod+Control+l exec ~/.config/i3/scripts/screensaver.sh
-
 # start a terminal
 bindsym $mod+Return exec kitty
+
+# start brave
+bindsym $mod+b exec brave
 
 # kill focused window
 bindsym $mod+q kill
@@ -113,8 +117,12 @@ client.background       #1e1e2e
 
 
 # Define names for monitors
-set $fm eDP-1
-set $sm HDMI-1-0
+# Desktop
+set $fm DP-0
+set $sm HDMI-0
+# Laptop
+# set $fm HDMI-1-0
+# set $sm eDP-1
 
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
@@ -204,7 +212,6 @@ bindsym $mod+r mode "resize"
 #         status_command i3status
 # }
 
-exec_always setxkbmap -option ctrl:nocaps
 exec_always ~/.config/polybar/launch.sh &
 exec_always --no-startup-id "picom -b"
 exec_always autotiling
