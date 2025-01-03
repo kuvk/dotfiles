@@ -85,3 +85,5 @@ ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
 eval "$(fzf --zsh)"
 
 export PATH=$PATH:$HOME.spicetify
+
+export PATH=$PATH:/home/kuvk/.spicetify

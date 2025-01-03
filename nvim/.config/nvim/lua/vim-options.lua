@@ -41,6 +41,8 @@ opt.backspace = "indent,eol,start"
 -- opt.cmdheight = 0
 opt.laststatus = 3
 
+opt.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+
 -- Add height to cmdline when recording macros
 -- vim.cmd([[
 --   augroup cmd_macro
