@@ -31,11 +31,6 @@ if [ -d "$HOME/.local/share/gem/ruby/3.1.0/bin" ] ; then
     PATH="$HOME/.local/share/gem/ruby/3.1.0/bin:$PATH"
 fi
 
-# Spicetify
-if [ -d "$HOME/.spicetify" ] ; then
-    PATH="$HOME/.spicetify:$PATH"
-fi
-
 export XCURSOR_PATH=${XCURSOR_PATH}:~/.local/share/icons
 # XDG Paths
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -46,5 +41,3 @@ export ZDOTDIR="$HOME/.config/zsh"
 # editor
 export EDITOR="nvim"
 export TERMINAL="kitty"
-# tmuxifier layout path
-export TMUXIFIER_LAYOUT_PATH="$HOME/.tmux-layouts"
