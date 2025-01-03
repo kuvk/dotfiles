@@ -1,7 +1,7 @@
 .zcompdump
 .zsh_history
-.zshrc.auto
-old/
-error.log
 lazy-lock.json
-.mypy_cache/
+bookmarks
+*.css
+*assets/
+

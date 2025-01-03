@@ -1,7 +1,6 @@
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
 set $mod Mod1
-font pango:SFPRODISPLAYREGULAR 10
-
+font pango:SF Pro Display 11 
 # Start XDG autostart .desktop files using dex. See also
 # https://wiki.archlinux.org/index.php/XDG_Autostart
 exec --no-startup-id dex --autostart --environment i3
@@ -15,15 +14,16 @@ exec --no-startup-id dex --autostart --environment i3
 
 # Screen lock
 exec --no-startup-id xset s off dpms 3600 3600 3600
-exec --no-startup-id xautolock -time 10 -locker '~/.config/i3/scripts/matrix_sc'
+# exec --no-startup-id xautolock -time 10 -locker '~/.config/i3/scripts/matrix_sc'
 bindsym $mod+Control+l exec ~/.config/i3/scripts/matrix_sc
+bindsym $mod+Control+q exec shutdown now
 
 # NetworkManager is the most popular way to manage wireless networks on Linux,
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
 
 # Monitors and background
-exec --no-startup-id ~/.config/i3/scripts/monitors.sh
+exec_always --no-startup-id ~/.config/i3/scripts/monitors.sh
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
@@ -118,11 +118,11 @@ client.background       #1e1e2e
 
 # Define names for monitors
 # Desktop
-set $fm DP-0
-set $sm HDMI-0
+# set $fm DP-0
+# set $sm HDMI-0
 # Laptop
-# set $fm HDMI-1-0
-# set $sm eDP-1
+set $fm HDMI-1-0
+set $sm eDP-1
 
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.

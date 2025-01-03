@@ -14,8 +14,6 @@ return {
         "isort",
         "black",
         "ruff",
-        "shellcheck",
-        "shfmt",
         "mypy",
         "beautysh",
         "debugpy",
@@ -35,14 +33,14 @@ return {
         require("none-ls.formatting.ruff"),
         require("none-ls.formatting.beautysh"),
         -- Shellcheck diagnostics not neccessary if using bashls
-        require("none-ls-shellcheck.diagnostics"),
-        require("none-ls-shellcheck.code_actions"),
-        null_ls.builtins.formatting.shfmt.with({
-          extra_args = {
-            "-i",
-            "4",
-          },
-        }),
+        -- require("none-ls-shellcheck.diagnostics"),
+        -- require("none-ls-shellcheck.code_actions"),
+        -- null_ls.builtins.formatting.shfmt.with({
+        --   extra_args = {
+        --     "-i",
+        --     "4",
+        --   },
+        -- }),
         null_ls.builtins.formatting.stylua.with({
           extra_args = {
             "--indent-type",

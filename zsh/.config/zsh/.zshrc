@@ -21,7 +21,10 @@ zstyle ':completion:*' menu select
 zmodload zsh/complist
 compinit
 _comp_options+=(globdots)
-eval "$(dircolors -b)"
+# eval "$(dircolors -b)"
+eval $(dircolors -b ${ZDOTDIR}/.dir_colors)
+LS_COLORS="$LS_COLORS:ma=42;30"
+export LS_COLORS
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' list-colors ''
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
@@ -29,12 +32,14 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
 ## ZSH VI MODE
 source $HOME/.local/share/zsh-plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
-# ## cursor style for vi mode
+## cursor style for vi mode
 ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BEAM
 ZVM_NORMAL_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
 ZVM_OPPEND_MODE_CURSOR=$ZVM_CURSOR_BLINKING_UNDERLINE
 ZVM_VISUAL_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
 ZVM_VISUAL_LINE_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
+ZVM_VI_HIGHLIGHT_BACKGROUND=black
+ZVM_VI_HIGHLIGHT_FOREGROUND=green
 ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
 
 # HISTORY AND AUTOSUGGESTIONS
@@ -44,28 +49,50 @@ source $HOME/.local/share/zsh-plugins/zsh-history-substring-search/zsh-history-s
 # Mappings
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
+# bindkey '^I' autosuggest-accept
 
-#bindkey '^I' autosuggest-accept
-
+# Tmuxifier
 if [[ -d "$HOME/.tmux/plugins/tmuxifier" ]]; then
     export PATH="$HOME/.tmux/plugins/tmuxifier/bin:$PATH"
     eval "$(tmuxifier init -)"
-    # Tmux
-    alias tmuxa="tmux attach"
-    alias tmuxd="tmux detach"
-    # Tmuxifier
+
+    # tmuxifier layout path
+    export TMUXIFIER_LAYOUT_PATH="$HOME/.tmux-layouts"
+
     alias tnew="tmuxifier new-session"
     alias tedit="tmuxifier edit-session"
     alias tload="tmuxifier load-session"
 fi
 
+# Spicetify
+if [[ -d "$HOME/.spicetify" ]]; then
+    export PATH=$PATH:$HOME.spicetify
+fi
+
+# Pyenv
+if [[ -d "$HOME/.pyenv" ]]; then
+    export PYENV_ROOT="$HOME/.pyenv"
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+fi
+
+# Set up fzf key bindings and fuzzy completion
+eval "$(fzf --zsh)"
+
 # ALIASES
 alias cl="clear"
 alias ll="lsd -la"
+alias l="lsd -l"
 alias ls="lsd"
 alias cat="bat --paging=never"
-alias top="htop"
+alias top="btop"
 alias nv="nvim"
+alias tmuxa="tmux attach"
+alias tmuxd="tmux detach"
+alias ip="ip --color=auto"
+alias grep="grep --color=auto"
+alias fgrep="fgrep --color=auto"
+alias diff="diff --color=auto"
 
 # Syntax highlighting plugin goes last
 source $HOME/.local/share/zsh-plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
@@ -80,8 +107,3 @@ ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=cyan
 ZSH_HIGHLIGHT_STYLES[redirection]=fg=yellow
 ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=yellow
 ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
-
-# Set up fzf key bindings and fuzzy completion
-eval "$(fzf --zsh)"
-
-export PATH=$PATH:$HOME.spicetify

@@ -1,8 +1,8 @@
 local opt = vim.opt
 
 -- Indentation and Tabs
-opt.tabstop = 2
-opt.shiftwidth = 2
+opt.tabstop = 4
+opt.shiftwidth = 4
 opt.expandtab = true
 opt.autoindent = true
 
@@ -40,6 +40,8 @@ opt.backspace = "indent,eol,start"
 -- Hide cmdline and strech status line
 -- opt.cmdheight = 0
 opt.laststatus = 3
+
+opt.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
 -- Add height to cmdline when recording macros
 -- vim.cmd([[

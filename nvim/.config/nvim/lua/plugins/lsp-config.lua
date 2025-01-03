@@ -57,9 +57,6 @@ return {
         capabilities = capabilities,
         settings = {
           filetypes = { "sh", "zsh", "bash" },
-          bashIde = {
-            shellcheckPath = "",
-          },
         },
       })
       vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
