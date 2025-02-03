@@ -32,6 +32,12 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
 ## ZSH VI MODE
 source $HOME/.local/share/zsh-plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
+# yank to clipboard
+zvm_vi_yank() {
+    zvm_yank
+    printf %s "${CUTBUFFER}" | xclip -sel c
+    zvm_exit_visual_mode
+}
 ## cursor style for vi mode
 ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BEAM
 ZVM_NORMAL_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
@@ -84,7 +90,7 @@ alias cl="clear"
 alias ll="lsd -la"
 alias l="lsd -l"
 alias ls="lsd"
-alias cat="bat --paging=never"
+alias cat="bat --style=plain,header,grid"
 alias top="btop"
 alias nv="nvim"
 alias tmuxa="tmux attach"

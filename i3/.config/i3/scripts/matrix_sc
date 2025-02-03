@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/usr/bin/sh
 
 BLANK='#00000000'
 DEFAULT='#cba6f7'
@@ -11,11 +11,13 @@ VERINSIDE='#a6e3a14d'
 
 
 if ! pidof -x xfce4-terminal; then
+    unclutter -idle 1 &
     xfce4-terminal --command "unimatrix -c cyan -b -s 96 -f -l m" &
-    sleep 0.8
+    sleep 1
 
     i3-msg fullscreen toggle global;
     wait -n
+    kill $(pidof -x unclutter)
     i3msg kill
     i3lock \
         --insidever-color="$VERINSIDE"     \
@@ -36,7 +38,7 @@ if ! pidof -x xfce4-terminal; then
         --keyhl-color="$TEXT"         \
         --bshl-color="$WRONG"          \
         \
-        --blur 5                     \
+        --blur 1                     \
         --clock                      \
         --indicator                  \
         --time-str="%H:%M:%S" \

@@ -1,0 +1,45 @@
+#!/usr/bin/sh
+
+BLANK='#00000000'
+DEFAULT='#cba6f7'
+INSIDE='#cba6f74d'
+TEXT='#89dceb'
+WRONG='#f38ba8'
+WRONGINSIDE='#f38ba84d'
+VERIFYING='#a6e3a1'
+VERINSIDE='#a6e3a14d'
+
+i3lock \
+    --insidever-color="$VERINSIDE"     \
+    --ringver-color="$VERIFYING"   \
+    \
+    --insidewrong-color="$WRONGINSIDE"   \
+    --ringwrong-color="$WRONG"     \
+    \
+    --inside-color="$INSIDE"        \
+    --ring-color="$DEFAULT"        \
+    --line-color="$BLANK"          \
+    --separator-color="$DEFAULT"   \
+    \
+    --verif-color="$VERIFYING"          \
+    --wrong-color="$WRONG"          \
+    --time-color="$TEXT"           \
+    --date-color="$TEXT"           \
+    --keyhl-color="$TEXT"         \
+    --bshl-color="$WRONG"          \
+    \
+    --blur 1                     \
+    --clock                      \
+    --indicator                  \
+    --time-str="%H:%M:%S" \
+    --date-str="%a %e %b %Y" \
+    --verif-text="CHECKING" \
+    --wrong-text="WRONG" \
+    --noinput="NO INPUT" \
+    --lock-text="LOCKING" \
+    --lockfailed="LOCK FAILED" \
+    --radius=120 \
+    --ring-width=12 \
+    --pass-media-keys \
+    --pass-screen-keys \
+    --pass-volume-keys
