@@ -1,5 +1,8 @@
 # PROMPT
 eval "$(starship init zsh)"
+if [[ "$(uname)" == "Darwin" ]]; then
+    export STARSHIP_CONFIG=~/.config/starship.toml
+fi
 
 setopt NOBEEP
 setopt inc_append_history
@@ -22,7 +25,9 @@ zmodload zsh/complist
 compinit
 _comp_options+=(globdots)
 # eval "$(dircolors -b)"
-eval $(dircolors -b ${ZDOTDIR}/.dir_colors)
+if [[ "$(uname)" == "Linux" ]]; then
+    eval $(dircolors -b ${ZDOTDIR}/.dir_colors)
+fi
 LS_COLORS="$LS_COLORS:ma=42;30"
 export LS_COLORS
 zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
@@ -33,11 +38,20 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 ## ZSH VI MODE
 source $HOME/.local/share/zsh-plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
 # yank to clipboard
-zvm_vi_yank() {
-    zvm_yank
-    printf %s "${CUTBUFFER}" | xclip -sel c
-    zvm_exit_visual_mode
-}
+if [[ "$(uname)" == "Linux" ]]; then
+    zvm_vi_yank() {
+        zvm_yank
+        printf %s "${CUTBUFFER}" | xclip -sel c
+        zvm_exit_visual_mode
+    }
+else
+    zvm_vi_yank() {
+        zvm_yank
+        printf %s "${CUTBUFFER}" | pbcopy -i
+        zvm_exit_visual_mode
+    }
+fi
+
 ## cursor style for vi mode
 ZVM_INSERT_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BEAM
 ZVM_NORMAL_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
@@ -113,3 +127,5 @@ ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=cyan
 ZSH_HIGHLIGHT_STYLES[redirection]=fg=yellow
 ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=yellow
 ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
+
+eval "$(direnv hook zsh)"

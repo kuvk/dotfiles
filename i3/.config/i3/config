@@ -119,10 +119,10 @@ client.background       #1e1e2e
 # Define names for monitors
 # Desktop
 # set $fm DP-0
-# set $sm HDMI-0
+set $fm HDMI-0
 # Laptop
-set $fm HDMI-1-0
-set $sm eDP-1
+# set $fm HDMI-1-0
+# set $sm eDP-1
 
 # Define names for default workspaces for which we configure key bindings later on.
 # We use variables to avoid repeating the names in multiple places.
