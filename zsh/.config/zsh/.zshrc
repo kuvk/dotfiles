@@ -1,9 +1,3 @@
-# PROMPT
-eval "$(starship init zsh)"
-if [[ "$(uname)" == "Darwin" ]]; then
-    export STARSHIP_CONFIG=~/.config/starship.toml
-fi
-
 setopt NOBEEP
 setopt inc_append_history
 setopt extended_history
@@ -127,5 +121,11 @@ ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=cyan
 ZSH_HIGHLIGHT_STYLES[redirection]=fg=yellow
 ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=yellow
 ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
+
+# PROMPT
+if [[ "$(uname)" == "Darwin" ]]; then
+    export STARSHIP_CONFIG=~/.config/starship.toml
+fi
+eval "$(starship init zsh)"
 
 eval "$(direnv hook zsh)"

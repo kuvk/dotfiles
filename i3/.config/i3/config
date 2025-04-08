@@ -118,7 +118,7 @@ client.background       #1e1e2e
 
 # Define names for monitors
 # Desktop
-# set $fm DP-0
+set $fm DP-0
 set $fm HDMI-0
 # Laptop
 # set $fm HDMI-1-0
