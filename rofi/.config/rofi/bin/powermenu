@@ -72,13 +72,13 @@ case $chosen in
         fi
         ;;
     $lock)
-        sh $HOME/.config/i3/scripts/matrix_sc
+        sh $HOME/.config/scripts/matrix_sc
         ;;
     $suspend)
         ans=$(rdialog &)
         if [[ $ans == "yes" ]] || [[ $ans == "YES" ]] || [[ $ans == "y" ]]; then
             amixer set Master mute
-            sh $HOME/.config/i3/scripts/lock
+            sh $HOME/.config/scripts/lock
             systemctl suspend
         elif [[ $ans == "no" ]] || [[ $ans == "NO" ]] || [[ $ans == "n" ]]; then
             exit

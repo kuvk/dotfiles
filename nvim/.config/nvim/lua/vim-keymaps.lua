@@ -35,3 +35,6 @@ keymap.set("n", "<leader>O", "O<ESC>")
 
 -- Remove highlighted search
 keymap.set("n", "<leader>nh", ":nohlsearch<CR>")
+
+-- Markdown Preview
+keymap.set("n", "<leader>mp", ":MarkdownPreviewToggle<CR>")

@@ -14,8 +14,8 @@ exec --no-startup-id dex --autostart --environment i3
 
 # Screen lock
 exec --no-startup-id xset s off dpms 3600 3600 3600
-# exec --no-startup-id xautolock -time 10 -locker '~/.config/i3/scripts/matrix_sc'
-bindsym $mod+Control+l exec ~/.config/i3/scripts/matrix_sc
+# exec --no-startup-id xautolock -time 10 -locker '~/.config/scripts/matrix_sc'
+bindsym $mod+Control+l exec ~/.config/scripts/matrix_sc
 bindsym $mod+Control+q exec shutdown now
 
 # NetworkManager is the most popular way to manage wireless networks on Linux,
@@ -23,7 +23,7 @@ bindsym $mod+Control+q exec shutdown now
 exec --no-startup-id nm-applet
 
 # Monitors and background
-exec_always --no-startup-id ~/.config/i3/scripts/monitors.sh
+exec_always --no-startup-id ~/.config/scripts/monitors.sh
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
@@ -117,9 +117,13 @@ client.background       #1e1e2e
 
 
 # Define names for monitors
-# Desktop
-set $fm DP-0
-set $fm HDMI-0
+# Desktop 1
+set $fm HDMI-1
+
+# Desktop 2
+# set $fm DP-0
+# set $fm HDMI-0
+
 # Laptop
 # set $fm HDMI-1-0
 # set $sm eDP-1
@@ -137,16 +141,29 @@ set $ws8 "8"
 set $ws9 "9"
 set $ws10 "10"
 
+# Single monitor
 workspace $ws1 output $fm
 workspace $ws2 output $fm
 workspace $ws3 output $fm
 workspace $ws4 output $fm
 workspace $ws5 output $fm
-workspace $ws6 output $sm
-workspace $ws7 output $sm
-workspace $ws8 output $sm
-workspace $ws9 output $sm
-workspace $ws10 output $sm
+workspace $ws6 output $fm
+workspace $ws7 output $fm
+workspace $ws8 output $fm
+workspace $ws9 output $fm
+workspace $ws10 output $fm
+
+# Double monitor
+# workspace $ws1 output $fm
+# workspace $ws2 output $fm
+# workspace $ws3 output $fm
+# workspace $ws4 output $fm
+# workspace $ws5 output $fm
+# workspace $ws6 output $sm
+# workspace $ws7 output $sm
+# workspace $ws8 output $sm
+# workspace $ws9 output $sm
+# workspace $ws10 output $sm
 
 # switch to workspace
 bindsym $mod+1 workspace number $ws1
