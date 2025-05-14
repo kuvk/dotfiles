@@ -31,3 +31,5 @@ export ZDOTDIR="$HOME/.config/zsh"
 # editor
 export EDITOR="nvim"
 export TERMINAL="kitty"
+# bat
+export BAT_THEME="Catppuccin Mocha"

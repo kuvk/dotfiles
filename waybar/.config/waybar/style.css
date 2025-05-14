@@ -1,0 +1,205 @@
+@import "mocha.css";
+
+* {
+  font-family:
+    Font Awesome,
+    Symbols Nerd Font,
+    SF Pro Display;
+  font-size: 13px;
+  min-height: 0;
+}
+
+#waybar {
+  background: transparent;
+  margin: 0px;
+  color: @text;
+}
+tooltip * {
+  background: transparent;
+}
+
+tooltip.background {
+  background: @base-rgba;
+  border: 1px solid @mantle;
+}
+tooltip label {
+  color: @green;
+}
+.modules-left {
+  margin-top: 5px;
+  margin-left: 0.8rem;
+  margin-bottom: 0px;
+  border-radius: 0.6rem;
+  /* background-color: @surface-rgba; */
+  background: linear-gradient(180deg, @surface-rgba 0%, @base-rgba 72%);
+  /* border: 1px solid @module-accent; */
+}
+.modules-center {
+  margin-top: 5px;
+  margin-bottom: 0px;
+  border-radius: 0.6rem;
+  /* background-color: @surface-rgba; */
+  background: linear-gradient(180deg, @surface-rgba 0%, @base-rgba 72%);
+  /* border: 1px solid @module-accent; */
+}
+.modules-right {
+  margin-top: 5px;
+  margin-right: 0.8rem;
+  margin-bottom: 0px;
+  border-radius: 0.6rem;
+  /* background-color: @surface-rgba; */
+  background: linear-gradient(180deg, @surface-rgba 0%, @base-rgba 72%);
+  /* border: 1px solid @module-accent; */
+}
+
+#custom-apps {
+  padding: 0.5rem 1rem;
+  border-radius: 0.6rem;
+  /* margin-left: 0.8rem; */
+  /* margin-right: 1rem; */
+  color: @blue;
+  font-size: 17px;
+}
+
+/* #custom-apps:hover { */
+/*   background-color: @surface0; */
+/*   border: 1px solid @blue; */
+/* } */
+
+#workspaces {
+  border-radius: 0.7rem;
+}
+
+#workspaces button {
+  color: @blue;
+  padding-left: 0.55rem;
+}
+
+#workspaces button.active {
+  color: @peach;
+}
+
+#workspaces button:hover {
+  color: @peach;
+}
+
+#custom-music,
+#tray,
+#backlight,
+#clock,
+#battery,
+#pulseaudio,
+#custom-lock,
+#network,
+#bluetooth,
+#tray,
+#custom-power {
+  /* border: 1px solid @blue-rgba; */
+  padding: 0.5rem 1rem;
+  margin: 0px;
+}
+
+#bluetooth,
+#network,
+#custom-lock {
+  border-right: none;
+}
+#pulseaudio,
+#network,
+#custom-power {
+  border-left: none;
+}
+
+#clock {
+  color: @green;
+  /* border-radius: 0.7rem; */
+  /* margin-right: 1rem; */
+}
+
+#battery {
+  color: @green;
+}
+
+#battery.charging,
+#battery.full {
+  color: @sapphire;
+}
+#battery.info:not(.charging) {
+  color: @yellow;
+}
+
+#battery.warning:not(.charging) {
+  color: @peach;
+}
+
+#battery.critical:not(.charging) {
+  color: @red;
+}
+
+#backlight {
+  color: @yellow;
+}
+
+#backlight,
+#battery {
+  border-radius: 0;
+}
+
+#pulseaudio {
+  color: @blue;
+  /* border-radius: 0px 0.7rem 0.7rem 0px; */
+  /* margin-right: 1rem; */
+}
+
+#pulseaudio.muted {
+  color: @red;
+}
+
+/* #bluetooth { */
+/*   border-radius: 0.7rem 0px 0px 0.7rem; */
+/* } */
+#bluetooth.on {
+  color: @teal;
+}
+
+#bluetooth.disabled,
+#bluetooth.off {
+  color: @surface1;
+}
+
+#bluetooth.connected {
+  color: @blue;
+}
+
+#network {
+  color: @blue;
+}
+
+#network.disconnected,
+#network.disabled,
+#network.unknown,
+#network.linked {
+  color: @mauve;
+}
+
+#custom-music {
+  padding-left: 0.2rem;
+  color: @green;
+  /* border-radius: 0.7rem; */
+}
+
+#custom-lock {
+  /* border-radius: 0.7rem 0px 0px 0.7rem; */
+  color: @mauve;
+}
+
+#custom-power {
+  /* margin-right: 0.8rem; */
+  /* border-radius: 0px 0.7rem 0.7rem 0px; */
+  color: @red;
+}
+
+#tray {
+  margin-right: 0;
+  padding-right: 0.5rem;
+}

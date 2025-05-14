@@ -37,14 +37,20 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
 ## ZSH VI MODE
 source $HOME/.local/share/zsh-plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
-# yank to clipboard
+# yank to clipboard linux
 if [[ "$(uname)" == "Linux" ]]; then
     zvm_vi_yank() {
         zvm_yank
-        printf %s "${CUTBUFFER}" | xclip -sel c
+        if [[ -n "$WAYLAND_DISPLAY" ]] && command -v wl-copy >/dev/null 2>&1; then
+            printf %s "${CUTBUFFER}" | wl-copy
+        else
+            printf %s "${CUTBUFFER}" | xclip -sel c
+        fi
+
         zvm_exit_visual_mode
     }
-else
+# macOS
+else 
     zvm_vi_yank() {
         zvm_yank
         printf %s "${CUTBUFFER}" | pbcopy -i

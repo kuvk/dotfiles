@@ -2,7 +2,7 @@
 add_newline = false
 
 format = """
-[╭─ ](peach)\
+[╭─](peach)\
 $os\
 $username\
 $hostname\
@@ -60,8 +60,8 @@ symbol = " "
 
 [os]
 disabled = false
-style = "mauve"
-format = "[$symbol]($style)"
+style = "blue"
+format = "[ $symbol ]($style)"
 
 [os.symbols]
 Windows = "󰍲"
