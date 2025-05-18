@@ -25,54 +25,45 @@ tooltip.background {
 tooltip label {
   color: @green;
 }
-.modules-left {
+
+#custom-apps,
+#language,
+#workspaces,
+#window,
+#backlight,
+#clock,
+#custom-spotify,
+#custom-music,
+#battery,
+#pulseaudio,
+#custom-lock,
+#network,
+#bluetooth,
+#tray,
+#custom-power {
+  /* border: 1px solid @blue-rgba; */
+  padding: 0.5rem 1rem;
+  margin: 0;
   margin-top: 5px;
-  margin-left: 0.8rem;
   margin-bottom: 0px;
-  border-radius: 0.6rem;
-  /* background-color: @surface-rgba; */
   background: linear-gradient(180deg, @surface-rgba 0%, @base-rgba 72%);
-  /* border: 1px solid @module-accent; */
-}
-.modules-center {
-  margin-top: 5px;
-  margin-bottom: 0px;
-  border-radius: 0.6rem;
-  /* background-color: @surface-rgba; */
-  background: linear-gradient(180deg, @surface-rgba 0%, @base-rgba 72%);
-  /* border: 1px solid @module-accent; */
-}
-.modules-right {
-  margin-top: 5px;
-  margin-right: 0.8rem;
-  margin-bottom: 0px;
-  border-radius: 0.6rem;
-  /* background-color: @surface-rgba; */
-  background: linear-gradient(180deg, @surface-rgba 0%, @base-rgba 72%);
-  /* border: 1px solid @module-accent; */
 }
 
 #custom-apps {
-  padding: 0.5rem 1rem;
-  border-radius: 0.6rem;
-  /* margin-left: 0.8rem; */
-  /* margin-right: 1rem; */
+  margin-left: 0.8rem;
+  border-radius: 0.6rem 0 0 0.6rem;
   color: @blue;
   font-size: 17px;
 }
 
-/* #custom-apps:hover { */
-/*   background-color: @surface0; */
-/*   border: 1px solid @blue; */
-/* } */
-
 #workspaces {
-  border-radius: 0.7rem;
+  padding: 0;
+  margin-right: 0.5rem;
+  border-radius: 0 0.6rem 0.6rem 0;
 }
 
 #workspaces button {
   color: @blue;
-  padding-left: 0.55rem;
 }
 
 #workspaces button.active {
@@ -83,37 +74,74 @@ tooltip label {
   color: @peach;
 }
 
-#custom-music,
-#tray,
-#backlight,
+#window,
 #clock,
-#battery,
-#pulseaudio,
-#custom-lock,
-#network,
-#bluetooth,
-#tray,
-#custom-power {
-  /* border: 1px solid @blue-rgba; */
-  padding: 0.5rem 1rem;
-  margin: 0px;
+#custom-spotify,
+#custom-music,
+#tray {
+  border-radius: 0.6rem;
+  margin-right: 0.5rem;
 }
 
-#bluetooth,
-#network,
-#custom-lock {
-  border-right: none;
+
+#window {
+  color: @peach;
 }
-#pulseaudio,
-#network,
-#custom-power {
-  border-left: none;
+
+window#waybar.empty #window {
+  background: none;
 }
 
 #clock {
+  color: @teal;
+}
+
+#custom-music {
+  color: @mauve;
+}
+#custom-spotify {
   color: @green;
-  /* border-radius: 0.7rem; */
-  /* margin-right: 1rem; */
+}
+
+#language {
+  border-radius: 0.6rem 0 0 0.6rem;
+  color: @peach;
+}
+
+#bluetooth.on {
+  color: @sky;
+}
+
+#bluetooth.disabled,
+#bluetooth.off {
+  color: @subtext0;
+}
+
+#bluetooth.connected {
+  color: @blue;
+}
+
+#network {
+  color: @blue;
+}
+
+#network.disconnected,
+#network.disabled,
+#network.unknown,
+#network.linked {
+  color: @mauve;
+}
+
+#pulseaudio {
+  color: @blue;
+}
+
+#pulseaudio.muted {
+  color: @red;
+}
+
+#backlight {
+  color: @yellow;
 }
 
 #battery {
@@ -136,70 +164,12 @@ tooltip label {
   color: @red;
 }
 
-#backlight {
-  color: @yellow;
-}
-
-#backlight,
-#battery {
-  border-radius: 0;
-}
-
-#pulseaudio {
-  color: @blue;
-  /* border-radius: 0px 0.7rem 0.7rem 0px; */
-  /* margin-right: 1rem; */
-}
-
-#pulseaudio.muted {
-  color: @red;
-}
-
-/* #bluetooth { */
-/*   border-radius: 0.7rem 0px 0px 0.7rem; */
-/* } */
-#bluetooth.on {
-  color: @teal;
-}
-
-#bluetooth.disabled,
-#bluetooth.off {
-  color: @surface1;
-}
-
-#bluetooth.connected {
-  color: @blue;
-}
-
-#network {
-  color: @blue;
-}
-
-#network.disconnected,
-#network.disabled,
-#network.unknown,
-#network.linked {
-  color: @mauve;
-}
-
-#custom-music {
-  padding-left: 0.2rem;
-  color: @green;
-  /* border-radius: 0.7rem; */
-}
-
 #custom-lock {
-  /* border-radius: 0.7rem 0px 0px 0.7rem; */
   color: @mauve;
 }
 
 #custom-power {
-  /* margin-right: 0.8rem; */
-  /* border-radius: 0px 0.7rem 0.7rem 0px; */
   color: @red;
-}
-
-#tray {
-  margin-right: 0;
-  padding-right: 0.5rem;
+  margin-right: 0.8rem;
+  border-radius: 0px 0.7rem 0.7rem 0px;
 }
