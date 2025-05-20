@@ -1,4 +1,5 @@
 #!/usr/bin/sh
+# i3 lockscreen
 
 BLANK='#00000000'
 DEFAULT='#cba6f7'

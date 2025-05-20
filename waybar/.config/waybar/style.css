@@ -30,6 +30,8 @@ tooltip label {
 #language,
 #workspaces,
 #window,
+#custom-mpvpaper,
+#custom-notifications,
 #backlight,
 #clock,
 #custom-spotify,
@@ -83,7 +85,6 @@ tooltip label {
   margin-right: 0.5rem;
 }
 
-
 #window {
   color: @peach;
 }
@@ -114,7 +115,7 @@ window#waybar.empty #window {
 
 #bluetooth.disabled,
 #bluetooth.off {
-  color: @subtext0;
+  color: @overlay1;
 }
 
 #bluetooth.connected {
@@ -172,4 +173,33 @@ window#waybar.empty #window {
   color: @red;
   margin-right: 0.8rem;
   border-radius: 0px 0.7rem 0.7rem 0px;
+}
+
+#custom-mpvpaper.playing {
+  color: @mauve;
+}
+#custom-mpvpaper.paused {
+  color: @sky;
+}
+
+#custom-mpvpaper.inactive {
+  color: @overlay1;
+}
+#custom-notifications.none,
+#custom-notifications.dnd-none {
+  color: @blue;
+}
+
+#custom-notifications.notification,
+#custom-notifications.dnd-notification {
+  color: @green;
+}
+
+#custom-notifications.inhibited-none,
+#custom-notifications.dnd-inhibited-none {
+  color: @yellow;
+}
+#custom-notifications.dnd-inhibited-notification,
+#custom-notifications.inhibited-notification {
+  color: @peach;
 }

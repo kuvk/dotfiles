@@ -4,7 +4,7 @@ CACHE="$HOME/.cache/current_non_spotify_player"
 
 IGNORE_PATTERN='^(spotify|firefox|chromium|chrome|brave|vivaldi)(\..*)?$'
 
-for player in $(playerctl -l); do
+for player in $(playerctl -l 2>/dev/null); do
     if [[ "$player" =~ $IGNORE_PATTERN ]]; then
         continue
     fi
@@ -20,7 +20,7 @@ for player in $(playerctl -l); do
     fi
 
     # Fallback: show file name if metadata is empty
-    file=$(playerctl -p "$player" metadata xesam:url 2>/dev/null | sed 's|file://||' | xargs basename)
+    file=$(playerctl -p "$player" metadata xesam:url 2>/dev/null | sed 's|file://||' | xargs basename 2>/dev/null)
     if [ -n "$file" ]; then
         echo "$file"
         echo "$player" > "$CACHE"
@@ -30,4 +30,4 @@ done
 
 # No suitable player found
 rm -f "$CACHE"
-echo ""
+exit 0
