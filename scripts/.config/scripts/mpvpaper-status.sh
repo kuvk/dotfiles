@@ -32,7 +32,7 @@ done
 
 # If no entries, inactive
 if [ ${#ENTRIES[@]} -eq 0 ]; then
-    echo '{ "text": "󰶐", "class": "inactive", "tooltip": "No active live wallpapers." }'
+    echo '{ "text": "󰶐", "class": "inactive", "tooltip": "Live wallpapers: off" }'
     exit 0
 fi
 
@@ -42,6 +42,5 @@ for entry in "${ENTRIES[@]}"; do
     TOOLTIP+=$'\r'"$entry"
 done
 
-# Output single-line JSON
 jq -nc --arg text "$ICON" --arg class "$CLASS" --arg tooltip "$TOOLTIP" \
   '{ text: $text, class: $class, tooltip: $tooltip }'

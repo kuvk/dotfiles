@@ -1,0 +1,224 @@
+@import "colors/mocha.css";
+/* ============ CC Label ============= */
+
+.widget-label label {
+  margin: 0;
+  margin-bottom: 1rem;
+  color: @overlay2;
+  font-size: 1.6em;
+}
+
+/* ============ DND ============= */
+
+.widget-dnd {
+  margin: 0;
+  margin-bottom: 1rem;
+  color: @overlay2;
+  font-size: 1.1rem;
+}
+
+.widget-dnd > switch {
+  border-radius: 0.7rem;
+  background: @surface0;
+  box-shadow: none;
+}
+
+.widget-dnd > switch slider {
+  background: @surface2;
+  border-radius: 0.6rem;
+}
+.widget-dnd > switch slider:hover {
+  background: @surface2;
+}
+.widget-dnd > switch slider:checked {
+  background: @green;
+}
+
+/* ============ Notification Title ============= */
+
+.widget-title {
+  margin: 0;
+  margin-bottom: 1rem;
+}
+.widget-title > label {
+  color: @overlay2;
+  font-size: 1.3em;
+}
+
+.widget-title button {
+  color: @overlay2;
+  background-color: @surface0;
+  border-radius: 0.7rem;
+  border: none;
+  padding: 0.5rem 0.8rem;
+}
+
+.widget-title button:hover,
+.widget-title button:active {
+  background-color: @surface1;
+  color: @green;
+}
+
+/* ========= Volume ========= */
+
+.widget-volume {
+  padding: 8px 8px;
+  margin: 0.5rem 0;
+  -gtk-outline-radius: 0.7rem;
+  border-radius: 0.7rem;
+}
+
+.widget-volume label {
+  background: transparent;
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  margin-left: 0.5rem;
+  color: @overlay2;
+}
+
+.widget-volume > box > button {
+  background: transparent;
+  border-radius: 0.7rem;
+  border: none;
+  font-size: 1.5rem;
+}
+
+.widget-volume box button label {
+  color: @green;
+  padding: 0 0 0 11px;
+  margin-left: 0;
+}
+.widget-volume > box > button:hover {
+  background: @surface-rgba;
+}
+.widget-volume > box > button:active {
+  background: @surface-rgba;
+}
+
+/* Per-app volume container */
+.widget-volume .per-app-volume {
+  background: @transparent;
+  margin-top: 0.8rem;
+}
+
+.widget-volume .per-app-volume image {
+  min-width: 24px;
+  min-height: 24px;
+  margin-right: 1rem;
+  border-radius: 0.7rem;
+  -gtk-icon-effect: none;
+}
+
+.widget-volume .per-app-volume label {
+  font-size: 0px;
+  color: transparent;
+  padding: 0;
+  margin: 0;
+}
+.widget-volume .per-app-volume box {
+  background: @surface-rgba;
+  padding: 0.8rem;
+  margin: 0.5rem 0;
+  border-radius: 0.7rem;
+}
+
+/* ========== Media Player ==========*/
+
+.widget-mpris {
+  border-radius: 0.7rem;
+  -gtk-outline-radius: 0.7rem;
+  background: @surface0;
+  padding: 1rem;
+  margin: 0.5rem 0;
+}
+
+.widget-mpris .widget-mpris-player {
+  background: @surface0;
+}
+/**/
+/* .widget-mpris .widget-mpris-player image { */
+/*   border-radius: 0.7rem; */
+/* } */
+
+.widget-mpris .widget-mpris-title {
+  color: @green;
+  font-size: 1.5rem;
+}
+
+.widget-mpris .widget-mpris-subtitle {
+  color: @overlay2;
+  font-size: 1rem;
+}
+
+/* ========== Buttons Grid ==========*/
+/**/
+/* .widget-buttons-grid { */
+/*   border-radius: 0.7rem; */
+/*   -gtk-outline-radius: 0.7rem; */
+/*   background-color: transparent; */
+/*   padding: unset; */
+/* } */
+/**/
+/* .widget-buttons-grid > flowbox { */
+/*   margin-top: 1rem; */
+/*   margin-bottom: 1rem; */
+/*   padding: unset; */
+/* } */
+/**/
+/* .widget-buttons-grid > flowbox > flowboxchild { */
+/*   border-radius: 0.7rem; */
+/*   background-color: @surface0; */
+/*   min-width: 5.522rem; */
+/*   min-height: 2.927rem; */
+/* } */
+/* .widget-buttons-grid > flowbox > flowboxchild:first-child { */
+/*   margin: 0; */
+/* } */
+/**/
+/* .widget-buttons-grid > flowbox > flowboxchild:not(:first-child) { */
+/*   margin-left: 1.2rem; */
+/* } */
+/* .widget-buttons-grid > flowbox > flowboxchild > button { */
+/*   border: none; */
+/*   background-color: unset; */
+/*   padding: unset; */
+/*   margin: unset; */
+/* } */
+/**/
+/* .widget-buttons-grid > flowbox > flowboxchild > button label { */
+/*   border-radius: 0.7rem; */
+/*   font-size: 1.3027rem; */
+/*   color: @subtext0; */
+/* } */
+/* .widget-buttons-grid > flowbox > flowboxchild:not(:first-child) > button label { */
+/*     padding-right: 3px; */
+/* } */
+/**/
+/* .widget-buttons-grid > flowbox > flowboxchild > button:hover label{ */
+/*   background-color: @surface1; */
+/*   color: @green; */
+/* } */
+/**/
+/* .widget-buttons-grid > flowbox > flowboxchild > button:checked label { */
+/*   background-color: @green; */
+/*   color: @base-rgba; */
+/* } */
+/**/
+/* .widget-buttons-grid > flowbox > flowboxchild > button:checked label { */
+/*   background-color: @green; */
+/*   color: @base-rgba; */
+/* } */
+
+/* ========= BACKLIGHT WIDGET ========= */
+.widget-backlight trough highlight {
+  background: @yellow;
+}
+
+.widget-backlight label {
+  font-size: 1.5rem;
+  color: @yellow;
+}
+
+.widget-backlight .KB {
+  padding-bottom: 1rem;
+}

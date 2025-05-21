@@ -34,18 +34,3 @@ if [ "$CHANGED" = true ] && [ -n "$NEW_STATE" ]; then
 fi
 
 exit 0
-#
-# SOCKETS=(/tmp/mpv-socket*)
-#
-# if [ ${#SOCKETS[@]} -eq 0 ]; then
-#     notify-send "mpvpaper" "No wallpaper sockets found"
-#     exit 1
-# fi
-#
-# for socket in "${SOCKETS[@]}"; do
-#     if [ -S "$socket" ]; then
-#         echo 'cycle pause' | socat - "$socket" >/dev/null 2>&1
-#     fi
-# done
-#
-# exit 0

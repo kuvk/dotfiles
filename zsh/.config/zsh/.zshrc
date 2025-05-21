@@ -106,7 +106,6 @@ fi
 eval "$(fzf --zsh)"
 
 # ALIASES
-alias cl="clear"
 alias ll="lsd -la"
 alias l="lsd -l"
 alias ls="lsd"

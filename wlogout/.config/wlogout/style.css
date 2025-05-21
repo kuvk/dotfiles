@@ -1,0 +1,108 @@
+@define-color rosewater #f5e0dc;
+@define-color flamingo #f2cdcd;
+@define-color pink #f5c2e7;
+@define-color mauve #cba6f7;
+@define-color mauve-rgba rgba(203, 166, 247, 0.8);
+@define-color red #f38ba8;
+@define-color maroon #eba0ac;
+@define-color peach rgba(250, 179, 135, 0.5);
+@define-color yellow #f9e2af;
+@define-color green rgba(166, 227, 161, 0.5);
+@define-color teal #94e2d5;
+@define-color sky #89dceb;
+@define-color sapphire #74c7ec;
+@define-color blue rgba(137, 180, 250, 0.5);
+@define-color lavender #b4befe;
+@define-color text #cdd6f4;
+@define-color subtext1 #bac2de;
+@define-color subtext0 #a6adc8;
+@define-color overlay2 #9399b2;
+@define-color overlay1 #7f849c;
+@define-color overlay0 rgba(108, 112, 134, 0.8);
+@define-color surface2 #585b70;
+@define-color surface1 #45475a;
+@define-color surface0 #313244;
+@define-color surface rgba(49, 50, 68, 0.5);
+@define-color base rgba(30, 30, 46, 0.9);
+@define-color mantle #181825;
+@define-color crust #11111b;
+@define-color module-accent @mauve-rgba;
+
+* {
+  background-image: none;
+  box-shadow: none;
+  font-family: "SF Display Pro";
+  font-size: 16px;
+}
+
+window {
+  background-color: transparent;
+}
+
+button {
+  border: none;
+  border-radius: 1rem;
+  background-color: @surface;
+  color: @text;
+  background-size: 40px;
+  background-repeat: no-repeat;
+  background-position: center;
+  min-width: 100px;
+  min-height: 100px;
+  box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.8);
+}
+
+button:focus,
+button:active,
+button:hover {
+  background-color: @overlay0;
+  outline-style: none;
+}
+
+#lock {
+  background-image: image(
+    url("file:///home/kuvk/.config/wlogout/icons/lock.png"),
+    url("/usr/share/wlogout/icons/lock.png"),
+    url("/usr/local/share/wlogout/icons/lock.png")
+  );
+}
+
+#logout {
+  background-image: image(
+    url("file:///home/kuvk/.config/wlogout/icons/logout.png"),
+    url("/usr/share/wlogout/icons/logout.png"),
+    url("/usr/local/share/wlogout/icons/logout.png")
+  );
+}
+
+#suspend {
+  background-image: image(
+    url("file:///home/kuvk/.config/wlogout/icons/suspend.png"),
+    url("/usr/share/wlogout/icons/suspend.png"),
+    url("/usr/local/share/wlogout/icons/suspend.png")
+  );
+}
+
+#hibernate {
+  background-image: image(
+    url("file:///home/kuvk/.config/wlogout/icons/hibernate.png"),
+    url("/usr/share/wlogout/icons/hibernate.png"),
+    url("/usr/local/share/wlogout/icons/hibernate.png")
+  );
+}
+
+#shutdown {
+  background-image: image(
+    url("file:///home/kuvk/.config/wlogout/icons/shutdown.png"),
+    url("/usr/share/wlogout/icons/shutdown.png"),
+    url("/usr/local/share/wlogout/icons/shutdown.png")
+  );
+}
+
+#reboot {
+  background-image: image(
+    url("file:///home/kuvk/.config/wlogout/icons/reboot.png"),
+    url("/usr/share/wlogout/icons/reboot.png"),
+    url("/usr/local/share/wlogout/icons/reboot.png")
+  );
+}

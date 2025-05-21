@@ -1,0 +1,179 @@
+@import "colors/mocha.css";
+
+
+/* ============== ALL NOTIFICATIONS ============== */
+
+/* Progress bar */
+.notification.critical trough,
+.notification.low trough,
+.notification.normal trough {
+  margin-top: 0.5rem;
+  border-radius: 0.7rem;
+  background-color: @surface2;
+}
+.notification.critical progress {
+  border-radius: 0.7rem;
+  background-color: @red;
+}
+
+.notification.low progress,
+.notification.normal progress {
+  border-radius: 0.7rem;
+  background-color: @green;
+}
+
+/* Notifications */
+.notification-row .notification-background {
+  box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.8);
+  border-radius: 0.7rem;
+  margin: 10px;
+  background-color: @base-rgba;
+  color: @overlay2;
+  padding: 0;
+}
+
+.notification-row .notification-background .notification {
+  border-radius: 0.7rem;
+  min-height: 80px;
+}
+
+.notification-row .notification-background .notification .notification-content {
+  margin: 0 0 1.2rem 0;
+}
+.notification-row
+  .notification-background
+  .notification
+  .notification-content
+  .text-box {
+  padding: 0.5rem 2rem 0 0;
+  margin: 0.5rem 1rem 0.2rem 1rem;
+}
+
+.notification-row
+  .notification-background
+  .notification
+  .notification-content
+  .summary {
+  color: @green;
+  font-weight: bold;
+  font-size: 15px;
+  margin-bottom: 5px;
+}
+.notification-row
+  .notification-background
+  .notification
+  .notification-content
+  .time {
+  background: transparent;
+  color: @green;
+}
+
+.notification-row
+  .notification-background
+  .notification.critical
+  .notification-content
+  .summary {
+  color: @red;
+}
+
+.notification-row
+  .notification-background
+  .notification.critical
+  .notification-content
+  .time {
+  /* Notification time-ago */
+  color: @red;
+}
+.notification-row
+  .notification-background
+  .notification
+  .notification-default-action
+  .notification-content
+  .image {
+  /* Notification Primary Image */
+  -gtk-icon-effect: none;
+  border-radius: 100px;
+  margin: 0.5rem 0.5rem 0 1rem;
+}
+
+.notification-row
+  .notification-background
+  .notification
+  .notification-default-action
+  .notification-content
+  .app-icon {
+  /* Notification app icon (only visible when the primary image is set) */
+  -gtk-icon-effect: none;
+  margin: 0.5rem 0.5rem 0 0.5rem;
+  /* padding-right: 0.5rem; */
+}
+
+.notification-row
+  .notification-background
+  .notification
+  .notification-default-action
+  .notification-content
+  .body-image {
+  /* The "extra" optional bottom notification image */
+  margin-top: 4px;
+  border-radius: 12px;
+  -gtk-icon-effect: none;
+}
+.notification-row .notification-background .close-button {
+  margin-top: 4px;
+  border-radius: 12px;
+  -gtk-icon-effect: none;
+  margin: 0.5rem 0.4rem 0 0;
+  padding: 2px;
+  border-radius: 9999px;
+  color: @subtext1;
+}
+
+.notification-row .notification-background .close-button:hover,
+.notification-row .notification-background .close-button:active {
+  background-color: @overlay2;
+  color: @base;
+}
+
+.notification-action:hover,
+.notification-default-action:hover {
+  border-radius: 0.7rem;
+  -gtk-icon-effect: none;
+  background: @base;
+  color: @subtext1;
+}
+
+/* ============== CC NOTIFICATIONS ============== */
+
+.control-center .notification-group {
+  margin: 0.5rem 0;
+  color: @overlay2;
+}
+
+.control-center .notification-group .notification-group-buttons {
+  color: @green;
+}
+.control-center .notification-group .notification-group-headers {
+  margin: 0.5rem 0;
+}
+.control-center .notification-row .notification-background {
+  box-shadow: 1px 2px 3px 0 rgba(0, 0, 0, 0.5);
+  background-color: @surface0;
+  color: @subtext0;
+}
+
+.control-center .notification-row .notification-background .close-button:hover,
+.control-center .notification-row .notification-background .close-button:active {
+  background-color: @base;
+  color: @subtext0;
+}
+
+.control-center .notification-action:hover,
+.control-center .notification-default-action:hover {
+  background: @surface1;
+  color: @subtext1;
+}
+.control-center .control-center-list-placeholder {
+  color: @green;
+  opacity: 0.5;
+}

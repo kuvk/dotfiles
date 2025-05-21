@@ -32,18 +32,16 @@ tooltip label {
 #window,
 #custom-mpvpaper,
 #custom-notifications,
+#custom-nightlight,
 #backlight,
 #clock,
-#custom-spotify,
 #custom-music,
 #battery,
 #pulseaudio,
-#custom-lock,
 #network,
 #bluetooth,
 #tray,
 #custom-power {
-  /* border: 1px solid @blue-rgba; */
   padding: 0.5rem 1rem;
   margin: 0;
   margin-top: 5px;
@@ -65,6 +63,7 @@ tooltip label {
 }
 
 #workspaces button {
+  padding-right: 1rem;
   color: @blue;
 }
 
@@ -76,13 +75,21 @@ tooltip label {
   color: @peach;
 }
 
+#cava,
 #window,
 #clock,
-#custom-spotify,
 #custom-music,
 #tray {
   border-radius: 0.6rem;
   margin-right: 0.5rem;
+}
+
+#cava {
+  padding: 0 0.5rem;
+  margin-top: 5px;
+  /* background: linear-gradient(180deg, @surface-rgba 0%, @base-rgba 72%); */
+  font-size: 10px;
+  color: @green;
 }
 
 #window {
@@ -98,9 +105,6 @@ window#waybar.empty #window {
 }
 
 #custom-music {
-  color: @mauve;
-}
-#custom-spotify {
   color: @green;
 }
 
@@ -165,41 +169,40 @@ window#waybar.empty #window {
   color: @red;
 }
 
-#custom-lock {
-  color: @mauve;
-}
-
 #custom-power {
   color: @red;
   margin-right: 0.8rem;
   border-radius: 0px 0.7rem 0.7rem 0px;
 }
 
-#custom-mpvpaper.playing {
-  color: @mauve;
-}
-#custom-mpvpaper.paused {
-  color: @sky;
+#custom-mpvpaper {
+  color: @maroon;
 }
 
 #custom-mpvpaper.inactive {
   color: @overlay1;
 }
 #custom-notifications.none,
-#custom-notifications.dnd-none {
+#custom-notifications.inhibited-none {
   color: @blue;
 }
 
 #custom-notifications.notification,
-#custom-notifications.dnd-notification {
+#custom-notifications.inhibited-notification {
   color: @green;
 }
 
-#custom-notifications.inhibited-none,
+#custom-notifications.dnd-none,
 #custom-notifications.dnd-inhibited-none {
-  color: @yellow;
+  color: @mauve;
 }
 #custom-notifications.dnd-inhibited-notification,
-#custom-notifications.inhibited-notification {
+#custom-notifications.dnd-notification {
+  color: @mauve;
+}
+#custom-nightlight {
+  color: @blue;
+}
+#custom-nightlight.active {
   color: @peach;
 }
