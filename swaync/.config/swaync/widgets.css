@@ -151,63 +151,63 @@
 }
 
 /* ========== Buttons Grid ==========*/
-/**/
-/* .widget-buttons-grid { */
-/*   border-radius: 0.7rem; */
-/*   -gtk-outline-radius: 0.7rem; */
-/*   background-color: transparent; */
-/*   padding: unset; */
-/* } */
-/**/
-/* .widget-buttons-grid > flowbox { */
-/*   margin-top: 1rem; */
-/*   margin-bottom: 1rem; */
-/*   padding: unset; */
-/* } */
-/**/
-/* .widget-buttons-grid > flowbox > flowboxchild { */
-/*   border-radius: 0.7rem; */
-/*   background-color: @surface0; */
-/*   min-width: 5.522rem; */
-/*   min-height: 2.927rem; */
-/* } */
-/* .widget-buttons-grid > flowbox > flowboxchild:first-child { */
-/*   margin: 0; */
-/* } */
-/**/
-/* .widget-buttons-grid > flowbox > flowboxchild:not(:first-child) { */
-/*   margin-left: 1.2rem; */
-/* } */
-/* .widget-buttons-grid > flowbox > flowboxchild > button { */
-/*   border: none; */
-/*   background-color: unset; */
-/*   padding: unset; */
-/*   margin: unset; */
-/* } */
-/**/
-/* .widget-buttons-grid > flowbox > flowboxchild > button label { */
-/*   border-radius: 0.7rem; */
-/*   font-size: 1.3027rem; */
-/*   color: @subtext0; */
-/* } */
-/* .widget-buttons-grid > flowbox > flowboxchild:not(:first-child) > button label { */
-/*     padding-right: 3px; */
-/* } */
-/**/
-/* .widget-buttons-grid > flowbox > flowboxchild > button:hover label{ */
-/*   background-color: @surface1; */
-/*   color: @green; */
-/* } */
-/**/
-/* .widget-buttons-grid > flowbox > flowboxchild > button:checked label { */
-/*   background-color: @green; */
-/*   color: @base-rgba; */
-/* } */
-/**/
-/* .widget-buttons-grid > flowbox > flowboxchild > button:checked label { */
-/*   background-color: @green; */
-/*   color: @base-rgba; */
-/* } */
+
+.widget-buttons-grid {
+  border-radius: 0.7rem;
+  -gtk-outline-radius: 0.7rem;
+  background-color: transparent;
+  padding: unset;
+}
+
+.widget-buttons-grid > flowbox {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding: unset;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild {
+  border-radius: 0.7rem;
+  background-color: @surface0;
+  min-width: 5.522rem;
+  min-height: 2.927rem;
+}
+.widget-buttons-grid > flowbox > flowboxchild:first-child {
+  margin: 0;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild:not(:first-child) {
+  margin-left: 1.2rem;
+}
+.widget-buttons-grid > flowbox > flowboxchild > button {
+  border: none;
+  background-color: unset;
+  padding: unset;
+  margin: unset;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild > button label {
+  border-radius: 0.7rem;
+  font-size: 1.3027rem;
+  color: @subtext0;
+}
+.widget-buttons-grid > flowbox > flowboxchild:not(:first-child) > button label {
+    padding-right: 3px;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild > button:hover label{
+  background-color: @surface1;
+  color: @green;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild > button:checked label {
+  background-color: @green;
+  color: @base-rgba;
+}
+
+.widget-buttons-grid > flowbox > flowboxchild > button:checked label {
+  background-color: @green;
+  color: @base-rgba;
+}
 
 /* ========= BACKLIGHT WIDGET ========= */
 .widget-backlight trough highlight {

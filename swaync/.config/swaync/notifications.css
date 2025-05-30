@@ -139,7 +139,7 @@
 .notification-default-action:hover {
   border-radius: 0.7rem;
   -gtk-icon-effect: none;
-  background: @base;
+  background: @surface0;
   color: @subtext1;
 }
 

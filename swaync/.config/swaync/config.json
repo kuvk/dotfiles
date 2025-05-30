@@ -60,17 +60,17 @@
           "label": "󰤄",
           "type": "toggle",
           "active": false,
-          "command": "sh -c '~/.config/scripts/toggle-nightlight.sh'"
+          "command": "sh -c '~/.config/scripts/nightlight-toggle.sh'"
         },
         {
           "active": false,
-          "command": "hyprshot -m output &",
+          "command": "hyprshot -m output",
           "label": "󰄄",
           "type": "button"
         },
         {
           "active": false,
-          "command": "hyprshot -m window &",
+          "command": "hyprshot -m window",
           "label": "󱣴",
           "type": "button"
         },

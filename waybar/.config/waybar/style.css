@@ -9,200 +9,164 @@
   min-height: 0;
 }
 
-#waybar {
-  background: transparent;
-  margin: 0px;
-  color: @text;
-}
 tooltip * {
   background: transparent;
 }
 
 tooltip.background {
   background: @base-rgba;
-  border: 1px solid @mantle;
+  border-radius: 0.7rem;
 }
+
 tooltip label {
   color: @green;
 }
 
+#waybar {
+  border-radius: 0.8rem;
+  background: @base-rgba;
+  color: @text;
+}
+
+#waybar.empty #window {
+  background: none;
+}
+
+#custom-separator {
+  font-size: 18px;
+  margin: 0 0.5rem;
+  margin-top: 0.2rem;
+  color: @overlay-rgba;
+}
+
 #custom-apps,
-#language,
 #workspaces,
 #window,
-#custom-mpvpaper,
-#custom-notifications,
-#custom-nightlight,
-#backlight,
-#clock,
 #custom-music,
+#tray,
+#custom-mpvpaper,
+#custom-nightlight,
+#bluetooth,
+#network,
+#backlight,
 #battery,
 #pulseaudio,
-#network,
-#bluetooth,
-#tray,
+#language,
+#clock,
+#custom-notifications,
 #custom-power {
   padding: 0.5rem 1rem;
-  margin: 0;
-  margin-top: 5px;
-  margin-bottom: 0px;
-  background: linear-gradient(180deg, @surface-rgba 0%, @base-rgba 72%);
+  margin: 3px;
+  border-radius: 0.7rem;
+  min-width: 10px;
+  /* background: linear-gradient(180deg, @surface-rgba 0%, @base-rgba 72%); */
+}
+
+#custom-apps:hover,
+#custom-music:hover,
+#custom-mpvpaper:hover,
+#custom-nightlight:hover,
+#bluetooth:hover,
+#network:hover,
+#backlight:hover,
+#battery:hover,
+#pulseaudio:hover,
+#language:hover,
+#clock:hover,
+#custom-notifications:hover,
+#custom-power:hover {
+  background: @surface0;
 }
 
 #custom-apps {
-  margin-left: 0.8rem;
-  border-radius: 0.6rem 0 0 0.6rem;
-  color: @blue;
   font-size: 17px;
 }
 
 #workspaces {
   padding: 0;
-  margin-right: 0.5rem;
-  border-radius: 0 0.6rem 0.6rem 0;
 }
 
 #workspaces button {
   padding-right: 1rem;
-  color: @blue;
 }
 
-#workspaces button.active {
-  color: @peach;
-}
-
-#workspaces button:hover {
-  color: @peach;
-}
-
-#cava,
+#workspaces button.active,
+#workspaces button:hover,
+#battery.warning:not(.charging),
+#custom-nightlight.active,
 #window,
-#clock,
-#custom-music,
-#tray {
-  border-radius: 0.6rem;
-  margin-right: 0.5rem;
+#language {
+  color: @peach;
 }
 
 #cava {
-  padding: 0 0.5rem;
-  margin-top: 5px;
-  /* background: linear-gradient(180deg, @surface-rgba 0%, @base-rgba 72%); */
-  font-size: 10px;
-  color: @green;
+  padding: 0 0.2rem;
+  font-size: 8px;
 }
 
-#window {
-  color: @peach;
-}
-
-window#waybar.empty #window {
-  background: none;
-}
-
+#language,
 #clock {
-  color: @teal;
+  padding: 0.55rem 0.5rem;
+    min-width: 20px;
 }
 
-#custom-music {
+#cava,
+#custom-notifications.notification,
+#custom-notifications.inhibited-notification,
+#custom-music,
+#battery {
   color: @green;
 }
 
-#language {
-  border-radius: 0.6rem 0 0 0.6rem;
-  color: @peach;
-}
-
+#clock,
 #bluetooth.on {
   color: @sky;
 }
 
+#custom-mpvpaper.inactive,
 #bluetooth.disabled,
 #bluetooth.off {
   color: @overlay1;
 }
 
-#bluetooth.connected {
-  color: @blue;
-}
-
+#custom-apps,
+#workspaces button,
+#bluetooth.connected,
+#custom-notifications.none,
+#custom-notifications.inhibited-none,
+#custom-nightlight,
+#pulseaudio,
 #network {
   color: @blue;
-}
-
-#network.disconnected,
-#network.disabled,
-#network.unknown,
-#network.linked {
-  color: @mauve;
-}
-
-#pulseaudio {
-  color: @blue;
-}
-
-#pulseaudio.muted {
-  color: @red;
-}
-
-#backlight {
-  color: @yellow;
-}
-
-#battery {
-  color: @green;
 }
 
 #battery.charging,
 #battery.full {
   color: @sapphire;
 }
-#battery.info:not(.charging) {
+
+#battery.info:not(.charging),
+#backlight {
   color: @yellow;
 }
 
-#battery.warning:not(.charging) {
-  color: @peach;
-}
-
-#battery.critical:not(.charging) {
-  color: @red;
-}
-
+#network.disabled,
+#network.unknown,
+#pulseaudio.muted,
+#battery.critical:not(.charging),
 #custom-power {
   color: @red;
-  margin-right: 0.8rem;
-  border-radius: 0px 0.7rem 0.7rem 0px;
 }
 
 #custom-mpvpaper {
   color: @maroon;
 }
 
-#custom-mpvpaper.inactive {
-  color: @overlay1;
-}
-#custom-notifications.none,
-#custom-notifications.inhibited-none {
-  color: @blue;
-}
-
-#custom-notifications.notification,
-#custom-notifications.inhibited-notification {
-  color: @green;
-}
-
+#network.disconnected,
+#network.linked,
 #custom-notifications.dnd-none,
-#custom-notifications.dnd-inhibited-none {
-  color: @mauve;
-}
+#custom-notifications.dnd-inhibited-none,
 #custom-notifications.dnd-inhibited-notification,
 #custom-notifications.dnd-notification {
   color: @mauve;
-}
-#custom-nightlight {
-  color: @blue;
-}
-#custom-nightlight.active {
-  color: @peach;
 }
