@@ -24,17 +24,23 @@ for name in "${FILENAMES[@]}"; do
     DISPLAY_NAMES+=("$(truncate_name "$name")")
 done
 
-SELECTED_TRUNC=$(printf '%s\n' "${DISPLAY_NAMES[@]}" | wofi --dmenu --prompt "Select wallpaper image")
+SELECTED_TRUNC=$(printf '%s\n' "${DISPLAY_NAMES[@]}" | wofi --dmenu --prompt "Select wallpaper")
 [ -z "$SELECTED_TRUNC" ] && exit 0
 
 # Match back to full name
 SELECTED_NAME=""
+SELECTED_IDX=-1
 for i in "${!DISPLAY_NAMES[@]}"; do
     if [[ "${DISPLAY_NAMES[$i]}" == "$SELECTED_TRUNC" ]]; then
         SELECTED_NAME="${FILENAMES[$i]}"
+        SELECTED_IDX=$i
         break
     fi
 done
+if [[ -z "$SELECTED_NAME" ]] || [[ $SELECTED_IDX -lt 0 ]] || [[ ! -f "$WALLPAPER_DIR/$SELECTED_NAME" ]]; then
+    notify-send "Wallpapers" "Selected wallpaper does not exist."
+    exit 1
+fi
 SELECTED_FILE="$WALLPAPER_DIR/$SELECTED_NAME"
 
 # --- MONITOR SELECTION ---
@@ -46,6 +52,23 @@ if (( ${#ACTIVE_MONITORS[@]} == 1 )); then
 else
     SELECTED_MONITOR=$(printf '%s\n' "${MONITORS[@]}" | wofi --dmenu --prompt "Select monitor (or ALL)")
     [ -z "$SELECTED_MONITOR" ] && exit 0
+fi
+
+# Ensure the selected monitor is valid
+MONITOR_VALID=false
+if [[ "$SELECTED_MONITOR" == "ALL" ]]; then
+    MONITOR_VALID=true
+else
+    for m in "${ACTIVE_MONITORS[@]}"; do
+        if [[ "$m" == "$SELECTED_MONITOR" ]]; then
+            MONITOR_VALID=true
+            break
+        fi
+    done
+fi
+if [[ "$MONITOR_VALID" != "true" ]]; then
+    notify-send "Wallpapers" "Selected monitor does not exist."
+    exit 1
 fi
 
 declare -A prev_wall  # monitor => file
