@@ -43,4 +43,4 @@ for entry in "${ENTRIES[@]}"; do
 done
 
 jq -nc --arg text "$ICON" --arg class "$CLASS" --arg tooltip "$TOOLTIP" \
-  '{ text: $text, class: $class, tooltip: $tooltip }'
+    '{ text: $text, class: $class, tooltip: $tooltip }'

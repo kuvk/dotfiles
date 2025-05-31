@@ -91,9 +91,18 @@ return {
       },
     })
 
-    -- Timeout used mostly for djlint, jinja files longer than 150 lines often trigger LSP timeout
+    local lsp_formatting = function(bufnr)
+      vim.lsp.buf.format({
+        filter = function(client)
+          return client.name == "null-ls"
+        end,
+        bufnr = bufnr,
+        timeout_ms = 3200,
+      })
+    end
+
     vim.keymap.set("n", "<leader>gf", function()
-      vim.lsp.buf.format({ timeout_ms = 3200 })
+      lsp_formatting(0)
     end)
   end,
 }

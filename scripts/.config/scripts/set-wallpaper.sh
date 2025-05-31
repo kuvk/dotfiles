@@ -99,7 +99,7 @@ if [[ "$SELECTED_MONITOR" == "ALL" ]]; then
 else
     # Check if monitor already has the wallpaper active (either via per-monitor or previous ALL)
     if [[ "${prev_wall[$SELECTED_MONITOR]}" == "$SELECTED_FILE" ]] || \
-       { [[ -n "$prev_all_file" ]] && [[ "$prev_all_file" == "$SELECTED_FILE" ]]; }; then
+        { [[ -n "$prev_all_file" ]] && [[ "$prev_all_file" == "$SELECTED_FILE" ]]; }; then
         notify-send "Wallpapers" "Wallpaper \"${SELECTED_NAME}\" is already active on $SELECTED_MONITOR"
         exit 0
     fi
@@ -160,7 +160,7 @@ fi
 if [[ "$config_changed" = true ]]; then
     cp "$CONFIG_PATH" "$PREV_CONFIG"
     pkill hyprpaper
-    
+
     # Kill mpvpaper
     if pgrep -x mpvpaper >/dev/null; then
         pkill mpvpaper
