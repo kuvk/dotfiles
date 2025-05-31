@@ -8,24 +8,22 @@ SOCKET_BASE="/tmp/mpv-socket"
 mapfile -t FILES < <(find "$WALLPAPER_DIR" -maxdepth 1 -type f \( -iname "*.mp4" -o -iname "*.webm" \) | sort)
 FILENAMES=("${FILES[@]##*/}")
 
-# Truncate helper
 truncate_name() {
     local maxlen=30
     local name="$1"
-    if (( ${#name} > maxlen )); then
+    if ((${#name} > maxlen)); then
         echo "${name:0:maxlen-2}.."
     else
         echo "$name"
     fi
 }
 
-# Build display list (only truncated names)
 DISPLAY_NAMES=()
 for name in "${FILENAMES[@]}"; do
     DISPLAY_NAMES+=("$(truncate_name "$name")")
 done
 
-SELECTED_TRUNC=$(printf '%s\n' "${DISPLAY_NAMES[@]}" | wofi --dmenu --prompt "Select wallpaper")
+SELECTED_TRUNC=$(printf '%s\n' "${DISPLAY_NAMES[@]}" | wofi --dmenu --prompt "Select live wallpaper")
 [ -z "$SELECTED_TRUNC" ] && exit 0
 
 # Match back to full name
@@ -40,10 +38,9 @@ SELECTED_FILE="$WALLPAPER_DIR/$SELECTED_NAME"
 
 # --- MONITOR SELECTION ---
 mapfile -t ACTIVE_MONITORS < <(hyprctl monitors -j | jq -r '.[].name' | sort)
-MONITORS=("ALL" "${ACTIVE_MONITORS[@]}")  # Add "ALL" option
+MONITORS=("ALL" "${ACTIVE_MONITORS[@]}") # Add "ALL" option
 
-if (( ${#ACTIVE_MONITORS[@]} == 1 )); then
-    # Only one monitor, skip menu
+if ((${#ACTIVE_MONITORS[@]} == 1)); then
     SELECTED_MONITOR="${ACTIVE_MONITORS[0]}"
 else
     SELECTED_MONITOR=$(printf '%s\n' "${MONITORS[@]}" | wofi --dmenu --prompt "Select monitor (or ALL)")
@@ -53,51 +50,144 @@ fi
 SOCKET_ALL="$SOCKET_BASE-ALL"
 SOCKET_PATH="$SOCKET_BASE-$SELECTED_MONITOR"
 
-# Get list of per-monitor sockets currently existing
-EXISTING_MONITOR_SOCKETS=()
+# --- Gather current mpvpaper assignments ---
+declare -A monitor_to_video
+
+# Check for ALL instance
+ALL_CMD=$(pgrep -a mpvpaper | grep -w "mpvpaper .*ALL")
+if [ -n "$ALL_CMD" ]; then
+    ALL_VIDEO=$(echo "$ALL_CMD" | awk '{print $NF}')
+    monitor_to_video["ALL"]="$ALL_VIDEO"
+fi
+
+# Check for per-monitor instances
 for m in "${ACTIVE_MONITORS[@]}"; do
-    [ -e "$SOCKET_BASE-$m" ] && EXISTING_MONITOR_SOCKETS+=("$SOCKET_BASE-$m")
+    # skip if ALL is running (ALL overrides per-monitor)
+    if [[ -n "${monitor_to_video["ALL"]}" ]]; then
+        break
+    fi
+    MON_CMD=$(pgrep -a mpvpaper | grep -w "mpvpaper .*${m}")
+    if [ -n "$MON_CMD" ]; then
+        MON_VIDEO=$(echo "$MON_CMD" | awk '{print $NF}')
+        monitor_to_video["$m"]="$MON_VIDEO"
+    fi
 done
 
-# --- LOGIC ---
+# --- COLLAPSE TO ALL LOGIC ---
+collapse_to_all=false
 if [[ "$SELECTED_MONITOR" == "ALL" ]]; then
-    killall mpvpaper
-    [ -e "$SOCKET_ALL" ] && rm -f "$SOCKET_ALL"
-    for sock in "${EXISTING_MONITOR_SOCKETS[@]}"; do
-        rm -f "$sock"
-    done
-    SOCKET_PATH="$SOCKET_ALL"
-
+    collapse_to_all=true
 else
-    # Check if ALL is actually running (not just socket exists)
-    ALL_CMD=$(pgrep -a mpvpaper | grep -w "mpvpaper .*ALL")
-    if [ -n "$ALL_CMD" ]; then
-        ALL_VIDEO=$(echo "$ALL_CMD" | awk '{print $NF}')
-        if [[ "$ALL_VIDEO" == "$SELECTED_FILE" ]]; then
-            notify-send "Wallpapers" "Wallpaper \"${SELECTED_NAME}\" is already active on ALL monitors"
-            exit 0
+    # Simulate the per-monitor assignments after this action
+    declare -A new_monitor_to_video
+    if [[ -n "${monitor_to_video["ALL"]}" ]]; then
+        for m in "${ACTIVE_MONITORS[@]}"; do
+            new_monitor_to_video["$m"]="${monitor_to_video["ALL"]}"
+        done
+        new_monitor_to_video["$SELECTED_MONITOR"]="$SELECTED_FILE"
+    else
+        for m in "${ACTIVE_MONITORS[@]}"; do
+            new_monitor_to_video["$m"]="${monitor_to_video["$m"]}"
+        done
+        new_monitor_to_video["$SELECTED_MONITOR"]="$SELECTED_FILE"
+    fi
+    # Check if all monitors have the same video
+    unique=""
+    all_same=true
+    for m in "${ACTIVE_MONITORS[@]}"; do
+        v="${new_monitor_to_video["$m"]}"
+        if [[ -z "$v" ]]; then
+            all_same=false
+            break
         fi
+        if [[ -z "$unique" ]]; then
+            unique="$v"
+        elif [[ "$v" != "$unique" ]]; then
+            all_same=false
+            break
+        fi
+    done
 
-        echo "$ALL_CMD" | awk '{print $1}' | xargs -r kill
+    if $all_same && [[ -n "$unique" ]] && [[ "$unique" == "$SELECTED_FILE" ]]; then
+        collapse_to_all=true
+    fi
+fi
+
+# --- Logic for setting wallpaper ALL ---
+if $collapse_to_all; then
+
+    if [[ "${monitor_to_video["ALL"]}" == "$SELECTED_FILE" ]]; then
+        notify-send "Live Wallpapers" "Wallpaper \"${SELECTED_NAME}\" is already active on ALL monitors"
+        exit 0
+    fi
+
+    killall mpvpaper
+    rm -f "$SOCKET_BASE"-*
+
+    # --- KILL HYPRPAPER ---
+    if pgrep -x hyprpaper >/dev/null; then
+        pkill hyprpaper
+        rm -f /tmp/hyprpaper-config*
+    fi
+
+    notify-send "Live Wallpapers" "Setting wallpaper \"${SELECTED_NAME}\" on ALL monitors"
+    mpvpaper -vsp -o "no-config no-audio loop input-ipc-server=$SOCKET_ALL" -p ALL "$SELECTED_FILE"
+    exit 0
+fi
+
+# --- Otherwise, per-monitor logic ---
+if [[ "$SELECTED_MONITOR" != "ALL" ]]; then
+    if [[ "${monitor_to_video["ALL"]}" == "$SELECTED_FILE" ]]; then
+        notify-send "Live Wallpapers" "Wallpaper \"${SELECTED_NAME}\" is already active on ALL monitors"
+        exit 0
+    fi
+
+    if [[ "${monitor_to_video["$SELECTED_MONITOR"]}" == "$SELECTED_FILE" ]]; then
+        notify-send "Live Wallpapers" "Wallpaper \"${SELECTED_NAME}\" is already active on $SELECTED_MONITOR"
+        exit 0
+    fi
+
+    # If ALL is running (but with a different video), split ALL and assign ALL's video to others
+    if [[ -n "${monitor_to_video["ALL"]}" ]]; then
+        ALL_VIDEO="${monitor_to_video["ALL"]}"
+
+        pkill -f "mpvpaper .*ALL"
         rm -f "$SOCKET_ALL"
 
+        # Assign ALL_VIDEO to all monitors except the one being changed
         for m in "${ACTIVE_MONITORS[@]}"; do
-            if [ "$m" != "$SELECTED_MONITOR" ]; then
+            if [[ "$m" != "$SELECTED_MONITOR" ]]; then
                 SOCKET_M="$SOCKET_BASE-$m"
                 pkill -f "mpvpaper .*${m}"
                 rm -f "$SOCKET_M"
-                notify-send "Wallpapers" "Moving \"${ALL_VIDEO##*/}\" from ALL to $m"
                 mpvpaper -vsp -o "no-config no-audio loop input-ipc-server=$SOCKET_M" -p "$m" "$ALL_VIDEO" &
             fi
         done
-    elif [ -e "$SOCKET_ALL" ]; then
-        rm -f "$SOCKET_ALL"
     fi
 
     pkill -f "mpvpaper .*${SELECTED_MONITOR}"
     [ -e "$SOCKET_PATH" ] && rm -f "$SOCKET_PATH"
+
+    # --- KILL HYPRPAPER ---
+    if pgrep -x hyprpaper >/dev/null; then
+        pkill hyprpaper
+        rm -f /tmp/hyprpaper-config*
+    fi
+
+    notify-send "Live Wallpapers" "Setting wallpaper \"$SELECTED_NAME\" on $SELECTED_MONITOR"
+    mpvpaper -vsp -p -o "no-config no-audio loop input-ipc-server=$SOCKET_PATH" -p "$SELECTED_MONITOR" "$SELECTED_FILE"
+    exit 0
 fi
 
-# --- START MPVPAPER ---
-notify-send "Wallpapers" "Setting wallpaper \"$SELECTED_NAME\" on $SELECTED_MONITOR"
-mpvpaper -vsp -p -o "no-config no-audio loop input-ipc-server=$SOCKET_PATH" -p "$SELECTED_MONITOR" "$SELECTED_FILE"
+# --- ALL selected but not collapse case ---
+killall mpvpaper
+rm -f "$SOCKET_BASE"-*
+
+# --- KILL HYPRPAPER ---
+if pgrep -x hyprpaper >/dev/null; then
+    pkill hyprpaper
+    rm -f /tmp/hyprpaper-config*
+fi
+
+notify-send "Live Wallpapers" "Setting wallpaper \"$SELECTED_NAME\" on ALL monitors"
+mpvpaper -vsp -o "no-config no-audio loop input-ipc-server=$SOCKET_ALL" -p ALL "$SELECTED_FILE"
