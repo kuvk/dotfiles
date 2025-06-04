@@ -7,3 +7,4 @@ lazy-lock.json
 bookmarks
 *assets/
 icons/
+*.log
