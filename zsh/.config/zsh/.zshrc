@@ -119,6 +119,7 @@ alias ip="ip --color=auto"
 alias grep="grep --color=auto"
 alias fgrep="fgrep --color=auto"
 alias diff="diff --color=auto"
+alias paccheck="pacman -Qq | fzf --preview 'pacman -Qil {}' --layout=reverse --bind 'enter:execute(pacman -Qil {} | less)'"
 
 # Syntax highlighting plugin goes last
 source $HOME/.local/share/zsh-plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh

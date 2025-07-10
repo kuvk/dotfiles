@@ -2,9 +2,10 @@
 
 * {
   font-family:
+    SF Pro Display,
     Font Awesome,
     Symbols Nerd Font,
-    SF Pro Display;
+    FiraCode Nerd Font Light;
   font-size: 13px;
   min-height: 0;
 }
