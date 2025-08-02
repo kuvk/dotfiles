@@ -7,7 +7,7 @@
   "control-center-margin-right": 0,
   "control-center-margin-left": 0,
   "control-center-width": 500,
-  "cssPriority": "application",
+  "cssPriority": "user",
   "control-center-positionX": "right",
   "control-center-positionY": "center",
   "fit-to-screen": true,
