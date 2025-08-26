@@ -22,9 +22,13 @@ fi
 width="${resolution%x*}"
 height="${resolution#*x}"
 
-# Set margin ratios
-left_right_ratio=0.30
-top_bottom_ratio=0.45
+# Set margin ratios (1920x1080)
+# left_right_ratio=0.30
+# top_bottom_ratio=0.45
+
+# Set margin ratios (2560x1600)
+left_right_ratio=0.1
+top_bottom_ratio=0.3
 
 margin_left="$(awk -v w="$width" -v r="$left_right_ratio" 'BEGIN{printf "%d", w*r}')"
 margin_right="$margin_left"
@@ -33,7 +37,8 @@ margin_bottom="$margin_top"
 
 # You can customize these options to taste
 buttons_per_row=5
-column_spacing=50
+# column_spacing=50 # (1920x1080)
+column_spacing=120 # (2560x1600) 
 
 # Launch wlogout with dynamic margins
 exec wlogout \
