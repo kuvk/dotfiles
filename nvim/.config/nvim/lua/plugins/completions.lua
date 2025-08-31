@@ -4,6 +4,15 @@ return {
   },
   {
     "github/copilot.vim",
+    config = function()
+      vim.g.copilot_no_tab_map = true
+      vim.api.nvim_set_keymap(
+        "i",
+        "<C-Y>",
+        'copilot#Accept("<CR>")',
+        { expr = true, silent = true, noremap = true, replace_keycodes = false }
+      )
+    end,
   },
   {
     "L3MON4D3/LuaSnip",
