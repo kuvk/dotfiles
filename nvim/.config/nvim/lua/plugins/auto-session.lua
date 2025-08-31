@@ -13,9 +13,9 @@ return {
         -- previewer = false,
         -- },
       })
-      vim.keymap.set("n", "<leader>ws", ":SessionSave<CR>", {})
-      vim.keymap.set("n", "<leader>wr", ":SessionRestore<CR>", {})
-      vim.keymap.set("n", "<leader>wa", ":SessionSearch<CR>", {})
+      vim.keymap.set("n", "<leader>ws", ":AutoSession save<CR>", {})
+      vim.keymap.set("n", "<leader>wr", ":AutoSession restore<CR>", {})
+      vim.keymap.set("n", "<leader>wa", ":AutoSession search<CR>", {})
     end,
   },
 }
