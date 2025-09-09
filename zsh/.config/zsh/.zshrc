@@ -25,6 +25,7 @@ zmodload zsh/complist
 compinit
 _comp_options+=(globdots)
 # eval "$(dircolors -b)"
+zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
 if [[ "$(uname)" == "Linux" ]]; then
     eval $(dircolors -b ${ZDOTDIR}/.dir_colors)
 fi
@@ -112,7 +113,7 @@ alias ls="lsd"
 alias cat="bat --style=plain,header,grid"
 alias top="btop"
 alias nv="nvim"
-alias ssh="kitten ssh"
+alias ssh='TERM="xterm-256color" ssh'
 alias fzf="fzf --preview='bat --color=always --style=plain,header,grid {}'"
 alias tmuxa="tmux attach"
 alias tmuxd="tmux detach"

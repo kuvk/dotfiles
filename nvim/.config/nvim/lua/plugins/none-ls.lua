@@ -64,6 +64,9 @@ return {
           },
         }),
         null_ls.builtins.diagnostics.djlint,
+        -- C/C++ setup with cppcheck and astyle (installed manually)
+        null_ls.builtins.diagnostics.cppcheck,
+        null_ls.builtins.formatting.astyle,
 
         -- Prettier
         null_ls.builtins.formatting.prettier.with({
