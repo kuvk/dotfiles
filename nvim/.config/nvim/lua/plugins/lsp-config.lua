@@ -25,7 +25,6 @@ return {
     "neovim/nvim-lspconfig",
     config = function()
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
-      local lspconfig = require("lspconfig")
       require("lspconfig.ui.windows").default_options = {
         border = "rounded",
       }
@@ -47,9 +46,13 @@ return {
         },
       })
 
-      lspconfig.lua_ls.setup({ capabilities = capabilities })
-      lspconfig.jinja_lsp.setup({ capabilities = capabilities })
-      lspconfig.pyright.setup({
+      vim.lsp.config("lua_ls", {
+        capabilities = capabilities,
+      })
+      vim.lsp.config("jinja_lsp", {
+        capabilities = capabilities,
+      })
+      vim.lsp.config("pyright", {
         capabilities = capabilities,
         settings = {
           pyright = { autoImportCompletion = true },
@@ -64,14 +67,18 @@ return {
           },
         },
       })
-      lspconfig.ts_ls.setup({ capabilities = capabilities })
-      lspconfig.bashls.setup({
+      vim.lsp.config("ts_ls", {
+        capabilities = capabilities,
+      })
+      vim.lsp.config("bashls", {
         capabilities = capabilities,
         settings = {
           filetypes = { "sh", "zsh", "bash" },
         },
       })
-      lspconfig.clangd.setup({ capabilities = capabilities })
+      vim.lsp.config("clangd", {
+        capabilities = capabilities,
+      })
       vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
       vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, {})
       vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, {})

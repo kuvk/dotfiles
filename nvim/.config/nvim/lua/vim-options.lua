@@ -41,7 +41,7 @@ opt.backspace = "indent,eol,start"
 -- opt.cmdheight = 0
 opt.laststatus = 3
 
-opt.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
+opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
 
 -- Add height to cmdline when recording macros
 -- vim.cmd([[
@@ -52,10 +52,18 @@ opt.sessionoptions="blank,buffers,curdir,folds,help,tabpages,winsize,winpos,term
 --   augroup END
 -- ]])
 
--- colocolumn for python
+-- colorcolumn
 vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter", "BufRead", "BufNewFile" }, {
   callback = function()
-    if vim.bo.filetype == "python" then
+    local ft = vim.bo.filetype
+    local with_col80 = {
+      python = true,
+      c = true,
+      cpp = true,
+      sh = true,
+    }
+
+    if with_col80[ft] then
       vim.cmd("set colorcolumn=80")
     else
       vim.cmd("set colorcolumn=0")
