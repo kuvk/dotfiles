@@ -1,0 +1,22 @@
+gtk-single-instance = true
+shell-integration = zsh
+mouse-hide-while-typing = true
+
+env = TERM=xterm-256color
+
+window-padding-x = 5
+window-padding-y = 5
+window-width = 120
+window-height = 39
+window-save-state = never
+
+font-size = 12
+font-family = FiraCode Nerd Font
+font-family-bold = FiraCode Nerd Font Med
+font-family-italic = FiraCode Nerd Font Light
+
+copy-on-select = clipboard
+clipboard-read = allow
+clipboard-write = allow
+
+theme = catppuccin-mocha.conf

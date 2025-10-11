@@ -5,6 +5,10 @@ return {
   priority = 1000,
   config = function()
     require("catppuccin").setup({
+      -- transparent_background = true,
+      -- float = {
+      --   transparent = true,
+      -- },
       integrations = {
         neotree = true,
         mason = true,

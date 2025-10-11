@@ -113,7 +113,6 @@ alias ls="lsd"
 alias cat="bat --style=plain,header,grid"
 alias top="btop"
 alias nv="nvim"
-alias ssh='TERM="xterm-256color" ssh'
 alias fzf="fzf --preview='bat --color=always --style=plain,header,grid {}'"
 alias tmuxa="tmux attach"
 alias tmuxd="tmux detach"

@@ -22,7 +22,7 @@ $haskell\
 $python\
 $time\
 $cmd_duration\
-$line_break[╰─ ](peach)$character"""
+$line_break[╰─ ](peach)$character """
 
 palette = 'catppuccin_mocha'
 command_timeout = 500
