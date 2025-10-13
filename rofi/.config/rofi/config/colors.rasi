@@ -1,12 +1,25 @@
 * {
-    BG:    #1E1E2Eff;
-    BGA:   #89dcebff;
-    FG:    #D9E0EEff;
-    FGA:   #F28FADff;
-    BDR:   #fab387ff;
-    SEL:   #1E1E2Eff;
-    UGT:   #F28FADff;
-    IMG:   #FAE3B0ff;
-    OFF:   #575268ff;
-    ON:    #ABE9B3ff;
+	TRANSPARENT: #00000000;
+	BLACK:    #11111bff;
+	BLACKA:    #11111b80;
+    BG:       #1e1e2eff;
+    BGA:      #1e1e2e80;
+    FG:       #CDD6F4ff;
+    FGA:      #CDD6F480;
+    RED:      #F38BA8ff;
+    REDA:     #F38BA880;
+    PEACH:    #fab387ff;
+    PEACHA:   #fab38780;
+	GREEN:    #A6E3A1ff;
+	GREENA:   #A6E3A180;
+	TEAL:     #94E2D5ff;
+	TEALA:    #94E2D580;
+	MAUVE:    #CBA6F7ff;
+	MAUVEA:   #CBA6F780;
+	BLUE:     #89B4FAff;
+	BLUEA:    #89B4FA80;
+	GRAY:     #585B70ff;
+	GRAYA:    #585B7080;
+	SURFACE:  #313244ff;
+	SURFACEA: #31324480;
 }

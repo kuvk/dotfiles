@@ -1,0 +1,17 @@
+# ~/.config/yazi/yazi.toml
+
+[mgr]
+show_hidden = true
+ratio = [2, 3, 4]
+sort_by = "natural"
+sort_sensitive = false
+sort_reverse = false
+sort_dir_first = true
+linemode = "none"
+tab_size = 4
+show_symlink = true
+
+[opener]
+play = [
+	{ run = 'vlc "$@"', orphan = true, for = "linux" },
+]

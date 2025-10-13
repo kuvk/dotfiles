@@ -19,7 +19,7 @@ vim.api.nvim_create_autocmd("FileType", {
     "xml",
     "scss",
     "django",
-    "css",
+    "css"
   },
   callback = function()
     vim.opt_local.tabstop = 2
