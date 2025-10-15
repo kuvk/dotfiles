@@ -1,9 +1,6 @@
+
 configuration {
-    show-icons:                     true;
-    icon-theme:						"kora";
-    display-drun: 		            "";
-    drun-display-format:            "{icon} {name}";
-    disable-history:                false;
+    show-icons:                     false;
     click-to-exit: 		            true;
     location:                       0;
 }
@@ -24,15 +21,11 @@ window {
     y-offset:                       0;
 }
 
-
-textbox-prompt-colon {
-	enabled:			            true;
-    expand: 			            false;
-    str: 			                "󰣇";
-    border-radius:                  100%;
-    background-color:               @TRANSPARENT;
-    text-color:                     @BLUE;
+prompt {
+    enabled: 			            true;
     padding: 			            15px 8px 15px 15px;
+    background-color: 		        @TRANSPARENT;
+    text-color: 		            @BLUE;
     font:			                "SF Pro Display Regular 14";
 }
 
@@ -46,7 +39,7 @@ entry {
 	font:			                "SF Pro Display Regular 14";
     expand:                         true;
     horizontal-align:               0;
-    placeholder:                    "Search apps ...";
+    placeholder:                    "Search ...";
     blink:                          true;
     border:                  	    1px 1px 1px 1px;
     border-color:                   @TRANSPARENT;
@@ -55,7 +48,7 @@ entry {
 }
 
 inputbar {
-	children: 		                [ textbox-prompt-colon, entry ];
+	children: 		                [ prompt, entry ];
     background-color:               @SURFACEA;
     text-color:                     @FG;
     expand:                         false;
@@ -66,6 +59,7 @@ inputbar {
     padding:                        0px;
     position:                       center;
 }
+
 
 listview {
     background-color:               @TRANSPARENT;
@@ -92,16 +86,6 @@ element {
     padding:                        10px;
 }
 
-element-icon {
-    background-color: 	            @TRANSPARENT;
-    text-color:       		        inherit;
-    horizontal-align:               0.5;
-    vertical-align:                 0.5;
-    size:                           36px;
-    border:                         0px;
-	margin:                         0px 5px 0px 0px;
-}
-
 element-text {
     background-color: 		        @TRANSPARENT;
     text-color:       		        inherit;
@@ -113,33 +97,10 @@ element-text {
     margin:                         2px 0px 2px 2px;
 }
 
-element normal.urgent,
-element alternate.urgent {
-    background-color:               @TRANSPARENT;
-    text-color:                     @RED;
-    border-radius:                  9px;
-}
-
-element normal.active,
-element alternate.active {
-    background-color:               @TRANSPARENT;
-    text-color:                     @FG;
-}
-
 element selected {
     background-color:               @SURFACEA;
     text-color:                     @FG;
     border:                  	    0px 0px 0px 0px;
     border-radius:                  10px;
     border-color:                   @PEACH;
-}
-
-element selected.urgent {
-    background-color:               @SURFACEA;
-    text-color:                     @RED;
-}
-
-element selected.active {
-    background-color:               @SURFACEA;
-    color:                          @BLUE;
 }

@@ -1,46 +1,25 @@
 #!/bin/bash
-# Launches wlogout with dynamic margins based on the focused Hyprland monitor's resolution.
 
-resolution=$(hyprctl monitors | awk '
-  /^Monitor / { inblock=1; res="" }
-  /^[ \t]+[0-9]+x[0-9]+@[0-9.]+/ && inblock {
-    split($1, a, "@")
-    res=a[1]
-  }
-  /focused: yes/ && inblock {
-    print res
-    exit
-  }
-')
-
-if [[ -z "$resolution" ]]; then
-    notify-send "wlogout-dynamic" "Unable to determine focused monitor resolution."
-    echo "Unable to determine focused monitor resolution."
-    exit 1
+# Check if wlogout is running
+if pgrep -x "wlogout" >/dev/null; then
+    pkill -x "wlogout"
+    exit 0
 fi
 
-width="${resolution%x*}"
-height="${resolution#*x}"
+# Get monitor geometry and scale
+x_mon=$(hyprctl -j monitors | jq '.[] | select(.focused==true) | .width')
+y_mon=$(hyprctl -j monitors | jq '.[] | select(.focused==true) | .height')
+hypr_scale=$(hyprctl -j monitors | jq '.[] | select(.focused==true) | .scale' | sed 's/\.//')
 
-# Set margin ratios (1920x1080)
-# left_right_ratio=0.30
-# top_bottom_ratio=0.45
-
-# Set margin ratios (2560x1600)
-left_right_ratio=0.1
-top_bottom_ratio=0.3
-
-margin_left="$(awk -v w="$width" -v r="$left_right_ratio" 'BEGIN{printf "%d", w*r}')"
-margin_right="$margin_left"
-margin_top="$(awk -v h="$height" -v r="$top_bottom_ratio" 'BEGIN{printf "%d", h*r}')"
-margin_bottom="$margin_top"
-
-# You can customize these options to taste
+# Set layout parameters (adjust these as needed)
 buttons_per_row=5
-# column_spacing=50 # (1920x1080)
-column_spacing=120 # (2560x1600) 
+margin_left=$((x_mon * 15 / hypr_scale))
+margin_right=$margin_left
+margin_top=$((y_mon * 42 / hypr_scale))
+margin_bottom=$margin_top
+column_spacing=$((x_mon * 5 / hypr_scale))
 
-# Launch wlogout with dynamic margins
+# Launch wlogout with calculated values
 exec wlogout \
     --buttons-per-row "$buttons_per_row" \
     --margin-left="${margin_left}px" \

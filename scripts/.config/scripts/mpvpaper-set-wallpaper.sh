@@ -23,7 +23,7 @@ for name in "${FILENAMES[@]}"; do
     DISPLAY_NAMES+=("$(truncate_name "$name")")
 done
 
-SELECTED_TRUNC=$(printf '%s\n' "${DISPLAY_NAMES[@]}" | wofi --dmenu --prompt "Select live wallpaper")
+SELECTED_TRUNC=$(printf '%s\n' "${DISPLAY_NAMES[@]}" | rofi -dmenu -p "󰸉" -theme "$HOME"/.config/rofi/config/wallpapers.rasi)
 [ -z "$SELECTED_TRUNC" ] && exit 0
 
 # Match back to full name
@@ -49,7 +49,7 @@ MONITORS=("ALL" "${ACTIVE_MONITORS[@]}") # Add "ALL" option
 if ((${#ACTIVE_MONITORS[@]} == 1)); then
     SELECTED_MONITOR="${ACTIVE_MONITORS[0]}"
 else
-    SELECTED_MONITOR=$(printf '%s\n' "${MONITORS[@]}" | wofi --dmenu --prompt "Select monitor (or ALL)")
+    SELECTED_MONITOR=$(printf '%s\n' "${MONITORS[@]}" | rofi -dmenu -p "󰍺" -theme "$HOME"/.config/rofi/config/wallpapers.rasi)
     [ -z "$SELECTED_MONITOR" ] && exit 0
 fi
 
