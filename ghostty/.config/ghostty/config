@@ -1,4 +1,5 @@
-gtk-single-instance = true
+gtk-single-instance = false
+quit-after-last-window-closed=true
 shell-integration = zsh
 mouse-hide-while-typing = true
 
