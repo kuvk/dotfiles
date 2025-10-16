@@ -81,7 +81,6 @@
     "cava": {
       // "cava_config": "$XDG_CONFIG_HOME/cava/cava.conf",
       "framerate": 60,
-			"swap-icon-label": true,
       "autosens": 1,
       // "sensitivity": 100,
       "bars": 12,

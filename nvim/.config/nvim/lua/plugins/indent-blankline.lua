@@ -5,6 +5,13 @@ return {
   enabled = true,
   lazy = true,
   opts = {
-    scope = { enabled = false },
+    indent = {
+      char = "▏",
+    },
+    scope = {
+      enabled = false,
+      show_start = false,
+      show_end = false,
+    },
   },
 }

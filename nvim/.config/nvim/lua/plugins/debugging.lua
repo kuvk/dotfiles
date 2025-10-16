@@ -14,8 +14,8 @@ return {
 
     -- C/C++ (cpptools)
     dap.adapters.cppdbg = {
-      id = 'cppdbg',
-      type = 'executable',
+      id = "cppdbg",
+      type = "executable",
       command = vim.fn.stdpath("data") .. "/mason/packages/cpptools/extension/debugAdapters/bin/OpenDebugAD7",
     }
     dap.configurations.cpp = {
@@ -24,15 +24,15 @@ return {
         type = "cppdbg",
         request = "launch",
         program = function()
-          return vim.fn.input('Path to executable: ', vim.fn.getcwd() .. '/', 'file')
+          return vim.fn.input("Path to executable: ", vim.fn.getcwd() .. "/", "file")
         end,
-        cwd = '${workspaceFolder}',
+        cwd = "${workspaceFolder}",
         stopAtEntry = true,
         setupCommands = {
           {
-            text = '-enable-pretty-printing',
-            description =  'enable pretty printing',
-            ignoreFailures = false
+            text = "-enable-pretty-printing",
+            description = "enable pretty printing",
+            ignoreFailures = false,
           },
         },
       },
