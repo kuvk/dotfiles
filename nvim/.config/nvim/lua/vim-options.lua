@@ -15,11 +15,11 @@ vim.api.nvim_create_autocmd("FileType", {
     "javascript",
     "jquery",
     "json",
-		"jsonc",
+    "jsonc",
     "xml",
     "scss",
     "django",
-    "css"
+    "css",
   },
   callback = function()
     vim.opt_local.tabstop = 2
@@ -61,7 +61,7 @@ opt.showmode = false
 -- Cursor blink
 opt.guicursor:append("n-v-c-i:blinkon500-blinkoff500")
 
--- Search
+-- Searc
 opt.ignorecase = true
 opt.smartcase = true
 

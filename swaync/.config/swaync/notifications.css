@@ -56,7 +56,8 @@
   .summary {
   color: @green;
   font-weight: bold;
-  font-size: 15px;
+  font-size: 14px;
+	padding-top: 5px;
   margin-bottom: 5px;
 }
 .notification-row
@@ -65,6 +66,7 @@
   .notification-content
   .time {
   background: transparent;
+	padding-top: 5px;
   color: @green;
 }
 
@@ -135,13 +137,21 @@
   color: @base;
 }
 
+.notification-action {
+  -gtk-icon-effect: none;
+  /* border-radius: 0.7rem; */
+	/* margin: 0.5rem; */
+	padding: 0.5rem;
+  -gtk-icon-effect: none;
+}
+
 .notification-action:hover,
 .notification-default-action:hover {
-  border-radius: 0.7rem;
-  -gtk-icon-effect: none;
+  /* border-radius: 0.7rem; */
   background: @surface0;
   color: @subtext1;
 }
+
 
 /* ============== CC NOTIFICATIONS ============== */
 

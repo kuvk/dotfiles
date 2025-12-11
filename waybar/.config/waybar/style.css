@@ -2,10 +2,12 @@
 
 * {
   font-family:
-    SF Pro Display,
-    Font Awesome,
-    Symbols Nerd Font,
-    FiraCode Nerd Font Light;
+    "SF Pro Display",
+    "Font Awesome 6 Free",
+    "Symbols Nerd Font",
+    "FiraCode Nerd Font",
+    "Noto Sans",
+    sans-serif;
   font-size: 13px;
   min-height: 0;
 }
@@ -41,7 +43,6 @@ tooltip label {
 }
 
 #custom-apps,
-#workspaces,
 #window,
 #custom-music,
 #tray,
@@ -85,10 +86,13 @@ tooltip label {
 
 #workspaces {
   padding: 0;
+  margin: 3px;
+  border-radius: 0.7rem;
 }
 
 #workspaces button {
   padding-right: 1rem;
+  padding-left: 0.80rem;
 }
 
 #workspaces button.active,

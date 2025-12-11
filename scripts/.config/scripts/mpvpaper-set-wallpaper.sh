@@ -154,7 +154,7 @@ if $collapse_to_all; then
     fi
 
     notify-send "Live Wallpapers" "Setting wallpaper \"${SELECTED_NAME}\" on ALL monitors"
-    mpvpaper -vsp -o "no-config no-audio loop input-ipc-server=$SOCKET_ALL" -p ALL "$SELECTED_FILE"
+    mpvpaper -vsp -o "no-config no-audio loop input-ipc-server=$SOCKET_ALL --gpu-context=wayland --fullscreen --no-border --keepaspect=no" -p ALL "$SELECTED_FILE"
     exit 0
 fi
 
@@ -183,7 +183,7 @@ if [[ "$SELECTED_MONITOR" != "ALL" ]]; then
                 SOCKET_M="$SOCKET_BASE-$m"
                 pkill -f "mpvpaper .*${m}"
                 rm -f "$SOCKET_M"
-                mpvpaper -vsp -o "no-config no-audio loop input-ipc-server=$SOCKET_M" -p "$m" "$ALL_VIDEO" &
+                mpvpaper -vsp -o "no-config no-audio loop input-ipc-server=$SOCKET_M --gpu-context=wayland --fullscreen --no-border --keepaspect=no" -p "$m" "$ALL_VIDEO" &
             fi
         done
     fi
@@ -198,7 +198,7 @@ if [[ "$SELECTED_MONITOR" != "ALL" ]]; then
     fi
 
     notify-send "Live Wallpapers" "Setting wallpaper \"$SELECTED_NAME\" on $SELECTED_MONITOR"
-    mpvpaper -vsp -p -o "no-config no-audio loop input-ipc-server=$SOCKET_PATH" -p "$SELECTED_MONITOR" "$SELECTED_FILE"
+    mpvpaper -vsp -p -o "no-config no-audio loop input-ipc-server=$SOCKET_PATH --gpu-context=wayland --fullscreen --no-border --keepaspect=no" -p "$SELECTED_MONITOR" "$SELECTED_FILE"
     exit 0
 fi
 
@@ -213,4 +213,4 @@ if pgrep -x hyprpaper >/dev/null; then
 fi
 
 notify-send "Live Wallpapers" "Setting wallpaper \"$SELECTED_NAME\" on ALL monitors"
-mpvpaper -vsp -o "no-config no-audio loop input-ipc-server=$SOCKET_ALL" -p ALL "$SELECTED_FILE"
+mpvpaper -vsp -o "no-config no-audio loop input-ipc-server=$SOCKET_ALL --gpu-context=wayland --fullscreen --no-border --keepaspect=no" -p ALL "$SELECTED_FILE"

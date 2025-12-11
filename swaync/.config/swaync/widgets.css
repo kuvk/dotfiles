@@ -28,12 +28,12 @@
   border-radius: 0.6rem;
 }
 .widget-dnd > switch slider:hover {
-  background: @surface2;
-}
-.widget-dnd > switch slider:checked {
   background: @green;
 }
 
+.control-center-dnd:checked slider {
+	background: @green;
+}
 /* ============ Notification Title ============= */
 
 .widget-title {

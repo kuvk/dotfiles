@@ -8,6 +8,7 @@
     "margin-bottom": 0,
     "margin-left": 10,
     "modules-left": ["custom/apps", "hyprland/workspaces", "hyprland/window"],
+		// "modules-center": ["custom/music"],
     "modules-center": ["cava", "custom/music", "cava"],
     "modules-right": [
       "tray",
@@ -34,7 +35,7 @@
     "custom/apps": {
       "format": "",
       "tooltip": false,
-      "on-click": "wofi --show drun --allow-images -I",
+      "on-click": "~/.config/rofi/bin/launcher",
     },
     "hyprland/workspaces": {
       "disable-scroll": false,
@@ -50,20 +51,20 @@
         "active": "",
       },
       "persistent-workspaces": {
+        "eDP-1": [1, 2, 3, 4],
+        // "eDP-1": [6, 7, 8, 9],
+
         // "DP-1": [1, 2, 3, 4],
         // "DP-1": [6, 7, 8, 9],
 
-        "DP-4": [1, 2, 3, 4],
+        // "DP-4": [1, 2, 3, 4],
         // "DP-4": [6, 7, 8, 9],
 
         // "HDMI-A-1": [1, 2, 3, 4],
         // "HDMI-A-1": [6, 7, 8, 9],
 
-        "HDMI-A-5": [1, 2, 3, 4],
+        // "HDMI-A-5": [1, 2, 3, 4],
         // "HDMI-A-5": [6, 7, 8, 9],
-
-        // "eDP-1": [1, 2, 3, 4],
-        "eDP-1": [6, 7, 8, 9],
       },
     },
     "custom/music": {
@@ -76,7 +77,7 @@
       "on-scroll-up": "~/.config/scripts/waybar-music.sh previous",
       "on-scroll-down": "~/.config/scripts/waybar-music.sh next",
       "on-click-right": "~/.config/scripts/waybar-music.sh switch",
-      "max-length": 20,
+      "max-length": 15,
     },
     "cava": {
       // "cava_config": "$XDG_CONFIG_HOME/cava/cava.conf",
