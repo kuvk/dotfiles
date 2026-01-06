@@ -8,8 +8,8 @@
     "margin-bottom": 0,
     "margin-left": 10,
     "modules-left": ["custom/apps", "hyprland/workspaces", "hyprland/window"],
-		// "modules-center": ["custom/music"],
-    "modules-center": ["cava", "custom/music", "cava"],
+		"modules-center": ["custom/music"],
+    // "modules-center": ["cava", "custom/music", "cava"],
     "modules-right": [
       "tray",
       "custom/separator",
@@ -51,8 +51,8 @@
         "active": "",
       },
       "persistent-workspaces": {
-        "eDP-1": [1, 2, 3, 4],
-        // "eDP-1": [6, 7, 8, 9],
+        // "eDP-1": [1, 2, 3, 4],
+        "eDP-1": [6, 7, 8, 9],
 
         // "DP-1": [1, 2, 3, 4],
         // "DP-1": [6, 7, 8, 9],
@@ -63,7 +63,7 @@
         // "HDMI-A-1": [1, 2, 3, 4],
         // "HDMI-A-1": [6, 7, 8, 9],
 
-        // "HDMI-A-5": [1, 2, 3, 4],
+        "HDMI-A-5": [1, 2, 3, 4],
         // "HDMI-A-5": [6, 7, 8, 9],
       },
     },
