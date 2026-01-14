@@ -1,6 +1,6 @@
 {
     "label" : "lock",
-    "action" : "hyprlock",
+    "action" : "~/.config/scripts/lockscreen.sh",
     "keybind" : "l"
 }
 {

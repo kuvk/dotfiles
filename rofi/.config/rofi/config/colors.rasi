@@ -3,7 +3,7 @@
 	BLACK:    #11111bff;
 	BLACKA:    #11111b80;
     BG:       #1e1e2eff;
-    BGA:      #1e1e2e80;
+    BGA:      #1e1e2ecc;
     FG:       #CDD6F4ff;
     FGA:      #CDD6F480;
     RED:      #F38BA8ff;
@@ -21,5 +21,5 @@
 	GRAY:     #585B70ff;
 	GRAYA:    #585B7080;
 	SURFACE:  #313244ff;
-	SURFACEA: #31324480;
+	SURFACEA: #313244CC;
 }

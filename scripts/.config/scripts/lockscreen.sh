@@ -1,15 +1,36 @@
 #!/bin/bash
-mtrx_command="kitty --start-as=fullscreen /home/kuvk/.config/scripts/matrix.sh"
+set -euo pipefail
 
-(hyprlock && kill -9 $(pgrep -f "$mtrx_command")) &
+LOCKFILE="/tmp/hyprlock-matrix.lock"
+MATRIX_SCRIPT="$HOME/.config/scripts/matrix.sh"
+KITTY_MATCH="kitty.*matrix\.sh"
 
-checkpid=$(pgrep hyprlock) # Check if hyprlock is running
-if ! [ -z $checkpid ]; then
-	screens=$(hyprctl -j monitors | jq length) # Get the number of screens
-	for (( i = -1; i < $screens; i++ ))
-	do
-		sleep 0.3
-		hyprctl dispatch focusmonitor $i 
-		eval $mtrx_command & # Run unimatrix 
-	done 
+exec 9>"$LOCKFILE"
+flock -n 9 || exit 0
+
+cleanup() {
+    pkill -f "$KITTY_MATCH" 2>/dev/null || true
+}
+trap cleanup EXIT INT TERM
+
+FOCUSED_MONITOR="$(hyprctl -j monitors | jq -r '.[] | select(.focused == true) | .name' | head -n1 || true)"
+
+cleanup
+
+hyprlock &
+LOCKPID=$!
+
+sleep 0.2
+
+hyprctl -j monitors | jq -r '.[] | "\(.name)\t\(.activeWorkspace.id)"' | \
+    while IFS=$'\t' read -r mon ws; do
+    hyprctl dispatch exec "[workspace ${ws}] kitty --start-as=fullscreen \"$MATRIX_SCRIPT\"" >/dev/null
+    sleep 0.1
+done
+
+wait "$LOCKPID" || true
+
+# Restore focus
+if [ -n "${FOCUSED_MONITOR:-}" ]; then
+    hyprctl dispatch focusmonitor "$FOCUSED_MONITOR" >/dev/null 2>&1 || true
 fi

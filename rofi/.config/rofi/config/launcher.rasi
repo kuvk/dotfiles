@@ -13,7 +13,7 @@ configuration {
 
 window {
     transparency:                   "real";
-    background-color:               @BG;
+    background-color:               @BGA;
     text-color:                     @FG;
     border:                         2px;
     border-color:                   @PEACH;
