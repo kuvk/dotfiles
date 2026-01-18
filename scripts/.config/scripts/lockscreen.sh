@@ -10,6 +10,8 @@ flock -n 9 || exit 0
 
 cleanup() {
     pkill -f "$KITTY_MATCH" 2>/dev/null || true
+	sleep 0.1
+    hyprctl dispatch exec waybar
 }
 trap cleanup EXIT INT TERM
 
@@ -17,6 +19,7 @@ FOCUSED_MONITOR="$(hyprctl -j monitors | jq -r '.[] | select(.focused == true) |
 
 cleanup
 
+hyprctl dispatch exec pkill waybar
 hyprlock &
 LOCKPID=$!
 

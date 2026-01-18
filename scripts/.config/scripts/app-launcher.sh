@@ -6,6 +6,6 @@ rofi \
 	-drun-match-fields all \
 	-drun-display-format "{name}" \
 	-no-drun-show-actions \
-	-terminal ghostty \
+	-terminal kitty \
 	-kb-cancel Escape \
-	-theme "$HOME"/.config/rofi/config/launcher.rasi
+	-theme "$HOME"/.config/rofi/launcher.rasi

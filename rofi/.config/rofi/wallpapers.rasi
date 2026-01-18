@@ -1,0 +1,119 @@
+configuration {
+    show-icons:                     true;
+    click-to-exit:                  true;
+    location:                       0;
+}
+
+@import "font.rasi"
+@import "colors.rasi"
+
+window {
+    transparency:                   "real";
+    background-color:               @BG;
+    text-color:                     @FG;
+    border:                         2px;
+    border-color:                   @PEACH;
+    border-radius:                  15px;
+
+    /* Bigger window to fit a 3x2 grid comfortably */
+    width:                          950px;
+
+    anchor:                         center;
+    x-offset:                       0;
+    y-offset:                       0;
+}
+
+mainbox {
+    background-color:               @TRANSPARENT;
+    children:                       [ inputbar, listview ];
+    spacing:                        15px;
+    padding:                        15px;
+}
+
+inputbar {
+    children:                       [ prompt, entry ];
+    background-color:               @SURFACEA;
+    text-color:                     @FG;
+    expand:                         false;
+    border:                         0px;
+    border-radius:                  10px;
+    border-color:                   @PEACH;
+    margin:                         0px;
+    padding:                        0px;
+    position:                       center;
+}
+
+prompt {
+    enabled:                        true;
+    padding:                        15px 8px 15px 15px;
+    background-color:               @TRANSPARENT;
+    text-color:                     @BLUE;
+    font:                           "SF Pro Display Regular 14";
+}
+
+entry {
+    hide-cursor-on-empty:           true;
+    background-color:               @TRANSPARENT;
+    text-color:                     @FG;
+    placeholder-color:              @GRAY;
+    font:                           "SF Pro Display Regular 14";
+    expand:                         true;
+    horizontal-align:               0;
+    placeholder:                    "Search wallpapers ...";
+    blink:                          true;
+    border:                         1px;
+    border-color:                   @TRANSPARENT;
+    border-radius:                  10px;
+    padding:                        15px;
+}
+
+listview {
+    background-color:               @TRANSPARENT;
+
+    /* 3 wallpapers per row, 2 rows */
+    columns:                        3;
+    lines:                          2;
+
+    spacing:                        15px;
+    cycle:                          false;
+    dynamic:                        true;
+    layout:                         vertical;
+}
+
+element {
+    background-color:               @TRANSPARENT;
+    text-color:                     @FG;
+
+    /* Put icon above text */
+    orientation:                    vertical;
+
+    border-radius:                  10px;
+    padding:                        10px;
+}
+
+element selected {
+    background-color:               @SURFACEA;
+    text-color:                     @FG;
+    border:                         0px;
+    border-radius:                  10px;
+    border-color:                   @PEACH;
+}
+
+element-icon {
+    /* Thumbnail size */
+    size:                           10em;
+    background-color:               @TRANSPARENT;
+    margin:                         0px 0px 6px 0px;
+}
+
+element-text {
+    background-color:               @TRANSPARENT;
+    text-color:                     inherit;
+    highlight:                      bold #fab387ff;
+    expand:                         false;
+
+    font:                           "SF Pro Display Regular 12";
+    horizontal-align:               0.5;     /* centered under the image */
+    vertical-align:                 0.5;
+    margin:                         0px;
+}

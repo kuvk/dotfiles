@@ -15,7 +15,7 @@ window {
     border:                         2px;
     border-color:                   @PEACH;
     border-radius:                  15px;
-    width:                          500px;
+    width:                          300px;
     anchor:                         center;
     x-offset:                       0;
     y-offset:                       0;
@@ -39,7 +39,9 @@ entry {
 	font:			                "SF Pro Display Regular 14";
     expand:                         true;
     horizontal-align:               0;
-    placeholder:                    "Search ...";
+    placeholder:                    "Choose monitor";
+    horizontal-align:               0.5;
+    vertical-align:                 0.5;
     blink:                          true;
     border:                  	    1px 1px 1px 1px;
     border-color:                   @TRANSPARENT;
@@ -48,7 +50,7 @@ entry {
 }
 
 inputbar {
-	children: 		                [ prompt, entry ];
+	children: 		                [ entry ];
     background-color:               @SURFACEA;
     text-color:                     @FG;
     expand:                         false;
@@ -63,7 +65,7 @@ inputbar {
 
 listview {
     background-color:               @TRANSPARENT;
-    columns:                        2;
+    columns:                        1;
     lines:			                5;
     spacing:                        15px;
     cycle:                          false;
@@ -92,7 +94,7 @@ element-text {
 	highlight:                      bold #fab387ff;
     expand:                         true;
 	font:			                "SF Pro Display Regular 14";
-    horizontal-align:               0;
+    horizontal-align:               00.5;
     vertical-align:                 0.5;
     margin:                         2px 0px 2px 2px;
 }

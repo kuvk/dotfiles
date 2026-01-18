@@ -3,7 +3,7 @@
 SOCKETS=(/tmp/mpv-socket*)
 ENTRIES=()
 STATE=""
-ICON="󰶐"
+ICON=" 󰶐 "
 CLASS="inactive"
 
 for socket in "${SOCKETS[@]}"; do
@@ -15,11 +15,11 @@ for socket in "${SOCKETS[@]}"; do
     STATUS=$(echo '{ "command": ["get_property", "pause"] }' | socat - "$socket" 2>/dev/null)
     if [[ "$STATUS" == *"true"* ]]; then
         STATE="Paused"
-        ICON="󰍹"
+        ICON=" 󰍹 "
         CLASS="paused"
     elif [[ "$STATUS" == *"false"* ]]; then
         STATE="Playing"
-        ICON="󰷜"
+        ICON=" 󰷜 "
         CLASS="playing"
     fi
 
@@ -30,13 +30,11 @@ for socket in "${SOCKETS[@]}"; do
     ENTRIES+=("$MONITOR: $FILENAME")
 done
 
-# If no entries, inactive
 if [ ${#ENTRIES[@]} -eq 0 ]; then
-    echo '{ "text": "󰶐", "class": "inactive", "tooltip": "Live wallpapers: off" }'
+    echo '{ "text": " 󰶐 ", "class": "inactive", "tooltip": "Live wallpapers: off" }'
     exit 0
 fi
 
-# Proper tooltip formatting with real carriage return
 TOOLTIP="$STATE"
 for entry in "${ENTRIES[@]}"; do
     TOOLTIP+=$'\r'"$entry"
