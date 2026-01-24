@@ -17,7 +17,7 @@ if command -v magick &> /dev/null; then
 elif command -v convert &> /dev/null; then
     IM_CMD="convert"
 else
-    notify-send "process-wlogout-icons" "Neither 'magick' nor 'convert' command found. Please install ImageMagick."
+    echo "Neither 'magick' nor 'convert' command found. Please install ImageMagick."
     exit 1
 fi
 

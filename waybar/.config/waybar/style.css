@@ -2,12 +2,8 @@
 
 * {
   font-family:
-    "SF Pro Display",
-    "Font Awesome 6 Free",
-    "Symbols Nerd Font",
-    "FiraCode Nerd Font",
-    "Noto Sans",
-    sans-serif;
+    "SF Pro Display", "Font Awesome 6 Free", "Symbols Nerd Font",
+    "FiraCode Nerd Font", "Noto Sans", sans-serif;
   font-size: 13px;
   min-height: 0;
 }
@@ -25,9 +21,18 @@ tooltip label {
   color: @green;
 }
 
+/* .modules-left, */
+/* .modules-center, */
+/* .modules-right { */
+/*   background: @base-rgba; */
+/*   border-radius: 0.8rem; */
+/* } */
+
 #waybar {
   border-radius: 0.8rem;
   background: @base-rgba;
+  /* background: @base; */
+  /* background: transparent; */
   color: @text;
 }
 
@@ -37,7 +42,7 @@ tooltip label {
 
 #custom-separator {
   font-size: 18px;
-  margin: 0 0.5rem;
+  margin: 0 0.3rem 0 0.5rem;
   margin-top: 0.2rem;
   color: @overlay-rgba;
 }
@@ -92,7 +97,7 @@ tooltip label {
 
 #workspaces button {
   padding-right: 1rem;
-  padding-left: 0.80rem;
+  padding-left: 0.8rem;
 }
 
 #workspaces button.active,
@@ -104,26 +109,21 @@ tooltip label {
   color: @peach;
 }
 
-#cava {
-  padding: 0 0.2rem;
-  font-size: 8px;
-}
-
 #language,
 #clock {
   padding: 0.55rem 0.5rem;
-    min-width: 20px;
+  min-width: 20px;
 }
 
-#cava,
+/* #cava, */
 #custom-notifications.notification,
 #custom-notifications.inhibited-notification,
-#custom-music,
 #battery {
   color: @green;
 }
 
 #clock,
+#custom-music,
 #bluetooth.on {
   color: @sky;
 }
@@ -140,7 +140,6 @@ tooltip label {
 #custom-notifications.none,
 #custom-notifications.inhibited-none,
 #custom-nightlight,
-#pulseaudio,
 #network {
   color: @blue;
 }
@@ -169,6 +168,7 @@ tooltip label {
 
 #network.disconnected,
 #network.linked,
+#pulseaudio,
 #custom-notifications.dnd-none,
 #custom-notifications.dnd-inhibited-none,
 #custom-notifications.dnd-inhibited-notification,

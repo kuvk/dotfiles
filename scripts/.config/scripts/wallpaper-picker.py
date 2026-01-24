@@ -7,8 +7,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 HOME = os.path.expanduser("~")
-
-# --- CONFIG ---
 WALLPAPER_DIR = os.path.join(HOME, "wallpapers")
 THUMB_DIR = os.path.join(HOME, ".cache/wallpaper-thumbs")
 ROFI_THEME_GRID = os.path.join(HOME, ".config/rofi/wallpapers.rasi")
