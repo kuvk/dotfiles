@@ -10,8 +10,8 @@
     "modules-left": ["custom/apps", "hyprland/workspaces", "hyprland/window"],
     // "modules-center": ["custom/music"],
     "modules-right": [
-      "custom/music",
       "cava",
+      "custom/music",
       "pulseaudio",
       // "custom/separator",
       "group/slide",

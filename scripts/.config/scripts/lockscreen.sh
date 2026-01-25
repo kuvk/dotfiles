@@ -12,6 +12,7 @@ cleanup() {
     pkill -f "$KITTY_MATCH" 2>/dev/null || true
     sleep 0.1
     hyprctl dispatch exec waybar
+    swaync-client -df
 }
 trap cleanup EXIT INT TERM
 
@@ -20,6 +21,7 @@ FOCUSED_MONITOR="$(hyprctl -j monitors | jq -r '.[] | select(.focused == true) |
 cleanup
 
 hyprctl dispatch exec pkill waybar
+swaync-client -dn &
 hyprlock &
 LOCKPID=$!
 
@@ -27,7 +29,7 @@ sleep 0.2
 
 hyprctl -j monitors | jq -r '.[] | "\(.name)\t\(.activeWorkspace.id)"' | \
     while IFS=$'\t' read -r mon ws; do
-    hyprctl dispatch exec "[workspace ${ws}] kitty --start-as=fullscreen \"$MATRIX_SCRIPT\"" >/dev/null
+    hyprctl dispatch exec "[workspace ${ws}] kitty --title \"MATRIXLOCK\" --start-as=fullscreen \"$MATRIX_SCRIPT\"" >/dev/null
 done
 
 wait "$LOCKPID" || true
