@@ -12,3 +12,5 @@ shaders/
 cava/.config/cava/themes/
 *.bak
 generated/
+plugins/
+flavors/

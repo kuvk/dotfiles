@@ -6,13 +6,15 @@ return {
   config = function()
     require("catppuccin").setup({
       -- transparent_background = true,
-      -- float = {
-      --   transparent = true,
-      -- },
+      float = {
+        transparent = true,
+      },
       integrations = {
         neotree = true,
         mason = true,
         telescope = true,
+				dap = true,
+				cmp = true,
       },
     })
     vim.cmd.colorscheme("catppuccin")
