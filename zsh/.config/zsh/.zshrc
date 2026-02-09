@@ -103,6 +103,11 @@ if [[ -d "$HOME/.pyenv" ]]; then
     eval "$(pyenv init -)"
 fi
 
+# Cargo
+if [ -d "$HOME/.cargo/bin" ]; then
+    export PATH="$HOME/.cargo/bin:$PATH"
+fi
+
 # Set up fzf key bindings and fuzzy completion
 eval "$(fzf --zsh)"
 

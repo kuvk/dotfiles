@@ -174,7 +174,7 @@
       "tooltip-format-enumerate-connected": "{device_alias}",
       "tooltip-format-on": "Bluetooth: on",
       "tooltip-format-off": "Bluetooth: off",
-      "on-click": "blueberry",
+      "on-click": "blueman-manager",
       "on-click-right": "~/.config/scripts/toggle_bluetooth.sh",
     },
     "network": {
@@ -233,7 +233,7 @@
       "escape": true,
     },
     "custom/nightlight": {
-      "exec-if": "which wlsunset",
+      "exec-if": "which hyprsunset",
       "exec": "~/.config/scripts/nightlight-status.sh",
       "interval": 1,
       "on-click": "~/.config/scripts/nightlight-toggle.sh",
