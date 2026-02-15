@@ -3,13 +3,10 @@ return {
   lazy = false,
   build = ":TSUpdate",
   config = function()
-    vim.filetype.add({
-      extension = {
-        conf = "hocon",
-        ini = "dosini",
-        cfg = "scfg",
-      },
-    })
+    -- vim.filetype.add({
+    -- extension = {
+    -- },
+    -- })
     vim.api.nvim_create_autocmd("FileType", {
       pattern = {
         "c",
@@ -33,6 +30,7 @@ return {
         "python",
         "rust",
         "ruby",
+        "sshconfig",
         "scfg",
         "typescript",
         "tsx",
@@ -56,7 +54,6 @@ return {
       "cmake",
       "comment",
       "css",
-      "dosini",
       "go",
       "java",
       "javascript",
@@ -73,6 +70,7 @@ return {
       "rust",
       "ruby",
       "scfg",
+      "ssh_config",
       "typescript",
       "tsx",
       "vim",

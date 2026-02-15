@@ -7,8 +7,3 @@ if pgrep -x mpvpaper > /dev/null; then
 else
     notify-send "Wallpapers" "No live wallpapers running."
 fi
-if pgrep -x mpvpaper > /dev/null; then
-	pkill -x hyprpaper
-	hyprpaper
-fi
-

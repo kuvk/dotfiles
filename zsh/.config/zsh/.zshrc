@@ -116,7 +116,7 @@ alias ll="lsd -la"
 alias l="lsd -l"
 alias ls="lsd"
 alias cat="bat --style=plain,header,grid"
-alias top="btop"
+alias top="htop"
 alias nv="nvim"
 alias fzf="fzf --preview='bat --color=always --style=plain,header,grid {}'"
 alias tmuxa="tmux attach"
@@ -148,3 +148,5 @@ ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=yellow
 ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
 
 eval "$(direnv hook zsh)"
+
+export PATH=$PATH:/home/kuvk/.spicetify
