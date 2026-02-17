@@ -150,14 +150,19 @@
     "pulseaudio": {
       "format": "{icon}",
       "format-muted": "",
-      "format-bluetooth": "󰂰 {icon}",
+      "format-bluetooth": "󰂰  {icon}",
       "format-icons": {
-        "headphone": "",
+        "headset": "",
+        "headphones": "",
         "default": ["", "", ""],
       },
+      "on-scroll-up": "pactl set-sink-volume @DEFAULT_SINK@ +5%",
+      "on-scroll-down": "pactl set-sink-volume @DEFAULT_SINK@ -5%",
       "on-click": "pavucontrol",
       "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+      "tooltip": true,
       "tooltip-format": "{desc}: {volume}%",
+			"max-volume": 120,
     },
     "bluetooth": {
       "format-on": "󰂯",

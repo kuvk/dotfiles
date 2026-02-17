@@ -1,7 +1,10 @@
 # PROMPT
-eval "$(starship init zsh)"
-if [[ "$(uname)" == "Darwin" ]]; then
-    export STARSHIP_CONFIG=~/.config/starship.toml
+if command -v starship >/dev/null; then
+    eval "$(starship init zsh)"
+    export STARSHIP_LOG=error
+    if [[ "$(uname)" == "Darwin" ]]; then
+        export STARSHIP_CONFIG=~/.config/starship.toml
+    fi
 fi
 
 setopt NOBEEP
@@ -50,8 +53,8 @@ if [[ "$(uname)" == "Linux" ]]; then
 
         zvm_exit_visual_mode
     }
-# macOS
-else 
+    # macOS
+else
     zvm_vi_yank() {
         zvm_yank
         printf %s "${CUTBUFFER}" | pbcopy -i
@@ -129,7 +132,7 @@ alias paccheck="pacman -Qq | fzf --preview 'pacman -Qil {}' --layout=reverse --b
 alias c++="c++ -std=c++23 -Wall -Wextra -Wconversion -Wsign-conversion --pedantic-errors -ggdb"
 
 if [[ "$TERM" = "xterm-kitty" ]]; then
-	alias ssh="TERM=xterm-256color ssh"
+    alias ssh="TERM=xterm-256color ssh"
 fi
 
 
