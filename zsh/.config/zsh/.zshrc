@@ -81,6 +81,11 @@ bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 # bindkey '^I' autosuggest-accept
 
+# Local
+if [[ -d "$HOME/.local/bin" ]]; then
+	PATH="$HOME/.local/bin:$PATH"
+fi
+
 # Tmuxifier
 if [[ -d "$HOME/.tmux/plugins/tmuxifier" ]]; then
     export PATH="$HOME/.tmux/plugins/tmuxifier/bin:$PATH"
@@ -95,8 +100,8 @@ if [[ -d "$HOME/.tmux/plugins/tmuxifier" ]]; then
 fi
 
 # Spicetify
-if [[ -d "$HOME/.spicetify" ]]; then
-    export PATH=$PATH:$HOME.spicetify
+if [[ -d "$HOME/.config/.spicetify" ]]; then
+    export PATH="$HOME/.config/spicetify:$PATH"
 fi
 
 # Pyenv
@@ -119,7 +124,7 @@ alias ll="lsd -la"
 alias l="lsd -l"
 alias ls="lsd"
 alias cat="bat --style=plain,header,grid"
-alias top="htop"
+alias top="btop"
 alias nv="nvim"
 alias fzf="fzf --preview='bat --color=always --style=plain,header,grid {}'"
 alias tmuxa="tmux attach"
@@ -151,5 +156,3 @@ ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=yellow
 ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
 
 eval "$(direnv hook zsh)"
-
-export PATH=$PATH:/home/kuvk/.spicetify

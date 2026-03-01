@@ -1,3 +1,3 @@
 #!/bin/bash
-unimatrix -c cyan -b -s 96 -f -l m
+unimatrix -c magenta -b -s 96 -f -l m
 
