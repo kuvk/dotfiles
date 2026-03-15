@@ -10,7 +10,7 @@
 }
 {
     "label" : "suspend",
-    "action" : "pidof hyprlock || (hyprlock &); sleep 0.1; systemctl suspend",
+    "action" : "systemctl suspend",
     "keybind" : "u"
 }
 {

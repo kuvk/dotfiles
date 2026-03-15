@@ -3,5 +3,5 @@
 if pgrep -x hyprsunset >/dev/null; then
     pkill -x hyprsunset
 else
-    hyprsunset -t 5000 >/dev/null 2>&1 &
+    hyprsunset -t 4000 >/dev/null 2>&1 &
 fi
