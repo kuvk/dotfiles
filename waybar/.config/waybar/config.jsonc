@@ -175,7 +175,7 @@
       "tooltip-format-enumerate-connected": "{device_alias}",
       "tooltip-format-on": "Bluetooth: on",
       "tooltip-format-off": "Bluetooth: off",
-      "on-click": "blueman-manager",
+      "on-click": "hyprctl dispatch exec blueman-manager",
       "on-click-right": "~/.config/scripts/toggle_bluetooth.sh",
     },
     "network": {

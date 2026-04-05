@@ -2,7 +2,7 @@ __pycache__/
 __init__.py
 .mypy_cache/
 .zcompdump
-.zsh_history
+.zsh_history*
 lazy-lock.json
 bookmarks
 *assets/

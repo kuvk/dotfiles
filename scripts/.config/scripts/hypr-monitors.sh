@@ -17,7 +17,7 @@ INTERNAL="eDP-1"
 # CASE 1: ONLY INTERNAL or MAIN DISPLAY
 if [[ -n "$EDP_PRESENT" && -z "$EXTERNAL" ]]; then
   cat > "$HYPR_MON_CONF" <<EOF
-monitor = $INTERNAL, preferred, auto, 1.33333
+monitor = $INTERNAL, preferred, auto, 1.25
 workspace = 1, monitor:$INTERNAL, persistent:true
 workspace = 2, monitor:$INTERNAL, persistent:true
 workspace = 3, monitor:$INTERNAL, persistent:true
