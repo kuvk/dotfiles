@@ -87,9 +87,7 @@ return {
       vim.cmd([[highlight DiagnosticVirtualTextWarn guibg=none]])
       vim.cmd([[highlight DiagnosticVirtualTextInfo guibg=none]])
       vim.cmd([[highlight DiagnosticVirtualTextHint guibg=none]])
-      vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
-        border = "rounded",
-      })
+      vim.lsp.handlers["textDocument/hover"] = vim.lsp.buf.hover({ border = "rounded" })
     end,
   },
 }

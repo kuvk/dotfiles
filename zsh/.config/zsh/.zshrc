@@ -120,9 +120,8 @@ fi
 eval "$(fzf --zsh)"
 
 # ALIASES
-alias ll="lsd -la"
-alias l="lsd -l"
-alias ls="lsd"
+alias ll="lsd -l"
+alias l="lsd"
 alias cat="bat --style=plain,header,grid"
 alias top="btop"
 alias nv="nvim"

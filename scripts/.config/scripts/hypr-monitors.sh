@@ -29,7 +29,7 @@ EOF
 else
   cat > "$HYPR_MON_CONF" <<EOF
 monitor = $EXTERNAL, preferred, 0x0, 1
-monitor = eDP-1, preferred, auto, 1.6
+monitor = $INTERNAL, preferred, auto, 1.6
 
 workspace = 1, monitor:$EXTERNAL, persistent:true
 workspace = 2, monitor:$EXTERNAL, persistent:true

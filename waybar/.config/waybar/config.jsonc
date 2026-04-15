@@ -121,9 +121,35 @@
     },
     "clock": {
       "format": "{:%H:%M}",
-      "format-alt": "{:%a %d %b}",
-      "tooltip-format": "<tt><big>{calendar}</big></tt>",
+      "format-alt": "{:%A %d %B %y - %R}",
+      "tooltip-format": "{calendar}",
+      "calendar": {
+        "mode": "year",
+        "mode-mon-col": 3,
+        "weeks-pos": "right",
+        "on-scroll": 1,
+        "on-click-right": "mode",
+        "format": {
+          "months": "{}",
+          "days": "{}",
+          "weeks": "W{}",
+          "weekdays": "{}",
+          "today": "{}",
+        },
+      },
+      "actions": {
+        "on-click-right": "mode",
+        "on-click-forward": "tz_up",
+        "on-click-backward": "tz_down",
+        "on-scroll-up": "shift_up",
+        "on-scroll-down": "shift_down",
+      },
     },
+    // "clock": {
+    //   "format": "{:%H:%M}",
+    //   "format-alt": "{:%a %d %b}",
+    //   "tooltip-format": "<tt><big>{calendar}</big></tt>",
+    // },
     "tray": {
       "icon-size": 14,
       "spacing": 24,
@@ -163,7 +189,7 @@
       "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
       "tooltip": true,
       "tooltip-format": "{desc}: {volume}%",
-			"scroll-step": 5,
+      "scroll-step": 5,
       "max-volume": 120,
     },
     "bluetooth": {
