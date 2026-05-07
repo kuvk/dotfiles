@@ -1,0 +1,7 @@
+/* background-color will be changed to @base in Gamemode */
+.control-center {
+  background-color: @base-rgba;
+}
+.notification-row .notification-background {
+  background-color: @base-rgba;
+}

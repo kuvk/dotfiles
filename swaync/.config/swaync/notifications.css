@@ -27,7 +27,6 @@
   box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.8);
   border-radius: 0.7rem;
   margin: 10px;
-  background-color: @base-rgba;
   color: @overlay2;
   padding: 0;
 }

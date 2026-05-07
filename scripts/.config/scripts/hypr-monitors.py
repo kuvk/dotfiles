@@ -10,6 +10,8 @@ from pathlib import Path
 GENERATED_FILE = Path.home() / ".config/hypr/configs/generated/monitors.conf"
 INTERNAL = "eDP-1"
 MODE = "highres"
+GAMEMODE = Path("/tmp/hypr-gamemode")
+GAMEMODE_SCRIPT = Path.home() / ".config/scripts/hypr-gamemode.sh"
 
 
 def run(
@@ -25,6 +27,7 @@ def run(
 
 
 def main() -> None:
+
     hypr_mon_conf = GENERATED_FILE
     hypr_mon_conf.parent.mkdir(parents=True, exist_ok=True)
 
@@ -67,6 +70,10 @@ workspace = 10, monitor:{INTERNAL}
 
     hypr_mon_conf.write_text(content, encoding="utf-8")
     # run(["cat", f"{GENERATED_FILE}"])
+    
+    # Turn off gamemode if on
+    if GAMEMODE.exists():
+        run(["/usr/bin/bash", f"{GAMEMODE_SCRIPT}"])
 
     # hyprctl reload
     run(["hyprctl", "reload"])

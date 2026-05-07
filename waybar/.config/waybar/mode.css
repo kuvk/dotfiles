@@ -1,0 +1,5 @@
+@import "mocha.css";
+#waybar {
+  background: @base-rgba;
+  color: @text;
+}

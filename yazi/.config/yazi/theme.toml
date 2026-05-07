@@ -34,7 +34,6 @@ rules = [
     { mime = "application/oasis.opendocument.*", fg = "#a6e3a1" },
     { mime = "application/ms-*", fg = "#a6e3a1" },
     { mime = "application/msword", fg = "#a6e3a1" },
-    { name = "*.docx", fg = "#a6e3a1" },
 
 	{ url = "*", is = "orphan", fg = "#f38ba8" },
 	{ url = "*/", is = "orphan", fg = "#f38ba8" },

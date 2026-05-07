@@ -1,0 +1,33 @@
+@import "mocha.css";
+* {
+  font-family:
+    "SF Pro Display", "Font Awesome 6 Free", "Symbols Nerd Font",
+    "JetBrainsMono Nerd Font";
+  font-size: 13px;
+  min-height: 0;
+}
+
+tooltip * {
+  background: transparent;
+}
+
+tooltip.background {
+  background: @tooltip-rgba;
+  border-radius: 0.5rem;
+}
+
+tooltip label {
+  color: @blue;
+}
+
+/* .modules-left, */
+/* .modules-center, */
+/* .modules-right { */
+/*   background: @base-rgba; */
+/*   border-radius: 0.8rem; */
+/* } */
+
+
+#waybar.empty #window {
+  background: none;
+}

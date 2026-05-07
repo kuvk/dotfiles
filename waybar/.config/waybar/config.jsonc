@@ -13,9 +13,8 @@
     "margin-left": 0,
 
     "modules-left": ["custom/apps", "hyprland/workspaces", "hyprland/window"],
-    "modules-center": ["clock"],
+    "modules-center": ["cava"],
     "modules-right": [
-      "cava",
       "custom/music",
       "pulseaudio",
       // "custom/separator",
@@ -24,6 +23,7 @@
       "battery",
       "group/slide",
       "tray",
+			"clock",
       "custom/notifications",
       "custom/power",
     ],
