@@ -29,6 +29,7 @@
 @define-color surface-rgba rgba(49, 50, 68, 0.8);
 @define-color base #1e1e2e;
 @define-color base-rgba rgba(30, 30, 46, 0.8);
+@define-color tooltip-rgba rgba(30, 30, 46, 0.95);
 @define-color waybar-rgba rgba(30, 30, 46, 0.2);
 @define-color mantle #181825;
 @define-color crust #11111b;

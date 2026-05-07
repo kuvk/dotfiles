@@ -1,12 +1,19 @@
-# PROMPT
+case "$OSTYPE" in
+    darwin*) _OS="Darwin" ;;
+    linux*)  _OS="Linux" ;;
+    *)       _OS="$(uname)" ;;
+esac
+
+## Starship
 if command -v starship >/dev/null; then
-    eval "$(starship init zsh)"
     export STARSHIP_LOG=error
-    if [[ "$(uname)" == "Darwin" ]]; then
+    if [[ "$_OS" == "Darwin" ]]; then
         export STARSHIP_CONFIG=~/.config/starship.toml
     fi
+    eval "$(starship init zsh)"
 fi
 
+## Options / history
 setopt NOBEEP
 setopt inc_append_history
 setopt extended_history
@@ -20,29 +27,48 @@ HISTSIZE=100000
 SAVEHIST=100000
 HISTFILE=${ZDOTDIR}/.zsh_history
 
-# Use modern completion system
+## Completions
 fpath=($HOME/.local/share/zsh-plugins/zsh-completions/src $fpath)
-autoload -U compinit
-zstyle ':completion:*' menu select
+
+autoload -Uz compinit
 zmodload zsh/complist
-compinit
-_comp_options+=(globdots)
-# eval "$(dircolors -b)"
+
+zstyle ':completion:*' menu select
 zstyle ':completion:*' matcher-list '' 'm:{a-zA-Z}={A-Za-z}'
-if [[ "$(uname)" == "Linux" ]]; then
-    eval $(dircolors -b ${ZDOTDIR}/.dir_colors)
-fi
-LS_COLORS="$LS_COLORS:ma=42;30"
-export LS_COLORS
-zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 zstyle ':completion:*' list-colors ''
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 
+if [[ "$_OS" == "Linux" ]]; then
+    eval "$(dircolors -b ${ZDOTDIR}/.dir_colors)"
+fi
+zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
+
+ZCOMPDUMP_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/zsh"
+ZCOMPDUMP="${ZCOMPDUMP_DIR}/zcompdump-${ZSH_VERSION}"
+mkdir -p "$ZCOMPDUMP_DIR"
+
+if [[ "$_OS" == "Linux" ]]; then
+    _zcompdump_mtime=$(stat -c %Y "$ZCOMPDUMP" 2>/dev/null || echo 0)
+else
+    # Fallback: no mtime check; still benefits from cached location + -C
+    _zcompdump_mtime=0
+fi
+
+if [[ ! -f "$ZCOMPDUMP" || $(( $(date +%s) - _zcompdump_mtime )) -gt 86400 ]]; then
+    compinit -d "$ZCOMPDUMP"
+else
+    compinit -C -d "$ZCOMPDUMP"
+fi
+unset _zcompdump_mtime
+
+_comp_options+=(globdots)
+
 ## ZSH VI MODE
 source $HOME/.local/share/zsh-plugins/zsh-vi-mode/zsh-vi-mode.plugin.zsh
-# yank to clipboard linux
-if [[ "$(uname)" == "Linux" ]]; then
+
+# yank to clipboard
+if [[ "$_OS" == "Linux" ]]; then
     zvm_vi_yank() {
         zvm_yank
         if [[ -n "$WAYLAND_DISPLAY" ]] && command -v wl-copy >/dev/null 2>&1; then
@@ -50,10 +76,8 @@ if [[ "$(uname)" == "Linux" ]]; then
         else
             printf %s "${CUTBUFFER}" | xclip -sel c
         fi
-
         zvm_exit_visual_mode
     }
-    # macOS
 else
     zvm_vi_yank() {
         zvm_yank
@@ -79,11 +103,10 @@ source $HOME/.local/share/zsh-plugins/zsh-history-substring-search/zsh-history-s
 # Mappings
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
-# bindkey '^I' autosuggest-accept
 
 # Local
 if [[ -d "$HOME/.local/bin" ]]; then
-	PATH="$HOME/.local/bin:$PATH"
+    PATH="$HOME/.local/bin:$PATH"
 fi
 
 # Tmuxifier
@@ -91,9 +114,7 @@ if [[ -d "$HOME/.tmux/plugins/tmuxifier" ]]; then
     export PATH="$HOME/.tmux/plugins/tmuxifier/bin:$PATH"
     eval "$(tmuxifier init -)"
 
-    # tmuxifier layout path
     export TMUXIFIER_LAYOUT_PATH="$HOME/.tmux-layouts"
-
     alias tnew="tmuxifier new-session"
     alias tedit="tmuxifier edit-session"
     alias tload="tmuxifier load-session"
@@ -112,16 +133,17 @@ if [[ -d "$HOME/.pyenv" ]]; then
 fi
 
 # Cargo
-if [ -d "$HOME/.cargo/bin" ]; then
+if [[ -d "$HOME/.cargo/bin" ]]; then
     export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
-# Set up fzf key bindings and fuzzy completion
+# Set up fzf
 eval "$(fzf --zsh)"
 
 # ALIASES
-alias ll="lsd -l"
-alias l="lsd"
+alias ll="lsd -lA"
+alias l="lsd -l"
+alias ls="ls --color=auto"
 alias cat="bat --style=plain,header,grid"
 alias top="btop"
 alias nv="nvim"
@@ -133,14 +155,12 @@ alias grep="grep --color=auto"
 alias fgrep="fgrep --color=auto"
 alias diff="diff --color=auto"
 alias paccheck="pacman -Qq | fzf --preview 'pacman -Qil {}' --layout=reverse --bind 'enter:execute(pacman -Qil {} | less)'"
-alias c++="c++ -std=c++23 -Wall -Wextra -Wconversion -Wsign-conversion --pedantic-errors -ggdb"
 
 if [[ "$TERM" = "xterm-kitty" ]]; then
     alias ssh="TERM=xterm-256color ssh"
 fi
 
-
-# Syntax highlighting plugin goes last
+# Syntax highlighting
 source $HOME/.local/share/zsh-plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 (( ${+ZSH_HIGHLIGHT_STYLES} )) || typeset -A ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[path]=fg=blue
@@ -155,3 +175,7 @@ ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=yellow
 ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
 
 eval "$(direnv hook zsh)"
+
+# if [[ -o interactive ]]; then
+#     fastfetch
+# fi

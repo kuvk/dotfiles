@@ -105,7 +105,6 @@ case "$1" in
                     exit 0
                 fi
             fi
-            echo "$icon"
             exit 0
         fi
 

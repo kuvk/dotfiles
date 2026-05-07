@@ -5,6 +5,7 @@ local opt = vim.opt
 -- opt.shiftwidth = 4
 opt.expandtab = false
 opt.autoindent = true
+opt.fillchars = { eob = " " }
 
 -- Set tab width for specific filetypes
 vim.api.nvim_create_autocmd("FileType", {

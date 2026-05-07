@@ -3,7 +3,7 @@
 * {
   font-family:
     "SF Pro Display", "Font Awesome 6 Free", "Symbols Nerd Font",
-    "FiraCode Nerd Font", "Noto Sans", sans-serif;
+    "JetBrainsMono Nerd Font";
   font-size: 13px;
   min-height: 0;
 }
@@ -13,12 +13,12 @@ tooltip * {
 }
 
 tooltip.background {
-  background: @base-rgba;
-  border-radius: 0.7rem;
+  background: @tooltip-rgba;
+  border-radius: 0.5rem;
 }
 
 tooltip label {
-  color: @green;
+  color: @blue;
 }
 
 /* .modules-left, */
@@ -29,7 +29,7 @@ tooltip label {
 /* } */
 
 #waybar {
-  border-radius: 0.8rem;
+  /* border-radius: 0.8rem; */
   background: @base-rgba;
   /* background: @base; */
   /* background: transparent; */
@@ -41,10 +41,9 @@ tooltip label {
 }
 
 #custom-separator {
-  font-size: 18px;
-  margin: 0 0.3rem 0 0.5rem;
-  margin-top: 0.2rem;
-  color: @overlay-rgba;
+  font-size: 16px;
+  margin: 0.1rem 0.6rem 0.1rem 0.3rem;
+  color: @peach;
 }
 
 #custom-apps,
@@ -67,6 +66,12 @@ tooltip label {
   border-radius: 0.7rem;
   min-width: 10px;
   /* background: linear-gradient(180deg, @surface-rgba 0%, @base-rgba 72%); */
+}
+
+#tray {
+	padding: 0.5rem 1rem;
+  margin: 3px 0 3px 3px;
+  min-width: 10px;
 }
 
 #custom-apps:hover,

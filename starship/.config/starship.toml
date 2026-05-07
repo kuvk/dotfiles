@@ -12,16 +12,7 @@ $git_branch\
 $git_state\
 $git_status\
 $fill\
-$c\
-$rust\
-$golang\
-$nodejs\
-$php\
-$java\
-$kotlin\
-$haskell\
 $python\
-$time\
 $cmd_duration\
 $line_break[╰─ ](peach)$character """
 
@@ -129,7 +120,7 @@ style = "maroon"
 # [python]
 # symbol = " "
 # style = "teal"
-# format = '[[ $symbol( $virtualenv) ](fg:teal)]($style)'
+# format = '[[ ($virtualenv )$symbol ](fg:teal)]($style)'
 
 [python]
 symbol = " "
