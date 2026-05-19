@@ -5,7 +5,7 @@
 }
 {
     "label" : "logout",
-    "action" : "hyprctl dispatch exit",
+    "action" : "hyprshutdown -t 'Logging out ...'",
     "keybind" : "e"
 }
 {

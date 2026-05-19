@@ -7,7 +7,7 @@ import os
 import subprocess
 from pathlib import Path
 
-GENERATED_FILE = Path.home() / ".config/hypr/configs/generated/monitors.conf"
+GENERATED_FILE = Path.home() / ".config/hypr/configs/generated/monitors.lua"
 INTERNAL = "eDP-1"
 MODE = "highres"
 GAMEMODE = Path("/tmp/hypr-gamemode")
@@ -42,30 +42,31 @@ def main() -> None:
     # Laptop internal only
     if edp_present and not external:
         content = f"""
-monitor = {INTERNAL}, {MODE}, auto, 1.3333
-workspace = 1, monitor:{INTERNAL}, persistent:true
-workspace = 2, monitor:{INTERNAL}, persistent:true
-workspace = 3, monitor:{INTERNAL}, persistent:true
-workspace = 4, monitor:{INTERNAL}, persistent:true
-workspace = 5, monitor:{INTERNAL}
+hl.monitor({{output = "{INTERNAL}", mode = "{MODE}", position = "auto", scale = "1.3333"}})
+
+hl.workspace_rule({{ workspace = "1", monitor = "{INTERNAL}", persistent = true}})
+hl.workspace_rule({{ workspace = "2", monitor = "{INTERNAL}", persistent = true}})
+hl.workspace_rule({{ workspace = "3", monitor = "{INTERNAL}", persistent = true}})
+hl.workspace_rule({{ workspace = "4", monitor = "{INTERNAL}", persistent = true}})
+hl.workspace_rule({{ workspace = "5", monitor = "{INTERNAL}", persistent = false}})
 """
     # Laptop with one external
     elif edp_present and external:
         content = f"""
-monitor = {external}, {MODE}, 0x0, 1
-monitor = {INTERNAL}, {MODE}, auto, 1.6
+hl.monitor({{output = "{external}", mode = "{MODE}", position = "0x0", scale = "1"}})
+hl.monitor({{output = "{INTERNAL}", mode = "{MODE}", position = "auto", scale = "1.6"}})
 
-workspace = 1, monitor:{external}, persistent:true
-workspace = 2, monitor:{external}, persistent:true
-workspace = 3, monitor:{external}, persistent:true
-workspace = 4, monitor:{external}, persistent:true
-workspace = 5, monitor:{external}
+hl.workspace_rule({{ workspace = "1", monitor = "{external}", persistent = true}})
+hl.workspace_rule({{ workspace = "2", monitor = "{external}", persistent = true}})
+hl.workspace_rule({{ workspace = "3", monitor = "{external}", persistent = true}})
+hl.workspace_rule({{ workspace = "4", monitor = "{external}", persistent = true}})
+hl.workspace_rule({{ workspace = "5", monitor = "{external}", persistent = false}})
 
-workspace = 6, monitor:{INTERNAL}, persistent:true
-workspace = 7, monitor:{INTERNAL}, persistent:true
-workspace = 8, monitor:{INTERNAL}, persistent:true
-workspace = 9, monitor:{INTERNAL}, persistent:true
-workspace = 10, monitor:{INTERNAL}
+hl.workspace_rule({{ workspace = "6", monitor = "{INTERNAL}", persistent = true}})
+hl.workspace_rule({{ workspace = "7", monitor = "{INTERNAL}", persistent = true}})
+hl.workspace_rule({{ workspace = "8", monitor = "{INTERNAL}", persistent = true}})
+hl.workspace_rule({{ workspace = "9", monitor = "{INTERNAL}", persistent = true}})
+hl.workspace_rule({{ workspace = "10", monitor = "{INTERNAL}", persistent = false}})
 """
 
     hypr_mon_conf.write_text(content, encoding="utf-8")

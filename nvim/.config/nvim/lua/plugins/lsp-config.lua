@@ -48,6 +48,13 @@ return {
 
       vim.lsp.config("lua_ls", {
         capabilities = capabilities,
+        settings = {
+          Lua = {
+            diagnostics = {
+              globals = { "vim", "hl" },
+            },
+          },
+        },
       })
       vim.lsp.config("jinja_lsp", {
         capabilities = capabilities,

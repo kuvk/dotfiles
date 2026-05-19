@@ -45,11 +45,11 @@ set_swaync_gamemode_colors() {
 }
 
 set_rofi_window_bg() {
-  local token="$1"   # @BG or @BGA
-  local f="$ROFI_LAUNCHER"
-  [[ -f "$f" ]] || return 0
+    local token="$1"   # @BG or @BGA
+    local f="$ROFI_LAUNCHER"
+    [[ -f "$f" ]] || return 0
 
-  awk -v tok="$token" '
+    awk -v tok="$token" '
     BEGIN { in_win=0; done=0 }
 
     /^\s*window\s*\{/ { in_win=1 }
@@ -72,24 +72,32 @@ enable() {
 
     set_swaync_gamemode_colors "@base"
     swaync-client -rs
+    set_rofi_window_bg "@BG"
 
-	set_rofi_window_bg "@BG"
-
-    hyprctl --batch "\
-    keyword animations:enabled 0;\
-    keyword decoration:shadow:enabled 0;\
-    keyword decoration:blur:enabled 0;\
-    keyword general:gaps_in 0;\
-    keyword general:gaps_out 0;\
-    keyword general:border_size 1;\
-	keyword general:col.active_border rgb(fab387);\
-	keyword general:col.inactive_border rgb(89b4fa);\
-    keyword decoration:inactive_opacity 1;\
-    keyword decoration:rounding 0;\
-    keyword decoration:rounding_power 0;\
-    keyword windowrule[kitty]:enable false;\
-    keyword windowrule[spotify]:enable false;\
-    keyword windowrule[thunderbird]:enable false"
+    hyprctl eval "
+hl.config({
+    animations = { enabled = false },
+    decoration = {
+        shadow = { enabled = false },
+        blur = { enabled = false },
+        inactive_opacity = 1,
+        rounding = 0,
+        rounding_power = 0,
+    },
+    general = {
+        gaps_in = 0,
+        gaps_out = 0,
+        border_size = 1,
+        col = {
+            active_border = 'rgb(fab387)',
+            inactive_border = 'rgb(89b4fa)',
+        },
+    },
+})
+hl.window_rule({ name = 'kitty', match = { class = 'kitty' }, opaque = true, no_blur = true  })
+hl.window_rule({ name = 'spotify', match = { class = 'spotify' }, opaque = true, no_blur = true })
+hl.window_rule({ name = 'thunderbird', match = { class = 'org.mozilla.Thunderbird' }, opaque = true, no_blur = true })
+"
 
     restart_waybar
     notify "Gamemode is ON."
@@ -103,23 +111,32 @@ disable() {
     set_swaync_gamemode_colors "@base-rgba"
     swaync-client -rs
 
-	set_rofi_window_bg "@BGA"
-
-    hyprctl --batch "\
-    keyword animations:enabled 1;\
-    keyword decoration:shadow:enabled 1;\
-    keyword decoration:blur:enabled 1;\
-    keyword general:gaps_in 2;\
-    keyword general:gaps_out 4;\
-    keyword general:border_size 2;\
-	keyword general:col.active_border rgba(fab387ee);\
-	keyword general:col.inactive_border rgba(89b4faaa);\
-    keyword decoration:inactive_opacity 0.9;\
-    keyword decoration:rounding 6;\
-    keyword decoration:rounding_power 2;\
-    keyword windowrule[kitty]:enable true;\
-    keyword windowrule[spotify]:enable true;\
-    keyword windowrule[thunderbird]:enable true"
+    set_rofi_window_bg "@BGA"
+	
+    hyprctl eval "
+hl.config({
+    animations = { enabled = true },
+    decoration = {
+        shadow = { enabled = true },
+        blur = { enabled = true },
+        inactive_opacity = 0.9,
+        rounding = 6,
+        rounding_power = 2,
+    },
+    general = {
+        gaps_in = 2,
+        gaps_out = 4,
+        border_size = 2,
+        col = {
+            active_border = 'rgba(fab387ee)',
+            inactive_border = 'rgba(89b4faaa)',
+        },
+    },
+})
+hl.window_rule({ name = 'kitty', match = { class = 'kitty' }, opaque = false, no_blur = false })
+hl.window_rule({ name = 'spotify', match = { class = 'spotify' }, opaque = false, no_blur = false })
+hl.window_rule({ name = 'thunderbird', match = { class = 'org.mozilla.Thunderbird' }, opaque = false, no_blur = false  })
+"
 
     restart_waybar
     notify "Gamemode is OFF."

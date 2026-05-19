@@ -61,34 +61,6 @@
     },
 
     // MODULES CENTER
-    "clock": {
-      "format": "{:%H:%M}",
-      // "format-alt": "{:%A %d %B %y - %R}",
-      "tooltip-format": "<span font='JetBrainsMono Nerd Font'> {calendar} </span>",
-      "calendar": {
-        "mode": "month",
-        "mode-mon-col": 3,
-        "weeks-pos": "right",
-        "on-scroll": 1,
-        "on-click": "mode",
-        "format": {
-          "months": "{}",
-          "days": "{}",
-          "weeks": "W{}",
-          "weekdays": "{}",
-          "today": "<span color='#fab387'><b>{}</b></span>",
-        },
-      },
-      "actions": {
-        "on-click": "mode",
-        // "on-click-forward": "tz_up",
-        // "on-click-backward": "tz_down",
-        "on-scroll-up": "shift_up",
-        "on-scroll-down": "shift_down",
-      },
-    },
-
-    // MODULES RIGHT
     "cava": {
       "cava_config": "$XDG_CONFIG_HOME/cava/waybar_cava.conf",
       "input_delay": 2,
@@ -98,6 +70,8 @@
         "on-click-right": "mode",
       },
     },
+
+    // MODULES RIGHT
     "custom/music": {
       "format": "{}",
       "escape": true,
@@ -139,6 +113,8 @@
       "format": "{icon}",
       "format-icons": ["", "", "", "", "", "", "", "", ""],
       "tooltip-format": "{icon} {percent}%",
+			// "scroll_step": 5,
+			"disable-scroll": true,
     },
     "battery": {
       "states": {
@@ -164,11 +140,12 @@
       },
       // "on-scroll-up": "pactl set-sink-volume @DEFAULT_SINK@ +5%",
       // "on-scroll-down": "pactl set-sink-volume @DEFAULT_SINK@ -5%",
-      "on-click": "hyprctl dispatch exec pavucontrol",
+      "on-click": "hyprctl dispatch \"hl.dsp.exec_cmd('pavucontrol')\"",
       "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
       "tooltip": true,
       "tooltip-format": "{desc}: {volume}%",
-      "scroll-step": 5,
+      // "scroll-step": 5,
+			"disable-scroll": true,
       "max-volume": 120,
     },
     "bluetooth": {
@@ -180,7 +157,7 @@
       "tooltip-format-enumerate-connected": "{device_alias}",
       "tooltip-format-on": "Bluetooth: on",
       "tooltip-format-off": "Bluetooth: off",
-      "on-click": "hyprctl dispatch exec blueman-manager",
+      "on-click": "hyprctl dispatch \"hl.dsp.exec_cmd('blueman-manager')\"",
       "on-click-right": "~/.config/scripts/toggle_bluetooth.sh",
     },
     "network": {
@@ -191,7 +168,7 @@
       "format-unknown": "󰤫",
       "format-disconnected": "󰤭",
       "format-disabled": "",
-      "on-click": "nm-connection-editor",
+      "on-click": "hyprctl dispatch \"hl.dsp.exec_cmd('nm-connection-editor')\"",
       "tooltip-format-wifi": "{essid}  󰖩 {signalStrength}%",
       "tooltip-format-ethernet": "{ifname} ",
       "tooltip-format-disconnected": "Disconnected",
@@ -217,6 +194,32 @@
       "on-click-right": "~/.config/scripts/mpvpaper-toggle.sh",
       "return-type": "json",
       "tooltip": true,
+    },
+    "clock": {
+      "format": "{:%H:%M}",
+      // "format-alt": "{:%A %d %B %y - %R}",
+      "tooltip-format": "<span font='JetBrainsMono Nerd Font'> {calendar} </span>",
+      "calendar": {
+        "mode": "month",
+        "mode-mon-col": 3,
+        "weeks-pos": "right",
+        "on-scroll": 1,
+        "on-click": "mode",
+        "format": {
+          "months": "{}",
+          "days": "{}",
+          "weeks": "W{}",
+          "weekdays": "{}",
+          "today": "<span color='#fab387'><b>{}</b></span>",
+        },
+      },
+      "actions": {
+        "on-click": "mode",
+        // "on-click-forward": "tz_up",
+        // "on-click-backward": "tz_down",
+        "on-scroll-up": "shift_up",
+        "on-scroll-down": "shift_down",
+      },
     },
     "custom/notifications": {
       "tooltip": true,

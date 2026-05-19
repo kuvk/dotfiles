@@ -29,7 +29,7 @@ sleep 0.2
 
 hyprctl -j monitors | jq -r '.[] | "\(.name)\t\(.activeWorkspace.id)"' | \
     while IFS=$'\t' read -r mon ws; do
-    hyprctl dispatch exec "[workspace ${ws}] kitty --title \"MATRIXLOCK\" --start-as=fullscreen \"$MATRIX_SCRIPT\"" >/dev/null
+	hyprctl eval "hl.exec_cmd('kitty --title \"MATRIXLOCK\" --start-as=fullscreen \"$MATRIX_SCRIPT\"', { workspace = '${ws}' })"
 done
 
 wait "$LOCKPID" || true
