@@ -36,7 +36,7 @@ return {
       dashboard.section.footer.val = {
         [[                     .]],
         [[                    / V\]],
-        [[       KUVK       / `  /]],
+        [[       DORI       / `  /]],
         [[                 <<   |]],
         [[                 /    |]],
         [[               /      |]],
