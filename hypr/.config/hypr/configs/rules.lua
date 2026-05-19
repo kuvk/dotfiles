@@ -90,7 +90,8 @@ local apps = {
   { name = "vlc", class = "vlc", no_blur = true, opaque = true },
   { name = "brasero", class = "brasero", float = true, center = true },
   { name = "rog-control-center", class = "rog-control-center", float = true, center = true, size = "950 600" },
-  { name = "openrgb", class = ".*OpenRGB.*", float = true, center = true, size = "950 600" },
+  { name = "openrgb", class = "org.openrgb.OpenRGB", float = true, center = true, size = "950 600" },
+  { name = "coolercontrol", class = "org.coolercontrol.CoolerControl", float = true, center = true, size = "1100 700" },
   { name = "timeshift", class = "timeshift-gtk", float = true, center = true },
   { name = "frame-checker", class = "Frame Checker", float = true, center = true },
   { name = "gpicview", class = "gpicview", float = true, center = true, size = "1000 600" },
@@ -101,7 +102,6 @@ local apps = {
   { name = "virt-manager", class = "virt-manager", float = true, center = true, size = "800 700" },
   { name = "cameractrls", class = "hu.irl.cameractrls", float = true, center = true, size = "600 800" },
 }
-
 
 for _, app in ipairs(apps) do
   hl.window_rule({
