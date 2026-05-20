@@ -121,8 +121,11 @@ if [[ -d "$HOME/.tmux/plugins/tmuxifier" ]]; then
 fi
 
 # Spicetify
-if [[ -d "$HOME/.config/.spicetify" ]]; then
+if [[ -d "$HOME/.config/spicetify" ]]; then
     export PATH="$HOME/.config/spicetify:$PATH"
+fi
+if [[ -d "$HOME/.spicetify" ]]; then
+    export PATH="$HOME/.spicetify:$PATH"
 fi
 
 # Pyenv

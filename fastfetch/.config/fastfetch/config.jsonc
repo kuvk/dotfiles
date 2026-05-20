@@ -95,6 +95,11 @@
     {
       "key": "│ {#34}󰇄  desktop {#keys}│",
       "type": "de",
+			"format": "{pretty-name}"
+    },
+    {
+      "key": "│ {#34}  pkgs    {#keys}│",
+      "type": "packages",
     },
     {
       "key": "│ {#34}  term    {#keys}│",

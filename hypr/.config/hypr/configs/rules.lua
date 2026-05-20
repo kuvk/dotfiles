@@ -75,13 +75,31 @@ hl.window_rule({
   match = { class = "org.mozilla.Thunderbird" },
   opacity = "0.9 0.9 1",
 })
-
 hl.window_rule({
   name = "thunderbird-write",
   match = { title = ".*Write:.*" },
   float = true,
   center = true,
   size = "800 700",
+})
+
+-- Steam
+hl.window_rule({
+  name = "steam-popups",
+  match = { title = ".*Friends.*|.*Steam Settings.*" },
+  float = true,
+	center = true,
+})
+
+-- Bitwarden
+hl.window_rule({
+  name = "bitwarden",
+  match = { initial_title = "_crx_.*" },
+  float = true,
+  pin = true,
+  center = true,
+  stay_focused = true,
+  size = "400 600",
 })
 
 -- Applications
@@ -99,8 +117,13 @@ local apps = {
   { name = "pavucontrol", class = "org.pulseaudio.pavucontrol", float = true, center = true, size = "700 600" },
   { name = "blueman-manager", class = "blueman-manager", float = true, center = true, size = "700 600" },
   { name = "nm-connection-editor", class = "nm-connection-editor", float = true, center = true, size = "800 700" },
+  { name = "nvidia-settings", class = "nvidia-settings", float = true, center = true, size = "800 700" },
   { name = "virt-manager", class = "virt-manager", float = true, center = true, size = "800 700" },
   { name = "cameractrls", class = "hu.irl.cameractrls", float = true, center = true, size = "600 800" },
+  { name = "lutris", class = "net.lutris.Lutris", no_blur = true, opaque = true, center = true, idle_inhibit = "always" },
+  { name = "heroic", class = ".*heroic.*", no_blur = true, opaque = true, center = true, idle_inhibit = "always" },
+  { name = "steam", class = "steam", no_blur = true, opaque = true, center = true, idle_inhibit = "always" },
+  { name = "protonqt", class = "net.davidotek.pupgui2", float = true, center = true, size = "700 600" },
 }
 
 for _, app in ipairs(apps) do
@@ -112,34 +135,6 @@ for _, app in ipairs(apps) do
     size = app.size,
     no_blur = app.no_blur,
     opaque = app.opaque,
+    idle_inhibit = app.idle_inhibit,
   })
 end
-
--- Steam
-hl.window_rule({
-  name = "steam",
-  match = { initial_class = "steam" },
-  no_blur = true,
-  opaque = true,
-  center = true,
-  idle_inhibit = "always",
-})
-
-hl.window_rule({
-  name = "steam-other",
-  match = { title = "Steam" },
-  no_blur = true,
-  opaque = true,
-  center = true,
-})
-
--- Bitwarden
-hl.window_rule({
-  name = "bitwarden",
-  match = { initial_title = "_crx_.*" },
-  float = true,
-  pin = true,
-  center = true,
-  stay_focused = true,
-  size = "400 600",
-})
