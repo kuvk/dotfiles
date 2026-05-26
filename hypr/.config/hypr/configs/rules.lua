@@ -116,6 +116,7 @@ local apps = {
   { name = "heroic", class = ".*heroic.*", no_blur = true, opaque = true, center = true, idle_inhibit = "always" },
   { name = "steam", class = "steam", no_blur = true, opaque = true, float = true, center = true, idle_inhibit = "always" },
   { name = "protonqt", class = "net.davidotek.pupgui2", float = true, center = true, size = "700 600" },
+  { name = "zathura", class = "org.pwmt.zathura", float = true, center = true, size = "1100 1200" },
 }
 
 for _, app in ipairs(apps) do
