@@ -83,14 +83,6 @@ hl.window_rule({
   size = "800 700",
 })
 
--- Steam
-hl.window_rule({
-  name = "steam-popups",
-  match = { title = ".*Friends.*|.*Steam Settings.*" },
-  float = true,
-	center = true,
-})
-
 -- Bitwarden
 hl.window_rule({
   name = "bitwarden",
@@ -122,7 +114,7 @@ local apps = {
   { name = "cameractrls", class = "hu.irl.cameractrls", float = true, center = true, size = "600 800" },
   { name = "lutris", class = "net.lutris.Lutris", no_blur = true, opaque = true, center = true, idle_inhibit = "always" },
   { name = "heroic", class = ".*heroic.*", no_blur = true, opaque = true, center = true, idle_inhibit = "always" },
-  { name = "steam", class = "steam", no_blur = true, opaque = true, center = true, idle_inhibit = "always" },
+  { name = "steam", class = "steam", no_blur = true, opaque = true, float = true, center = true, idle_inhibit = "always" },
   { name = "protonqt", class = "net.davidotek.pupgui2", float = true, center = true, size = "700 600" },
 }
 
@@ -138,3 +130,19 @@ for _, app in ipairs(apps) do
     idle_inhibit = app.idle_inhibit,
   })
 end
+
+-- Steam
+hl.window_rule({
+  name = "steam-main",
+  match = { title = "Steam" },
+  float = false,
+})
+
+-- Ubisoft Connect
+hl.window_rule({
+  name = "ubisoft-connect",
+  match = { title = "Ubisoft Connect" },
+  float = true,
+  center = true,
+})
+

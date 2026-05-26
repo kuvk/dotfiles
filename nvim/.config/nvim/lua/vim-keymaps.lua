@@ -42,3 +42,4 @@ keymap.set("n", "<leader>nh", ":nohlsearch<CR>")
 
 -- Markdown Preview
 keymap.set("n", "<leader>mp", ":MarkdownPreviewToggle<CR>")
+keymap.set("n", "<leader>ll", ":Lazy<CR>")

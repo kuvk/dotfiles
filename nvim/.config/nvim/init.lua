@@ -1,4 +1,3 @@
--- Lazy package manager
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
   local lazyrepo = "https://github.com/folke/lazy.nvim.git"
@@ -19,4 +18,12 @@ require("vim-options")
 require("vim-keymaps")
 
 -- Setup lazy.nvim
-require("lazy").setup("plugins")
+require("lazy").setup({
+  spec = {
+    { import = "plugins" },
+  },
+  ui = {
+    border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
+  },
+  install = { colorscheme = { "catppuccin" } },
+})

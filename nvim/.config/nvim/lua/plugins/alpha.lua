@@ -22,8 +22,9 @@ return {
         [[                                                                       ]],
         [[                                                                       ]],
       }
+      dashboard.section.header.opts.hl = "AlphaHeader"
 
-      dashboard.section.buttons.val = {
+      local buttons = {
         dashboard.button("e", "  > New File", "<cmd>ene<CR>"),
         dashboard.button("C-n", "  > File Explorer", "<cmd>Neotree toggle<CR>"),
         dashboard.button("SPC ff", "󰱽  > Find File", "<cmd>Telescope find_files hidden=true<CR>"),
@@ -32,20 +33,29 @@ return {
         dashboard.button("SPC wa", "  > Saved Sessions", "<cmd>AutoSession search<CR>"),
         dashboard.button("q", "󰿅  > Quit NVIM", "<cmd>qa<CR>"),
       }
+      for _, button in ipairs(buttons) do
+        button.opts.hl = "AlphaButtons"
+        button.opts.hl_shortcut = "AlphaShortcut"
+      end
+
+      dashboard.section.buttons.val = buttons
 
       dashboard.section.footer.val = {
-        [[                     .]],
-        [[                    / V\]],
-        [[       DORI       / `  /]],
-        [[                 <<   |]],
-        [[                 /    |]],
-        [[               /      |]],
-        [[             /        |]],
-        [[           /    \  \ /]],
-        [[          (      ) | |]],
-        [[  ________|   _/_  | |]],
-        [[<__________\______)\__)]],
+        [[]],
+        [[]],
+        [[                     .		  	]],
+        [[                    / V\	  	]],
+        [[       DORI       / `  /	  	]],
+        [[                 <<   |		  	]],
+        [[                 /    |		  	]],
+        [[               /      |		  	]],
+        [[             /        |		  	]],
+        [[           /    \  \ /		  	]],
+        [[          (      ) | |		  	]],
+        [[  ________|   _/_  | |		  	]],
+        [[<__________\______)\__)		  	]],
       }
+      dashboard.section.footer.opts.hl = "AlphaFooter"
 
       alpha.setup(dashboard.opts)
     end,

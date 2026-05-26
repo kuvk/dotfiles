@@ -93,7 +93,7 @@ ZVM_OPPEND_MODE_CURSOR=$ZVM_CURSOR_BLINKING_UNDERLINE
 ZVM_VISUAL_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
 ZVM_VISUAL_LINE_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
 ZVM_VI_HIGHLIGHT_BACKGROUND=black
-ZVM_VI_HIGHLIGHT_FOREGROUND=green
+ZVM_VI_HIGHLIGHT_FOREGROUND=magenta
 ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
 
 # HISTORY AND AUTOSUGGESTIONS
@@ -144,9 +144,9 @@ fi
 eval "$(fzf --zsh)"
 
 # ALIASES
-alias ll="lsd -lA"
-alias l="lsd -l"
-alias ls="ls --color=auto"
+alias ll="lsd -lA --group-directories-first"
+alias l="lsd -l  --group-directories-first"
+alias ls="ls --color=auto  --group-directories-first"
 alias cat="bat --style=plain,header,grid"
 alias dots="cd \"$HOME/dotfiles\""
 alias top="btop"

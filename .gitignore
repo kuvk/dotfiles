@@ -12,5 +12,5 @@ shaders/
 cava/.config/cava/themes/
 *.bak
 generated/
-plugins/
-flavors/
+yazi/.config/yazi/plugins/
+yazi/.config/yazi/flavors/

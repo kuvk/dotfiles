@@ -2,7 +2,11 @@ return {
   {
     "williamboman/mason.nvim",
     config = function()
-      require("mason").setup()
+      require("mason").setup({
+        ui = {
+          border = "rounded",
+        },
+      })
     end,
     vim.keymap.set("n", "<leader>mm", ":Mason<CR>", {}),
   },
@@ -51,7 +55,7 @@ return {
         settings = {
           Lua = {
             diagnostics = {
-              globals = { "vim", "hl" },
+              globals = { "vim", "hl", "catppuccin" },
             },
           },
         },
