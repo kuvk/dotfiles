@@ -132,11 +132,19 @@ for _, app in ipairs(apps) do
   })
 end
 
+-- WhatsApp
+hl.window_rule({
+  name = "whatsapp",
+  match = { title = "WhatsApp Web" },
+  float = false,
+})
+
 -- Steam
 hl.window_rule({
   name = "steam-main",
   match = { title = "Steam" },
   float = false,
+	center = true,
 })
 
 -- Ubisoft Connect

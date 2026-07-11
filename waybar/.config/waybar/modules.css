@@ -1,7 +1,7 @@
 @import "mocha.css";
 #custom-separator {
   font-size: 16px;
-  margin: 0.1rem 0.6rem 0.1rem 0.3rem;
+  margin: 0.1rem 0.8rem 0.1rem 0.8rem;
   color: @peach;
 }
 
@@ -29,7 +29,7 @@
 
 #tray {
 	padding: 0.5rem 1rem;
-  margin: 3px 0 3px 3px;
+  margin: 3px 0 3px 0px;
   min-width: 10px;
 }
 
