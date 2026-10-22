@@ -55,6 +55,13 @@ hl.window_rule({
   opacity = "0.9 0.9 1",
 })
 
+-- dolphin 
+hl.window_rule({
+  name = "dolphin",
+  match = { class = "org.kde.dolphin" },
+  opacity = "0.9 0.9 1",
+})
+
 -- Spotify
 hl.window_rule({
   name = "spotify",
@@ -104,6 +111,7 @@ local apps = {
   { name = "coolercontrol", class = "org.coolercontrol.CoolerControl", float = true, center = true, size = "1100 700" },
   { name = "timeshift", class = "timeshift-gtk", float = true, center = true },
   { name = "frame-checker", class = "Frame Checker", float = true, center = true },
+  { name = "kdeconnect", class = "org.kde.kdeconnect.*", float = true, center = true },
   { name = "gpicview", class = "gpicview", float = true, center = true, size = "1000 600" },
   { name = "nwg-look", class = "nwg-look", float = true, center = true, size = "700 600" },
   { name = "pavucontrol", class = "org.pulseaudio.pavucontrol", float = true, center = true, size = "700 600" },
@@ -112,11 +120,14 @@ local apps = {
   { name = "nvidia-settings", class = "nvidia-settings", float = true, center = true, size = "800 700" },
   { name = "virt-manager", class = "virt-manager", float = true, center = true, size = "800 700" },
   { name = "cameractrls", class = "hu.irl.cameractrls", float = true, center = true, size = "600 800" },
-  { name = "lutris", class = "net.lutris.Lutris", no_blur = true, opaque = true, center = true, idle_inhibit = "always" },
-  { name = "heroic", class = ".*heroic.*", no_blur = true, opaque = true, center = true, idle_inhibit = "always" },
-  { name = "steam", class = "steam", no_blur = true, opaque = true, float = true, center = true, idle_inhibit = "always" },
+  -- { name = "lutris", class = "net.lutris.Lutris", no_blur = true, opaque = true, center = true, idle_inhibit = "always" },
+  { name = "heroic", class = ".*heroic.*", no_blur = true, opaque = true, center = true},
+  { name = "steam", class = "steam", no_blur = true, opaque = true, float = true, center = true},
+  { name = "games", class = "steam_app.*", idle_inhibit = "always" },
   { name = "protonqt", class = "net.davidotek.pupgui2", float = true, center = true, size = "700 600" },
   { name = "zathura", class = "org.pwmt.zathura", float = true, center = true, size = "1100 1200" },
+  { name = "remmina", class = "org.remmina.Remmina", no_blur = true, opaque = true, float = true, center = true},
+  { name = "davinci", class = "resolve", no_blur = true, opaque = true, float = true},
 }
 
 for _, app in ipairs(apps) do
@@ -155,3 +166,10 @@ hl.window_rule({
   center = true,
 })
 
+-- Rockstar
+hl.window_rule({
+  name = "rockstar",
+  match = { title = "Rockstar Games.*" },
+  float = true,
+  center = true,
+})

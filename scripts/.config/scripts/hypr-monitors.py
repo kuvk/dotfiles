@@ -71,7 +71,7 @@ hl.workspace_rule({{ workspace = "10", monitor = "{INTERNAL}", persistent = fals
 
     hypr_mon_conf.write_text(content, encoding="utf-8")
     # run(["cat", f"{GENERATED_FILE}"])
-    
+
     # Turn off gamemode if on
     if GAMEMODE.exists():
         run(["/usr/bin/bash", f"{GAMEMODE_SCRIPT}"])

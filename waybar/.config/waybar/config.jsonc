@@ -1,7 +1,7 @@
 [
   {
     "layer": "top", // Waybar at top layer
-    "position": "top", // Waybar position (top|bottom|left|right)
+    "position": "bottom", // Waybar position (top|bottom|left|right)
     "reload_style_on_change": true,
     // "margin-top": 8,
     // "margin-right": 10,
@@ -21,12 +21,10 @@
       "bluetooth",
       "network",
       "battery",
-      "backlight",
-      "custom/nightlight",
       "group/slide",
       "hyprland/language",
       "clock",
-      "custom/mpvpaper",
+      "tray",
       "custom/notifications",
       "custom/power",
     ],
@@ -94,7 +92,12 @@
         "transition-left-to-right": false,
         "click-to-reveal": false,
       },
-      "modules": ["custom/separator", "tray"],
+      "modules": [
+        "custom/separator",
+        "backlight",
+        "custom/nightlight",
+        "custom/mpvpaper",
+      ],
     },
     "custom/separator": {
       "format": "",

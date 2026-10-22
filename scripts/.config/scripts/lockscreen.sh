@@ -11,7 +11,7 @@ flock -n 9 || exit 0
 cleanup() {
     pkill -f "$KITTY_MATCH" 2>/dev/null || true
     sleep 0.1
-    hyprctl dispatch exec waybar
+	hyprctl eval "hl.exec_cmd('exec waybar')"
     swaync-client -df
 }
 trap cleanup EXIT INT TERM
@@ -20,7 +20,7 @@ FOCUSED_MONITOR="$(hyprctl -j monitors | jq -r '.[] | select(.focused == true) |
 
 cleanup
 
-hyprctl dispatch exec pkill waybar
+hyprctl eval "hl.exec_cmd('pkill waybar')"
 swaync-client -dn &
 hyprlock &
 LOCKPID=$!
@@ -36,5 +36,5 @@ wait "$LOCKPID" || true
 
 # Restore focus
 if [ -n "${FOCUSED_MONITOR:-}" ]; then
-    hyprctl dispatch focusmonitor "$FOCUSED_MONITOR" >/dev/null 2>&1 || true
+hyprctl eval "hl.dispatch(focusmonitor \"$FOCUSED_MONITOR\" >/dev/null 2>&1 || true)"
 fi
