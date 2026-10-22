@@ -15,6 +15,14 @@ show_symlink = true
 play = [
 	{ run = 'vlc "$@"', orphan = true, for = "linux" },
 ]
+pinta_image = [
+	{ run = 'pinta %s', orphan = true }
+]
+
+[open]
+rules = [
+	{ mime = "image/*", use = "pinta_image" }
+]   
 
 [plugin]
 

@@ -109,7 +109,7 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter", "BufRead", "BufNewFile"
       c = true,
       cpp = true,
       sh = true,
-			lua = true,
+      lua = true,
     }
 
     if with_col80[ft] then
@@ -126,4 +126,3 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.bo[ev.buf].commentstring = "# %s"
   end,
 })
-

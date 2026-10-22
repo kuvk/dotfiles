@@ -104,9 +104,20 @@ source $HOME/.local/share/zsh-plugins/zsh-history-substring-search/zsh-history-s
 bindkey '^[[A' history-substring-search-up
 bindkey '^[[B' history-substring-search-down
 
+# fzf
+eval "$(direnv hook zsh)"
+eval "$(zoxide init zsh)"
+eval "$(fzf --zsh)"
+
+autoload -Uz add-zsh-hook
+_fzf_init() {
+    source <(fzf --zsh)
+}
+add-zsh-hook -Uz precmd _fzf_init   
+
 # Local
 if [[ -d "$HOME/.local/bin" ]]; then
-    PATH="$HOME/.local/bin:$PATH"
+	export PATH="$HOME/.local/bin:$PATH"
 fi
 
 # Tmuxifier
@@ -140,20 +151,20 @@ if [[ -d "$HOME/.cargo/bin" ]]; then
     export PATH="$HOME/.cargo/bin:$PATH"
 fi
 
-# Set up fzf
-eval "$(fzf --zsh)"
 
 # ALIASES
-alias ll="lsd -lA --group-directories-first"
-alias l="lsd -l  --group-directories-first"
-alias ls="ls --color=auto  --group-directories-first"
+alias cd="z"
+alias cdi="zi"
+alias ll="eza -lAh --group-directories-first --git --icons=always"
+alias l="eza -lh  --group-directories-first --git --icons=always"
+alias ls="eza --group-directories-first --icons=always"
 alias cat="bat --style=plain,header,grid"
-alias dots="cd \"$HOME/dotfiles\""
+alias dots="z \"$HOME/dotfiles\""
 alias top="btop"
 alias nv="nvim"
 alias fzf="fzf --preview='bat --color=always --style=plain,header,grid {}'"
-alias tmuxa="tmux attach"
-alias tmuxd="tmux detach"
+alias ta="tmux attach"
+alias td="tmux detach"
 alias ip="ip --color=auto"
 alias grep="grep --color=auto"
 alias fgrep="fgrep --color=auto"
@@ -177,8 +188,6 @@ ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=cyan
 ZSH_HIGHLIGHT_STYLES[redirection]=fg=yellow
 ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=yellow
 ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
-
-eval "$(direnv hook zsh)"
 
 # if [[ -o interactive ]]; then
 #     fastfetch

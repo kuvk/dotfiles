@@ -21,6 +21,7 @@ return {
           "jinja_lsp",
           "bashls",
           "clangd",
+          "qmlls",
         },
       })
     end,
@@ -90,6 +91,16 @@ return {
       vim.lsp.config("clangd", {
         capabilities = capabilities,
       })
+      vim.lsp.config("qmlls", {
+        capabilities = capabilities,
+        cmd = { "qmlls6" },
+        filetypes = { "qml", "qmljs" },
+        offset_encoding = "utf-8", -- sometimes helps with token position bugs
+        on_attach = function(client, _)
+          client.server_capabilities.semanticTokensProvider = nil
+        end,
+      })
+
       vim.keymap.set("n", "K", vim.lsp.buf.hover, {})
       vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, {})
       vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, {})

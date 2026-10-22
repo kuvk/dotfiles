@@ -38,6 +38,7 @@ def main() -> None:
     edp_present = INTERNAL in names
 
     external = next((n for n in names if n != INTERNAL), "")
+    external2nd = next((n for n in names if n != INTERNAL and n != external), "")
 
     # Laptop internal only
     if edp_present and not external:
@@ -51,7 +52,25 @@ hl.workspace_rule({{ workspace = "4", monitor = "{INTERNAL}", persistent = true}
 hl.workspace_rule({{ workspace = "5", monitor = "{INTERNAL}", persistent = false}})
 """
     # Laptop with one external
-    elif edp_present and external:
+    elif edp_present and external and external2nd:
+        content = f"""
+hl.monitor({{output = "{external2nd}", mode = "{MODE}", position = "0x0", scale = "1"}})
+hl.monitor({{output = "{external}", mode = "{MODE}", position = "2560x0", scale = "1"}})
+hl.monitor({{output = "{INTERNAL}", mode = "{MODE}", position = "auto", scale = "1.6"}})
+
+hl.workspace_rule({{ workspace = "1", monitor = "{external2nd}", persistent = true}})
+hl.workspace_rule({{ workspace = "2", monitor = "{external2nd}", persistent = true}})
+hl.workspace_rule({{ workspace = "3", monitor = "{external2nd}", persistent = true}})
+
+hl.workspace_rule({{ workspace = "4", monitor = "{external}", persistent = true}})
+hl.workspace_rule({{ workspace = "5", monitor = "{external}", persistent = true}})
+hl.workspace_rule({{ workspace = "6", monitor = "{external}", persistent = true}})
+
+hl.workspace_rule({{ workspace = "7", monitor = "{INTERNAL}", persistent = true}})
+hl.workspace_rule({{ workspace = "8", monitor = "{INTERNAL}", persistent = true}})
+hl.workspace_rule({{ workspace = "9", monitor = "{INTERNAL}", persistent = true}})
+"""
+    else:
         content = f"""
 hl.monitor({{output = "{external}", mode = "{MODE}", position = "0x0", scale = "1"}})
 hl.monitor({{output = "{INTERNAL}", mode = "{MODE}", position = "auto", scale = "1.6"}})
@@ -71,7 +90,7 @@ hl.workspace_rule({{ workspace = "10", monitor = "{INTERNAL}", persistent = fals
 
     hypr_mon_conf.write_text(content, encoding="utf-8")
     # run(["cat", f"{GENERATED_FILE}"])
-    
+
     # Turn off gamemode if on
     if GAMEMODE.exists():
         run(["/usr/bin/bash", f"{GAMEMODE_SCRIPT}"])

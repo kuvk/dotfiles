@@ -55,7 +55,7 @@ return {
       "css",
       "go",
       "hocon",
-			"ini",
+      "ini",
       "java",
       "javascript",
       "jsx",
@@ -81,6 +81,7 @@ return {
       "yaml",
       "toml",
       "rasi",
+      "qmljs",
     })
   end,
 }

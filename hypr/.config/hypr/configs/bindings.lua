@@ -3,6 +3,7 @@
 ---------------------
 local terminal = "kitty"
 local fileManager = terminal .. " -e yazi"
+-- local fileManager = "dolphin"
 local menu = "~/.config/scripts/app-launcher.sh || pkill rofi"
 local browser = "brave"
 local notifications = "swaync-client -t"

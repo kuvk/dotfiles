@@ -14,3 +14,4 @@ cava/.config/cava/themes/
 generated/
 yazi/.config/yazi/plugins/
 yazi/.config/yazi/flavors/
+.qmlls.ini
