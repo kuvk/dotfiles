@@ -1,6 +1,6 @@
 -- Layer Rules
 hl.layer_rule({
-  match = { class = "^(quickshell-.*|waybar)$" },
+  match = { class = "^(quickshell-.*)$" },
   blur = true,
   ignore_alpha = 0.5,
 })
@@ -112,6 +112,7 @@ local apps = {
   { name = "frame-checker", class = "Frame Checker", float = true, center = true },
   { name = "pinta", class = ".*Pinta.*", float = true, center = true },
   -- { name = "qs", class = "org.quickshell", float = true, center = true },	
+  { name = "cliamp", class = "cliamp", float = true, center = true, size = "900 600" },
   { name = "localsend", class = "org.localsend.localsend_app", float = true, center = true, size = "900 450" },
   { name = "nwg-look", class = "nwg-look", float = true, center = true, size = "700 600" },
   { name = "pavucontrol", class = "org.pulseaudio.pavucontrol", float = true, center = true, size = "700 600" },

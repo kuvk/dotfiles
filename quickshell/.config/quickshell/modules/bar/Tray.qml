@@ -1,8 +1,6 @@
 import QtQuick
-import QtQuick.Effects
 import Quickshell
 import Quickshell.Services.SystemTray
-import Quickshell.Widgets
 import qs.config
 import qs.components
 import qs.services
@@ -90,23 +88,8 @@ Item {
                         }
                     }
 
-                    IconImage {
-                        implicitSize: 15
-                        // Panel Settings > Monochrome tray icons
-                        layer.enabled: Config.trayMonochrome
-                        layer.effect: MultiEffect {
-                            colorization: 1
-                            colorizationColor: Theme.subtext1
-                        }
-                        source: {
-                            // Some apps (Steam, Discord, ...) send "name?path=/dir"
-                            let icon = item.modelData.icon;
-                            if (icon.includes("?path=")) {
-                                const [name, path] = icon.split("?path=");
-                                icon = `file://${path}/${name.slice(name.lastIndexOf("/") + 1)}`;
-                            }
-                            return icon;
-                        }
+                    TrayIcon {
+                        item: item.modelData
                     }
                 }
             }

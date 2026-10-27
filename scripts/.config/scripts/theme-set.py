@@ -38,7 +38,11 @@ EXTRA_DESTINATIONS = {
     "bat.tmTheme": HOME / ".config/bat/themes/Current.tmTheme",
     "cava": HOME / ".config/cava/themes/current",
     "yazi-theme.toml": HOME / ".config/yazi/theme.toml",
+    "tmux.conf": HOME / ".tmux/plugins/catppuccin/tmux/themes/catppuccin_current_tmux.conf",
+    "cliamp.toml": HOME / ".config/cliamp/themes/system.toml",
 }
+# Written only when the app's folder exists (don't create a half plugin dir)
+ONLY_IF_PRESENT = {"tmux.conf", "cliamp.toml"}
 
 STARSHIP_SOURCE = HOME / ".config/starship/base.toml"
 STARSHIP_OUTPUT = HOME / ".config/starship.toml"
@@ -198,6 +202,8 @@ def generate(name: str) -> dict:
         content = render(tpl.read_text(), theme, tpl.name)
         write_if_changed(CURRENT_DIR / out_name, content)
         if out_name in EXTRA_DESTINATIONS:
+            if out_name in ONLY_IF_PRESENT and not EXTRA_DESTINATIONS[out_name].parent.parent.is_dir():
+                continue
             try:
                 if write_if_changed(EXTRA_DESTINATIONS[out_name], content):
                     theme["changed"].add(out_name)
@@ -245,9 +251,11 @@ def reload_apps(theme: dict) -> None:
     # bat reads themes from a cache that must be rebuilt
     if "bat.tmTheme" in theme.get("changed", ()) and shutil.which("bat"):
         run_quiet(["bat", "cache", "--build"])
-    run_quiet(["pkill", "-USR2", "-x", "waybar"])
     if shutil.which("tmux") and subprocess.run(["tmux", "info"], capture_output=True).returncode == 0:
         run_quiet(["tmux", "source-file", str(HOME / ".tmux.conf")])
+    # a running cliamp re-reads the theme file when told to switch to it
+    if "cliamp.toml" in theme.get("changed", ()) and shutil.which("cliamp") and (HOME / ".config/cliamp/cliamp.sock").exists():
+        run_quiet(["cliamp", "theme", "system"])
 
     browsers(colors["base"])
 

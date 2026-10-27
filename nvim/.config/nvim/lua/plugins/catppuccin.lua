@@ -26,5 +26,8 @@ return {
         }
       end,
     })
+    -- Apply the system theme here, before other plugins (bufferline, lualine)
+    -- set up their highlights. See lua/theme.lua.
+    require("theme").setup()
   end,
 }

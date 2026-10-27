@@ -9,16 +9,20 @@ BarButton {
     visible: Media.active !== null && Media.label !== ""
     onWheel: wheel => wheel.angleDelta.y > 0 ? Media.active?.previous() : Media.active?.next()
 
-    // Visualizer while playing (cava), the player icon otherwise
+    // Small fixed-size visualizer in place of the player icon (Settings can
+    // turn it off); idle bar bottoms show when nothing sounds
     CavaBars {
         anchors.verticalCenter: parent.verticalCenter
-        visible: Cava.values.length > 0
-        barWidth: 2
-        maxHeight: Theme.iconSize
+        visible: Config.cava
+        width: 26
+        height: Theme.iconSize
+        count: 8
+        spacing: 1
+        minHeight: 2
     }
 
     Icon {
-        visible: Cava.values.length === 0
+        visible: !Config.cava
         text: Media.iconFor(Media.active)
         color: Theme.sky
     }

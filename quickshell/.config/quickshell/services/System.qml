@@ -12,9 +12,26 @@ Singleton {
     readonly property string scripts: Quickshell.env("HOME") + "/.config/scripts/"
 
     property bool nightlight: false
-    // Holds a systemd idle inhibitor, which hypridle respects (like media-inhibit.sh)
+    // Holds a systemd idle inhibitor, which hypridle respects
     property bool stayAwake: false
+    // Work-Game Mode (hypr-gamemode.sh reports its state over IPC)
     property bool gamemode: false
+    // Stay Awake was switched on by Work-Game Mode, so leaving it switches it off
+    property bool awakeForGamemode: false
+    // Something is playing: keep the screen awake (replaces media-inhibit.sh)
+    readonly property bool mediaPlaying: Media.players.some(p => p.isPlaying)
+
+    function setGamemode(on: bool): void {
+        gamemode = on;
+        if (on && !stayAwake) {
+            stayAwake = true;
+            awakeForGamemode = true;
+        } else if (!on && awakeForGamemode) {
+            stayAwake = false;
+            awakeForGamemode = false;
+        }
+        Hypr.applyGaps();
+    }
     property bool hasBrightness: false
     property real brightness: 0
 
@@ -30,9 +47,8 @@ Singleton {
     }
 
     function toggleGamemode(): void {
+        // the script reports back through `qs ipc call theme gamemode`
         Quickshell.execDetached([scripts + "hypr-gamemode.sh"]);
-        gamemode = !gamemode;
-        delayedRefresh.restart();
     }
 
     function setBrightness(value: real): void {
@@ -81,6 +97,11 @@ Singleton {
     Process {
         running: root.stayAwake
         command: ["systemd-inhibit", "--what=idle", "--who=quickshell", "--why=Stay awake", "sleep", "infinity"]
+    }
+
+    Process {
+        running: root.mediaPlaying && !root.stayAwake
+        command: ["systemd-inhibit", "--what=idle", "--who=quickshell", "--why=Media playing", "sleep", "infinity"]
     }
 
     Timer {

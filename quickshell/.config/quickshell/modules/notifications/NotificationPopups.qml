@@ -33,8 +33,11 @@ PanelWindow {
         spacing: Theme.spacing
 
         Repeater {
-            // newest on top, at most 5 at a time
-            model: Notifs.popups.slice(-5).reverse()
+            // newest on top, at most 5 at a time. ScriptModel keeps existing
+            // cards (and their countdowns) when one is added or removed
+            model: ScriptModel {
+                values: Notifs.popups.slice(-5).reverse()
+            }
 
             NotificationCard {
                 required property var modelData

@@ -63,7 +63,7 @@ PanelWindow {
             anchors.margins: 16
             spacing: 14
 
-            // Header: time with the Panel Settings gear level with it, date below
+            // Header: time with the Settings gear level with it, date below
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 0
@@ -130,8 +130,8 @@ PanelWindow {
                 }
 
                 QuickToggle {
-                    icon: Icons.gamepad
-                    label: "Game mode"
+                    icon: Icons.rocket
+                    label: "Work-Game Mode"
                     checked: System.gamemode
                     onClicked: System.toggleGamemode()
                 }

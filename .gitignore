@@ -21,3 +21,6 @@ kitty/.config/kitty/text-size.conf
 bat/.config/bat/themes/Current.tmTheme
 btop/.config/btop/themes/current.theme
 starship/.config/starship.toml
+cliamp/.config/cliamp/themes/
+cliamp/.config/cliamp/*.log
+cliamp/.config/cliamp/cliamp.sock

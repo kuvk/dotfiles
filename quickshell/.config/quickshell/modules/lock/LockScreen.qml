@@ -20,6 +20,12 @@ WlSessionLock {
         id: surface
 
         readonly property bool isMain: screen?.name === Lock.mainScreen || Lock.mainScreen === ""
+        // Colors chosen in Settings > Lock screen (theme color names)
+        readonly property color clockColor: Theme[Config.lockClockColor] ?? Theme.green
+        readonly property color rainColor: Theme[Config.lockRainColor] ?? Theme.green
+        readonly property color outlineColor: Theme[Config.lockOutlineColor] ?? Theme.green
+        readonly property color dotsColor: Theme[Config.lockDotsColor] ?? Theme.blue
+        readonly property color textColor: Theme[Config.lockTextColor] ?? Theme.text
         // Blur a still capture of the desktop (Hyprland can't blur lock surfaces)
         readonly property bool blur: Config.lockBlur && !Theme.gamemode && !Lock.instant
         property bool dropped: Lock.instant
@@ -52,6 +58,15 @@ WlSessionLock {
 
             interval: 400
             onTriggered: surface.drop()
+        }
+
+        // No mouse pointer on the lock screen
+        MouseArea {
+            anchors.fill: parent
+            z: 100
+            hoverEnabled: true
+            acceptedButtons: Qt.NoButton
+            cursorShape: Qt.BlankCursor
         }
 
         ScreencopyView {
@@ -103,6 +118,9 @@ WlSessionLock {
 
             MatrixRain {
                 anchors.fill: parent
+                color: surface.rainColor
+                headColor: Qt.lighter(surface.rainColor, 1.6)
+                dimColor: Theme.alpha(surface.rainColor, 0.45)
                 visible: Config.lockMatrix
                 running: Lock.locked && Config.lockMatrix
             }
@@ -112,7 +130,7 @@ WlSessionLock {
                 anchors.bottom: parent.bottom
                 width: parent.width
                 height: 2
-                color: Theme.green
+                color: surface.rainColor
                 opacity: curtain.y < 0 ? 1 : 0
 
                 Behavior on opacity {
@@ -163,7 +181,7 @@ WlSessionLock {
                 StyledText {
                     Layout.alignment: Qt.AlignRight
                     text: Qt.formatDateTime(Time.date, "HH:mm")
-                    color: Theme.green
+                    color: surface.clockColor
                     font.pixelSize: 120
                     font.weight: Font.Medium
                 }
@@ -171,7 +189,7 @@ WlSessionLock {
                 StyledText {
                     Layout.alignment: Qt.AlignRight
                     text: Qt.formatDateTime(Time.date, "dddd, d MMMM yyyy")
-                    color: Theme.green
+                    color: surface.clockColor
                     font.pixelSize: 33
                 }
             }
@@ -184,7 +202,7 @@ WlSessionLock {
                 height: box.implicitHeight + 48
                 radius: Theme.radius * 1.5
                 color: Theme.alpha(Theme.base, 0.75)
-                border.color: Theme.alpha(Theme.green, 0.3)
+                border.color: Theme.alpha(surface.outlineColor, 0.3)
 
                 ColumnLayout {
                     id: box
@@ -198,7 +216,7 @@ WlSessionLock {
                         implicitWidth: 139
                         implicitHeight: 139
                         radius: width / 2
-                        color: Theme.green
+                        color: surface.outlineColor
 
                         ClippingRectangle {
                             anchors.centerIn: parent
@@ -221,7 +239,7 @@ WlSessionLock {
                                 anchors.centerIn: parent
                                 visible: avatar.status !== Image.Ready
                                 text: Icons.user
-                                color: Theme.green
+                                color: surface.outlineColor
                                 font.pixelSize: 56
                             }
                         }
@@ -230,7 +248,7 @@ WlSessionLock {
                     Rectangle {
                         id: field
 
-                        readonly property color stateColor: Lock.authenticating ? Theme.blue : Lock.failed ? Theme.red : Lock.capsLock ? Theme.yellow : Theme.green
+                        readonly property color stateColor: Lock.authenticating ? surface.dotsColor : Lock.failed ? Theme.red : Lock.capsLock ? Theme.yellow : surface.outlineColor
 
                         Layout.alignment: Qt.AlignHCenter
                         implicitWidth: 260
@@ -271,9 +289,9 @@ WlSessionLock {
                                     return "●".repeat(Math.min(Lock.password.length, 24));
                                 if (Lock.failed)
                                     return "<i>ACCESS DENIED</i>";
-                                return `<i>${Icons.g(0xf033e)}  Logged in as </i><b><font color="${Theme.blue}">${Quickshell.env("USER")}</font></b>`;
+                                return `<i>${Icons.g(0xf033e)}  Logged in as </i><b><font color="${surface.dotsColor}">${Quickshell.env("USER")}</font></b>`;
                             }
-                            color: Lock.failed && Lock.password.length === 0 ? Theme.red : Lock.password.length > 0 ? Theme.blue : Theme.text
+                            color: Lock.failed && Lock.password.length === 0 ? Theme.red : Lock.password.length > 0 ? surface.dotsColor : surface.textColor
                             font.pixelSize: Lock.password.length > 0 ? 10 : 14
                             font.letterSpacing: Lock.password.length > 0 ? 3 : 0
                         }

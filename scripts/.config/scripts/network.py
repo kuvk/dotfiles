@@ -200,24 +200,27 @@ def speedtest() -> int:
         jitter = statistics.mean(abs(a - b) for a, b in zip(samples, samples[1:]))
         emit(phase="ping", ping=round(ping, 1), jitter=round(jitter, 1))
 
-        # Download: stream for up to ~8 s
+        # Download: 25 MB requests back to back for ~8 s
         total, start, last = 0, time.perf_counter(), 0.0
-        conn.request("GET", f"/__down?bytes={200_000_000}")
-        resp = conn.getresponse()
-        while True:
-            chunk = resp.read(256 * 1024)
-            if not chunk:
-                break
-            total += len(chunk)
-            elapsed = time.perf_counter() - start
-            if elapsed - last > 0.4:
-                last = elapsed
-                emit(phase="download", mbps=round(total * 8 / elapsed / 1e6, 1), progress=min(1, elapsed / 8))
-            if elapsed > 8:
-                break
-        down = total * 8 / (time.perf_counter() - start) / 1e6
+        while time.perf_counter() - start < 8:
+            conn.request("GET", f"/__down?bytes={25_000_000}")
+            resp = conn.getresponse()
+            if resp.status != 200:
+                raise OSError(f"download refused (HTTP {resp.status})")
+            while True:
+                chunk = resp.read(256 * 1024)
+                if not chunk:
+                    break
+                total += len(chunk)
+                elapsed = time.perf_counter() - start
+                if elapsed - last > 0.4:
+                    last = elapsed
+                    emit(phase="download", download=round(total * 8 / elapsed / 1e6, 1), progress=min(1, elapsed / 8))
+                if elapsed > 8:
+                    break
         conn.close()
-        emit(phase="download", mbps=round(down, 1), progress=1)
+        down = total * 8 / (time.perf_counter() - start) / 1e6
+        emit(phase="download", download=round(down, 1), progress=1)
 
         # Upload: a few rounds, growing until a round takes ~2 s or 8 s pass
         conn = connection()
@@ -230,7 +233,7 @@ def speedtest() -> int:
             conn.getresponse().read()
             sent += len(body)
             elapsed = time.perf_counter() - start
-            emit(phase="upload", mbps=round(sent * 8 / elapsed / 1e6, 1), progress=min(1, elapsed / 8))
+            emit(phase="upload", upload=round(sent * 8 / elapsed / 1e6, 1), progress=min(1, elapsed / 8))
             if time.perf_counter() - t0 < 2 and size < 32_000_000:
                 size *= 2
         up = sent * 8 / (time.perf_counter() - start) / 1e6
