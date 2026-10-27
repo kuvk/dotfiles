@@ -17,6 +17,25 @@ Singleton {
     readonly property var list: server.trackedNotifications.values
     readonly property int count: list.length
 
+    // Notifications grouped by app, newest group and newest first:
+    // [{ app, icon, list: [Notification] }]
+    readonly property var groups: {
+        const byApp = new Map();
+        for (const n of list.slice().reverse()) {
+            const app = n.appName || "Notifications";
+            if (!byApp.has(app))
+                byApp.set(app, { app: app, icon: n.appIcon, list: [] });
+            byApp.get(app).list.push(n);
+        }
+        return Array.from(byApp.values());
+    }
+
+    function clearGroup(app: string): void {
+        for (const n of list.slice())
+            if ((n.appName || "Notifications") === app)
+                n.dismiss();
+    }
+
     function dismissPopup(n: Notification): void {
         popups = popups.filter(p => p !== n);
     }

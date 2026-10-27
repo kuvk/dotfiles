@@ -211,7 +211,7 @@ PanelWindow {
     visible: shown
     color: "transparent"
     implicitWidth: 760
-    implicitHeight: content.implicitHeight + 32
+    implicitHeight: Math.ceil(content.implicitHeight + 32)
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "quickshell-displays"
     WlrLayershell.layer: WlrLayer.Overlay

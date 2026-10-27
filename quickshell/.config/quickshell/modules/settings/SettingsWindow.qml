@@ -7,7 +7,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// Shell preferences (the gear in the control center). Changes apply
+// Panel Settings (the gear in the Control Center). Changes apply
 // immediately and are saved by Config.
 PanelWindow {
     id: root
@@ -24,7 +24,7 @@ PanelWindow {
     visible: shown
     color: "transparent"
     implicitWidth: 560
-    implicitHeight: content.implicitHeight + 32
+    implicitHeight: Math.ceil(content.implicitHeight + 32)
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "quickshell-settings"
     WlrLayershell.layer: WlrLayer.Overlay
@@ -53,7 +53,7 @@ PanelWindow {
             spacing: 10
 
             SectionHeader {
-                title: "Settings"
+                title: "Panel Settings"
 
                 CloseButton {
                     onClicked: Panels.settings = false
@@ -181,6 +181,25 @@ PanelWindow {
                 }
             }
 
+            SettingRow {
+                label: "Monochrome tray icons"
+
+                Switch {
+                    checked: Config.trayMonochrome
+                    onToggled: Config.trayMonochrome = !Config.trayMonochrome
+                }
+            }
+
+            SettingRow {
+                label: "Audio visualizer in the player"
+                hint: "Needs cava"
+
+                Switch {
+                    checked: Config.cava
+                    onToggled: Config.cava = !Config.cava
+                }
+            }
+
             StyledText {
                 Layout.topMargin: 6
                 text: "Notifications and lock screen"
@@ -199,7 +218,7 @@ PanelWindow {
             }
 
             SettingRow {
-                label: "Digital rain"
+                label: "Digital rain on the lock screen"
 
                 Switch {
                     checked: Config.lockMatrix

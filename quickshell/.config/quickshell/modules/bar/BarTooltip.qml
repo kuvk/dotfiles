@@ -41,12 +41,13 @@ PanelWindow {
     }
     margins {
         top: 6
-        left: Math.max(6, Math.min((screen?.width ?? 0) - implicitWidth - 6, Panels.tooltipX - implicitWidth / 2))
+        left: Math.round(Math.max(6, Math.min((screen?.width ?? 0) - implicitWidth - 6, Panels.tooltipX - implicitWidth / 2)))
     }
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
-    implicitWidth: label.implicitWidth + 24
-    implicitHeight: label.implicitHeight + 16
+    // whole pixels, so fractional monitor scales don't cut the border
+    implicitWidth: Math.ceil(label.implicitWidth + 24)
+    implicitHeight: Math.ceil(label.implicitHeight + 16)
     mask: Region {}
     WlrLayershell.namespace: "quickshell-tooltip"
     WlrLayershell.layer: WlrLayer.Overlay
@@ -63,7 +64,7 @@ PanelWindow {
             id: label
 
             anchors.centerIn: parent
-            text: root.text
+            text: root.text.replace(/\n/g, "<br>")
             textFormat: Text.StyledText
             lineHeight: 1.15
         }

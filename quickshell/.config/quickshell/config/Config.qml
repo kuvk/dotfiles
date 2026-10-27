@@ -32,10 +32,14 @@ Singleton {
     property alias lockMatrix: adapter.lockMatrix
     property alias lockBlur: adapter.lockBlur
 
+    // Tray and player
+    property alias trayMonochrome: adapter.trayMonochrome
+    property alias cava: adapter.cava
+
     function reset(): void {
-        adapter.radius = 6;
-        adapter.borderWidth = 2;
-        adapter.barOpacity = 0.8;
+        adapter.radius = 8;
+        adapter.borderWidth = 1;
+        adapter.barOpacity = 0.9;
         adapter.panelOpacity = 0.9;
         adapter.animations = true;
         adapter.clockFormat = "dddd HH:mm";
@@ -44,26 +48,38 @@ Singleton {
         adapter.weatherFahrenheit = false;
         adapter.notificationTimeout = 10;
         adapter.lockMatrix = true;
-        adapter.lockBlur = true;
+        adapter.lockBlur = false;
+        adapter.trayMonochrome = false;
+        adapter.cava = true;
+        adapter.version = root.version;
     }
+
+    // Bump when defaults change; older settings files are reset once
+    readonly property int version: 2
 
     FileView {
         path: Quickshell.statePath("settings.json")
         watchChanges: true
         onFileChanged: reload()
         onAdapterUpdated: writeAdapter()
+        onLoaded: {
+            if (adapter.version < root.version)
+                root.reset();
+        }
         onLoadFailed: error => {
-            if (error === FileViewError.FileNotFound)
+            if (error === FileViewError.FileNotFound) {
+                adapter.version = root.version;
                 writeAdapter();
+            }
         }
 
         JsonAdapter {
             id: adapter
 
-            // Same as Hyprland's decoration rounding
-            property int radius: 6
-            property int borderWidth: 2
-            property real barOpacity: 0.8
+            property int version: 0
+            property int radius: 8
+            property int borderWidth: 1
+            property real barOpacity: 0.9
             property real panelOpacity: 0.9
             property bool animations: true
             property string clockFormat: "dddd HH:mm"
@@ -72,7 +88,9 @@ Singleton {
             property bool weatherFahrenheit: false
             property int notificationTimeout: 10
             property bool lockMatrix: true
-            property bool lockBlur: true
+            property bool lockBlur: false
+            property bool trayMonochrome: false
+            property bool cava: true
         }
     }
 }

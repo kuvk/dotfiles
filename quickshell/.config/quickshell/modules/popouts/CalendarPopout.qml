@@ -10,7 +10,7 @@ Popout {
     id: root
 
     name: "calendar"
-    contentWidth: 330
+    contentWidth: 400
 
     property int month: Time.date.getMonth()
     property int year: Time.date.getFullYear()
@@ -56,6 +56,7 @@ Popout {
         Layout.fillWidth: true
         text: Qt.formatDateTime(Time.date, "dddd, d MMMM yyyy  ·  HH:mm:ss")
         color: Theme.subtext0
+        font.pixelSize: Theme.fontSize + 1
         horizontalAlignment: Text.AlignHCenter
     }
 
@@ -72,7 +73,7 @@ Popout {
             text: Qt.formatDate(new Date(root.year, root.month, 1), "MMMM yyyy")
             color: Theme.highlight
             font.weight: Font.Bold
-            font.pixelSize: Theme.fontSize + 2
+            font.pixelSize: Theme.fontSize + 4
             horizontalAlignment: Text.AlignHCenter
 
             MouseArea {
@@ -112,6 +113,7 @@ Popout {
                 text: Qt.locale().dayName(modelData, Locale.ShortFormat)
                 color: modelData === 0 || modelData === 6 ? Theme.red : Theme.accent2
                 font.weight: Font.DemiBold
+                font.pixelSize: Theme.fontSize + 1
                 horizontalAlignment: Text.AlignHCenter
             }
         }
@@ -145,13 +147,13 @@ Popout {
 
                     Layout.fillWidth: true
                     Layout.preferredWidth: 1
-                    implicitHeight: 32
+                    implicitHeight: 38
 
                     Rectangle {
                         anchors.centerIn: parent
-                        width: 30
-                        height: 30
-                        radius: 15
+                        width: 34
+                        height: 34
+                        radius: 17
                         color: Theme.highlight
                         visible: cell.isToday
                     }
@@ -159,7 +161,7 @@ Popout {
                     StyledText {
                         anchors.centerIn: parent
                         text: cell.isWeek ? `W${week.modelData.week}` : cell.modelData.getDate()
-                        font.pixelSize: cell.isWeek ? Theme.fontSize - 2 : Theme.fontSize
+                        font.pixelSize: cell.isWeek ? Theme.fontSize - 1 : Theme.fontSize + 2
                         font.weight: cell.isToday ? Font.Bold : Font.Normal
                         color: {
                             if (cell.isWeek)

@@ -3,14 +3,15 @@
 
 Static wallpapers live in ~/Pictures/Wallpapers and are shown with hyprpaper.
 Live wallpapers live in ~/Pictures/WallpapersLive and play with mpvpaper, one
-process per monitor. The choice is saved and restored at login.
+process per monitor. The static choice is restored at login; live wallpapers
+last until logout.
 
   wallpaper.py list static|live          JSON list for the picker
   wallpaper.py thumbs static|live        create missing thumbnails
   wallpaper.py set static|live PATH [MONITOR]   apply (all monitors if none)
   wallpaper.py stop [MONITOR]            stop live wallpapers
   wallpaper.py pause                     pause/resume live wallpapers
-  wallpaper.py restore                   re-apply the saved choice (autostart)
+  wallpaper.py restore                   re-apply the saved static wallpapers (autostart)
 """
 
 from __future__ import annotations
@@ -128,6 +129,10 @@ def make_thumb(kind: str, src: Path) -> None:
                f"scale={THUMB_W}:{THUMB_H}:force_original_aspect_ratio=increase,crop={THUMB_W}:{THUMB_H}",
                str(tmp)]
     subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    if kind == "live" and not tmp.exists():
+        # shorter than 2 s: take the first frame
+        cmd[cmd.index("-ss") + 1] = "0"
+        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     if tmp.exists():
         tmp.replace(dst)
 
@@ -259,16 +264,16 @@ def pause() -> None:
 
 
 def restore() -> None:
+    """Static wallpapers survive a reboot; live ones don't, so forget them."""
     state = load_state()
-    mons = monitors()
     static = state["static"]
-    for mon in mons:
+    for mon in monitors():
         path = static.get(mon) or static.get("*")
         if path and Path(path).exists():
             run(["hyprctl", "hyprpaper", "wallpaper", f"{mon},{path},cover"])
-    for mon, path in state["live"].items():
-        if mon in mons and Path(path).exists():
-            start_live(mon, Path(path))
+    if state["live"]:
+        state["live"] = {}
+        save_state(state)
 
 
 def notify(body: str) -> None:

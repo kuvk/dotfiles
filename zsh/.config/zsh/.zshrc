@@ -7,15 +7,15 @@ esac
 ## Starship
 if command -v starship >/dev/null; then
     export STARSHIP_LOG=error
-    # theme-set.py writes a copy of starship.toml with the current palette
-    if [[ -f ~/.config/theme/current/starship.toml ]]; then
-        export STARSHIP_CONFIG=~/.config/theme/current/starship.toml
-    fi
     if [[ "$_OS" == "Darwin" ]]; then
-        export STARSHIP_CONFIG=~/.config/starship.toml
+        # no theme-set on macOS: use the base config directly
+        export STARSHIP_CONFIG=~/.config/starship/base.toml
     fi
     eval "$(starship init zsh)"
 fi
+
+## Lazygit: the theme overlay from theme-set.py wins over config.yml
+export LG_CONFIG_FILE="$HOME/.config/lazygit/config.yml,$HOME/.config/theme/current/lazygit.yml"
 
 ## Options / history
 setopt NOBEEP
