@@ -9,6 +9,7 @@ current live layout, and workspaces are split across the monitors.
 
   hypr-monitors.py [apply]              apply the profile for the connected monitors
   hypr-monitors.py hotplug              same, from Hyprland's monitor.added/removed events
+  hypr-monitors.py startup              same, at login (waits for late outputs)
   hypr-monitors.py state                print the current profile as JSON (Quickshell)
   hypr-monitors.py set '<json>'         save and apply changes from Quickshell
   hypr-monitors.py brightness           print brightness per monitor as JSON
@@ -458,38 +459,76 @@ def log(message: str) -> None:
         pass
 
 
-def hotplug() -> int:
-    """Monitors were plugged in or out: switch to the saved profile for the
-    new combination. Docks add several outputs at once, so wait for them to
-    settle; one run at a time, and run again if the set changed meanwhile."""
+def settle(timeout: float = 8.0) -> list[dict]:
+    """Wait until the set of monitors stops changing (a dock, or a dGPU
+    output that shows up a few seconds into the session)."""
+    live, key, stable = [], None, 0
+    end = time.monotonic() + timeout
+    while time.monotonic() < end:
+        now = hypr_json("monitors")
+        now_key = " + ".join(sorted(m["name"] for m in now))
+        stable = stable + 1 if now and now_key == key else 0
+        live, key = now, now_key
+        if stable >= 3:  # unchanged for 1.5 s
+            break
+        time.sleep(0.5)
+    return live
+
+
+def wake_dark_monitors(data: dict, live: list[dict]) -> None:
+    """A monitor that should be on but is disabled or has DPMS off after the
+    reload (seen right after login) gets one more reload and DPMS on."""
+    _, profile = current_profile(data, live)
+    wanted = {mid for mid, mon in profile["monitors"].items() if mon["enabled"]}
+    now = hypr_json("monitors")
+    dark = [m["name"] for m in now if ident(m) in wanted and (m.get("disabled") or not m.get("dpmsStatus", True))]
+    if dark:
+        log(f"monitors still dark after applying: {', '.join(dark)}; reloading again")
+        run(["hyprctl", "reload"])
+        time.sleep(1)
+    run(["hyprctl", "dispatch", 'hl.dsp.dpms({ action = "on" })'])
+
+
+def hotplug(startup: bool = False) -> int:
+    """Monitors were plugged in or out (or the session just started): switch
+    to the saved profile for the connected set. Waits for the set to settle;
+    one run at a time, and runs again if the set changed meanwhile."""
     LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
     with open(LOCK_FILE, "w") as lock:
         try:
-            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            # at login, wait for a hotplug run instead of skipping
+            fcntl.flock(lock, fcntl.LOCK_EX if startup else fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             return 0  # another run is handling it
-        time.sleep(1.5)
+        live = settle()
         for _ in range(5):
-            live = hypr_json("monitors")
             if not live:
                 return 1
             DUPLICATES.clear()
             descs = [(m.get("description") or "").strip() for m in live]
             DUPLICATES.update(d for d in descs if d and descs.count(d) > 1)
             key = profile_key(live)
-            log(f"hotplug: applying profile '{key}'")
-            apply(load_profiles(), live)
+            state = ", ".join(
+                f"{m['name']}{' disabled' if m.get('disabled') else ''}{' dpms-off' if not m.get('dpmsStatus', True) else ''}"
+                for m in live
+            )
+            log(f"{'startup' if startup else 'hotplug'}: applying profile '{key}' ({state})")
+            data = load_profiles()
+            apply(data, live)
             time.sleep(1)
-            if profile_key(hypr_json("monitors") or live) == key:
+            again = settle(4) or live
+            if profile_key(again) == key:
+                wake_dark_monitors(data, again)
                 break
+            live = again
         # start from the first workspace on the new layout
         run(["hyprctl", "dispatch", "hl.dsp.focus({ workspace = 1 })"])
     return 0
 
 
 def main(argv: list[str]) -> int:
-    if argv and argv[0] == "hotplug":
-        return hotplug()
+    if argv and argv[0] in ("hotplug", "startup"):
+        return hotplug(startup=argv[0] == "startup")
     live = hypr_json("monitors")
     if not live:
         print("hyprctl monitors returned nothing; is Hyprland running?", file=sys.stderr)

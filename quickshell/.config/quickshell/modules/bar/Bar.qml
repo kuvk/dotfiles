@@ -83,7 +83,7 @@ PanelWindow {
     BarButton {
         anchors.right: clockButton.left
         anchors.verticalCenter: parent.verticalCenter
-        visible: Hypr.layout !== ""
+        visible: Config.showLayout && Hypr.layout !== ""
         tooltip: `Keyboard layout\n${Hypr.layoutName || Hypr.layout}`
         onClicked: Hypr.nextLayout()
 

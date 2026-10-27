@@ -50,8 +50,8 @@ Dropdowns slide out of the bar; one click anywhere outside closes them.
 Hovering a bar item shows a dot under it, an open dropdown an accent line.
 
 Preferences are set in Settings, one sidebar section each: Appearance (corner
-radius, border width, opacity, animations), Bar (clock format, weather),
-Windows (gaps for regular and Work-Game Mode), Notifications, Lock Screen
+radius, border width, opacity, animations), Bar (clock format, weather,
+keyboard layout and window title on/off), Windows (gaps for regular and Work-Game Mode), Notifications, Lock Screen
 (effects and the colors of the clock, rain, outlines, password dots and text),
 and Tray & Player (tray icon style, apps that keep their own colors, the
 visualizer and its bar count). They are saved to Quickshell's state folder

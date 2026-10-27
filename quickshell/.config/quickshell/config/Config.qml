@@ -19,6 +19,8 @@ Singleton {
     // Bar
     property alias clockFormat: adapter.clockFormat
     property alias showWeather: adapter.showWeather
+    property alias showLayout: adapter.showLayout
+    property alias showWindowTitle: adapter.showWindowTitle
 
     // Weather: empty location means "detect from IP" (wttr.in)
     property alias weatherLocation: adapter.weatherLocation
@@ -60,6 +62,8 @@ Singleton {
         adapter.animations = true;
         adapter.clockFormat = "dddd HH:mm";
         adapter.showWeather = true;
+        adapter.showLayout = true;
+        adapter.showWindowTitle = true;
         adapter.weatherLocation = "";
         adapter.weatherFahrenheit = false;
         adapter.notificationTimeout = 10;
@@ -112,6 +116,8 @@ Singleton {
             property bool animations: true
             property string clockFormat: "dddd HH:mm"
             property bool showWeather: true
+            property bool showLayout: true
+            property bool showWindowTitle: true
             property string weatherLocation: ""
             property bool weatherFahrenheit: false
             property int notificationTimeout: 10

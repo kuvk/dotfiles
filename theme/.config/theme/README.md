@@ -61,6 +61,14 @@ theme folder and set `wallpaper` under `[apps]`.
 | scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |
 | GTK apps | `gsettings ... color-scheme` | live (dark/light only) |
 
+## Power menu icons
+
+The power menu and the Control Center use wlogout's icons, recolored per theme
+(lock green, sleep peach, log out teal, reboot mauve, shut down red). The
+sources are in `icons/source/`, and `~/.config/scripts/theme-icons.py` writes
+`icons/<theme>/*.svg` for every theme (`--missing` only for themes without a
+folder, or name the themes). A theme without icons uses Catppuccin Mocha's.
+
 ## Adding a theme
 
 1. Copy `themes/catppuccin-mocha` to `themes/<name>`.
@@ -75,6 +83,7 @@ theme folder and set `wallpaper` under `[apps]`.
 5. Optional: `[terminal]` overrides for the 16 ANSI colors, `cursor`, and
    `selection_fg`/`selection_bg`; `wallpaper = "~/wallpapers/x.jpg"` (or a path
    inside the theme folder) in `[apps]` sets the wallpaper on switch.
+6. Run `~/.config/scripts/theme-icons.py <name>` for its power menu icons.
 
 ## Adding an app
 

@@ -236,6 +236,26 @@ PanelWindow {
                             }
 
                             SettingRow {
+                                label: "Keyboard layout"
+                                hint: "Left of the clock; click switches layout"
+
+                                Switch {
+                                    checked: Config.showLayout
+                                    onToggled: Config.showLayout = !Config.showLayout
+                                }
+                            }
+
+                            SettingRow {
+                                label: "Window title"
+                                hint: "Focused app, next to the workspaces"
+
+                                Switch {
+                                    checked: Config.showWindowTitle
+                                    onToggled: Config.showWindowTitle = !Config.showWindowTitle
+                                }
+                            }
+
+                            SettingRow {
                                 label: "Weather"
 
                                 Switch {

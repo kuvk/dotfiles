@@ -47,11 +47,16 @@ noise_reduction = 60
 
     onActiveChanged: active ? restart() : (proc.running = false, values = [])
     onBarsChanged: if (active) restart()
+    // already playing when the shell starts
+    Component.onCompleted: if (active) restart()
 
     FileView {
         id: configFile
 
         path: Quickshell.statePath("cava.conf")
+        // cava starts right after the write, so the file must be complete
+        blockWrites: true
+        atomicWrites: false
     }
 
     Process {
