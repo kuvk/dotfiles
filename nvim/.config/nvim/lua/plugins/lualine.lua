@@ -25,7 +25,7 @@ return {
     require("lualine").setup({
       options = {
         icons_enabled = true,
-        theme = catppuccin,
+        theme = "auto",
         component_separators = "",
         section_separators = { left = "", right = "" },
       },
@@ -41,9 +41,9 @@ return {
             "diff",
             symbols = { added = " ", modified = " ", removed = " " },
             diff_color = {
-              added = { fg = "#a6e3a1" },
-              modified = { fg = "#f9e2af" },
-              removed = { fg = "#f38ba8" },
+              added = "GitSignsAdd",
+              modified = "GitSignsChange",
+              removed = "GitSignsDelete",
             },
           },
         },
@@ -66,7 +66,7 @@ return {
               return msg
             end,
             icon = " LSP:",
-            color = { fg = "#94e2d5" },
+            color = "DiagnosticHint",
             cond = conditions.hide_in_width,
           },
         },

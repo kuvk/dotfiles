@@ -1,11 +1,17 @@
+-- Border colors follow the theme (written by ~/.config/scripts/theme-set.py)
+local ok, theme = pcall(require, "configs.generated.theme")
+if not ok then
+  theme = { active_border = "rgba(fab387ee)", inactive_border = "rgba(89b4faaa)" }
+end
+
 hl.config({
   general = {
     gaps_in = 2,
     gaps_out = 4,
     border_size = 2,
     col = {
-      active_border = "rgba(fab387ee)",
-      inactive_border = "rgba(89b4faaa)",
+      active_border = theme.active_border,
+      inactive_border = theme.inactive_border,
     },
     allow_tearing = false,
     layout = "dwindle",

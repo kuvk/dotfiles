@@ -7,6 +7,10 @@ esac
 ## Starship
 if command -v starship >/dev/null; then
     export STARSHIP_LOG=error
+    # theme-set.py writes a copy of starship.toml with the current palette
+    if [[ -f ~/.config/theme/current/starship.toml ]]; then
+        export STARSHIP_CONFIG=~/.config/theme/current/starship.toml
+    fi
     if [[ "$_OS" == "Darwin" ]]; then
         export STARSHIP_CONFIG=~/.config/starship.toml
     fi

@@ -2,7 +2,9 @@
 hl.on("hyprland.start", function()
   hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
   hl.exec_cmd("~/.config/scripts/hypr-monitors.py")
-  hl.exec_cmd("swaync & hyprpaper & hypridle & udiskie &")
+  -- Regenerate ~/.config/theme/current (no-op if nothing changed), then the shell
+  hl.exec_cmd("~/.config/scripts/theme-set.py")
+  hl.exec_cmd("qs & hyprpaper & hypridle & udiskie &")
   hl.exec_cmd("~/.config/scripts/autostart.sh")
   hl.exec_cmd("~/.config/scripts/media-inhibit.sh &")
   hl.exec_cmd("systemctl --user start hyprpolkitagent")
