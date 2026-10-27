@@ -29,7 +29,7 @@ ShellRoot {
 
     PowerMenu {}
 
-    Displays {}
+    DisplaysPanel {}
 
     LockScreen {}
 
