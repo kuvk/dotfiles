@@ -114,7 +114,7 @@ PanelWindow {
         color: Theme.panelBg
         radius: Theme.radius
         border.color: Theme.border
-        border.width: 2
+        border.width: Theme.borderWidth
 
         ColumnLayout {
             anchors.fill: parent
@@ -246,7 +246,7 @@ PanelWindow {
                             StyledText {
                                 Layout.fillWidth: true
                                 text: entry.modelData.name
-                                color: entry.ListView.isCurrentItem ? Theme.accent : Theme.text
+                                color: entry.ListView.isCurrentItem ? Theme.highlight : Theme.text
                                 font.pixelSize: 14
                             }
 

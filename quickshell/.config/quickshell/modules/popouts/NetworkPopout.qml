@@ -24,7 +24,7 @@ Popout {
 
         IconButton {
             icon: Icons.refresh
-            color: Network.scanning ? Theme.accent : Theme.subtext0
+            color: Network.scanning ? Theme.highlight : Theme.subtext0
             onClicked: Network.scan()
         }
 

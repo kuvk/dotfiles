@@ -19,6 +19,36 @@ Singleton {
     property bool controlCenter: false
     property bool displays: false
     property bool powerMenu: false
+    property bool settings: false
+    property string wallpapers: "" // "static" | "live" | ""
+
+    // The click that dismisses a popout can also land on the button that
+    // opened it; ignore that click instead of reopening the popout.
+    property string lastClosed: ""
+    property double lastClosedAt: 0
+
+    // Bar tooltip
+    property string tooltip: ""
+    property var tooltipScreen: null
+    property real tooltipX: 0
+
+    function showTooltip(text: string, screen: var, x: real): void {
+        tooltipScreen = screen;
+        tooltipX = x;
+        tooltip = text;
+    }
+
+    function hideTooltip(): void {
+        tooltip = "";
+    }
+
+    function closePopout(name: string): void {
+        if (popout !== name)
+            return;
+        lastClosed = name;
+        lastClosedAt = Date.now();
+        popout = "";
+    }
     property bool launcher: false
     property string launcherMode: "apps" // "apps" | "themes"
 
@@ -33,14 +63,19 @@ Singleton {
     }
 
     function togglePopout(name: string, screen: var, x: real): void {
+        hideTooltip();
         if (popout === name && popoutScreen === screen) {
-            popout = "";
+            closePopout(name);
             return;
         }
+        if (lastClosed === name && Date.now() - lastClosedAt < 300)
+            return;
         controlCenter = false;
         launcher = false;
         displays = false;
         powerMenu = false;
+        settings = false;
+        wallpapers = "";
         popoutScreen = screen;
         popoutX = x;
         popout = name;
@@ -64,6 +99,18 @@ Singleton {
         powerMenu = open;
     }
 
+    function toggleSettings(): void {
+        const open = !settings;
+        closeAll();
+        settings = open;
+    }
+
+    function toggleWallpapers(kind: string): void {
+        const open = wallpapers !== kind;
+        closeAll();
+        wallpapers = open ? kind : "";
+    }
+
     function toggleLauncher(mode: string): void {
         const open = !(launcher && launcherMode === mode);
         closeAll();
@@ -77,5 +124,8 @@ Singleton {
         launcher = false;
         displays = false;
         powerMenu = false;
+        settings = false;
+        wallpapers = "";
+        tooltip = "";
     }
 }

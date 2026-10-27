@@ -33,7 +33,7 @@ Rectangle {
     implicitHeight: layout.implicitHeight + 24
     radius: Theme.smallRadius
     color: popup ? Theme.panelBg : Theme.cardBg
-    border.width: popup || critical ? 1 : 0
+    border.width: popup || critical ? Theme.borderWidth : 0
     border.color: critical ? Theme.red : Theme.border
 
     Timer {
@@ -92,7 +92,7 @@ Rectangle {
                     StyledText {
                         Layout.fillWidth: true
                         text: root.notification.appName || "Notification"
-                        color: root.critical ? Theme.red : Theme.accent
+                        color: root.critical ? Theme.red : Theme.highlight
                         font.pixelSize: Theme.fontSize - 2
                         font.weight: Font.DemiBold
                     }

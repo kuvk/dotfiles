@@ -1,5 +1,6 @@
 import QtQuick
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.config
 import qs.components
@@ -32,18 +33,22 @@ PanelWindow {
     color: Theme.barBg
     WlrLayershell.namespace: "quickshell-bar"
 
-    // Left: launcher, workspaces, focused window
+    // Left: launcher, workspaces, focused window (no hover dots here)
     Row {
         anchors.left: parent.left
         anchors.leftMargin: 4
         anchors.verticalCenter: parent.verticalCenter
 
         BarButton {
+            id: launcherButton
+
+            indicator: false
+            tooltip: "Applications"
             onClicked: Panels.toggleLauncher("apps")
 
             Icon {
                 text: Icons.arch
-                color: Theme.accent2
+                color: launcherButton.containsMouse || (Panels.launcher && Panels.launcherMode === "apps") ? Theme.accent : Theme.accent2
                 font.pixelSize: 17
             }
         }
@@ -59,39 +64,54 @@ PanelWindow {
         }
     }
 
-    // Center: clock and weather, centered on the screen
-    Row {
+    // Center: the clock sits exactly in the middle; layout to its left, weather to its right
+    BarButton {
+        id: clockButton
+
         anchors.centerIn: parent
+        active: barWindow.isOpen("calendar")
+        tooltip: Qt.formatDateTime(Time.date, "dddd, d MMMM yyyy")
+        onClicked: barWindow.toggle("calendar", clockButton)
 
-        BarButton {
-            id: clockButton
+        StyledText {
+            text: Qt.formatDateTime(Time.date, Config.clockFormat)
+            color: Theme.text
+            font.weight: Font.DemiBold
+        }
+    }
 
-            active: barWindow.isOpen("calendar")
-            onClicked: barWindow.toggle("calendar", clockButton)
+    BarButton {
+        anchors.right: clockButton.left
+        anchors.verticalCenter: parent.verticalCenter
+        visible: Hypr.layout !== ""
+        tooltip: `Keyboard layout: ${Hypr.layoutName || Hypr.layout}`
+        onClicked: Hypr.nextLayout()
 
-            StyledText {
-                text: Qt.formatDateTime(Time.date, Config.clockFormat)
-                color: Theme.text
-                font.weight: Font.DemiBold
-            }
+        StyledText {
+            text: Hypr.layout
+            color: Theme.text
+            font.weight: Font.DemiBold
+        }
+    }
+
+    BarButton {
+        id: weatherButton
+
+        anchors.left: clockButton.right
+        anchors.verticalCenter: parent.verticalCenter
+        visible: Config.showWeather && Weather.ready
+        active: barWindow.isOpen("weather")
+        tooltip: `${Weather.description}, feels like ${Weather.feelsLike}${Weather.unit}\n${Weather.location}`
+        onClicked: barWindow.toggle("weather", weatherButton)
+
+        Icon {
+            text: Weather.icon
+            color: Theme.yellow
         }
 
-        BarButton {
-            id: weatherButton
-
-            visible: Weather.ready
-            active: barWindow.isOpen("weather")
-            onClicked: barWindow.toggle("weather", weatherButton)
-
-            Icon {
-                text: Weather.icon
-                color: Theme.yellow
-            }
-
-            StyledText {
-                text: `${Weather.temp}°`
-                color: Theme.subtext1
-            }
+        StyledText {
+            text: `${Weather.temp}°`
+            color: Theme.subtext1
         }
     }
 
@@ -105,6 +125,7 @@ PanelWindow {
             id: media
 
             active: barWindow.isOpen("media")
+            tooltip: `${Media.active?.identity ?? ""}\n${Media.label}`
             onClicked: mouse => {
                 if (mouse.button === Qt.LeftButton)
                     barWindow.toggle("media", media);
@@ -118,6 +139,7 @@ PanelWindow {
         Tray {}
 
         BarButton {
+            tooltip: System.stayAwake ? "Stay awake: on\nScreen won't lock or sleep" : "Stay awake: off"
             onClicked: System.stayAwake = !System.stayAwake
 
             Icon {
@@ -128,6 +150,7 @@ PanelWindow {
 
         BarButton {
             active: Panels.displays
+            tooltip: "Displays"
             onClicked: Panels.toggleDisplays()
 
             Icon {
@@ -140,6 +163,7 @@ PanelWindow {
             id: audioButton
 
             active: barWindow.isOpen("audio")
+            tooltip: Audio.muted ? `Muted\n${Audio.nodeName(Audio.sink)}` : `Volume ${Math.round(Audio.volume * 100)}%\n${Audio.nodeName(Audio.sink)}`
             onClicked: mouse => mouse.button === Qt.RightButton ? Audio.toggleMute(Audio.sink) : barWindow.toggle("audio", audioButton)
             onWheel: wheel => Audio.setVolume(Audio.sink, Audio.volume + (wheel.angleDelta.y > 0 ? 0.05 : -0.05))
 
@@ -153,6 +177,7 @@ PanelWindow {
             id: btButton
 
             active: barWindow.isOpen("bluetooth")
+            tooltip: !Bluetooth.enabled ? "Bluetooth: off" : Bluetooth.connected.length > 0 ? `Bluetooth: ${Bluetooth.connected.map(d => d.name).join(", ")}` : "Bluetooth: on"
             onClicked: mouse => mouse.button === Qt.RightButton ? Bluetooth.toggle() : barWindow.toggle("bluetooth", btButton)
 
             Icon {
@@ -165,6 +190,7 @@ PanelWindow {
             id: netButton
 
             active: barWindow.isOpen("network")
+            tooltip: Network.type === "ethernet" ? `Ethernet: ${Network.connection}` : Network.type === "wifi" ? `Wi-Fi: ${Network.connection} (${Network.strength}%)` : (Network.wifiEnabled ? "Not connected" : "Wi-Fi: off")
             onClicked: barWindow.toggle("network", netButton)
 
             Icon {
@@ -173,20 +199,23 @@ PanelWindow {
             }
         }
 
-        Battery {}
-
         BarButton {
-            visible: Hypr.layout !== ""
-            onClicked: Hypr.nextLayout()
+            id: batteryButton
 
-            StyledText {
-                text: Hypr.layout
-                color: Theme.accent
+            visible: Battery.available
+            active: barWindow.isOpen("battery")
+            tooltip: Battery.summary
+            onClicked: barWindow.toggle("battery", batteryButton)
+
+            Icon {
+                text: Battery.icon
+                color: Battery.color
             }
         }
 
         BarButton {
             active: Panels.controlCenter
+            tooltip: Notifs.dnd ? "Control center\nDo not disturb is on" : `Control center\n${Notifs.count} notification${Notifs.count === 1 ? "" : "s"}`
             onClicked: mouse => mouse.button === Qt.RightButton ? (Notifs.dnd = !Notifs.dnd) : Panels.toggleControlCenter()
 
             Icon {
@@ -209,6 +238,8 @@ PanelWindow {
         }
 
         BarButton {
+            active: Panels.powerMenu
+            tooltip: "Power menu"
             onClicked: Panels.togglePowerMenu()
 
             Icon {
@@ -216,6 +247,10 @@ PanelWindow {
                 color: Theme.red
             }
         }
+    }
+
+    BarTooltip {
+        bar: barWindow
     }
 
     // Popouts belong to the bar of their screen
@@ -240,6 +275,10 @@ PanelWindow {
     }
 
     WeatherPopout {
+        bar: barWindow
+    }
+
+    BatteryPopout {
         bar: barWindow
     }
 }

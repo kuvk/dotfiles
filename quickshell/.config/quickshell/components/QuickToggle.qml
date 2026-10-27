@@ -19,7 +19,7 @@ MouseArea {
     Rectangle {
         anchors.fill: parent
         radius: Theme.smallRadius
-        color: root.checked ? Theme.alpha(Theme.accent, root.containsMouse ? 0.35 : 0.25) : (root.containsMouse ? Theme.hoverBg : Theme.cardBg)
+        color: root.checked ? Theme.alpha(Theme.highlight, root.containsMouse ? 0.35 : 0.25) : (root.containsMouse ? Theme.hoverBg : Theme.cardBg)
 
         Behavior on color {
             ColorAnimation {
@@ -35,7 +35,7 @@ MouseArea {
 
         Icon {
             text: root.icon
-            color: root.checked ? Theme.accent : Theme.subtext0
+            color: root.checked ? Theme.highlight : Theme.subtext0
             font.pixelSize: 18
             Layout.preferredWidth: 22
         }

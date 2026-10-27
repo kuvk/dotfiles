@@ -13,7 +13,7 @@ Rectangle {
     implicitHeight: 36
     radius: Theme.smallRadius
     color: Theme.cardBg
-    border.color: input.activeFocus ? Theme.accent : "transparent"
+    border.color: input.activeFocus ? Theme.highlight : "transparent"
 
     onActiveChanged: {
         input.text = "";

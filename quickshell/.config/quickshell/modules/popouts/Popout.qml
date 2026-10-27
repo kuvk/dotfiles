@@ -4,10 +4,11 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.config
+import qs.components
 import qs.services
 
-// Dropdown under the bar, horizontally centered on the item that opened it.
-// Clicking anywhere outside it (except its bar) closes it.
+// Dropdown that slides out from under the bar, horizontally centered on the
+// item that opened it. One click anywhere outside it (bar included) closes it.
 PanelWindow {
     id: root
 
@@ -17,16 +18,16 @@ PanelWindow {
     default property alias content: column.data
 
     readonly property bool shown: Panels.popout === name && Panels.popoutScreen === bar.screen
+    readonly property real reveal: revealer.value
 
     screen: bar.screen
-    visible: shown
+    visible: reveal > 0
     color: "transparent"
     anchors {
         top: true
         left: true
     }
     margins {
-        top: 6
         left: Math.max(6, Math.min((screen?.width ?? 0) - implicitWidth - 6, Panels.popoutX - implicitWidth / 2))
     }
     exclusionMode: ExclusionMode.Normal
@@ -37,28 +38,49 @@ PanelWindow {
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
-    HyprlandFocusGrab {
-        active: root.shown
-        windows: [root, root.bar]
-        onCleared: Panels.popout = ""
+    Reveal {
+        id: revealer
+
+        shown: root.shown
+        duration: Theme.animDuration * 1.6
     }
 
-    Rectangle {
+    HyprlandFocusGrab {
+        active: root.shown
+        windows: [root]
+        onCleared: Panels.closePopout(root.name)
+    }
+
+    Item {
         anchors.fill: parent
-        color: Theme.panelBg
-        radius: Theme.radius
-        border.color: Theme.border
-        border.width: 1
+        clip: true
 
-        focus: root.shown
-        Keys.onEscapePressed: Panels.popout = ""
+        Rectangle {
+            id: panel
 
-        ColumnLayout {
-            id: column
+            // The top edge tucks under the bar, so only sides and bottom show a border
+            width: parent.width
+            height: parent.height + Theme.borderWidth
+            y: -Theme.borderWidth - height * (1 - root.reveal)
+            color: Theme.panelBg
+            border.color: Theme.border
+            border.width: Theme.borderWidth
+            topLeftRadius: 0
+            topRightRadius: 0
+            bottomLeftRadius: Theme.radius
+            bottomRightRadius: Theme.radius
 
-            anchors.fill: parent
-            anchors.margins: Theme.padding
-            spacing: Theme.spacing
+            focus: root.shown
+            Keys.onEscapePressed: Panels.closePopout(root.name)
+
+            ColumnLayout {
+                id: column
+
+                anchors.fill: parent
+                anchors.margins: Theme.padding
+                anchors.topMargin: Theme.padding + Theme.borderWidth
+                spacing: Theme.spacing
+            }
         }
     }
 }

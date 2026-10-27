@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
@@ -6,15 +7,24 @@ import qs.config
 import qs.components
 import qs.services
 
-// Replacement for wlogout with the same look: a dimmed full-screen overlay
-// with one row of large buttons. Keys: l e u r s (like the wlogout layout),
-// arrows/Tab + Enter, Esc or a click on the background closes.
-PanelWindow {
+// Replacement for wlogout: every monitor gets a blurred, dimmed overlay and the
+// focused one shows a row of icon buttons (same proportions as before).
+// Keys: l e u r s, arrows/Tab + Enter; Esc or a click on the background closes.
+Scope {
     id: root
 
     readonly property bool shown: Panels.powerMenu
     readonly property var actions: System.sessionActions
     property int current: 0
+    readonly property real reveal: revealer.value
+
+    Reveal {
+        id: revealer
+
+        shown: root.shown
+    }
+
+    onShownChanged: current = 0
 
     function run(index: int): void {
         const action = actions[index];
@@ -23,140 +33,136 @@ PanelWindow {
             System.runAction(action.id);
     }
 
-    screen: Panels.focusedScreen
-    visible: shown || fade.running
-    color: "transparent"
-    anchors {
-        top: true
-        bottom: true
-        left: true
-        right: true
-    }
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "quickshell-powermenu"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    Variants {
+        model: Quickshell.screens
 
-    onShownChanged: {
-        current = 0;
-        if (shown)
-            content.forceActiveFocus();
-    }
+        PanelWindow {
+            id: win
 
-    Rectangle {
-        id: content
+            required property ShellScreen modelData
+            readonly property bool main: modelData === Panels.focusedScreen
 
-        anchors.fill: parent
-        color: Theme.alpha(Theme.surface0, Theme.gamemode ? 0.9 : 0.5)
-        opacity: root.shown ? 1 : 0
-        focus: root.shown
-
-        Behavior on opacity {
-            NumberAnimation {
-                id: fade
-
-                duration: Theme.animDuration
+            screen: modelData
+            visible: root.reveal > 0
+            color: "transparent"
+            anchors {
+                top: true
+                bottom: true
+                left: true
+                right: true
             }
-        }
+            exclusionMode: ExclusionMode.Ignore
+            // blur comes from the quickshell-.* layer rule (needs alpha above 0.5)
+            WlrLayershell.namespace: "quickshell-powermenu"
+            WlrLayershell.layer: WlrLayer.Overlay
+            WlrLayershell.keyboardFocus: root.shown && main ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
-        Keys.onPressed: event => {
-            if (event.key === Qt.Key_Escape) {
-                Panels.powerMenu = false;
-            } else if (event.key === Qt.Key_Left || event.key === Qt.Key_Backtab || event.key === Qt.Key_H) {
-                root.current = (root.current + root.actions.length - 1) % root.actions.length;
-            } else if (event.key === Qt.Key_Right || event.key === Qt.Key_Tab) {
-                root.current = (root.current + 1) % root.actions.length;
-            } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
-                root.run(root.current);
-            } else {
-                const i = root.actions.findIndex(a => a.key === event.text.toLowerCase());
-                if (i >= 0)
-                    root.run(i);
-                else
-                    return;
-            }
-            event.accepted = true;
-        }
+            Rectangle {
+                id: background
 
-        // Click outside the buttons closes, like wlogout
-        MouseArea {
-            anchors.fill: parent
-            onClicked: Panels.powerMenu = false
-        }
+                anchors.fill: parent
+                color: Theme.alpha(Theme.crust, Theme.gamemode ? 1 : 0.6)
+                opacity: root.reveal
+                focus: root.shown && win.main
 
-        // Same proportions as wlogout-dynamic.sh: 15% side margins,
-        // 42% top/bottom margins, 5% column spacing
-        RowLayout {
-            anchors.fill: parent
-            anchors.leftMargin: root.width * 0.15
-            anchors.rightMargin: root.width * 0.15
-            anchors.topMargin: root.height * 0.42
-            anchors.bottomMargin: root.height * 0.42
-            spacing: root.width * 0.05
-            scale: root.shown ? 1 : 0.92
+                onFocusChanged: if (focus) forceActiveFocus()
 
-            Behavior on scale {
-                NumberAnimation {
-                    duration: Theme.animDuration * 1.5
-                    easing.type: Easing.OutBack
+                Keys.onPressed: event => {
+                    const n = root.actions.length;
+                    if (event.key === Qt.Key_Escape) {
+                        Panels.powerMenu = false;
+                    } else if (event.key === Qt.Key_Left || event.key === Qt.Key_Backtab || event.key === Qt.Key_H) {
+                        root.current = (root.current + n - 1) % n;
+                    } else if (event.key === Qt.Key_Right || event.key === Qt.Key_Tab) {
+                        root.current = (root.current + 1) % n;
+                    } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter || event.key === Qt.Key_Space) {
+                        root.run(root.current);
+                    } else {
+                        const i = root.actions.findIndex(a => a.key === event.text.toLowerCase());
+                        if (i < 0)
+                            return;
+                        root.run(i);
+                    }
+                    event.accepted = true;
                 }
-            }
-
-            Repeater {
-                model: root.actions
 
                 MouseArea {
-                    id: button
+                    anchors.fill: parent
+                    onClicked: Panels.powerMenu = false
+                }
 
-                    required property var modelData
-                    required property int index
-                    readonly property bool selected: root.current === index || containsMouse
+                // 15% side margins, 42% top/bottom, 5% between buttons
+                RowLayout {
+                    visible: win.main
+                    anchors.fill: parent
+                    anchors.leftMargin: win.width * 0.15
+                    anchors.rightMargin: win.width * 0.15
+                    anchors.topMargin: win.height * 0.42
+                    anchors.bottomMargin: win.height * 0.42
+                    spacing: win.width * 0.05
+                    scale: 0.92 + 0.08 * root.reveal
 
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    Layout.minimumWidth: 100
-                    Layout.minimumHeight: 100
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onEntered: root.current = index
-                    onClicked: root.run(index)
+                    Repeater {
+                        model: root.actions
 
-                    // shadow: 1px 2px 4px rgba(0,0,0,0.8)
-                    Rectangle {
-                        anchors.fill: parent
-                        anchors.leftMargin: 1
-                        anchors.topMargin: 2
-                        anchors.rightMargin: -1
-                        anchors.bottomMargin: -2
-                        radius: Theme.gamemode ? 0 : 16
-                        color: Qt.rgba(0, 0, 0, 0.35)
-                    }
+                        MouseArea {
+                            id: button
 
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: Theme.gamemode ? 0 : 16
-                        color: button.selected ? Theme.alpha(Theme.overlay0, 0.8) : Theme.alpha(Theme.surface0, 0.5)
+                            required property var modelData
+                            required property int index
+                            readonly property bool selected: root.current === index
 
-                        Behavior on color {
-                            ColorAnimation {
-                                duration: Theme.animDuration
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Layout.minimumWidth: 90
+                            Layout.minimumHeight: 90
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onEntered: root.current = index
+                            onClicked: root.run(index)
+
+                            Rectangle {
+                                id: box
+
+                                anchors.fill: parent
+                                radius: Theme.radius * 2
+                                color: button.selected ? Theme.alpha(Theme.surface1, Theme.gamemode ? 1 : 0.9) : Theme.alpha(Theme.surface0, Theme.gamemode ? 1 : 0.75)
+                                border.color: button.selected ? Theme[button.modelData.color] : "transparent"
+                                border.width: Theme.borderWidth
+
+                                // tight shadow: small offset, soft edge
+                                layer.enabled: !Theme.gamemode
+                                layer.effect: MultiEffect {
+                                    shadowEnabled: true
+                                    shadowColor: "black"
+                                    shadowOpacity: 0.55
+                                    shadowBlur: 0.45
+                                    shadowVerticalOffset: 4
+                                    shadowHorizontalOffset: 0
+                                }
+
+                                Behavior on color {
+                                    ColorAnimation {
+                                        duration: Theme.animDuration
+                                    }
+                                }
+                            }
+
+                            Icon {
+                                anchors.centerIn: parent
+                                text: button.modelData.icon
+                                color: Theme[button.modelData.color]
+                                font.pixelSize: 44
+                                scale: button.selected ? 1.1 : 1
+
+                                Behavior on scale {
+                                    NumberAnimation {
+                                        duration: Theme.animDuration
+                                        easing.type: Easing.OutBack
+                                    }
+                                }
                             }
                         }
-                    }
-
-                    Icon {
-                        anchors.centerIn: parent
-                        text: button.modelData.icon
-                        color: Theme[button.modelData.color]
-                        font.pixelSize: 40
-                    }
-
-                    StyledText {
-                        anchors.bottom: parent.bottom
-                        anchors.bottomMargin: 12
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: button.modelData.label.toLowerCase()
-                        font.pixelSize: 16
                     }
                 }
             }

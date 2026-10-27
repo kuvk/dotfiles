@@ -49,7 +49,8 @@ theme folder and set `wallpaper` under `[apps]`.
 | Hyprland borders | `~/.config/hypr/configs/generated/theme.lua` | live (`hyprctl eval`) |
 | kitty | `current/kitty.conf` | live (SIGUSR1) |
 | Neovim | `current/nvim.lua` | live (`lua/theme.lua` watches it) |
-| btop | `current/btop.theme` | live (SIGUSR2) |
+| btop | `~/.config/btop/themes/current.theme` | live (SIGUSR2) |
+| bat | `~/.config/bat/themes/Current.tmTheme` | next run (`bat cache --build`) |
 | tmux | `current/tmux.conf` | live (`source-file`) |
 | starship | `current/starship.toml` (copy of `~/.config/starship.toml` + palette) | next prompt |
 | rofi | `current/rofi.rasi` | next launch |

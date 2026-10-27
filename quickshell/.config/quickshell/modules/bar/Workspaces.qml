@@ -5,6 +5,8 @@ import qs.config
 import qs.components
 import qs.services
 
+// Workspaces of this monitor. Only the focused workspace (on the focused
+// monitor) is marked active; hovering turns an icon accent.
 Row {
     id: root
 
@@ -21,9 +23,10 @@ Row {
             id: ws
 
             required property HyprlandWorkspace modelData
-            readonly property bool current: modelData.monitor?.activeWorkspace === modelData
+            readonly property bool current: Hyprland.focusedWorkspace === modelData
 
             implicitWidth: 28
+            indicator: false
             onClicked: Hypr.focusWorkspace(modelData.id)
 
             Icon {

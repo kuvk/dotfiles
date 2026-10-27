@@ -45,27 +45,30 @@ Singleton {
     readonly property color crust: colors.crust ?? "#11111b"
     readonly property color accent: colors.accent ?? peach
     readonly property color accent2: colors.accent2 ?? blue
+    // Highlights inside dropdowns, launchers and tooltips; their borders use accent
+    readonly property color highlight: accent2
 
-    // Surfaces
-    readonly property color barBg: alpha(base, gamemode ? 1 : 0.8)
-    readonly property color panelBg: alpha(base, gamemode ? 1 : 0.9)
-    readonly property color cardBg: alpha(surface0, 0.6)
+    // Surfaces. Gamemode turns blur off in Hyprland, so everything goes opaque.
+    readonly property color barBg: alpha(base, gamemode ? 1 : Config.barOpacity)
+    readonly property color panelBg: alpha(base, gamemode ? 1 : Config.panelOpacity)
+    readonly property color cardBg: alpha(surface0, gamemode ? 1 : 0.6)
     readonly property color hoverBg: surface0
-    readonly property color border: alpha(accent, 0.6)
+    readonly property color border: accent
+    readonly property int borderWidth: Config.borderWidth
 
     // Metrics
     readonly property string font: "SF Pro Display"
     readonly property string iconFont: "Symbols Nerd Font"
-    // Text size from the Displays panel (~/.config/hypr/monitors.json)
-    property real textScale: 1
-    readonly property int fontSize: Math.round(13 * textScale)
-    readonly property int iconSize: Math.round(14 * textScale)
-    readonly property int barHeight: Math.round(34 * Math.max(1, textScale))
-    readonly property int radius: gamemode ? 0 : 12
-    readonly property int smallRadius: gamemode ? 0 : 8
+    // Text size in px from the Displays panel (~/.config/hypr/monitors.json)
+    property int textSize: 13
+    readonly property int fontSize: textSize
+    readonly property int iconSize: textSize + 1
+    readonly property int barHeight: Math.max(34, Math.round(textSize * 2.6))
+    readonly property int radius: gamemode ? 0 : Config.radius
+    readonly property int smallRadius: gamemode ? 0 : Math.max(0, Config.radius - 2)
     readonly property int spacing: 8
     readonly property int padding: 12
-    readonly property int animDuration: gamemode ? 0 : 150
+    readonly property int animDuration: gamemode || !Config.animations ? 0 : 150
 
     function alpha(c: color, a: real): color {
         return Qt.rgba(c.r, c.g, c.b, a);
@@ -101,7 +104,8 @@ Singleton {
         onFileChanged: reload()
         onLoaded: {
             try {
-                root.textScale = JSON.parse(text()).text_scale ?? 1;
+                const d = JSON.parse(text());
+                root.textSize = d.text_size ?? Math.round(13 * (d.text_scale ?? 1));
             } catch (e) {}
         }
     }

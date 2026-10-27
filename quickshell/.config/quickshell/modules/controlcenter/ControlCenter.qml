@@ -52,7 +52,7 @@ PanelWindow {
         color: Theme.panelBg
         radius: Theme.radius
         border.color: Theme.border
-        border.width: 1
+        border.width: Theme.borderWidth
 
         focus: root.shown
         Keys.onEscapePressed: Panels.controlCenter = false
@@ -80,6 +80,13 @@ PanelWindow {
                         text: Qt.formatDateTime(Time.date, "dddd, d MMMM")
                         color: Theme.subtext0
                     }
+                }
+
+                IconButton {
+                    Layout.alignment: Qt.AlignTop
+                    icon: Icons.cog
+                    color: Theme.subtext0
+                    onClicked: Panels.toggleSettings()
                 }
 
             }
@@ -142,7 +149,7 @@ PanelWindow {
 
                 IconButton {
                     icon: Audio.icon
-                    color: Audio.muted ? Theme.red : Theme.accent
+                    color: Audio.muted ? Theme.red : Theme.highlight
                     onClicked: Audio.toggleMute(Audio.sink)
                 }
 
@@ -150,7 +157,7 @@ PanelWindow {
                     Layout.fillWidth: true
                     value: Audio.volume
                     to: 1.2
-                    color: Audio.muted ? Theme.overlay0 : Theme.accent
+                    color: Audio.muted ? Theme.overlay0 : Theme.highlight
                     onMoved: v => Audio.setVolume(Audio.sink, v)
                 }
             }
@@ -240,7 +247,7 @@ PanelWindow {
                         required property var modelData
 
                         Layout.fillWidth: true
-                        implicitHeight: 52
+                        implicitHeight: 44
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
@@ -254,23 +261,11 @@ PanelWindow {
                             color: action.containsMouse ? Theme.hoverBg : Theme.cardBg
                         }
 
-                        ColumnLayout {
+                        Icon {
                             anchors.centerIn: parent
-                            spacing: 2
-
-                            Icon {
-                                Layout.alignment: Qt.AlignHCenter
-                                text: action.modelData.icon
-                                color: Theme[action.modelData.color]
-                                font.pixelSize: 16
-                            }
-
-                            StyledText {
-                                Layout.alignment: Qt.AlignHCenter
-                                text: action.modelData.label
-                                color: Theme.subtext0
-                                font.pixelSize: Theme.fontSize - 2
-                            }
+                            text: action.modelData.icon
+                            color: Theme[action.modelData.color]
+                            font.pixelSize: 18
                         }
                     }
                 }

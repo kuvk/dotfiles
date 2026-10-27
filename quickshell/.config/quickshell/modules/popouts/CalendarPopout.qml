@@ -70,7 +70,7 @@ Popout {
         StyledText {
             Layout.fillWidth: true
             text: Qt.formatDate(new Date(root.year, root.month, 1), "MMMM yyyy")
-            color: Theme.accent
+            color: Theme.highlight
             font.weight: Font.Bold
             font.pixelSize: Theme.fontSize + 2
             horizontalAlignment: Text.AlignHCenter
@@ -152,7 +152,7 @@ Popout {
                         width: 30
                         height: 30
                         radius: 15
-                        color: Theme.accent
+                        color: Theme.highlight
                         visible: cell.isToday
                     }
 

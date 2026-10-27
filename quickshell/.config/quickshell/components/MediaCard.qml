@@ -85,7 +85,7 @@ Card {
                 Layout.fillWidth: true
                 value: root.player?.position ?? 0
                 to: Math.max(1, root.player?.length ?? 1)
-                color: Theme.accent
+                color: Theme.highlight
                 onMoved: v => {
                     if (root.player?.canSeek)
                         root.player.position = v;
@@ -126,7 +126,7 @@ Card {
             IconButton {
                 size: 40
                 icon: root.player?.isPlaying ? Icons.pause : Icons.play
-                color: Theme.accent
+                color: Theme.highlight
                 onClicked: root.player.togglePlaying()
             }
 

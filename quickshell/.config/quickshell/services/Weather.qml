@@ -28,6 +28,10 @@ Singleton {
         proc.running = true;
     }
 
+    // Settings changes refetch right away
+    readonly property string query: Config.weatherLocation + Config.weatherFahrenheit
+    onQueryChanged: refresh()
+
     // WWO weather codes used by wttr.in
     function iconFor(code: int, current: bool): string {
         const hour = new Date().getHours();

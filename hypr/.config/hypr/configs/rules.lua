@@ -5,6 +5,12 @@ hl.layer_rule({
   ignore_alpha = 0.5,
 })
 
+-- Quickshell animates its dropdowns and tooltips itself
+hl.layer_rule({
+  match = { class = "^(quickshell-popout|quickshell-tooltip)$" },
+  no_anim = true,
+})
+
 -- XWayland Settings
 hl.config({
   xwayland = {
