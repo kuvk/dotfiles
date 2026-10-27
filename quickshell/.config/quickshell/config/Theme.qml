@@ -56,9 +56,11 @@ Singleton {
     // Metrics
     readonly property string font: "SF Pro Display"
     readonly property string iconFont: "Symbols Nerd Font"
-    readonly property int fontSize: 13
-    readonly property int iconSize: 14
-    readonly property int barHeight: 34
+    // Text size from the Displays panel (~/.config/hypr/monitors.json)
+    property real textScale: 1
+    readonly property int fontSize: Math.round(13 * textScale)
+    readonly property int iconSize: Math.round(14 * textScale)
+    readonly property int barHeight: Math.round(34 * Math.max(1, textScale))
     readonly property int radius: gamemode ? 0 : 12
     readonly property int smallRadius: gamemode ? 0 : 8
     readonly property int spacing: 8
@@ -91,6 +93,17 @@ Singleton {
             }
         }
         onLoadFailed: err => console.warn("Theme: no generated theme yet, run theme-set.py")
+    }
+
+    FileView {
+        path: Quickshell.env("HOME") + "/.config/hypr/monitors.json"
+        watchChanges: true
+        onFileChanged: reload()
+        onLoaded: {
+            try {
+                root.textScale = JSON.parse(text()).text_scale ?? 1;
+            } catch (e) {}
+        }
     }
 
     FileView {

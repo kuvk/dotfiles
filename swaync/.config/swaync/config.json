@@ -80,7 +80,7 @@
         },
         {
           "active": false,
-          "command": "~/.config/scripts/wlogout-dynamic.sh",
+          "command": "qs ipc call power toggle",
           "label": "",
           "type": "button"
         }

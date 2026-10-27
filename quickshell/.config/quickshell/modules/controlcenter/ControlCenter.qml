@@ -82,22 +82,6 @@ PanelWindow {
                     }
                 }
 
-                IconButton {
-                    icon: Icons.lock
-                    onClicked: {
-                        Panels.closeAll();
-                        System.lock();
-                    }
-                }
-
-                IconButton {
-                    icon: Icons.power
-                    color: Theme.red
-                    onClicked: {
-                        Panels.closeAll();
-                        System.powerMenu();
-                    }
-                }
             }
 
             GridLayout {
@@ -239,6 +223,56 @@ PanelWindow {
                     visible: notifList.count === 0
                     text: `${Icons.bell}  No notifications`
                     color: Theme.overlay1
+                }
+            }
+
+            // Session actions
+            RowLayout {
+                Layout.fillWidth: true
+                spacing: 8
+
+                Repeater {
+                    model: System.sessionActions
+
+                    MouseArea {
+                        id: action
+
+                        required property var modelData
+
+                        Layout.fillWidth: true
+                        implicitHeight: 52
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: {
+                            Panels.closeAll();
+                            System.runAction(modelData.id);
+                        }
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: Theme.smallRadius
+                            color: action.containsMouse ? Theme.hoverBg : Theme.cardBg
+                        }
+
+                        ColumnLayout {
+                            anchors.centerIn: parent
+                            spacing: 2
+
+                            Icon {
+                                Layout.alignment: Qt.AlignHCenter
+                                text: action.modelData.icon
+                                color: Theme[action.modelData.color]
+                                font.pixelSize: 16
+                            }
+
+                            StyledText {
+                                Layout.alignment: Qt.AlignHCenter
+                                text: action.modelData.label
+                                color: Theme.subtext0
+                                font.pixelSize: Theme.fontSize - 2
+                            }
+                        }
+                    }
                 }
             }
         }

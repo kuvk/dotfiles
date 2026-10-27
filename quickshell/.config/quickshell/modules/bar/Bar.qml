@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
 import qs.config
@@ -18,6 +17,10 @@ PanelWindow {
         Panels.togglePopout(name, screen, pos.x);
     }
 
+    function isOpen(name: string): bool {
+        return Panels.popout === name && Panels.popoutScreen === screen;
+    }
+
     screen: modelData
     visible: Panels.barVisible
     anchors {
@@ -29,11 +32,11 @@ PanelWindow {
     color: Theme.barBg
     WlrLayershell.namespace: "quickshell-bar"
 
-    RowLayout {
-        anchors.fill: parent
+    // Left: launcher, workspaces, focused window
+    Row {
+        anchors.left: parent.left
         anchors.leftMargin: 4
-        anchors.rightMargin: 4
-        spacing: 0
+        anchors.verticalCenter: parent.verticalCenter
 
         BarButton {
             onClicked: Panels.toggleLauncher("apps")
@@ -46,22 +49,62 @@ PanelWindow {
         }
 
         Workspaces {
+            anchors.verticalCenter: parent.verticalCenter
             screen: barWindow.screen
         }
 
         WindowTitle {
+            anchors.verticalCenter: parent.verticalCenter
             screen: barWindow.screen
-            Layout.maximumWidth: 260
+        }
+    }
+
+    // Center: clock and weather, centered on the screen
+    Row {
+        anchors.centerIn: parent
+
+        BarButton {
+            id: clockButton
+
+            active: barWindow.isOpen("calendar")
+            onClicked: barWindow.toggle("calendar", clockButton)
+
+            StyledText {
+                text: Qt.formatDateTime(Time.date, Config.clockFormat)
+                color: Theme.text
+                font.weight: Font.DemiBold
+            }
         }
 
-        Item {
-            Layout.fillWidth: true
+        BarButton {
+            id: weatherButton
+
+            visible: Weather.ready
+            active: barWindow.isOpen("weather")
+            onClicked: barWindow.toggle("weather", weatherButton)
+
+            Icon {
+                text: Weather.icon
+                color: Theme.yellow
+            }
+
+            StyledText {
+                text: `${Weather.temp}°`
+                color: Theme.subtext1
+            }
         }
+    }
+
+    // Right: media, tray, status, control center
+    Row {
+        anchors.right: parent.right
+        anchors.rightMargin: 4
+        anchors.verticalCenter: parent.verticalCenter
 
         MediaWidget {
             id: media
 
-            Layout.maximumWidth: 320
+            active: barWindow.isOpen("media")
             onClicked: mouse => {
                 if (mouse.button === Qt.LeftButton)
                     barWindow.toggle("media", media);
@@ -72,14 +115,31 @@ PanelWindow {
             }
         }
 
-        Tray {
-            bar: barWindow
+        Tray {}
+
+        BarButton {
+            onClicked: System.stayAwake = !System.stayAwake
+
+            Icon {
+                text: Icons.coffee
+                color: System.stayAwake ? Theme.accent : Theme.overlay1
+            }
+        }
+
+        BarButton {
+            active: Panels.displays
+            onClicked: Panels.toggleDisplays()
+
+            Icon {
+                text: Icons.display
+                color: Theme.teal
+            }
         }
 
         BarButton {
             id: audioButton
 
-            active: Panels.popout === "audio" && Panels.popoutScreen === barWindow.screen
+            active: barWindow.isOpen("audio")
             onClicked: mouse => mouse.button === Qt.RightButton ? Audio.toggleMute(Audio.sink) : barWindow.toggle("audio", audioButton)
             onWheel: wheel => Audio.setVolume(Audio.sink, Audio.volume + (wheel.angleDelta.y > 0 ? 0.05 : -0.05))
 
@@ -92,7 +152,7 @@ PanelWindow {
         BarButton {
             id: btButton
 
-            active: Panels.popout === "bluetooth" && Panels.popoutScreen === barWindow.screen
+            active: barWindow.isOpen("bluetooth")
             onClicked: mouse => mouse.button === Qt.RightButton ? Bluetooth.toggle() : barWindow.toggle("bluetooth", btButton)
 
             Icon {
@@ -104,7 +164,7 @@ PanelWindow {
         BarButton {
             id: netButton
 
-            active: Panels.popout === "network" && Panels.popoutScreen === barWindow.screen
+            active: barWindow.isOpen("network")
             onClicked: barWindow.toggle("network", netButton)
 
             Icon {
@@ -126,30 +186,30 @@ PanelWindow {
         }
 
         BarButton {
-            id: clockButton
-
-            active: Panels.popout === "calendar" && Panels.popoutScreen === barWindow.screen
-            onClicked: barWindow.toggle("calendar", clockButton)
-
-            StyledText {
-                text: Qt.formatDateTime(Time.date, "HH:mm")
-                color: Theme.sky
-                font.weight: Font.DemiBold
-            }
-        }
-
-        BarButton {
             active: Panels.controlCenter
             onClicked: mouse => mouse.button === Qt.RightButton ? (Notifs.dnd = !Notifs.dnd) : Panels.toggleControlCenter()
 
             Icon {
-                text: Notifs.dnd ? Icons.bellDnd : (Notifs.count > 0 ? Icons.bellBadge : Icons.bell)
-                color: Notifs.dnd ? Theme.mauve : (Notifs.count > 0 ? Theme.green : Theme.blue)
+                text: Icons.sliders
+                color: Notifs.dnd ? Theme.mauve : Theme.blue
+
+                // Unread notifications
+                Rectangle {
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.rightMargin: -4
+                    anchors.topMargin: -1
+                    width: 7
+                    height: 7
+                    radius: 4
+                    color: Theme.accent
+                    visible: Notifs.count > 0 && !Notifs.dnd
+                }
             }
         }
 
         BarButton {
-            onClicked: System.powerMenu()
+            onClicked: Panels.togglePowerMenu()
 
             Icon {
                 text: Icons.power
@@ -176,6 +236,10 @@ PanelWindow {
     }
 
     CalendarPopout {
+        bar: barWindow
+    }
+
+    WeatherPopout {
         bar: barWindow
     }
 }

@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import qs.config
 
 // Small bits of system state driven by the existing scripts in ~/.config/scripts
 Singleton {
@@ -11,6 +12,8 @@ Singleton {
     readonly property string scripts: Quickshell.env("HOME") + "/.config/scripts/"
 
     property bool nightlight: false
+    // Holds a systemd idle inhibitor, which hypridle respects (like media-inhibit.sh)
+    property bool stayAwake: false
     property bool gamemode: false
     property bool hasBrightness: false
     property real brightness: 0
@@ -38,12 +41,35 @@ Singleton {
         Quickshell.execDetached(["brightnessctl", "-q", "s", `${pct}%`]);
     }
 
-    function powerMenu(): void {
-        Quickshell.execDetached([scripts + "wlogout-dynamic.sh"]);
-    }
+    // Shared by the power menu and the control center. `key` is the power
+    // menu shortcut, `color` a Theme color name (same colors as the old wlogout icons).
+    readonly property var sessionActions: [
+        { id: "lock", label: "Lock", icon: Icons.lock, key: "l", color: "green" },
+        { id: "suspend", label: "Sleep", icon: Icons.bed, key: "u", color: "peach" },
+        { id: "logout", label: "Log out", icon: Icons.signOut, key: "e", color: "teal" },
+        { id: "reboot", label: "Reboot", icon: Icons.reboot, key: "r", color: "mauve" },
+        { id: "shutdown", label: "Shut down", icon: Icons.power, key: "s", color: "red" }
+    ]
 
-    function lock(): void {
-        Quickshell.execDetached([scripts + "lockscreen.sh"]);
+    function runAction(id: string): void {
+        switch (id) {
+        case "lock":
+            Lock.lock();
+            break;
+        case "suspend":
+            // hypridle locks before sleeping (before_sleep_cmd)
+            Quickshell.execDetached(["systemctl", "suspend"]);
+            break;
+        case "logout":
+            Quickshell.execDetached(["hyprshutdown", "-t", "Logging out ..."]);
+            break;
+        case "reboot":
+            Quickshell.execDetached(["systemctl", "reboot"]);
+            break;
+        case "shutdown":
+            Quickshell.execDetached(["systemctl", "poweroff"]);
+            break;
+        }
     }
 
     function run(cmd: var): void {
@@ -51,6 +77,11 @@ Singleton {
     }
 
     Component.onCompleted: refresh()
+
+    Process {
+        running: root.stayAwake
+        command: ["systemd-inhibit", "--what=idle", "--who=quickshell", "--why=Stay awake", "sleep", "infinity"]
+    }
 
     Timer {
         id: delayedRefresh
