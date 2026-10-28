@@ -11,6 +11,12 @@ PanelWindow {
     id: barWindow
 
     required property ShellScreen modelData
+    // The profile's primary monitor (Displays); with none known yet, every bar is primary
+    readonly property bool primary: Displays.primaryName === "" || Displays.primaryName === screen?.name
+
+    function shows(id: string): bool {
+        return Config.barShows(primary, id);
+    }
 
     // Open a popout centered under `item`
     function toggle(name: string, item: Item): void {
@@ -42,24 +48,27 @@ PanelWindow {
         BarButton {
             id: launcherButton
 
+            visible: barWindow.shows("launcher")
             indicator: false
             tooltip: "Applications"
             onClicked: Panels.toggleLauncher("apps")
 
             Icon {
                 text: Icons.arch
-                color: launcherButton.containsMouse || (Panels.launcher && Panels.launcherMode === "apps") ? Theme.accent : Theme.accent2
+                color: launcherButton.containsMouse || (Panels.launcher && Panels.launcherMode === "apps" && Panels.overlayScreen === barWindow.screen) ? Theme.accent : Theme.accent2
                 font.pixelSize: 17
             }
         }
 
         Workspaces {
             anchors.verticalCenter: parent.verticalCenter
+            visible: barWindow.shows("workspaces")
             screen: barWindow.screen
         }
 
         WindowTitle {
             anchors.verticalCenter: parent.verticalCenter
+            shown: barWindow.shows("windowTitle")
             screen: barWindow.screen
         }
     }
@@ -83,7 +92,7 @@ PanelWindow {
     BarButton {
         anchors.right: clockButton.left
         anchors.verticalCenter: parent.verticalCenter
-        visible: Config.showLayout && Hypr.layout !== ""
+        visible: barWindow.shows("layout") && Hypr.layout !== ""
         tooltip: `Keyboard layout\n${Hypr.layoutName || Hypr.layout}`
         onClicked: Hypr.nextLayout()
 
@@ -99,7 +108,7 @@ PanelWindow {
 
         anchors.left: clockButton.right
         anchors.verticalCenter: parent.verticalCenter
-        visible: Config.showWeather && Weather.ready
+        visible: barWindow.shows("weather") && Weather.ready
         active: barWindow.isOpen("weather")
         tooltip: `${Weather.description}\nFeels like ${Weather.feelsLike}${Weather.unit}\n${Weather.location}`
         onClicked: barWindow.toggle("weather", weatherButton)
@@ -124,6 +133,7 @@ PanelWindow {
         MediaWidget {
             id: media
 
+            shown: barWindow.shows("media")
             active: barWindow.isOpen("media")
             tooltip: `${Media.active?.identity ?? ""}\n${Media.label}`
             onClicked: mouse => {
@@ -136,19 +146,23 @@ PanelWindow {
             }
         }
 
-        Tray {}
+        Tray {
+            shown: barWindow.shows("tray")
+        }
 
         BarButton {
+            visible: barWindow.shows("workGame")
             tooltip: System.gamemode ? "Leave Work-Game Mode" : "Work-Game Mode"
             onClicked: System.toggleGamemode()
 
             Icon {
                 text: Icons.rocket
-                color: System.gamemode ? Theme.accent : Theme.overlay1
+                color: System.gamemode ? Theme.mauve : Theme.overlay1
             }
         }
 
         BarButton {
+            visible: barWindow.shows("stayAwake")
             tooltip: System.stayAwake ? "Allow Idle Lock & Screensaver" : "Stay Awake"
             onClicked: System.stayAwake = !System.stayAwake
 
@@ -161,6 +175,7 @@ PanelWindow {
         BarButton {
             id: audioButton
 
+            visible: barWindow.shows("audio")
             active: barWindow.isOpen("audio")
             tooltip: `${Audio.muted ? "Muted" : `Volume ${Math.round(Audio.volume * 100)}%`}\n${Audio.nodeName(Audio.sink)}`
             onClicked: mouse => mouse.button === Qt.RightButton ? Audio.toggleMute(Audio.sink) : barWindow.toggle("audio", audioButton)
@@ -175,6 +190,7 @@ PanelWindow {
         BarButton {
             id: btButton
 
+            visible: barWindow.shows("bluetooth")
             active: barWindow.isOpen("bluetooth")
             tooltip: !Bluetooth.enabled ? "Bluetooth\nOff" : Bluetooth.connected.length > 0 ? `Bluetooth\n${Bluetooth.connected.map(d => d.name).join("\n")}` : "Bluetooth\nOn, nothing connected"
             onClicked: mouse => mouse.button === Qt.RightButton ? Bluetooth.toggle() : barWindow.toggle("bluetooth", btButton)
@@ -188,6 +204,7 @@ PanelWindow {
         BarButton {
             id: netButton
 
+            visible: barWindow.shows("network")
             active: barWindow.isOpen("network")
             tooltip: Network.tooltip
             onClicked: barWindow.toggle("network", netButton)
@@ -201,7 +218,7 @@ PanelWindow {
         BarButton {
             id: batteryButton
 
-            visible: Battery.available
+            visible: barWindow.shows("battery") && Battery.available
             active: barWindow.isOpen("battery")
             tooltip: Battery.summary.split(" · ").join("\n")
             onClicked: barWindow.toggle("battery", batteryButton)
@@ -213,7 +230,8 @@ PanelWindow {
         }
 
         BarButton {
-            active: Panels.controlCenter
+            visible: barWindow.shows("controlCenter")
+            active: Panels.controlCenter && Panels.overlayScreen === barWindow.screen
             tooltip: `Control Center\nNotifications: ${Notifs.count}${Notifs.dnd ? "\nDo not disturb" : ""}`
             onClicked: mouse => mouse.button === Qt.RightButton ? (Notifs.dnd = !Notifs.dnd) : Panels.toggleControlCenter()
 
@@ -237,7 +255,8 @@ PanelWindow {
         }
 
         BarButton {
-            active: Panels.displays
+            visible: barWindow.shows("displays")
+            active: Panels.displays && Panels.overlayScreen === barWindow.screen
             tooltip: "Displays"
             onClicked: Panels.toggleDisplays()
 
@@ -248,6 +267,7 @@ PanelWindow {
         }
 
         BarButton {
+            visible: barWindow.shows("power")
             active: Panels.powerMenu
             tooltip: "Power Menu"
             onClicked: Panels.togglePowerMenu()

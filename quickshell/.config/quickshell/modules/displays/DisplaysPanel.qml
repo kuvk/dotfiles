@@ -1,8 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Hyprland
-import Quickshell.Wayland
 import qs.config
 import qs.components
 import qs.services
@@ -10,7 +8,7 @@ import qs.services
 // Display settings: drag monitors to arrange them (they snap edge to edge),
 // pick resolution and scale, turn monitors on/off, assign workspaces, set
 // brightness and text size. Changes are saved per setup by hypr-monitors.py.
-PanelWindow {
+FloatingWindow {
     id: root
 
     readonly property bool shown: Panels.displays
@@ -207,15 +205,11 @@ PanelWindow {
         dirty = false;
     }
 
-    screen: Panels.focusedScreen
     visible: shown
-    color: "transparent"
+    title: "Displays"
+    color: Theme.panelBg
     implicitWidth: 760
     implicitHeight: Math.ceil(content.implicitHeight + 32)
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "quickshell-displays"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     onShownChanged: {
         if (shown) {
@@ -234,20 +228,15 @@ PanelWindow {
         }
     }
 
-    HyprlandFocusGrab {
-        active: root.shown
-        windows: [root]
-        onCleared: Panels.displays = false
-    }
+    // A regular window (floating and centered by a Hyprland rule, can be
+    // tiled); closing it from Hyprland updates the panel state
+    onClosed: Panels.displays = false
 
     Rectangle {
         id: background
 
         anchors.fill: parent
         color: Theme.panelBg
-        radius: Theme.radius
-        border.color: Theme.border
-        border.width: Theme.borderWidth
         focus: root.shown
         Keys.onEscapePressed: Panels.displays = false
 

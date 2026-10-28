@@ -32,7 +32,7 @@ katakana in the lock screen's digital rain.
 | Battery, power mode (Quiet / Balanced / Performance) | `modules/popouts/BatteryPopout.qml` | click the battery |
 | Stay awake | `services/System.qml` | the coffee icon (holds an idle inhibitor); while media plays an inhibitor is held automatically |
 | Work-Game Mode (no blur/animations/rounding, game gaps, turns Stay Awake on) | `scripts/hypr-gamemode.sh` + `services/System.qml` | the rocket icon, or the Control Center tile |
-| Displays | `modules/displays/Displays.qml` | the monitor icon, or `ALT+CTRL+M` |
+| Displays | `modules/displays/DisplaysPanel.qml` | the monitor icon, or `ALT+CTRL+M` |
 | Notification popups | `modules/notifications/NotificationPopups.qml` | |
 | Control Center: toggles, sliders, media (with visualizer), notifications grouped by app, session buttons | `modules/controlcenter/ControlCenter.qml` | `ALT+N`, or the sliders icon (right-click toggles DND) |
 | App launcher | `modules/launcher/Launcher.qml` | `ALT+Space` |
@@ -44,14 +44,27 @@ katakana in the lock screen's digital rain.
 
 The launcher takes arrows, Tab, Ctrl+J/K and Ctrl+N/P to move, Enter to launch,
 and Esc to close. The power menu takes `l` lock, `u` sleep, `e` log out,
-`r` reboot, `s` shut down.
+`r` reboot, `s` shut down. In the Control Center, `Shift+C` clears the
+notifications and `Shift+D` toggles do not disturb.
+
+Settings and Displays are regular windows: a Hyprland rule (`rules.lua`) makes
+them float centered, and `togglefloating` tiles them. They have no close
+button unless Settings > Windows > Window buttons is on; close them with Esc
+or your close-window binding.
+
+Switching the theme or the wallpaper is animated: a capture of every monitor
+covers it while the switch happens underneath, then opens from the middle out
+along a diagonal (`services/Transition.qml`). Off with animations or in
+Work-Game Mode.
 
 Dropdowns slide out of the bar; one click anywhere outside closes them.
 Hovering a bar item shows a dot under it, an open dropdown an accent line.
 
 Preferences are set in Settings, one sidebar section each: Appearance (corner
-radius, border width, opacity, animations), Bar (clock format, weather,
-keyboard layout and window title on/off), Windows (gaps for regular and Work-Game Mode), Notifications, Lock Screen
+radius, border width, opacity, animations), Bar (clock format, weather
+location and unit, and which modules show on the primary monitor's bar and on
+the others; the clock always shows), Windows (window buttons, gaps for regular
+and Work-Game Mode), Notifications, Lock Screen
 (effects and the colors of the clock, rain, outlines, password dots and text),
 and Tray & Player (tray icon style, apps that keep their own colors, the
 visualizer and its bar count). They are saved to Quickshell's state folder

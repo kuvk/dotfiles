@@ -7,7 +7,7 @@ hl.layer_rule({
 
 -- Quickshell animates its dropdowns and tooltips itself
 hl.layer_rule({
-  match = { class = "^(quickshell-popout|quickshell-tooltip)$" },
+  match = { class = "^(quickshell-popout|quickshell-tooltip|quickshell-transition)$" },
   no_anim = true,
 })
 
@@ -22,6 +22,14 @@ hl.window_rule({
   match = { xwayland = true },
   no_blur = true,
   opaque = true,
+})
+
+-- Quickshell's Settings and Displays: floating and centered (togglefloating tiles them)
+hl.window_rule({
+  name = "quickshell-windows",
+  match = { class = "^org\\.quickshell$", title = "^(Settings|Displays)$" },
+  float = true,
+  center = true,
 })
 
 -- XDG Desktop Portal GTK

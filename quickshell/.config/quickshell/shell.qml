@@ -14,6 +14,7 @@ import qs.modules.lock
 import qs.modules.notifications
 import qs.modules.powermenu
 import qs.modules.settings
+import qs.modules.transition
 import qs.modules.wallpaper
 
 ShellRoot {
@@ -21,6 +22,13 @@ ShellRoot {
         model: Quickshell.screens
 
         Bar {}
+    }
+
+    // Theme and wallpaper switch animation, above everything
+    Variants {
+        model: Quickshell.screens
+
+        TransitionOverlay {}
     }
 
     NotificationPopups {}

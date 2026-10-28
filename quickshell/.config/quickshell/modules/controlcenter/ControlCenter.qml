@@ -15,7 +15,7 @@ PanelWindow {
 
     readonly property bool shown: Panels.controlCenter
 
-    screen: Panels.focusedScreen
+    screen: Panels.overlayScreen ?? Panels.focusedScreen
     visible: shown
     color: "transparent"
     anchors {
@@ -33,7 +33,8 @@ PanelWindow {
     implicitWidth: 420
     WlrLayershell.namespace: "quickshell-controlcenter"
     WlrLayershell.layer: WlrLayer.Top
-    WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
+    // keyboard while open, for Esc, Shift+C (clear) and Shift+D (do not disturb)
+    WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     onShownChanged: {
         if (shown) {
@@ -57,6 +58,17 @@ PanelWindow {
 
         focus: root.shown
         Keys.onEscapePressed: Panels.controlCenter = false
+        Keys.onPressed: event => {
+            if (!(event.modifiers & Qt.ShiftModifier))
+                return;
+            if (event.key === Qt.Key_C) {
+                Notifs.clearAll();
+                event.accepted = true;
+            } else if (event.key === Qt.Key_D) {
+                Notifs.dnd = !Notifs.dnd;
+                event.accepted = true;
+            }
+        }
 
         ColumnLayout {
             anchors.fill: parent

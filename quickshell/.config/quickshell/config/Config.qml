@@ -18,9 +18,41 @@ Singleton {
 
     // Bar
     property alias clockFormat: adapter.clockFormat
-    property alias showWeather: adapter.showWeather
-    property alias showLayout: adapter.showLayout
-    property alias showWindowTitle: adapter.showWindowTitle
+    // Bar modules hidden on the primary monitor's bar and on the others
+    property alias barHiddenPrimary: adapter.barHiddenPrimary
+    property alias barHiddenOthers: adapter.barHiddenOthers
+    readonly property var barModules: [
+        { id: "launcher", label: "App launcher" },
+        { id: "workspaces", label: "Workspaces" },
+        { id: "windowTitle", label: "Window title" },
+        { id: "layout", label: "Keyboard layout" },
+        { id: "weather", label: "Weather" },
+        { id: "media", label: "Media player" },
+        { id: "tray", label: "System tray" },
+        { id: "workGame", label: "Work-Game Mode" },
+        { id: "stayAwake", label: "Stay Awake" },
+        { id: "audio", label: "Volume" },
+        { id: "bluetooth", label: "Bluetooth" },
+        { id: "network", label: "Network" },
+        { id: "battery", label: "Battery" },
+        { id: "controlCenter", label: "Control Center" },
+        { id: "displays", label: "Displays" },
+        { id: "power", label: "Power menu" }
+    ]
+
+    function barShows(primary: bool, id: string): bool {
+        return !(primary ? barHiddenPrimary : barHiddenOthers).includes(id);
+    }
+
+    function setBarModule(primary: bool, id: string, shown: bool): void {
+        const list = (primary ? barHiddenPrimary : barHiddenOthers).filter(m => m !== id);
+        if (!shown)
+            list.push(id);
+        if (primary)
+            barHiddenPrimary = list;
+        else
+            barHiddenOthers = list;
+    }
 
     // Weather: empty location means "detect from IP" (wttr.in)
     property alias weatherLocation: adapter.weatherLocation
@@ -42,6 +74,7 @@ Singleton {
     property alias cavaBars: adapter.cavaBars
 
     // Window gaps (Hyprland), normal and in Work-Game Mode
+    property alias windowButtons: adapter.windowButtons
     property alias gapsIn: adapter.gapsIn
     property alias gapsOut: adapter.gapsOut
     property alias gameGapsIn: adapter.gameGapsIn
@@ -61,9 +94,8 @@ Singleton {
         adapter.panelOpacity = 0.9;
         adapter.animations = true;
         adapter.clockFormat = "dddd HH:mm";
-        adapter.showWeather = true;
-        adapter.showLayout = true;
-        adapter.showWindowTitle = true;
+        adapter.barHiddenPrimary = [];
+        adapter.barHiddenOthers = [];
         adapter.weatherLocation = "";
         adapter.weatherFahrenheit = false;
         adapter.notificationTimeout = 10;
@@ -74,6 +106,7 @@ Singleton {
         adapter.trayKeepColors = "rog-control-center";
         adapter.cava = true;
         adapter.cavaBars = 24;
+        adapter.windowButtons = false;
         adapter.gapsIn = 2;
         adapter.gapsOut = 4;
         adapter.gameGapsIn = 0;
@@ -115,9 +148,8 @@ Singleton {
             property real panelOpacity: 0.9
             property bool animations: true
             property string clockFormat: "dddd HH:mm"
-            property bool showWeather: true
-            property bool showLayout: true
-            property bool showWindowTitle: true
+            property var barHiddenPrimary: []
+            property var barHiddenOthers: []
             property string weatherLocation: ""
             property bool weatherFahrenheit: false
             property int notificationTimeout: 10
@@ -130,6 +162,7 @@ Singleton {
             property string trayKeepColors: "rog-control-center"
             property bool cava: true
             property int cavaBars: 24
+            property bool windowButtons: false
             property int gapsIn: 2
             property int gapsOut: 4
             property int gameGapsIn: 0
