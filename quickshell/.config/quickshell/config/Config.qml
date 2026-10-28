@@ -74,11 +74,12 @@ Singleton {
     property alias cavaBars: adapter.cavaBars
 
     // Window gaps (Hyprland), normal and in Work-Game Mode
-    // Fonts (Settings > Fonts): text in the bar, panels and windows; icons
-    // (a Nerd Font: Symbols Nerd Font or any full Nerd Font); monospace
-    property alias uiFont: adapter.uiFont
-    property alias iconFont: adapter.iconFont
-    property alias monoFont: adapter.monoFont
+    // Fonts (Settings > Fonts): a Nerd Font, a display font for text, and
+    // whether text uses the Nerd Font too and icons come from Symbols Nerd Font
+    property alias nerdFont: adapter.nerdFont
+    property alias displayFont: adapter.displayFont
+    property alias nerdFontOnly: adapter.nerdFontOnly
+    property alias nerdSymbols: adapter.nerdSymbols
     property alias windowButtons: adapter.windowButtons
     property alias gapsIn: adapter.gapsIn
     property alias gapsOut: adapter.gapsOut
@@ -111,9 +112,10 @@ Singleton {
         adapter.trayKeepColors = "rog-control-center";
         adapter.cava = true;
         adapter.cavaBars = 24;
-        adapter.uiFont = "SF Pro Display";
-        adapter.iconFont = "Symbols Nerd Font";
-        adapter.monoFont = "JetBrainsMono Nerd Font";
+        adapter.nerdFont = "JetBrainsMono Nerd Font";
+        adapter.displayFont = "SF Pro Display";
+        adapter.nerdFontOnly = false;
+        adapter.nerdSymbols = true;
         adapter.windowButtons = false;
         adapter.gapsIn = 2;
         adapter.gapsOut = 4;
@@ -170,9 +172,10 @@ Singleton {
             property string trayKeepColors: "rog-control-center"
             property bool cava: true
             property int cavaBars: 24
-            property string uiFont: "SF Pro Display"
-            property string iconFont: "Symbols Nerd Font"
-            property string monoFont: "JetBrainsMono Nerd Font"
+            property string nerdFont: "JetBrainsMono Nerd Font"
+            property string displayFont: "SF Pro Display"
+            property bool nerdFontOnly: false
+            property bool nerdSymbols: true
             property bool windowButtons: false
             property int gapsIn: 2
             property int gapsOut: 4

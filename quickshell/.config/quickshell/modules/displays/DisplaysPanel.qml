@@ -208,7 +208,9 @@ FloatingWindow {
     visible: shown
     title: "Displays"
     color: Theme.panelBg
-    implicitWidth: 760
+    // grows with wider fonts (e.g. a monospaced Nerd Font) so the content
+    // never runs into the right edge
+    implicitWidth: Math.max(760, Math.ceil(content.implicitWidth + 32))
     implicitHeight: Math.ceil(content.implicitHeight + 32)
 
     onShownChanged: {
