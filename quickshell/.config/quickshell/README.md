@@ -39,7 +39,8 @@ katakana in the lock screen's digital rain.
 | Theme picker | same file, `themes` mode | `ALT+SHIFT+T`, or the Theme tile |
 | Power menu (the old wlogout layout) | `modules/powermenu/PowerMenu.qml` | `ALT+SHIFT+E`, or the power icon |
 | Lock screen | `modules/lock/LockScreen.qml` | `` ALT+` ``, hypridle, before sleep |
-| Wallpaper carousel (type to search) | `modules/wallpaper/WallpaperPicker.qml` | `ALT+P` (static), `ALT+W` (live) |
+| Wallpaper carousel (type to search; other monitors are blurred) | `modules/wallpaper/WallpaperPicker.qml` | `ALT+W`, Tab for live wallpapers |
+| Keybindings (built from `bindings.lua`, type to filter) | `modules/keybinds/KeybindsWindow.qml` + `scripts/hypr-keybinds.py` | `ALT+SHIFT+/` |
 | Settings | `modules/settings/SettingsWindow.qml` | `ALT+CTRL+P`, or the gear in the Control Center |
 
 The launcher takes arrows, Tab, Ctrl+J/K and Ctrl+N/P to move, Enter to launch,
@@ -47,7 +48,7 @@ and Esc to close. The power menu takes `l` lock, `u` sleep, `e` log out,
 `r` reboot, `s` shut down. In the Control Center, `Shift+C` clears the
 notifications and `Shift+D` toggles do not disturb.
 
-Settings and Displays are regular windows: a Hyprland rule (`rules.lua`) makes
+Settings, Displays and Keybindings are regular windows: a Hyprland rule (`rules.lua`) makes
 them float centered, and `togglefloating` tiles them. They have no close
 button unless Settings > Windows > Window buttons is on; close them with Esc
 or your close-window binding.
@@ -137,7 +138,8 @@ qs ipc call lock lock | lockNow
 qs ipc call power toggle
 qs ipc call displays toggle
 qs ipc call theme reload | gamemode true
-qs ipc call wallpaper static | live
+qs ipc call wallpaper toggle | static | live
+qs ipc call keybinds toggle
 qs ipc call settings toggle
 qs ipc call panels close
 ```

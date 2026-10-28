@@ -9,6 +9,7 @@ import qs.services
 import qs.modules.bar
 import qs.modules.controlcenter
 import qs.modules.displays
+import qs.modules.keybinds
 import qs.modules.launcher
 import qs.modules.lock
 import qs.modules.notifications
@@ -45,7 +46,11 @@ ShellRoot {
 
     SettingsWindow {}
 
+    KeybindsWindow {}
+
     WallpaperPicker {}
+
+    WallpaperBackdrop {}
 
     // qs ipc call <target> <function> [args]
     IpcHandler {
@@ -149,6 +154,11 @@ ShellRoot {
         function live(): void {
             Panels.toggleWallpapers("live");
         }
+
+        // ALT+W: opens on static wallpapers, Tab switches to live
+        function toggle(): void {
+            Panels.toggleWallpapers(Panels.wallpapers !== "" ? Panels.wallpapers : "static");
+        }
     }
 
     IpcHandler {
@@ -156,6 +166,14 @@ ShellRoot {
 
         function toggle(): void {
             Panels.toggleSettings();
+        }
+    }
+
+    IpcHandler {
+        target: "keybinds"
+
+        function toggle(): void {
+            Panels.toggleKeybinds();
         }
     }
 
