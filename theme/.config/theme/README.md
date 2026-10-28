@@ -51,7 +51,7 @@ theme folder and set `wallpaper` under `[apps]`.
 | Neovim | `current/nvim.lua` | live (`lua/theme.lua` watches it) |
 | btop | `~/.config/btop/themes/current.theme` | live (SIGUSR2) |
 | bat | `~/.config/bat/themes/Current.tmTheme` | next run (`bat cache --build`) |
-| tmux | `themes/catppuccin_current_tmux.conf` in every catppuccin/tmux copy (`~/.tmux/plugins/catppuccin/tmux`, TPM's `~/.tmux/plugins/tmux`) | live (`source-file`) |
+| tmux | `~/.tmux/plugins/catppuccin/tmux/themes/catppuccin_current_tmux.conf`, a catppuccin/tmux flavor (the plugin is loaded by `.tmux.conf`, not TPM) | live (`source-file`) |
 | starship | `~/.config/starship.toml` (generated from `~/.config/starship/base.toml` + palette) | next prompt |
 | lazygit | `current/lazygit.yml` (via `LG_CONFIG_FILE`) | next start |
 | yazi | `~/.config/yazi/theme.toml` | live for yazi started with `yazi-live.sh` (`ALT+E`, `y`): it reopens in the same folder |

@@ -63,12 +63,15 @@ function Status:mode()
   })
 end
 
--- B: size and name on the secondary block, closed with a curve
-function Status:size()
+-- B: size and name on the secondary block, closed with a curve.
+-- yazi calls the size component `length` (`size` in older versions).
+function Status:length()
   local h = self._current.hovered
   local main = self:style().main:bg()
   return ui.Span(" " .. ya.readable_size(h and h.cha.len or 0) .. " "):fg(main):bg(secondary())
 end
+
+Status.size = Status.length
 
 function Status:name()
   local h = self._current.hovered
