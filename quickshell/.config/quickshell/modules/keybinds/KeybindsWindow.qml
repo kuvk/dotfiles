@@ -22,11 +22,30 @@ FloatingWindow {
     // Keys handled inside the shell's own windows
     readonly property var shellSections: [
         {
-            section: "Launcher",
+            section: "Search launcher",
             binds: [
+                { keys: ["Type"], desc: "Apps appear as you type" },
                 { keys: ["↑", "↓"], desc: "Move (also Tab, Ctrl+J/K, Ctrl+N/P)" },
-                { keys: ["Enter"], desc: "Launch, or switch theme" },
-                { keys: ["Esc"], desc: "Close" }
+                { keys: ["Enter"], desc: "Launch" },
+                { keys: ["Esc"], desc: "Clear, then close" }
+            ]
+        },
+        {
+            section: "App menu",
+            binds: [
+                { keys: ["←", "→"], desc: "Categories (also Tab)" },
+                { keys: ["↑", "↓"], desc: "Apps" },
+                { keys: ["Type"], desc: "Filter the category" },
+                { keys: ["Enter"], desc: "Launch" },
+                { keys: ["Esc"], desc: "Clear, then close" }
+            ]
+        },
+        {
+            section: "Theme carousel",
+            binds: [
+                { keys: ["←", "→"], desc: "Previous / next (also scroll)" },
+                { keys: ["Enter"], desc: "Apply" },
+                { keys: ["Type"], desc: "Search; Esc clears, then closes" }
             ]
         },
         {

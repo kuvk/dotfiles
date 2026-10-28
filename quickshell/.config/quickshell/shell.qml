@@ -17,6 +17,7 @@ import qs.modules.powermenu
 import qs.modules.settings
 import qs.modules.transition
 import qs.modules.wallpaper
+import qs.modules.themes
 
 ShellRoot {
     Variants {
@@ -37,6 +38,8 @@ ShellRoot {
     ControlCenter {}
 
     Launcher {}
+
+    AppMenu {}
 
     PowerMenu {}
 
@@ -67,6 +70,8 @@ ShellRoot {
 
     WallpaperBackdrop {}
 
+    ThemePicker {}
+
     // qs ipc call <target> <function> [args]
     IpcHandler {
         target: "launcher"
@@ -75,8 +80,14 @@ ShellRoot {
             Panels.toggleLauncher("apps");
         }
 
+        // the theme carousel (kept here for old bindings)
         function themes(): void {
-            Panels.toggleLauncher("themes");
+            Panels.toggleThemes();
+        }
+
+        // the app menu dropdown with categories
+        function menu(): void {
+            Panels.toggleAppMenu();
         }
     }
 
@@ -181,6 +192,14 @@ ShellRoot {
 
         function toggle(): void {
             Panels.toggleSettings();
+        }
+    }
+
+    IpcHandler {
+        target: "themes"
+
+        function toggle(): void {
+            Panels.toggleThemes();
         }
     }
 

@@ -6,7 +6,8 @@ local terminal = "kitty"
 local fileManager = terminal .. " -e ~/.config/scripts/yazi-live.sh"
 -- local fileManager = "dolphin"
 local menu = "qs ipc call launcher toggle"
-local themes = "qs ipc call launcher themes"
+local appMenu = "qs ipc call launcher menu"
+local themes = "qs ipc call themes toggle"
 local browser = "brave"
 local notifications = "qs ipc call notifications toggle"
 local bar = "qs ipc call bar toggle"
@@ -34,9 +35,10 @@ hl.bind(mainMod .. " + CONTROL + return", hl.dsp.exec_cmd(browser)) -- Browser
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(email)) -- Email
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(notifications)) -- Control Center
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager)) -- File manager
-hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(menu)) -- App launcher
+hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(menu)) -- Search apps
+hl.bind(mainMod .. " + CONTROL + space", hl.dsp.exec_cmd(appMenu)) -- App menu with categories
 hl.bind(mainMod .. " + SHIFT + space", hl.dsp.exec_cmd(bar)) -- Show / hide the bar
-hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd(themes)) -- Theme picker
+hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd(themes)) -- Theme carousel
 hl.bind(mainMod .. " + CONTROL + M", hl.dsp.exec_cmd(displays)) -- Displays
 hl.bind(mainMod .. " + CONTROL + P", hl.dsp.exec_cmd(settings)) -- Settings
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(music)) -- Music player (cliamp)

@@ -35,16 +35,18 @@ katakana in the lock screen's digital rain.
 | Displays | `modules/displays/DisplaysPanel.qml` | the monitor icon, or `ALT+CTRL+M` |
 | Notification popups | `modules/notifications/NotificationPopups.qml` | |
 | Control Center: toggles, sliders, media (with visualizer), notifications grouped by app, session buttons | `modules/controlcenter/ControlCenter.qml` | `ALT+N`, or the sliders icon (right-click toggles DND) |
-| App launcher | `modules/launcher/Launcher.qml` | `ALT+Space` |
-| Theme picker | same file, `themes` mode | `ALT+SHIFT+T`, or the Theme tile |
+| Search launcher (just the field; apps appear as you type) | `modules/launcher/Launcher.qml` | `ALT+Space` |
+| App menu: categories on the left, apps on the right | `modules/launcher/AppMenu.qml` + `services/Apps.qml` | the Arch icon, or `ALT+CTRL+Space` |
+| Theme carousel (palette previews, type to search; other monitors are blurred) | `modules/themes/ThemePicker.qml` | `ALT+SHIFT+T`, or the Theme tile |
 | Power menu (the old wlogout layout) | `modules/powermenu/PowerMenu.qml` | `ALT+SHIFT+E`, or the power icon |
 | Lock screen | `modules/lock/LockScreen.qml` | `` ALT+` ``, hypridle, before sleep |
 | Wallpaper carousel (type to search; other monitors are blurred) | `modules/wallpaper/WallpaperPicker.qml` | `ALT+W`, Tab for live wallpapers |
 | Keybindings (built from `bindings.lua`, type to filter) | `modules/keybinds/KeybindsWindow.qml` + `scripts/hypr-keybinds.py` | `ALT+SHIFT+/` |
 | Settings | `modules/settings/SettingsWindow.qml` | `ALT+CTRL+P`, or the gear in the Control Center |
 
-The launcher takes arrows, Tab, Ctrl+J/K and Ctrl+N/P to move, Enter to launch,
-and Esc to close. The power menu takes `l` lock, `u` sleep, `e` log out,
+The search launcher takes arrows, Tab, Ctrl+J/K and Ctrl+N/P to move, Enter to
+launch, and Esc to clear and close. The app menu switches categories with ←/→
+or Tab and filters the category as you type. The power menu takes `l` lock, `u` sleep, `e` log out,
 `r` reboot, `s` shut down. In the Control Center, `Shift+C` clears the
 notifications and `Shift+D` toggles do not disturb.
 
@@ -133,7 +135,8 @@ pam/               PAM config for the lock screen
 ## IPC
 
 ```sh
-qs ipc call launcher toggle | themes
+qs ipc call launcher toggle | menu
+qs ipc call themes toggle
 qs ipc call notifications toggle | clear | toggleDnd | dnd true
 qs ipc call bar show | hide | toggle
 qs ipc call lock lock | lockNow
