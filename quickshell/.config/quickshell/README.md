@@ -87,6 +87,17 @@ The password is checked with PAM using `pam/password.conf`
 hypridle runs `qs ipc call lock lock` on `loginctl lock-session`, and
 `lock lockNow` (no animation) before sleep.
 
+## Web apps
+
+`~/.config/scripts/webapp.py` makes a site its own app, like Omarchy's web
+apps: a Brave/Chromium `--app` window (no tabs, address bar or extension
+icons) with a launcher entry and an icon, listed under Internet in the app
+menu. `webapp.py` asks for name, URL and icon; `webapp.py install NAME URL
+[ICON]`, `list`, `remove NAME`. The icon can be a PNG URL, a file, or a name
+from https://dashboardicons.com; without one it tries the app's name there,
+then the site's favicon. For no title bar, turn on Brave > Settings >
+Appearance > "Use system title bar and borders".
+
 ## Wallpapers
 
 `~/.config/scripts/wallpaper.py` backs the carousel. Static wallpapers go in
