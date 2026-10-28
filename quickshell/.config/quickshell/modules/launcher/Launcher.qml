@@ -193,7 +193,7 @@ PanelWindow {
 
                         IconImage {
                             implicitSize: 32
-                            source: Quickshell.iconPath(entry.modelData.icon ?? "", "application-x-executable")
+                            source: Apps.iconSource(entry.modelData.icon ?? "", "application-x-executable")
                         }
 
                         ColumnLayout {

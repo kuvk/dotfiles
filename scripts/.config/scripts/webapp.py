@@ -138,7 +138,9 @@ def install(name: str, url: str, icon: str | None) -> None:
         f"Name={name}\n"
         f"Comment=Web app: {url}\n"
         f'Exec="{SELF}" launch {url}\n'
-        f"Icon={icon_path.stem if icon_path else 'web-browser'}\n"
+        # full path: Quickshell (Qt) doesn't see icons added to the theme
+        # after it started; GTK apps find it in the hicolor theme too
+        f"Icon={icon_path if icon_path else 'web-browser'}\n"
         "Terminal=false\n"
         "Categories=Network;WebBrowser;\n"
         f"StartupWMClass={window_class(b, url)}\n"

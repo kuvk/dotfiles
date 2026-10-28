@@ -26,14 +26,27 @@ Singleton {
         { id: "system", label: "System", icon: Icons.chip, cats: ["System", "Monitor", "PackageManager", "Security"] }
     ]
 
-    // The first group whose categories an app lists ("other" if none)
+    // Matched most specific first, so an app listing several categories lands
+    // where you'd look for it (Steam: Network;FileTransfer;Game -> Games)
+    readonly property var matchOrder: ["games", "development", "graphics", "office", "multimedia", "education", "settings", "system", "internet", "utilities"]
+
     function groupOf(app: var): string {
         const cats = app.categories ?? [];
-        for (const g of groups) {
-            if (g.cats.some(c => cats.includes(c)))
+        for (const id of matchOrder) {
+            const g = groups.find(g => g.id === id);
+            if (g && g.cats.some(c => cats.includes(c)))
                 return g.id;
         }
         return "other";
+    }
+
+    // Image source for a desktop entry's Icon=: a theme icon name, or a file
+    // path (web apps from webapp.py)
+    function iconSource(icon: string, fallback: string): string {
+        if (icon && icon.startsWith("/"))
+            return "file://" + icon;
+        // no fallback: "" when the theme has no such icon
+        return fallback === "" ? Quickshell.iconPath(icon ?? "", true) : Quickshell.iconPath(icon ?? "", fallback);
     }
 
     // group id -> apps, only groups that have apps (with "other" last)
