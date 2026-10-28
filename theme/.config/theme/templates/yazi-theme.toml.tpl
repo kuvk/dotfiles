@@ -100,6 +100,8 @@ hovered = { fg = "{{ pink }}", bold = true }
 # : Which {{{
 
 [which]
+# also the text color on the status line bubbles (init.lua)
+mask            = { bg = "{{ base }}" }
 border          = { fg = "{{ blue }}" }
 cand            = { fg = "{{ teal }}" }
 rest            = { fg = "{{ overlay2 }}" }

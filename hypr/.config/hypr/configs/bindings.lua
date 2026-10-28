@@ -2,7 +2,8 @@
 ---- MY PROGRAMS ----
 ---------------------
 local terminal = "kitty"
-local fileManager = terminal .. " -e yazi"
+-- yazi-live.sh restarts yazi in place when the theme changes
+local fileManager = terminal .. " -e ~/.config/scripts/yazi-live.sh"
 -- local fileManager = "dolphin"
 local menu = "qs ipc call launcher toggle"
 local themes = "qs ipc call launcher themes"
