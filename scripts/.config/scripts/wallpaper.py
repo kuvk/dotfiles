@@ -142,7 +142,10 @@ def list_json(kind: str) -> str:
     active = set(state[kind].values())
     items = []
     for p in collect(kind):
-        t = thumb_path(kind, p)
+        try:
+            t = thumb_path(kind, p)
+        except OSError:
+            continue  # vanished or unreadable meanwhile: skip it, list the rest
         items.append({
             "path": str(p),
             "name": p.stem.replace("_", " ").replace("-", " "),
@@ -153,7 +156,13 @@ def list_json(kind: str) -> str:
 
 
 def thumbs(kind: str) -> None:
-    files = [p for p in collect(kind) if not thumb_path(kind, p).exists()]
+    files = []
+    for p in collect(kind):
+        try:
+            if not thumb_path(kind, p).exists():
+                files.append(p)
+        except OSError:
+            pass
     with ThreadPoolExecutor(max_workers=os.cpu_count() or 4) as pool:
         list(pool.map(lambda p: make_thumb(kind, p), files))
 
