@@ -49,7 +49,8 @@ and Esc to close. The power menu takes `l` lock, `u` sleep, `e` log out,
 notifications and `Shift+D` toggles do not disturb.
 
 Settings, Displays and Keybindings are regular windows: a Hyprland rule (`rules.lua`) makes
-them float centered, and `togglefloating` tiles them. They have no close
+them float centered; they always stay floating (tiling one reopens it), open at
+their default size and can grow but not shrink below it. They have no close
 button unless Settings > Windows > Window buttons is on; close them with Esc
 or your close-window binding.
 
