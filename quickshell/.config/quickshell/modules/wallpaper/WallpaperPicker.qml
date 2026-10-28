@@ -20,6 +20,10 @@ PanelWindow {
     id: root
 
     readonly property string kind: Panels.wallpapers
+    // For bindings only. Code that runs when `kind` changes must test `kind`
+    // itself: in onKindChanged this binding still holds its old value, which
+    // made every fresh opening skip its load (empty carousel) and every close
+    // run `wallpaper.py list ""`. Tab worked because `shown` was already true.
     readonly property bool shown: kind !== ""
     readonly property string script: Quickshell.env("HOME") + "/.config/scripts/wallpaper.py"
 
@@ -115,7 +119,7 @@ PanelWindow {
 
     onSelectedChanged: {
         positionAnim.stop();
-        if (jump || !shown || Theme.animDuration === 0) {
+        if (jump || root.kind === "" || Theme.animDuration === 0) {
             position = selected;
         } else {
             positionAnim.from = position;
@@ -146,16 +150,9 @@ PanelWindow {
     // Thumbnails generated during this opening, per kind
     property var thumbsTried: ({})
 
-    // Debugging: `qs log | grep WPDBG` (wallpaper.py logs to ~/.cache/wallpaper-debug.log)
-    function dbg(msg: string): void {
-        console.log(`WPDBG ${Date.now() % 100000} ${msg} | root.kind="${root.kind}" shown=${root.shown} running=${listProc.running} again=${listProc.again} retries=${root.retries} items=${root.items.length} cache.static=${root.cache.static?.length ?? "null"} cache.live=${root.cache.live?.length ?? "null"}`);
-    }
-
     function load(): void {
-        dbg("load() called");
-        // nothing to list while closed (a late retry or re-run used to run
-        // `wallpaper.py list ""`, which fails, and kept retrying)
-        if (!shown)
+        // nothing to list while closed
+        if (root.kind === "")
             return;
         loading = true;
         // one run at a time: a run still going (previous tab) finishes and
@@ -166,7 +163,6 @@ PanelWindow {
         }
         listProc.kind = root.kind;
         listProc.command = [root.script, "list", root.kind];
-        dbg(`start ${JSON.stringify(listProc.command)}`);
         listProc.running = true;
     }
 
@@ -226,8 +222,7 @@ PanelWindow {
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     onKindChanged: {
-        dbg("kind changed");
-        if (shown) {
+        if (kind !== "") {
             Hyprland.refreshMonitors();
             query = "";
             moved = false;
@@ -276,7 +271,6 @@ PanelWindow {
 
         stdout: StdioCollector {
             onStreamFinished: {
-                root.dbg(`preload ${preload.kind} done: ${text.length}b`);
                 try {
                     const list = JSON.parse(text);
                     if (root.cache[preload.kind] === null)
@@ -318,7 +312,6 @@ PanelWindow {
         }
 
         onExited: (code, status) => {
-            root.dbg(`exited code=${code} status=${status} listProc.kind="${listProc.kind}" out=${listOut.text.length}b err=${JSON.stringify(listErr.text)} cmd=${JSON.stringify(listProc.command)}`);
             // A load came in during this run, or the tab changed: read again
             // for what is shown now (load() does nothing once closed)
             if (listProc.again || listProc.kind !== root.kind) {
@@ -362,8 +355,7 @@ PanelWindow {
         id: retry
 
         onTriggered: {
-            root.dbg("retry timer fired");
-            if (root.shown)
+            if (root.kind !== "")
                 root.load();
         }
     }
@@ -374,8 +366,7 @@ PanelWindow {
         property string kind: ""
 
         onExited: {
-            root.dbg(`thumbs ${thumbsProc.kind} exited`);
-            if (root.shown && thumbsProc.kind === root.kind)
+            if (root.kind !== "" && thumbsProc.kind === root.kind)
                 root.load();
         }
     }
