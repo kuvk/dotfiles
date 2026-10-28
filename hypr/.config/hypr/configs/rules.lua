@@ -11,6 +11,15 @@ hl.layer_rule({
   no_anim = true,
 })
 
+-- Ignore maximize requests (as in Hyprland's example config): apps that
+-- restore a saved maximized state (LibreOffice opening a document) would
+-- otherwise cover the workspace until they're resized. ALT+F still works.
+hl.window_rule({
+  name = "no-maximize",
+  match = { class = ".*" },
+  suppress_event = "maximize",
+})
+
 -- XWayland Settings
 hl.config({
   xwayland = {
