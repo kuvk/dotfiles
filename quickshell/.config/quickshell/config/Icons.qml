@@ -66,6 +66,7 @@ Singleton {
 
     // Media
     readonly property string music: g(0xf001)
+    readonly property string font: g(0xf031)
     readonly property string waveform: g(0xf147d)
     readonly property string musicOutline: g(0xf0ad4)
     readonly property string play: g(0xf04b)

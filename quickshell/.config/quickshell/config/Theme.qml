@@ -59,8 +59,10 @@ Singleton {
     readonly property int borderWidth: Config.borderWidth
 
     // Metrics
-    readonly property string font: "SF Pro Display"
-    readonly property string iconFont: "Symbols Nerd Font"
+    // Settings > Fonts
+    readonly property string font: Config.uiFont || "SF Pro Display"
+    readonly property string iconFont: Config.iconFont || "Symbols Nerd Font"
+    readonly property string monoFont: Config.monoFont || "JetBrainsMono Nerd Font"
     // Text size in px from the Displays panel (~/.config/hypr/monitors.json)
     property int textSize: 13
     readonly property int fontSize: textSize

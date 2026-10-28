@@ -74,6 +74,11 @@ Singleton {
     property alias cavaBars: adapter.cavaBars
 
     // Window gaps (Hyprland), normal and in Work-Game Mode
+    // Fonts (Settings > Fonts): text in the bar, panels and windows; icons
+    // (a Nerd Font: Symbols Nerd Font or any full Nerd Font); monospace
+    property alias uiFont: adapter.uiFont
+    property alias iconFont: adapter.iconFont
+    property alias monoFont: adapter.monoFont
     property alias windowButtons: adapter.windowButtons
     property alias gapsIn: adapter.gapsIn
     property alias gapsOut: adapter.gapsOut
@@ -106,6 +111,9 @@ Singleton {
         adapter.trayKeepColors = "rog-control-center";
         adapter.cava = true;
         adapter.cavaBars = 24;
+        adapter.uiFont = "SF Pro Display";
+        adapter.iconFont = "Symbols Nerd Font";
+        adapter.monoFont = "JetBrainsMono Nerd Font";
         adapter.windowButtons = false;
         adapter.gapsIn = 2;
         adapter.gapsOut = 4;
@@ -162,6 +170,9 @@ Singleton {
             property string trayKeepColors: "rog-control-center"
             property bool cava: true
             property int cavaBars: 24
+            property string uiFont: "SF Pro Display"
+            property string iconFont: "Symbols Nerd Font"
+            property string monoFont: "JetBrainsMono Nerd Font"
             property bool windowButtons: false
             property int gapsIn: 2
             property int gapsOut: 4
