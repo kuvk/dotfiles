@@ -12,6 +12,15 @@ if command -v starship >/dev/null; then
         export STARSHIP_CONFIG=~/.config/starship/base.toml
     fi
     eval "$(starship init zsh)"
+
+    # theme-set.py redraws the prompt in every open shell after a theme
+    # switch: each interactive shell registers its pid, and USR1 (sent only
+    # to registered shells) re-renders the prompt with the new colors
+    _prompt_dir="${XDG_RUNTIME_DIR:-/tmp}/zsh-prompt"
+    mkdir -p "$_prompt_dir" && : >"$_prompt_dir/$$"
+    TRAPUSR1() { zle && zle reset-prompt; }
+    _prompt_unregister() { rm -f "$_prompt_dir/$$"; }
+    autoload -Uz add-zsh-hook && add-zsh-hook zshexit _prompt_unregister
 fi
 
 ## Lazygit: the theme overlay from theme-set.py wins over config.yml
