@@ -12,7 +12,8 @@ PanelWindow {
 
     required property ShellScreen modelData
 
-    readonly property bool running: Transition.phase !== "idle"
+    // explicit phases, so the overlay can never stay up if the service fails
+    readonly property bool running: ["capture", "run", "reveal"].includes(SwitchFx.phase)
     readonly property real w: width
     readonly property real h: height
     readonly property real skew: h * 0.3
@@ -31,6 +32,8 @@ PanelWindow {
         right: true
     }
     exclusionMode: ExclusionMode.Ignore
+    // never takes the mouse: clicks go to whatever is underneath
+    mask: Region {}
     WlrLayershell.namespace: "quickshell-transition"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
@@ -40,13 +43,13 @@ PanelWindow {
         captured = 0;
     }
 
-    onCapturedChanged: if (captured === 2) Transition.screenReady()
+    onCapturedChanged: if (captured === 2) SwitchFx.screenReady()
 
     NumberAnimation on gap {
-        running: Transition.phase === "reveal"
+        running: SwitchFx.phase === "reveal"
         from: 0
         to: root.w / 2 + root.skew + 20
-        duration: Transition.revealMs
+        duration: SwitchFx.revealMs
         easing.type: Easing.InOutCubic
     }
 
@@ -68,8 +71,8 @@ PanelWindow {
             width: root.w
             height: root.h
             live: false
-            captureSource: Transition.phase === "capture" || hasContent && root.running ? root.screen : null
-            onHasContentChanged: if (hasContent && Transition.phase === "capture") root.captured++
+            captureSource: SwitchFx.phase === "capture" || hasContent && root.running ? root.screen : null
+            onHasContentChanged: if (hasContent && SwitchFx.phase === "capture") root.captured++
             transform: Matrix4x4 {
                 matrix: Qt.matrix4x4(1, root.k, 0, -(root.skew + half.edge), 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
             }

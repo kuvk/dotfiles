@@ -99,7 +99,7 @@ PanelWindow {
             cmd.push(screen.name);
         Panels.wallpapers = "";
         // wait for the picker to fade out; live wallpapers need a moment to start playing
-        Transition.run(cmd, Theme.animDuration + 250, kind === "live" ? 1200 : 400);
+        SwitchFx.run(cmd, Theme.animDuration + 250, kind === "live" ? 1200 : 400);
     }
 
     // Size of the visible slice at fractional distance `d` from the selection

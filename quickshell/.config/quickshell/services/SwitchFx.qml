@@ -7,7 +7,8 @@ import qs.config
 
 // Animated theme and wallpaper switches: every monitor is captured, the
 // capture covers the screen while the command runs underneath, then it opens
-// from the middle out along a diagonal (modules/transition/TransitionOverlay).
+// from the middle out along a diagonal (modules/transition/TransitionOverlay). Not named
+// "Transition": that is a QtQuick type.
 // Without animations (Settings, or Work-Game Mode) the command just runs.
 Singleton {
     id: root

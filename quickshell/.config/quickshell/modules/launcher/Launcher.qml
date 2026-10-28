@@ -61,7 +61,7 @@ PanelWindow {
             return;
         if (themes) {
             Panels.launcher = false;
-            Transition.run([themeSet, item.theme], 250, 500); // after the launcher has faded out
+            SwitchFx.run([themeSet, item.theme], 250, 500); // after the launcher has faded out
         } else {
             launch(item);
         }
