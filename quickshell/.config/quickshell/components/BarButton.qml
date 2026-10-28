@@ -39,7 +39,7 @@ MouseArea {
         if (tooltip === "" || Panels.popout !== "")
             return;
         const pos = mapToItem(null, width / 2, 0);
-        Panels.showTooltip(tooltip, QsWindow.window?.screen ?? null, pos.x);
+        Panels.showTooltip(tooltip, QsWindow.window?.screen ?? null, pos.x + Theme.barMargin);
     }
 
     Timer {

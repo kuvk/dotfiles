@@ -37,8 +37,14 @@ PanelWindow {
         top: Math.round((screen?.height ?? 1080) * 0.22)
     }
     implicitWidth: 600
-    // grows downward with the results, so the field never moves
-    implicitHeight: 74 + (results.length > 0 ? Math.min(results.length, maxRows) * (rowHeight + 4) + 12 : 0)
+    // The window keeps its full size (resizing a layer surface lands a frame
+    // late, so the bottom popped in and out while typing); the panel inside
+    // drops down and back up with the results, and only it takes the mouse
+    implicitHeight: 74 + maxRows * (rowHeight + 4) + 12
+    readonly property real panelHeight: 74 + (results.length > 0 ? Math.min(results.length, maxRows) * (rowHeight + 4) + 12 : 0)
+    mask: Region {
+        item: panel
+    }
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "quickshell-launcher"
     WlrLayershell.layer: WlrLayer.Overlay
@@ -60,15 +66,30 @@ PanelWindow {
     }
 
     Rectangle {
-        anchors.fill: parent
+        id: panel
+
+        width: parent.width
+        height: root.panelHeight
+        clip: true
         color: Theme.panelBg
         radius: Theme.radius
         border.color: Theme.border
         border.width: Theme.borderWidth
 
+        Behavior on height {
+            NumberAnimation {
+                duration: Theme.animDuration * 1.6
+                easing.type: Easing.OutCubic
+            }
+        }
+
+        // laid out at the full size and revealed by the panel's height, so
+        // rows don't squeeze while it animates
         ColumnLayout {
-            anchors.fill: parent
-            anchors.margins: 13
+            x: 13
+            y: 13
+            width: parent.width - 26
+            height: root.implicitHeight - 26
             spacing: 12
 
             Rectangle {
@@ -140,7 +161,6 @@ PanelWindow {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                visible: root.results.length > 0
                 clip: true
                 spacing: 4
                 model: root.results

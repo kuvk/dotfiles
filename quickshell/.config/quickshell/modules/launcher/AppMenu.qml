@@ -42,11 +42,17 @@ PanelWindow {
         left: true
     }
     margins {
-        top: 4
-        left: 6
+        // the panel's left edge on the bar's (floating bar margin)
+        left: Math.max(2, Theme.barMargin - pad)
     }
-    implicitWidth: 680
-    implicitHeight: 540
+    // panel size, plus the gap under the bar and a transparent margin (as in
+    // popouts/Popout.qml, so fractional scales never cut the border)
+    readonly property int gap: 6
+    readonly property int pad: 4
+    readonly property int panelWidth: 680
+    readonly property int panelHeight: 540
+    implicitWidth: panelWidth + pad * 2
+    implicitHeight: panelHeight + gap + pad
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
     WlrLayershell.namespace: "quickshell-appmenu"
@@ -71,241 +77,247 @@ PanelWindow {
         id: reveal
 
         shown: root.shown
+        duration: Theme.animDuration * 1.6
     }
 
-    Rectangle {
-        width: parent.width
-        height: parent.height
-        // drops from the bar
-        y: -12 * (1 - reveal.value)
-        opacity: reveal.value
-        color: Theme.panelBg
-        radius: Theme.radius
-        border.color: Theme.border
-        border.width: Theme.borderWidth
+    // Clipped at the bar's edge, so the menu drops out of it like the dropdowns
+    Item {
+        anchors.fill: parent
+        clip: true
 
-        RowLayout {
-            anchors.fill: parent
-            anchors.margins: Theme.borderWidth
-            spacing: 0
+        Rectangle {
+            x: root.pad
+            y: Math.round(root.gap - (root.panelHeight + root.gap) * (1 - reveal.value))
+            width: root.panelWidth
+            height: root.panelHeight
+            color: Theme.panelBg
+            radius: Theme.radius
+            border.color: Theme.border
+            border.width: Theme.borderWidth
 
-            // Categories
-            Rectangle {
-                Layout.fillHeight: true
-                implicitWidth: 190
-                color: Theme.alpha(Theme.mantle, 0.6)
-                topLeftRadius: Theme.radius
-                bottomLeftRadius: Theme.radius
+            RowLayout {
+                anchors.fill: parent
+                anchors.margins: Theme.borderWidth
+                spacing: 0
 
-                ListView {
-                    id: groups
+                // Categories
+                Rectangle {
+                    Layout.fillHeight: true
+                    implicitWidth: 190
+                    color: Theme.alpha(Theme.mantle, 0.6)
+                    topLeftRadius: Theme.radius
+                    bottomLeftRadius: Theme.radius
 
-                    anchors.fill: parent
-                    anchors.margins: 10
-                    spacing: 2
-                    clip: true
-                    model: Apps.menuGroups
-                    boundsBehavior: Flickable.StopAtBounds
+                    ListView {
+                        id: groups
 
-                    delegate: MouseArea {
-                        id: groupEntry
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        spacing: 2
+                        clip: true
+                        model: Apps.menuGroups
+                        boundsBehavior: Flickable.StopAtBounds
 
-                        required property var modelData
+                        delegate: MouseArea {
+                            id: groupEntry
 
-                        readonly property bool current: root.group === modelData.id
+                            required property var modelData
 
-                        width: ListView.view.width
-                        implicitHeight: 34
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: {
-                            root.group = modelData.id;
-                            list.currentIndex = 0;
-                        }
-                        // hovering a category shows it, like a start menu
-                        onContainsMouseChanged: if (containsMouse && root.group !== modelData.id) hoverDelay.restart()
+                            readonly property bool current: root.group === modelData.id
 
-                        Timer {
-                            id: hoverDelay
-
-                            interval: 120
-                            onTriggered: if (groupEntry.containsMouse) {
-                                root.group = groupEntry.modelData.id;
+                            width: ListView.view.width
+                            implicitHeight: 34
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: {
+                                root.group = modelData.id;
                                 list.currentIndex = 0;
                             }
-                        }
+                            // hovering a category shows it, like a start menu
+                            onContainsMouseChanged: if (containsMouse && root.group !== modelData.id) hoverDelay.restart()
 
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: Theme.smallRadius
-                            color: groupEntry.current ? Theme.alpha(Theme.highlight, 0.2) : groupEntry.containsMouse ? Theme.hoverBg : "transparent"
+                            Timer {
+                                id: hoverDelay
+
+                                interval: 120
+                                onTriggered: if (groupEntry.containsMouse) {
+                                    root.group = groupEntry.modelData.id;
+                                    list.currentIndex = 0;
+                                }
+                            }
+
+                            Rectangle {
+                                anchors.fill: parent
+                                radius: Theme.smallRadius
+                                color: groupEntry.current ? Theme.alpha(Theme.highlight, 0.2) : groupEntry.containsMouse ? Theme.hoverBg : "transparent"
+                            }
+
+                            RowLayout {
+                                anchors.fill: parent
+                                anchors.leftMargin: 10
+                                anchors.rightMargin: 10
+                                spacing: 10
+
+                                Icon {
+                                    Layout.preferredWidth: 18
+                                    text: groupEntry.modelData.icon
+                                    color: groupEntry.current ? Theme.highlight : Theme.subtext0
+                                }
+
+                                StyledText {
+                                    Layout.fillWidth: true
+                                    text: groupEntry.modelData.label
+                                    color: groupEntry.current ? Theme.highlight : Theme.text
+                                    font.weight: groupEntry.current ? Font.DemiBold : Font.Normal
+                                    elide: Text.ElideRight
+                                }
+                            }
                         }
+                    }
+                }
+
+                // Apps
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    Layout.fillHeight: true
+                    Layout.margins: 12
+                    spacing: 10
+
+                    Rectangle {
+                        Layout.fillWidth: true
+                        implicitHeight: 38
+                        radius: Theme.smallRadius
+                        color: Theme.alpha(Theme.surface0, 0.8)
 
                         RowLayout {
                             anchors.fill: parent
-                            anchors.leftMargin: 10
-                            anchors.rightMargin: 10
+                            anchors.leftMargin: 12
+                            anchors.rightMargin: 12
                             spacing: 10
 
                             Icon {
-                                Layout.preferredWidth: 18
-                                text: groupEntry.modelData.icon
-                                color: groupEntry.current ? Theme.highlight : Theme.subtext0
+                                text: Icons.search
+                                color: Theme.accent2
                             }
 
-                            StyledText {
+                            TextInput {
+                                id: filter
+
                                 Layout.fillWidth: true
-                                text: groupEntry.modelData.label
-                                color: groupEntry.current ? Theme.highlight : Theme.text
-                                font.weight: groupEntry.current ? Font.DemiBold : Font.Normal
-                                elide: Text.ElideRight
+                                color: Theme.text
+                                font.family: Theme.font
+                                font.pixelSize: Theme.fontSize + 1
+                                clip: true
+                                onTextChanged: list.currentIndex = 0
+
+                                Keys.onEscapePressed: {
+                                    if (filter.text !== "")
+                                        filter.text = "";
+                                    else
+                                        Panels.appMenu = false;
+                                }
+                                Keys.onReturnPressed: root.activate(list.currentIndex)
+                                Keys.onEnterPressed: root.activate(list.currentIndex)
+                                Keys.onUpPressed: list.decrementCurrentIndex()
+                                Keys.onDownPressed: list.incrementCurrentIndex()
+                                Keys.onTabPressed: root.stepGroup(1)
+                                Keys.onBacktabPressed: root.stepGroup(-1)
+                                Keys.onPressed: event => {
+                                    // ←/→ switch categories while there's no text to move in
+                                    if (filter.text === "" && event.key === Qt.Key_Left) {
+                                        root.stepGroup(-1);
+                                        event.accepted = true;
+                                    } else if (filter.text === "" && event.key === Qt.Key_Right) {
+                                        root.stepGroup(1);
+                                        event.accepted = true;
+                                    }
+                                }
+
+                                StyledText {
+                                    anchors.fill: parent
+                                    verticalAlignment: Text.AlignVCenter
+                                    visible: filter.text === ""
+                                    text: `Filter ${Apps.menuGroups.find(g => g.id === root.group)?.label ?? ""}…`
+                                    color: Theme.surface2
+                                }
                             }
                         }
                     }
-                }
-            }
 
-            // Apps
-            ColumnLayout {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
-                Layout.margins: 12
-                spacing: 10
+                    ListView {
+                        id: list
 
-                Rectangle {
-                    Layout.fillWidth: true
-                    implicitHeight: 38
-                    radius: Theme.smallRadius
-                    color: Theme.alpha(Theme.surface0, 0.8)
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        clip: true
+                        spacing: 2
+                        model: root.results
+                        highlightMoveDuration: Theme.animDuration
+                        boundsBehavior: Flickable.StopAtBounds
 
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 12
-                        anchors.rightMargin: 12
-                        spacing: 10
-
-                        Icon {
-                            text: Icons.search
-                            color: Theme.accent2
+                        highlight: Rectangle {
+                            radius: Theme.smallRadius
+                            color: Theme.alpha(Theme.surface0, 0.8)
                         }
 
-                        TextInput {
-                            id: filter
+                        delegate: MouseArea {
+                            id: entry
 
-                            Layout.fillWidth: true
-                            color: Theme.text
-                            font.family: Theme.font
-                            font.pixelSize: Theme.fontSize + 1
-                            clip: true
-                            onTextChanged: list.currentIndex = 0
+                            required property var modelData
+                            required property int index
 
-                            Keys.onEscapePressed: {
-                                if (filter.text !== "")
-                                    filter.text = "";
-                                else
-                                    Panels.appMenu = false;
-                            }
-                            Keys.onReturnPressed: root.activate(list.currentIndex)
-                            Keys.onEnterPressed: root.activate(list.currentIndex)
-                            Keys.onUpPressed: list.decrementCurrentIndex()
-                            Keys.onDownPressed: list.incrementCurrentIndex()
-                            Keys.onTabPressed: root.stepGroup(1)
-                            Keys.onBacktabPressed: root.stepGroup(-1)
-                            Keys.onPressed: event => {
-                                // ←/→ switch categories while there's no text to move in
-                                if (filter.text === "" && event.key === Qt.Key_Left) {
-                                    root.stepGroup(-1);
-                                    event.accepted = true;
-                                } else if (filter.text === "" && event.key === Qt.Key_Right) {
-                                    root.stepGroup(1);
-                                    event.accepted = true;
-                                }
-                            }
+                            width: ListView.view.width - 12
+                            implicitHeight: 44
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onEntered: list.currentIndex = index
+                            onClicked: root.activate(index)
 
-                            StyledText {
+                            RowLayout {
                                 anchors.fill: parent
-                                verticalAlignment: Text.AlignVCenter
-                                visible: filter.text === ""
-                                text: `Filter ${Apps.menuGroups.find(g => g.id === root.group)?.label ?? ""}…`
-                                color: Theme.surface2
-                            }
-                        }
-                    }
-                }
+                                anchors.leftMargin: 8
+                                anchors.rightMargin: 8
+                                spacing: 12
 
-                ListView {
-                    id: list
-
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    clip: true
-                    spacing: 2
-                    model: root.results
-                    highlightMoveDuration: Theme.animDuration
-                    boundsBehavior: Flickable.StopAtBounds
-
-                    highlight: Rectangle {
-                        radius: Theme.smallRadius
-                        color: Theme.alpha(Theme.surface0, 0.8)
-                    }
-
-                    delegate: MouseArea {
-                        id: entry
-
-                        required property var modelData
-                        required property int index
-
-                        width: ListView.view.width - 12
-                        implicitHeight: 44
-                        hoverEnabled: true
-                        cursorShape: Qt.PointingHandCursor
-                        onEntered: list.currentIndex = index
-                        onClicked: root.activate(index)
-
-                        RowLayout {
-                            anchors.fill: parent
-                            anchors.leftMargin: 8
-                            anchors.rightMargin: 8
-                            spacing: 12
-
-                            IconImage {
-                                implicitSize: 28
-                                source: Quickshell.iconPath(entry.modelData.icon ?? "", "application-x-executable")
-                            }
-
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                spacing: 0
-
-                                StyledText {
-                                    Layout.fillWidth: true
-                                    text: entry.modelData.name
-                                    color: entry.ListView.isCurrentItem ? Theme.highlight : Theme.text
-                                    elide: Text.ElideRight
+                                IconImage {
+                                    implicitSize: 28
+                                    source: Quickshell.iconPath(entry.modelData.icon ?? "", "application-x-executable")
                                 }
 
-                                StyledText {
+                                ColumnLayout {
                                     Layout.fillWidth: true
-                                    visible: text !== ""
-                                    text: entry.modelData.genericName || entry.modelData.comment || ""
-                                    color: Theme.overlay1
-                                    font.pixelSize: Theme.fontSize - 2
-                                    elide: Text.ElideRight
+                                    spacing: 0
+
+                                    StyledText {
+                                        Layout.fillWidth: true
+                                        text: entry.modelData.name
+                                        color: entry.ListView.isCurrentItem ? Theme.highlight : Theme.text
+                                        elide: Text.ElideRight
+                                    }
+
+                                    StyledText {
+                                        Layout.fillWidth: true
+                                        visible: text !== ""
+                                        text: entry.modelData.genericName || entry.modelData.comment || ""
+                                        color: Theme.overlay1
+                                        font.pixelSize: Theme.fontSize - 2
+                                        elide: Text.ElideRight
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    ScrollBar {
-                        parent: list
-                        flick: list
-                    }
+                        ScrollBar {
+                            parent: list
+                            flick: list
+                        }
 
-                    StyledText {
-                        anchors.centerIn: parent
-                        visible: root.results.length === 0
-                        text: "No apps"
-                        color: Theme.overlay1
+                        StyledText {
+                            anchors.centerIn: parent
+                            visible: root.results.length === 0
+                            text: "No apps"
+                            color: Theme.overlay1
+                        }
                     }
                 }
             }
