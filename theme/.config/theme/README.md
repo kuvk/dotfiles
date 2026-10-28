@@ -88,7 +88,7 @@ folder, or name the themes). A theme without icons uses Catppuccin Mocha's.
 ## Adding an app
 
 Add `templates/<output-file>.tpl` with placeholders such as `{{ base }}` (`#1e1e2e`),
-`{{ base.hex }}` (`1e1e2e`), `{{ base.rgb }}` (`30, 30, 46`), `{{ accent }}`,
+`{{ base.hex }}` (`1e1e2e`), `{{ base.rgb }}` (`30, 30, 46`), `{{ base.ansi }}` (`38;2;30;30;46`), `{{ accent }}`,
 `{{ term_color1 }}`, `{{ mode }}`, `{{ theme_name }}`, or any `[apps]` key. Point the
 app at `~/.config/theme/current/<output-file>`, and add a reload command to
 `reload_apps()` in `theme-set.py` if the app supports one.

@@ -16,28 +16,38 @@ play = [
 	{ run = 'vlc "$@"', orphan = true, for = "linux" },
 ]
 pinta_image = [
-	{ run = 'pinta %s', orphan = true }
+	{ run = 'pinta "$@"', orphan = true, desc = "Pinta" },
 ]
 
+# prepend_rules keeps yazi's own rules after these (Enter opens anything
+# else with the default app, through xdg-open). A plain `rules = [...]`
+# replaced all of them, so only images could be opened.
 [open]
-rules = [
-	{ mime = "image/*", use = "pinta_image" }
-]   
+prepend_rules = [
+	{ mime = "image/*", use = ["pinta_image", "open", "reveal"] },
+]
 
 [plugin]
-
+# Office documents: page previews through LibreOffice (plugins/office.yazi).
+# Matched by MIME type (with and without the "vnd." part, which depends on
+# the yazi version) and by extension.
 prepend_preloaders = [
-    # Office Documents
-    { mime = "application/openxmlformats-officedocument.*", run = "office" },
-    { mime = "application/oasis.opendocument.*", run = "office" },
-    { mime = "application/ms-*", run = "office" },
-    { mime = "application/msword", run = "office" },
+	{ mime = "application/openxmlformats-officedocument.*", run = "office" },
+	{ mime = "application/vnd.openxmlformats-officedocument.*", run = "office" },
+	{ mime = "application/oasis.opendocument.*", run = "office" },
+	{ mime = "application/vnd.oasis.opendocument.*", run = "office" },
+	{ mime = "application/ms-*", run = "office" },
+	{ mime = "application/vnd.ms-*", run = "office" },
+	{ mime = "application/msword", run = "office" },
+	{ url = "*.{doc,docx,xls,xlsx,ppt,pptx,odt,ods,odp,rtf}", run = "office" },
 ]
-
 prepend_previewers = [
-    # Office Documents
-    { mime = "application/openxmlformats-officedocument.*", run = "office" },
-    { mime = "application/oasis.opendocument.*", run = "office" },
-    { mime = "application/ms-*", run = "office" },
-    { mime = "application/msword", run = "office" },
+	{ mime = "application/openxmlformats-officedocument.*", run = "office" },
+	{ mime = "application/vnd.openxmlformats-officedocument.*", run = "office" },
+	{ mime = "application/oasis.opendocument.*", run = "office" },
+	{ mime = "application/vnd.oasis.opendocument.*", run = "office" },
+	{ mime = "application/ms-*", run = "office" },
+	{ mime = "application/vnd.ms-*", run = "office" },
+	{ mime = "application/msword", run = "office" },
+	{ url = "*.{doc,docx,xls,xlsx,ppt,pptx,odt,ods,odp,rtf}", run = "office" },
 ]
