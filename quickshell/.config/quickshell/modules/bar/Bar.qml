@@ -256,7 +256,7 @@ PanelWindow {
 
         BarButton {
             visible: barWindow.shows("displays")
-            active: Panels.displays && Panels.overlayScreen === barWindow.screen
+            active: Panels.displays
             tooltip: "Displays"
             onClicked: Panels.toggleDisplays()
 
