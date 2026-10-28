@@ -12,11 +12,12 @@ tab_size = 4
 show_symlink = true
 
 [opener]
-# Default app (xdg-open), detached: yazi doesn't wait for it and closing yazi
-# leaves it running. Text and the like still open in $EDITOR in the terminal
-# (yazi's `edit` rule).
+# Default app (xdg-open) in its own session: setsid -f returns at once, so
+# yazi forgets it, and closing yazi leaves the app running. (`orphan = true`
+# stopped files from opening at all.) Text and the like still open in
+# $EDITOR in the terminal (yazi's `edit` rule).
 open = [
-	{ run = 'xdg-open "$1"', orphan = true, desc = "Open", for = "linux" },
+	{ run = 'setsid -f xdg-open "$1" >/dev/null 2>&1', desc = "Open", for = "linux" },
 ]
 play = [
 	{ run = 'vlc "$@"', orphan = true, for = "linux" },

@@ -15,6 +15,7 @@ Singleton {
     property alias barOpacity: adapter.barOpacity
     // Floating bar: margins around it and rounded corners
     property alias barFloating: adapter.barFloating
+    property alias barMargin: adapter.barMargin
     property alias panelOpacity: adapter.panelOpacity
     property alias animations: adapter.animations
 
@@ -100,6 +101,7 @@ Singleton {
         adapter.borderWidth = 1;
         adapter.barOpacity = 0.9;
         adapter.barFloating = false;
+        adapter.barMargin = 6;
         adapter.panelOpacity = 0.9;
         adapter.animations = true;
         adapter.clockFormat = "dddd HH:mm";
@@ -159,6 +161,7 @@ Singleton {
             property int borderWidth: 1
             property real barOpacity: 0.9
             property bool barFloating: false
+            property int barMargin: 6
             property real panelOpacity: 0.9
             property bool animations: true
             property string clockFormat: "dddd HH:mm"
