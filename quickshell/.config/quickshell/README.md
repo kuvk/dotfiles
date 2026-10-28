@@ -138,7 +138,7 @@ pam/               PAM config for the lock screen
 qs ipc call launcher toggle | menu
 qs ipc call themes toggle
 qs ipc call notifications toggle | clear | toggleDnd | dnd true
-qs ipc call bar show | hide | toggle
+qs ipc call bar show | hide | toggle | floating
 qs ipc call lock lock | lockNow
 qs ipc call power toggle
 qs ipc call displays toggle

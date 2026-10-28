@@ -114,6 +114,11 @@ ShellRoot {
     IpcHandler {
         target: "bar"
 
+        // ALT+B: full width / floating
+        function floating(): void {
+            Config.barFloating = !Config.barFloating;
+        }
+
         function show(): void {
             Panels.barVisible = true;
         }

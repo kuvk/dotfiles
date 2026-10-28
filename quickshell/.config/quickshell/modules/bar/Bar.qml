@@ -46,14 +46,11 @@ PanelWindow {
     WlrLayershell.namespace: "quickshell-bar"
 
     // Background: full width and square, or floating with rounded corners
-    // and the window border
     Rectangle {
         anchors.fill: parent
         z: -1
         color: Theme.barBg
         radius: Theme.barRadius
-        border.color: Theme.barMargin > 0 ? Theme.border : "transparent"
-        border.width: Theme.barMargin > 0 ? Theme.borderWidth : 0
     }
 
     // Left: launcher, workspaces, focused window (no hover dots here)
