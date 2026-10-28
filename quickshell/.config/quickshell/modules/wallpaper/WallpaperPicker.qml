@@ -28,7 +28,7 @@ PanelWindow {
     property int selected: 0
     property bool loading: false
     property string loadedKind: ""
-    property bool retried: false
+    property int retries: 0
     // the user moved since opening; until then a refreshed list re-selects
     // the current wallpaper
     property bool moved: false
@@ -148,13 +148,15 @@ PanelWindow {
 
     function load(): void {
         loading = true;
-        listProc.running = false;
-        // start on the next tick so a list for the previous tab is really stopped
-        Qt.callLater(() => {
-            listProc.kind = kind;
-            listProc.command = [script, "list", kind];
-            listProc.running = true;
-        });
+        // one run at a time: a run still going (previous tab) finishes and
+        // is ignored, then the list is read again for the current tab
+        if (listProc.running) {
+            listProc.again = true;
+            return;
+        }
+        listProc.kind = kind;
+        listProc.command = [script, "list", kind];
+        listProc.running = true;
     }
 
     function makeThumbs(): void {
@@ -217,7 +219,8 @@ PanelWindow {
             Hyprland.refreshMonitors();
             query = "";
             moved = false;
-            retried = false;
+            retries = 0;
+            retry.stop();
             positionAnim.stop();
             // show the kept list at once, then refresh it
             const kept = cache[kind];
@@ -282,41 +285,58 @@ PanelWindow {
         shown: root.shown
     }
 
+    // `wallpaper.py list KIND`. The result is read when the process exits,
+    // so a run that was stopped (or crashed) is never taken for an empty
+    // folder; failures are retried with growing delays and logged.
     Process {
         id: listProc
 
         property string kind: ""
+        property bool again: false
 
         stdout: StdioCollector {
-            onStreamFinished: {
-                // Ignore a list for a tab that is no longer shown
-                if (listProc.kind !== root.kind)
-                    return;
-                let list = [];
+            id: listOut
+        }
+        stderr: StdioCollector {
+            id: listErr
+        }
+
+        onExited: (code, status) => {
+            if (again) {
+                again = false;
+                Qt.callLater(root.load);
+                return;
+            }
+            // Ignore a list for a tab that is no longer shown
+            if (kind !== root.kind)
+                return;
+            let list = null;
+            if (code === 0 && status === 0) {
                 try {
-                    list = JSON.parse(text);
-                } catch (e) {
-                    console.warn("Wallpapers: bad list", e);
-                }
-                // an empty first answer is retried once before believing it
-                if (list.length === 0 && !root.retried) {
-                    root.retried = true;
+                    list = JSON.parse(listOut.text);
+                } catch (e) {}
+            }
+            if (list === null || (list.length === 0 && root.retries < 2)) {
+                console.warn(`Wallpapers: list ${kind} failed (exit ${code}/${status}, try ${root.retries + 1}): ${listErr.text.trim().slice(-300) || listOut.text.slice(0, 120) || "no output"}`);
+                if (root.retries < 5) {
+                    retry.interval = 200 * Math.pow(2, root.retries);
+                    root.retries++;
                     retry.restart();
                     return;
                 }
-                root.useList(root.kind, list);
-                root.loading = false;
-                // Fill in missing thumbnails, then reload once
-                if (list.some(i => !i.thumb))
-                    root.makeThumbs();
+                list = list ?? [];
             }
+            root.useList(root.kind, list);
+            root.loading = false;
+            // Fill in missing thumbnails, then reload once
+            if (list.some(i => !i.thumb))
+                root.makeThumbs();
         }
     }
 
     Timer {
         id: retry
 
-        interval: 400
         onTriggered: root.load()
     }
 

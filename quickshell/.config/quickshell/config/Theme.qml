@@ -115,6 +115,8 @@ Singleton {
 
     FileView {
         path: "/tmp/hypr-gamemode"
+        // missing simply means gamemode is off
+        printErrors: false
         onLoaded: root.gamemode = true
         onLoadFailed: root.gamemode = false
     }
