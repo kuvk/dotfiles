@@ -372,13 +372,15 @@ PanelWindow {
                                         width: cards.width
                                         notification: modelData
                                         showAppName: false
+                                        // nothing shows through the top card
+                                        solid: group.stacked
                                         z: -index
                                         y: cards.yFor(index)
                                         // the ones behind are a little smaller and fainter,
                                         // scaled from their bottom edge so it still peeks out
                                         transformOrigin: Item.Bottom
                                         scale: group.stacked ? 1 - index * 0.04 : 1
-                                        opacity: group.stacked && index > 0 ? 1 - index * 0.3 : 1
+                                        opacity: group.stacked && index > 0 ? 1 - index * 0.15 : 1
                                         onImplicitHeightChanged: cards.setHeight(index, implicitHeight)
                                         Component.onCompleted: cards.setHeight(index, implicitHeight)
 

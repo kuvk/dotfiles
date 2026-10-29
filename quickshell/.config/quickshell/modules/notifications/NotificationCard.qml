@@ -18,6 +18,9 @@ Item {
     required property Notification notification
     property bool popup: false
     property bool showAppName: true
+    // opaque background (the card color blended onto the panel), for cards
+    // stacked over each other in the Control Center
+    property bool solid: false
 
     readonly property bool critical: notification.urgency === NotificationUrgency.Critical
     readonly property int timeout: popup ? Notifs.timeoutFor(notification) : 0
@@ -50,7 +53,7 @@ Item {
         anchors.fill: parent
         implicitHeight: layout.implicitHeight + 24
         radius: Theme.radius
-        color: root.popup ? Theme.panelBg : Theme.cardBg
+        color: root.popup ? Theme.panelBg : root.solid ? Qt.tint(Theme.base, Theme.cardBg) : Theme.cardBg
         // only critical notifications get an outline
         border.width: root.critical ? Theme.borderWidth : 0
         border.color: Theme.red
