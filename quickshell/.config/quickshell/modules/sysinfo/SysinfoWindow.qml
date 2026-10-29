@@ -115,7 +115,8 @@ FloatingWindow {
             }
         }
         // rows as styled text, without blank rows around the output
-        const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/ /g, "&nbsp;");
+        // plain spaces: the rows go into a <pre>, so copied text stays normal
+        const esc = s => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         const lines = [];
         for (let r = 0; r < grid.length; r++) {
             const cells = grid[r] ?? [];
@@ -142,7 +143,7 @@ FloatingWindow {
             flush();
             lines.push(html);
         }
-        const blank = l => l.replace(/&nbsp;/g, "").replace(/<[^>]*>/g, "") === "";
+        const blank = l => l.replace(/<[^>]*>/g, "").trim() === "";
         while (lines.length && blank(lines[0]))
             lines.shift();
         while (lines.length && blank(lines[lines.length - 1]))
@@ -179,25 +180,23 @@ FloatingWindow {
         focus: root.shown
         Keys.onEscapePressed: Panels.sysinfo = false
 
-        Column {
+        // Text, not an image: select with the mouse, copy with Ctrl+C
+        TextEdit {
             id: output
 
             x: root.pad
             y: root.pad
-
-            Repeater {
-                model: root.rows
-
-                Text {
-                    required property string modelData
-
-                    text: modelData
-                    textFormat: Text.StyledText
-                    color: Theme.text
-                    font.family: root.monoFamily
-                    font.pixelSize: Theme.fontSize + 1
-                }
-            }
+            readOnly: true
+            selectByMouse: true
+            persistentSelection: true
+            Keys.onEscapePressed: Panels.sysinfo = false
+            textFormat: TextEdit.RichText
+            color: Theme.text
+            selectionColor: Theme.alpha(Theme.accent, 0.35)
+            selectedTextColor: Theme.text
+            font.family: root.monoFamily
+            font.pixelSize: Theme.fontSize + 1
+            text: root.rows.length ? `<pre style="margin:0; font-family:'${root.monoFamily}'">${root.rows.join("\n")}</pre>` : ""
         }
 
         StyledText {
