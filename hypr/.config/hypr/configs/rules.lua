@@ -2,7 +2,7 @@
 hl.layer_rule({
   match = { class = "^(quickshell-.*)$" },
   blur = true,
-  ignore_alpha = 0.5,
+  ignore_alpha = 0.2,
 })
 
 -- Quickshell animates its dropdowns and tooltips itself
@@ -145,7 +145,7 @@ local apps = {
   { name = "protonqt", class = "net.davidotek.pupgui2", float = true, center = true, size = "700 600" },
   { name = "zathura", class = "org.pwmt.zathura", float = true, center = true, size = "1100 1200" },
   { name = "remmina", class = "org.remmina.Remmina", no_blur = true, opaque = true, float = true, center = true},
-  { name = "davinci", class = "resolve", no_blur = true, opaque = true, float = true},
+  { name = "davinci", class = "resolve", no_blur = true, opaque = true},
 }
 
 for _, app in ipairs(apps) do
