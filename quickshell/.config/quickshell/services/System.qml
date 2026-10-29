@@ -14,14 +14,25 @@ Singleton {
     property bool nightlight: false
     // Holds a systemd idle inhibitor, which hypridle respects
     property bool stayAwake: false
-    // Work-Game Mode (hypr-gamemode.sh reports its state over IPC)
+    // Work-Game (hypr-gamemode.sh reports its state over IPC)
     property bool gamemode: false
-    // Stay Awake was switched on by Work-Game Mode, so leaving it switches it off
+    // Stay Awake was switched on by Work-Game, so leaving it switches it off
     property bool awakeForGamemode: false
     // Something is playing: keep the screen awake (replaces media-inhibit.sh)
     readonly property bool mediaPlaying: Media.players.some(p => p.isPlaying)
 
+    // Work-Game makes the bar full width; ALT+B can still float it while it
+    // lasts, and leaving restores what it was before
+    property var floatingBeforeGame: null
+
     function setGamemode(on: bool): void {
+        if (on && !gamemode) {
+            floatingBeforeGame = Config.barFloating;
+            Config.barFloating = false;
+        } else if (!on && gamemode && floatingBeforeGame !== null) {
+            Config.barFloating = floatingBeforeGame;
+            floatingBeforeGame = null;
+        }
         gamemode = on;
         if (on && !stayAwake) {
             stayAwake = true;
@@ -31,6 +42,13 @@ Singleton {
             awakeForGamemode = false;
         }
         Hypr.applyGaps();
+    }
+
+    // System information: fastfetch in a floating kitty window (rules.lua),
+    // open until a key is pressed
+    function showSysinfo(): void {
+        Panels.closeAll();
+        Quickshell.execDetached(["kitty", "--class", "sysinfo", "--title", "System Information", "-e", "bash", "-c", "fastfetch; read -rsn1"]);
     }
     property bool hasBrightness: false
     property real brightness: 0

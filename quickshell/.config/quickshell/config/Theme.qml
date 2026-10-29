@@ -80,7 +80,7 @@ Singleton {
     // Floating bar (Settings > Bar): its own margin on the left, right and
     // top (the gap below it is Hyprland's outer gap); 0 for the full-width bar
     readonly property int barMargin: Config.barFloating ? Config.barMargin : 0
-    // rounded like the other windows only while it floats (0 in Work-Game Mode)
+    // rounded like the other windows only while it floats (0 in Work-Game)
     readonly property int barRadius: barMargin > 0 ? radius : 0
     readonly property int radius: gamemode ? 0 : Config.radius
     readonly property int smallRadius: gamemode ? 0 : Math.max(0, Config.radius - 2)

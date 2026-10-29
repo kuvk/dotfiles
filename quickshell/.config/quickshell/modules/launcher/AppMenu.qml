@@ -69,7 +69,8 @@ PanelWindow {
 
     HyprlandFocusGrab {
         active: root.shown
-        windows: [root]
+        // the bars too: clicking another bar icon switches to its dropdown
+        windows: [root].concat(Panels.bars)
         onCleared: Panels.appMenu = false
     }
 
@@ -111,7 +112,10 @@ PanelWindow {
                     ListView {
                         id: groups
 
-                        anchors.fill: parent
+                        anchors.top: parent.top
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: shortcuts.top
                         anchors.margins: 10
                         spacing: 2
                         clip: true
@@ -173,6 +177,17 @@ PanelWindow {
                                 }
                             }
                         }
+                    }
+
+                    // Settings, Displays, Keybindings, System information
+                    ShellShortcuts {
+                        id: shortcuts
+
+                        anchors.left: parent.left
+                        anchors.right: parent.right
+                        anchors.bottom: parent.bottom
+                        anchors.margins: 10
+                        buttonHeight: 32
                     }
                 }
 

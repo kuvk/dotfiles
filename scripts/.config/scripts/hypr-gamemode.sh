@@ -17,10 +17,10 @@ fi
 
 notify() {
     command -v notify-send >/dev/null 2>&1 || return 0
-    notify-send -a "Work-Game Mode" -t 1500 "󰊴" "$1"
+    notify-send -a "Work-Game" -i input-gaming -t 1500 "$1"
 }
 
-# Work-Game Mode: no animations, blur or rounding. Quickshell goes opaque,
+# Work-Game: no animations, blur or rounding. Quickshell goes opaque,
 # applies the Work-Game gaps from its Settings and keeps the screen awake.
 set_shell_gamemode() {
     qs ipc call theme gamemode "$1" >/dev/null 2>&1 || true
@@ -147,7 +147,7 @@ hl.window_rule({ name = 'spotify', match = { class = 'spotify' }, opaque = true,
 hl.window_rule({ name = 'thunderbird', match = { class = 'org.mozilla.Thunderbird' }, opaque = true, no_blur = true })
 "
 
-    notify "Work-Game Mode is on."
+    notify "Work-Game mode is ON"
 }
 
 disable() {
@@ -178,7 +178,7 @@ hl.window_rule({ name = 'kitty', match = { class = 'kitty' }, opaque = false, no
 hl.window_rule({ name = 'spotify', match = { class = 'spotify' }, opaque = false, no_blur = false })
 hl.window_rule({ name = 'thunderbird', match = { class = 'org.mozilla.Thunderbird' }, opaque = false, no_blur = false  })
 "
-    notify "Work-Game Mode is off."
+    notify "Work-Game mode is OFF"
 }
 
 if [[ -e "$FLAG" ]]; then

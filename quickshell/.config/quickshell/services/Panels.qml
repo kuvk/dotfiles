@@ -66,6 +66,32 @@ Singleton {
         return screens.length > 0 ? screens[0] : null;
     }
 
+    // Bar windows (one per monitor). Dropdowns, the app menu and the Control
+    // Center include them in their focus grab, so a click on another bar icon
+    // reaches it (switching straight to that dropdown) instead of only
+    // closing the open one.
+    property var bars: []
+
+    function registerBar(bar: var): void {
+        bars = bars.concat([bar]);
+    }
+
+    function unregisterBar(bar: var): void {
+        bars = bars.filter(b => b !== bar);
+    }
+
+    // Switching workspaces (keys or mouse) closes the dropdowns
+    Connections {
+        target: Hyprland
+
+        function onFocusedWorkspaceChanged(): void {
+            root.popout = "";
+            root.appMenu = false;
+            root.controlCenter = false;
+            root.tooltip = "";
+        }
+    }
+
     // Screen of the open overlay (launcher, control center, wallpapers, ...),
     // fixed when it opens. Following the focused monitor live would move a
     // shown window, and Quickshell recreates a moved layer window, which

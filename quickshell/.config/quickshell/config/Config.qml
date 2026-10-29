@@ -32,7 +32,7 @@ Singleton {
         { id: "weather", label: "Weather" },
         { id: "media", label: "Media player" },
         { id: "tray", label: "System tray" },
-        { id: "workGame", label: "Work-Game Mode" },
+        { id: "workGame", label: "Work-Game" },
         { id: "stayAwake", label: "Stay Awake" },
         { id: "audio", label: "Volume" },
         { id: "bluetooth", label: "Bluetooth" },
@@ -76,7 +76,7 @@ Singleton {
     property alias cava: adapter.cava
     property alias cavaBars: adapter.cavaBars
 
-    // Window gaps (Hyprland), normal and in Work-Game Mode
+    // Window gaps (Hyprland), normal and in Work-Game
     // Fonts (Settings > Fonts): a Nerd Font, a display font for text, and
     // whether text uses the Nerd Font too and icons come from Symbols Nerd Font
     property alias nerdFont: adapter.nerdFont

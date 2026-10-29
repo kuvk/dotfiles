@@ -70,7 +70,7 @@ PLACEHOLDER_RE = re.compile(r"\{\{\s*([\w.]+)\s*\}\}")
 
 def notify(body: str) -> None:
     if shutil.which("notify-send"):
-        subprocess.run(["notify-send", "-a", "Theme", "Theme", body], check=False)
+        subprocess.run(["notify-send", "-a", "Theme", "-i", "preferences-desktop-theme", body], check=False)
 
 
 def run_quiet(cmd: list[str]) -> None:
