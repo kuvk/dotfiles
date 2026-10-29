@@ -9,6 +9,7 @@ Singleton {
     SystemClock {
         id: clock
 
-        precision: SystemClock.Seconds
+        // nothing shows seconds: updating once a minute is enough
+        precision: SystemClock.Minutes
     }
 }

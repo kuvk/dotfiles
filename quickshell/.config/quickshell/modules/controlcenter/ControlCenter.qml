@@ -240,6 +240,8 @@ PanelWindow {
 
                         // Groups whose older notifications are shown
                         property var expanded: ({})
+                        // Groups shown as a stack (hidden), per app
+                        property var stackedApps: ({})
 
                         anchors.fill: parent
                         clip: true
@@ -251,6 +253,14 @@ PanelWindow {
 
                             required property var modelData
                             readonly property bool open: notifList.expanded[modelData.app] === true
+                            readonly property bool stacked: notifList.stackedApps[modelData.app] === true && modelData.list.length > 1
+                            readonly property var shownCards: open && !stacked ? modelData.list : modelData.list.slice(0, 3)
+
+                            function toggleStack(): void {
+                                const s = Object.assign({}, notifList.stackedApps);
+                                s[modelData.app] = !stacked;
+                                notifList.stackedApps = s;
+                            }
                             readonly property string iconSource: {
                                 const icon = modelData.icon;
                                 if (!icon)
@@ -287,6 +297,15 @@ PanelWindow {
                                     font.pixelSize: Theme.fontSize - 1
                                 }
 
+                                // hide (stack) / reveal this app's notifications
+                                IconButton {
+                                    size: 24
+                                    visible: group.modelData.list.length > 1
+                                    icon: group.stacked ? Icons.chevronDown : Icons.chevronUp
+                                    color: Theme.overlay1
+                                    onClicked: group.toggleStack()
+                                }
+
                                 IconButton {
                                     size: 24
                                     icon: Icons.trash
@@ -295,21 +314,107 @@ PanelWindow {
                                 }
                             }
 
-                            Repeater {
-                                model: group.open ? group.modelData.list : group.modelData.list.slice(0, 3)
+                            // The cards: one under another, or stacked (the
+                            // newest on top, two more peeking out below it).
+                            // Positions animate between the two.
+                            Item {
+                                id: cards
 
-                                NotificationCard {
-                                    required property var modelData
+                                // card heights by index, kept by the cards
+                                property var heights: []
+                                readonly property int peek: 7
+                                readonly property real topHeight: heights[0] ?? 0
+                                readonly property real fullHeight: {
+                                    let h = 0;
+                                    for (let i = 0; i < group.shownCards.length; i++)
+                                        h += (heights[i] ?? 0) + (i > 0 ? 6 : 0);
+                                    return h;
+                                }
 
-                                    Layout.fillWidth: true
-                                    notification: modelData
-                                    showAppName: false
+                                function setHeight(i: int, h: real): void {
+                                    if (heights[i] === h)
+                                        return;
+                                    const copy = heights.slice();
+                                    copy[i] = h;
+                                    heights = copy;
+                                }
+
+                                function yFor(i: int): real {
+                                    if (group.stacked)
+                                        // bottoms aligned under the top card, each a bit lower
+                                        return topHeight - (heights[i] ?? 0) + i * peek;
+                                    let y = 0;
+                                    for (let j = 0; j < i; j++)
+                                        y += (heights[j] ?? 0) + 6;
+                                    return y;
+                                }
+
+                                Layout.fillWidth: true
+                                implicitHeight: group.stacked ? topHeight + (group.shownCards.length - 1) * peek : fullHeight
+                                clip: true
+
+                                Behavior on implicitHeight {
+                                    NumberAnimation {
+                                        duration: Theme.animDuration * 1.6
+                                        easing.type: Easing.OutCubic
+                                    }
+                                }
+
+                                Repeater {
+                                    model: group.shownCards
+
+                                    NotificationCard {
+                                        id: card
+
+                                        required property var modelData
+                                        required property int index
+
+                                        width: cards.width
+                                        notification: modelData
+                                        showAppName: false
+                                        z: -index
+                                        y: cards.yFor(index)
+                                        // the ones behind are a little smaller and fainter,
+                                        // scaled from their bottom edge so it still peeks out
+                                        transformOrigin: Item.Bottom
+                                        scale: group.stacked ? 1 - index * 0.04 : 1
+                                        opacity: group.stacked && index > 0 ? 1 - index * 0.3 : 1
+                                        onImplicitHeightChanged: cards.setHeight(index, implicitHeight)
+                                        Component.onCompleted: cards.setHeight(index, implicitHeight)
+
+                                        Behavior on y {
+                                            NumberAnimation {
+                                                duration: Theme.animDuration * 1.6
+                                                easing.type: Easing.OutCubic
+                                            }
+                                        }
+                                        Behavior on scale {
+                                            NumberAnimation {
+                                                duration: Theme.animDuration * 1.6
+                                                easing.type: Easing.OutCubic
+                                            }
+                                        }
+                                        Behavior on opacity {
+                                            NumberAnimation {
+                                                duration: Theme.animDuration * 1.6
+                                            }
+                                        }
+                                    }
+                                }
+
+                                // a click on the stack reveals it
+                                MouseArea {
+                                    anchors.fill: parent
+                                    visible: group.stacked
+                                    z: 10
+                                    cursorShape: Qt.PointingHandCursor
+                                    onClicked: group.toggleStack()
                                 }
                             }
 
                             StyledText {
                                 Layout.alignment: Qt.AlignHCenter
-                                visible: group.modelData.list.length > 3
+                                visible: !group.stacked && group.modelData.list.length > 3
                                 text: group.open ? "Show less" : `Show ${group.modelData.list.length - 3} more`
                                 color: Theme.subtext0
                                 font.pixelSize: Theme.fontSize - 1
