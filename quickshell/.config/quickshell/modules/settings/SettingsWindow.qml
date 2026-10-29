@@ -488,7 +488,7 @@ FloatingWindow {
 
                                     Icon {
                                         anchors.verticalCenter: parent.verticalCenter
-                                        text: Icons.arch
+                                        text: Distro.logo
                                         color: Theme.accent2
                                         font.pixelSize: 17
                                     }
@@ -550,7 +550,7 @@ FloatingWindow {
                             FontDropdown {
                                 value: Config.nerdFont
                                 options: fontsPage.nerdFonts
-                                sample: Icons.arch + " " + Icons.cog + " 0O1lI"
+                                sample: Distro.logo + " " + Icons.cog + " 0O1lI"
                                 onPicked: family => Config.nerdFont = family
                             }
 

@@ -36,7 +36,7 @@ Row {
     Icon {
         anchors.verticalCenter: parent.verticalCenter
         visible: root.shellWindow
-        text: root.shellIcons[root.toplevel?.title] ?? Icons.arch
+        text: root.shellIcons[root.toplevel?.title] ?? Distro.logo
         color: Theme.accent
     }
 
