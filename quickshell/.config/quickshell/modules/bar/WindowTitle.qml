@@ -17,7 +17,7 @@ Row {
     // The shell's own windows all have Quickshell's app id: show their title
     // and a matching icon instead of "Quickshell"
     readonly property bool shellWindow: toplevel?.appId === "org.quickshell"
-    readonly property var shellIcons: ({ "Settings": Icons.cog, "Displays": Icons.display, "Keybindings": Icons.keyboard })
+    readonly property var shellIcons: ({ "Settings": Icons.cog, "Displays": Icons.display, "Keybindings": Icons.keyboard, "System Information": Icons.info })
     readonly property var entry: toplevel && !shellWindow ? DesktopEntries.heuristicLookup(toplevel.appId) : null
 
     property bool shown: true

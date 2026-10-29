@@ -21,6 +21,7 @@ Singleton {
     property bool powerMenu: false
     property bool settings: false
     property bool keybinds: false
+    property bool sysinfo: false
     property string wallpapers: "" // "static" | "live" | ""
     property bool themes: false // theme carousel
     property bool appMenu: false // app menu dropdown with categories
@@ -148,6 +149,12 @@ Singleton {
         const open = !settings;
         closeAll();
         settings = open;
+    }
+
+    function toggleSysinfo(): void {
+        const open = !sysinfo;
+        closeAll();
+        sysinfo = open;
     }
 
     function toggleKeybinds(): void {

@@ -15,6 +15,7 @@ import qs.modules.lock
 import qs.modules.notifications
 import qs.modules.powermenu
 import qs.modules.settings
+import qs.modules.sysinfo
 import qs.modules.transition
 import qs.modules.wallpaper
 import qs.modules.themes
@@ -58,6 +59,12 @@ ShellRoot {
         active: Panels.settings
 
         SettingsWindow {}
+    }
+
+    LazyLoader {
+        active: Panels.sysinfo
+
+        SysinfoWindow {}
     }
 
     LazyLoader {
@@ -205,6 +212,14 @@ ShellRoot {
 
         function toggle(): void {
             Panels.toggleThemes();
+        }
+    }
+
+    IpcHandler {
+        target: "sysinfo"
+
+        function toggle(): void {
+            Panels.toggleSysinfo();
         }
     }
 

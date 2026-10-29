@@ -33,10 +33,10 @@ hl.window_rule({
   opaque = true,
 })
 
--- Quickshell's Settings, Displays and Keybindings: floating and centered (the shell reopens one that gets tiled)
+-- Quickshell's Settings, Displays, Keybindings and System Information: floating and centered (the shell reopens one that gets tiled)
 hl.window_rule({
   name = "quickshell-windows",
-  match = { class = "^org\\.quickshell$", title = "^(Settings|Displays|Keybindings)$" },
+  match = { class = "^org\\.quickshell$", title = "^(Settings|Displays|Keybindings|System Information)$" },
   float = true,
   center = true,
 })
@@ -130,8 +130,6 @@ local apps = {
   { name = "pinta", class = ".*Pinta.*", float = true, center = true },
   -- { name = "qs", class = "org.quickshell", float = true, center = true },	
   { name = "cliamp", class = "cliamp", float = true, center = true, size = "900 600" },
-  -- sized by sysinfo.py to fastfetch's output
-  { name = "sysinfo", class = "sysinfo", float = true, center = true },
   { name = "localsend", class = "org.localsend.localsend_app", float = true, center = true, size = "900 450" },
   { name = "nwg-look", class = "nwg-look", float = true, center = true, size = "700 600" },
   { name = "pavucontrol", class = "org.pulseaudio.pavucontrol", float = true, center = true, size = "700 600" },
