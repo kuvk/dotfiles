@@ -22,7 +22,6 @@ hl.env("QT6CT_PLATFORMTHEME", "qt6ct")
 hl.env("QT_STYLE_OVERRIDE", "kvantum")
 hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
 hl.env("QT_AUTO_SCREEN_SCALE_FACTOR", "1")
-
 hl.env("GTK_THEME", "Catppuccin")
 hl.env("XCURSOR_THEME", "Colloid-dark-cursors")
 hl.env("XCURSOR_SIZE", "24")

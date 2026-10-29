@@ -10,9 +10,10 @@
     "type": "auto",
     "width": 12,
     "padding": {
-      "top": 4,
-      "right": 0,
-      "left": 3,
+      "top": 2,
+      "right": 3,
+      "left": 2,
+			"bottom": 2,
     },
     "color": {
       "1": "{{ mauve.ansi }}",

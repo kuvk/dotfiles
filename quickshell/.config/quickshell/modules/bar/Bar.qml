@@ -258,6 +258,18 @@ PanelWindow {
         }
 
         BarButton {
+            visible: barWindow.shows("displays")
+            active: Panels.displays
+            tooltip: "Displays"
+            onClicked: Panels.toggleDisplays()
+
+            Icon {
+                text: Icons.display
+                color: Theme.teal
+            }
+        }
+
+        BarButton {
             visible: barWindow.shows("controlCenter")
             active: Panels.controlCenter && Panels.overlayScreen === barWindow.screen
             tooltip: `Control Center\nNotifications: ${Notifs.count}${Notifs.dnd ? "\nDo not disturb" : ""}`
@@ -279,18 +291,6 @@ PanelWindow {
                     color: Theme.accent
                     visible: Notifs.count > 0 && !Notifs.dnd
                 }
-            }
-        }
-
-        BarButton {
-            visible: barWindow.shows("displays")
-            active: Panels.displays
-            tooltip: "Displays"
-            onClicked: Panels.toggleDisplays()
-
-            Icon {
-                text: Icons.display
-                color: Theme.teal
             }
         }
 
