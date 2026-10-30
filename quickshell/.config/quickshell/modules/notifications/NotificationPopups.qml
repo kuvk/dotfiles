@@ -23,6 +23,7 @@ PanelWindow {
     implicitHeight: Math.ceil(column.implicitHeight + 20)
     WlrLayershell.namespace: "quickshell-notifications"
     WlrLayershell.layer: WlrLayer.Overlay
+    WlrLayershell.keyboardFocus: Notifs.replying ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     ColumnLayout {
         id: column
