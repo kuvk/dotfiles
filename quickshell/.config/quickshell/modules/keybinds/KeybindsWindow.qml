@@ -77,12 +77,159 @@ FloatingWindow {
                 { keys: ["S"], desc: "Shut down" },
                 { keys: ["←", "→"], desc: "Choose, Enter runs it" }
             ]
+        },
+        {
+            section: "Clipboard history",
+            binds: [
+                { keys: ["Type"], desc: "Filter" },
+                { keys: ["Ctrl", "J"], desc: "Next (also ↓, Tab)" },
+                { keys: ["Ctrl", "K"], desc: "Previous (also ↑)" },
+                { keys: ["Ctrl", "D"], desc: "Delete the entry" },
+                { keys: ["Enter"], desc: "Copy it again" },
+                { keys: ["Esc"], desc: "Clear, then close" }
+            ]
+        }
+    ]
+
+    // Keys of the terminal tools. Each chip is one press, in order, so
+    // ["Ctrl+S", "V"] means Ctrl+S, then V.
+    readonly property var terminalSections: [
+        {
+            section: "Panes (tmux, nvim, herdr)",
+            binds: [
+                { keys: ["Ctrl+H"], desc: "Left pane or split" },
+                { keys: ["Ctrl+J"], desc: "Pane or split below" },
+                { keys: ["Ctrl+K"], desc: "Pane or split above" },
+                { keys: ["Ctrl+L"], desc: "Right pane or split" }
+            ]
+        },
+        {
+            section: "Copy and paste",
+            binds: [
+                { keys: ["y"], desc: "Copy (zsh normal, nvim, copy modes)" },
+                { keys: ["p"], desc: "Paste after (zsh normal, nvim)" },
+                { keys: ["P"], desc: "Paste before (zsh normal, nvim)" },
+                { keys: ["Ctrl+S", "P"], desc: "Paste in tmux" },
+                { keys: ["Ctrl+Shift+V"], desc: "Paste anywhere in kitty" },
+                { keys: ["Ctrl+Shift+C"], desc: "Copy the kitty selection" }
+            ]
+        },
+        {
+            section: "tmux",
+            binds: [
+                { keys: ["Ctrl+S", "|"], desc: "Split right" },
+                { keys: ["Ctrl+S", "-"], desc: "Split down" },
+                { keys: ["Ctrl+S", "H"], desc: "Resize left (J, K, L too)" },
+                { keys: ["Ctrl+S", "h"], desc: "Move to pane (j, k, l)" },
+                { keys: ["Ctrl+S", "z"], desc: "Zoom pane" },
+                { keys: ["Ctrl+S", "x"], desc: "Close pane" },
+                { keys: ["Ctrl+S", "c"], desc: "New window" },
+                { keys: ["Ctrl+S", "n"], desc: "Next window (p previous)" },
+                { keys: ["Ctrl+S", "1…9"], desc: "Go to window" },
+                { keys: ["Ctrl+S", "d"], desc: "Detach" },
+                { keys: ["Ctrl+S", "r"], desc: "Reload config" },
+                { keys: ["Ctrl+S", "Ctrl+S"], desc: "Send Ctrl+S to the app" }
+            ]
+        },
+        {
+            section: "tmux copy mode",
+            binds: [
+                { keys: ["Ctrl+S", "v"], desc: "Enter copy mode" },
+                { keys: ["h j k l"], desc: "Move (also w, b, Ctrl+U/D, g, G)" },
+                { keys: ["/"], desc: "Search down (? up, n, N)" },
+                { keys: ["v"], desc: "Start selection" },
+                { keys: ["Ctrl+V"], desc: "Rectangle selection" },
+                { keys: ["y"], desc: "Copy and leave" },
+                { keys: ["q"], desc: "Leave" }
+            ]
+        },
+        {
+            section: "herdr panes",
+            binds: [
+                { keys: ["Ctrl+S", "v"], desc: "Split right" },
+                { keys: ["Ctrl+S", "-"], desc: "Split down" },
+                { keys: ["Ctrl+S", "h"], desc: "Move to pane (j, k, l)" },
+                { keys: ["Ctrl+S", "z"], desc: "Zoom pane" },
+                { keys: ["Ctrl+S", "x"], desc: "Close pane" },
+                { keys: ["Ctrl+S", "r"], desc: "Resize mode" },
+                { keys: ["Ctrl+S", "["], desc: "Copy mode (v, y, q, /)" },
+                { keys: ["Ctrl+S", "e"], desc: "Scrollback in the editor" }
+            ]
+        },
+        {
+            section: "herdr tabs and workspaces",
+            binds: [
+                { keys: ["Ctrl+S", "g"], desc: "Find an agent (b, w, i, d filter)" },
+                { keys: ["Ctrl+S", "w"], desc: "Workspaces" },
+                { keys: ["Ctrl+S", "Shift+N"], desc: "New workspace" },
+                { keys: ["Ctrl+S", "c"], desc: "New tab" },
+                { keys: ["Ctrl+S", "n"], desc: "Next tab (p previous)" },
+                { keys: ["Ctrl+S", "1…9"], desc: "Go to tab" },
+                { keys: ["Ctrl+S", "b"], desc: "Show / hide the sidebar" },
+                { keys: ["Ctrl+S", "s"], desc: "Settings" },
+                { keys: ["Ctrl+S", "?"], desc: "All keys" },
+                { keys: ["Ctrl+S", "q"], desc: "Detach; agents keep running" }
+            ]
+        },
+        {
+            section: "Claude Code",
+            binds: [
+                { keys: ["PgUp"], desc: "Scroll up (PgDn down)" },
+                { keys: ["Ctrl+Home"], desc: "Top (Ctrl+End latest)" },
+                { keys: ["Ctrl+O"], desc: "Open the transcript" },
+                { keys: ["Shift+Enter"], desc: "New line" },
+                { keys: ["Ctrl+G"], desc: "Write the prompt in nvim" },
+                { keys: ["Ctrl+V"], desc: "Paste an image" },
+                { keys: ["Shift+Tab"], desc: "Change permission mode" },
+                { keys: ["jk"], desc: "Leave insert mode" }
+            ]
+        },
+        {
+            section: "Claude Code transcript",
+            binds: [
+                { keys: ["j"], desc: "Line down (k up)" },
+                { keys: ["Ctrl+D"], desc: "Half page down (Ctrl+U up)" },
+                { keys: ["g"], desc: "Top (G bottom)" },
+                { keys: ["{"], desc: "Previous prompt (} next)" },
+                { keys: ["/"], desc: "Search (n, N)" },
+                { keys: ["v"], desc: "Open in nvim" },
+                { keys: ["["], desc: "Send to terminal scrollback" },
+                { keys: ["q"], desc: "Back to the prompt" }
+            ]
+        },
+        {
+            section: "zsh",
+            binds: [
+                { keys: ["jk"], desc: "Normal mode (also Esc)" },
+                { keys: ["k"], desc: "Normal mode: older match (j newer)" },
+                { keys: ["↑"], desc: "Older match in history (↓ newer)" },
+                { keys: ["Ctrl+R"], desc: "Search history (fzf)" },
+                { keys: ["Ctrl+T"], desc: "Pick a file (fzf)" },
+                { keys: ["v"], desc: "Normal mode: select text" }
+            ]
+        },
+        {
+            section: "nvim",
+            binds: [
+                { keys: ["Space", "s", "v"], desc: "Split right (s h down)" },
+                { keys: ["Space", "s", "x"], desc: "Close split" },
+                { keys: ["Ctrl+←"], desc: "Resize split (other arrows too)" },
+                { keys: ["Space", "d"], desc: "Delete without copying" },
+                { keys: ["jk"], desc: "Leave insert mode" }
+            ]
+        },
+        {
+            section: "kitty",
+            binds: [
+                { keys: ["Ctrl+Shift+H"], desc: "Scrollback in nvim (y, q)" },
+                { keys: ["Ctrl+F5"], desc: "Reload config" }
+            ]
         }
     ]
 
     readonly property var sections: {
         const q = query.toLowerCase();
-        const all = hyprSections.concat(shellSections);
+        const all = hyprSections.concat(shellSections, terminalSections);
         if (!q)
             return all;
         return all.map(s => ({

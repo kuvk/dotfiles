@@ -1,6 +1,5 @@
 -- Environment Variables
 hl.env("AQ_DRM_DEVICES", "/dev/dri/card1:/dev/dri/card0")
-hl.env("WLR_NO_HARDWARE_CURSORS", "1")
 
 -- hl.env("__NV_PRIME_RENDER_OFFLOAD", "1")
 -- hl.env("__GLX_VENDOR_LIBRARY_NAME","nvidia")
