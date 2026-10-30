@@ -48,6 +48,7 @@ _compiled $ZDOTDIR/.zshrc nosource
 _ls_colors=$HOME/.config/theme/current/ls_colors.zsh
 _load_ls_colors() {
     [[ -r $_ls_colors ]] && source $_ls_colors
+    [[ -r $_ls_colors:h/zsh-colors.zsh ]] && source $_ls_colors:h/zsh-colors.zsh
     zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
 }
 _load_ls_colors
@@ -136,8 +137,6 @@ zvm_config() {
     ZVM_OPPEND_MODE_CURSOR=$ZVM_CURSOR_BLINKING_UNDERLINE
     ZVM_VISUAL_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
     ZVM_VISUAL_LINE_MODE_CURSOR=$ZVM_CURSOR_BLINKING_BLOCK
-    ZVM_VI_HIGHLIGHT_BACKGROUND=black
-    ZVM_VI_HIGHLIGHT_FOREGROUND=magenta
     ZVM_VI_INSERT_ESCAPE_BINDKEY=jk
 }
 _compiled $HOME/.local/share/zsh-plugins/zsh-vi-mode/zsh-vi-mode.zsh

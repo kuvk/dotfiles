@@ -51,6 +51,15 @@ EXTRA_DESTINATIONS = {
     "herdr-config.toml": HOME / ".config/herdr/config.toml",
     # GTK adds these to whatever theme is set (also replaces an old symlink here)
     "gtk.css": [HOME / ".config/gtk-3.0/gtk.css", HOME / ".config/gtk-4.0/gtk.css"],
+    "gtk-settings.ini": [HOME / ".config/gtk-3.0/settings.ini", HOME / ".config/gtk-4.0/settings.ini"],
+    "qt5ct.conf": HOME / ".config/qt5ct/qt5ct.conf",
+    "qt6ct.conf": HOME / ".config/qt6ct/qt6ct.conf",
+    "kvantum.kvconfig": HOME / ".config/Kvantum/kvantum.kvconfig",
+    "kvantum-current.kvconfig": HOME / ".config/Kvantum/current/current.kvconfig",
+    "kvantum-current.svg": HOME / ".config/Kvantum/current/current.svg",
+    "hyprtoolkit.conf": HOME / ".config/hypr/hyprtoolkit.conf",
+    "cursor-index.theme": HOME / ".icons/default/index.theme",
+    "claude-theme.json": HOME / ".claude/themes/current.json",
 }
 # Written only when the app's folder exists (don't create a half plugin dir)
 ONLY_IF_PRESENT = {"tmux.conf", "cliamp.toml"}
@@ -65,7 +74,9 @@ SLOTS = (
     "sapphire blue lavender text subtext1 subtext0 overlay2 overlay1 overlay0 "
     "surface2 surface1 surface0 base mantle crust"
 ).split()
-ROLES = {"accent": "peach", "accent2": "blue"}
+# selection_*: selected text in every app; surface1 reads well in all themes
+ROLES = {"accent": "peach", "accent2": "blue", "selection_bg": "surface1", "selection_fg": "text"}
+CURSOR_THEME = "Adwaita"
 
 HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 PLACEHOLDER_RE = re.compile(r"\{\{\s*([\w.]+)\s*\}\}")
@@ -143,6 +154,13 @@ def load_theme(name: str) -> dict:
         "theme": name,
         "theme_name": data.get("name", name),
         "mode": mode,
+        "cursor_theme": CURSOR_THEME,
+        "icon_theme": "Papirus" if mode == "light" else "Papirus-Dark",
+        "prefer_dark": "0" if mode == "light" else "1",
+        # adw-gtk3, when installed, follows gtk.css in plain GTK3 and GTK4 apps too;
+        # Adwaita only does in libadwaita apps
+        "gtk_theme": ("adw-gtk3" if Path("/usr/share/themes/adw-gtk3").is_dir() else "Adwaita")
+        + ("" if mode == "light" else "-dark"),
     }
     for key, value in data.get("apps", {}).items():
         strings[key] = str(value)
@@ -282,33 +300,13 @@ def hypr_running() -> bool:
     return bool(os.environ.get("HYPRLAND_INSTANCE_SIGNATURE")) and shutil.which("hyprctl") is not None
 
 
-def set_gtk_theme(light: bool) -> None:
-    """A base theme in the theme's mode; gtk.css (rendered above) brings the colors.
-    adw-gtk3, when installed, follows those colors in plain GTK3 and GTK4 apps too;
-    Adwaita only does in libadwaita apps."""
-    base = "adw-gtk3" if Path("/usr/share/themes/adw-gtk3").is_dir() else "Adwaita"
-    gtk_theme = base if light else f"{base}-dark"
-    icons = "Papirus" if light else "Papirus-Dark"
+def set_gtk_theme(strings: dict) -> None:
+    """Wayland GTK apps read these; settings.ini (rendered above) is for XWayland ones."""
     interface = "org.gnome.desktop.interface"
-    run_quiet(["gsettings", "set", interface, "gtk-theme", gtk_theme])
-    run_quiet(["gsettings", "set", interface, "icon-theme", icons])
-    run_quiet(["gsettings", "set", interface, "color-scheme", "prefer-light" if light else "prefer-dark"])
-
-    # XWayland GTK apps read these files instead
-    wanted = {
-        "gtk-theme-name": gtk_theme,
-        "gtk-icon-theme-name": icons,
-        "gtk-application-prefer-dark-theme": "0" if light else "1",
-    }
-    for folder in ("gtk-3.0", "gtk-4.0"):
-        path = HOME / ".config" / folder / "settings.ini"
-        try:
-            lines = path.read_text().splitlines()
-        except FileNotFoundError:
-            lines = ["[Settings]"]
-        kept = [line for line in lines if line.split("=")[0].strip() not in wanted]
-        kept[1:1] = [f"{key}={value}" for key, value in wanted.items()]
-        write_if_changed(path, "\n".join(kept) + "\n")
+    run_quiet(["gsettings", "set", interface, "gtk-theme", strings["gtk_theme"]])
+    run_quiet(["gsettings", "set", interface, "icon-theme", strings["icon_theme"]])
+    run_quiet(["gsettings", "set", interface, "cursor-theme", strings["cursor_theme"]])
+    run_quiet(["gsettings", "set", interface, "color-scheme", f"prefer-{strings['mode']}"])
 
 
 def reload_apps(theme: dict) -> None:
@@ -350,7 +348,7 @@ def reload_apps(theme: dict) -> None:
 
     browsers(colors["base"])
 
-    set_gtk_theme(strings["mode"] == "light")
+    set_gtk_theme(strings)
 
     wallpaper = strings.get("wallpaper")
     if wallpaper and hypr_running():

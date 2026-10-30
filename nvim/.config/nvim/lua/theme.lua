@@ -39,6 +39,10 @@ function M.apply()
     vim.notify("theme: colorscheme '" .. theme.colorscheme .. "' not available", vim.log.levels.WARN)
     vim.cmd.colorscheme(fallback.colorscheme)
   end
+  -- selected text looks the same as in the terminal and everywhere else
+  if theme.selection then
+    vim.api.nvim_set_hl(0, "Visual", { bg = theme.selection })
+  end
 end
 
 function M.setup()

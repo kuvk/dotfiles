@@ -1,0 +1,19 @@
+[Settings]
+gtk-theme-name={{ gtk_theme }}
+gtk-icon-theme-name={{ icon_theme }}
+gtk-font-name=SF Pro 10
+gtk-cursor-theme-name={{ cursor_theme }}
+gtk-cursor-theme-size=24
+gtk-application-prefer-dark-theme={{ prefer_dark }}
+gtk-decoration-layout=:
+gtk-enable-animations=true
+gtk-cursor-blink=true
+gtk-cursor-blink-time=1000
+gtk-sound-theme-name=ocean
+gtk-enable-event-sounds=1
+gtk-enable-input-feedback-sounds=0
+gtk-error-bell=1
+gtk-xft-antialias=1
+gtk-xft-hinting=1
+gtk-xft-hintstyle=hintfull
+gtk-xft-rgba=rgb
