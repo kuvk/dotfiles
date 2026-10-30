@@ -67,7 +67,7 @@ theme folder and set `wallpaper` under `[apps]`.
 | scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |
 | GTK apps | adw-gtk3 if installed, otherwise Adwaita, in the theme's mode; icons and `color-scheme` through `gsettings` and `settings.ini`; colors in `~/.config/gtk-{3,4}.0/gtk.css` | mode live; colors when an app next starts |
 
-Selected text uses the `selection_bg` and `selection_fg` roles in kitty, tmux, zsh, nvim, GTK, Qt, herdr and Claude Code.
+Selected text uses the `selection_bg` (gray) and `selection_fg` (accent, or text where the accent is unreadable on it) roles in kitty, tmux, zsh, nvim, GTK and Qt. herdr and Claude Code only take the background.
 
 ## Power menu icons
 
