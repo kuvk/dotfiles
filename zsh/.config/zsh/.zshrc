@@ -149,8 +149,10 @@ _clipboard_to_cutbuffer() {
 functions[_zvm_put_after]=$functions[zvm_vi_put_after]
 functions[_zvm_put_before]=$functions[zvm_vi_put_before]
 functions[_zvm_replace_selection]=$functions[zvm_vi_replace_selection]
-zvm_vi_put_after() { _clipboard_to_cutbuffer; _zvm_put_after "$@"; }
-zvm_vi_put_before() { _clipboard_to_cutbuffer; _zvm_put_before "$@"; }
+# (the plugin also highlights what it pasted; only the spaces show, as syntax
+# highlighting recolors the rest, so that's cleared)
+zvm_vi_put_after() { _clipboard_to_cutbuffer; _zvm_put_after "$@"; zvm_highlight clear; }
+zvm_vi_put_before() { _clipboard_to_cutbuffer; _zvm_put_before "$@"; zvm_highlight clear; }
 zvm_vi_replace_selection() { _clipboard_to_cutbuffer; _zvm_replace_selection "$@"; }
 
 # zsh-vi-mode sets its keys at the first prompt, over anything bound before it,

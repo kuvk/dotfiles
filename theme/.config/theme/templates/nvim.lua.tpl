@@ -3,7 +3,7 @@ return {
   name = "{{ theme }}",
   colorscheme = "{{ nvim_colorscheme }}",
   background = "{{ mode }}",
-  selection = "{{ selection_bg }}",
+  selection = { bg = "{{ selection_bg }}", fg = "{{ selection_fg }}" },
   -- Palette for the aether colorscheme, used by themes without their own
   aether = {
     bg = "{{ base }}",
