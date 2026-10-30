@@ -5,10 +5,10 @@
 -- swayimg's own defaults stay; the bindings below are added on top.
 --
 -- Viewer                               Gallery (Enter switches)
---   h j k l      move the image          h j k l      select
---   H / L, n / N previous / next image   g / G        first / last
+--   h / l, N / n previous / next image   h j k l      select
+--   H J K L      move the image          g / G        first / last
 --   g / G        first / last image      Ctrl+d / u   page down / up
---   K / J, + / - zoom in / out           K / J        bigger / smaller thumbnails
+--   + / -        zoom in / out           K / J        bigger / smaller thumbnails
 --   0            fit to window           Enter        open in the viewer
 --   w            fit to width            q            quit
 --   r / R        rotate right / left
@@ -72,7 +72,7 @@ apply_theme()
 --------------------------------------------------------------------------------
 -- Vim keys
 --------------------------------------------------------------------------------
-local STEP = 60 -- pixels per h/j/k/l press
+local STEP = 60 -- pixels per H/J/K/L press
 
 local function move(dx, dy)
   return function()
@@ -99,18 +99,18 @@ end
 
 do
   local mode = swayimg.viewer
-  mode.on_key("h", move(STEP, 0))
-  mode.on_key("l", move(-STEP, 0))
-  mode.on_key("k", move(0, STEP))
-  mode.on_key("j", move(0, -STEP))
+  mode.on_key("Shift+h", move(STEP, 0))
+  mode.on_key("Shift+l", move(-STEP, 0))
+  mode.on_key("Shift+k", move(0, STEP))
+  mode.on_key("Shift+j", move(0, -STEP))
 
-  mode.on_key({ "Shift+h", "Shift+n" }, open("prev"))
-  mode.on_key({ "Shift+l", "n" }, open("next"))
+  mode.on_key({ "h", "Shift+n" }, open("prev"))
+  mode.on_key({ "l", "n" }, open("next"))
   mode.on_key("g", open("first"))
   mode.on_key("Shift+g", open("last"))
 
-  mode.on_key({ "Shift+k", "plus", "Shift+plus", "equal" }, zoom(1.25))
-  mode.on_key({ "Shift+j", "minus" }, zoom(0.8))
+  mode.on_key({ "plus", "Shift+plus", "equal" }, zoom(1.25))
+  mode.on_key("minus", zoom(0.8))
   mode.on_key("0", function() swayimg.viewer.set_fix_scale("optimal") end)
   mode.on_key("w", function() swayimg.viewer.set_fix_scale("width") end)
 
