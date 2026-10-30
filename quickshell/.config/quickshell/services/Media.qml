@@ -44,11 +44,23 @@ Singleton {
         return Icons.music;
     }
 
-    function cyclePlayer(): void {
+    // The last switch made with the arrows or keys, for the cards' slide
+    property int lastStep: 0
+    property MprisPlayer stepTarget: null
+
+    // Switch to the previous (-1) or next (1) player
+    function step(delta: int): void {
         if (players.length < 2)
             return;
-        const i = players.indexOf(active);
-        pinned = players[(i + 1) % players.length];
+        const i = Math.max(0, players.indexOf(active));
+        const next = players[(i + delta + players.length) % players.length];
+        lastStep = delta;
+        stepTarget = next;
+        pinned = next;
+    }
+
+    function cyclePlayer(): void {
+        step(1);
     }
 
     function formatTime(seconds: real): string {

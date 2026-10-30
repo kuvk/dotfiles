@@ -1,12 +1,12 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell.Services.Mpris
 import Quickshell.Widgets
 import qs.config
 import qs.services
 
-// Now playing: cover, title, progress and controls for Media.active, and
-// with several players, a row per player to switch to it or play/pause it
+// Now playing: cover, title, progress and controls for Media.active. With
+// several players each is a card of its own: the arrows (or Left/Right in
+// the dropdown and Control Center) switch between them, with a slide.
 Card {
     id: root
 
@@ -14,6 +14,35 @@ Card {
 
     visible: player !== null
     implicitHeight: content.implicitHeight + 24
+    clip: true
+
+    // slide in from the side we switched to; automatic switches only fade
+    onPlayerChanged: {
+        if (Theme.animDuration > 0) {
+            shift.x = player !== null && player === Media.stepTarget ? Media.lastStep * 48 : 0;
+            slide.restart();
+        }
+    }
+
+    ParallelAnimation {
+        id: slide
+
+        NumberAnimation {
+            target: shift
+            property: "x"
+            to: 0
+            duration: Theme.animDuration * 1.6
+            easing.type: Easing.OutCubic
+        }
+
+        NumberAnimation {
+            target: content
+            property: "opacity"
+            from: 0
+            to: 1
+            duration: Theme.animDuration * 1.6
+        }
+    }
 
     ColumnLayout {
         id: content
@@ -21,6 +50,62 @@ Card {
         anchors.fill: parent
         anchors.margins: 12
         spacing: 10
+        transform: Translate {
+            id: shift
+        }
+
+        // Player switcher: arrows and a dot per player
+        RowLayout {
+            Layout.fillWidth: true
+            visible: Media.players.length > 1
+            spacing: 4
+
+            IconButton {
+                size: 24
+                icon: Icons.chevronLeft
+                color: Theme.overlay1
+                onClicked: Media.step(-1)
+            }
+
+            Item {
+                Layout.fillWidth: true
+                implicitHeight: dots.implicitHeight
+
+                Row {
+                    id: dots
+
+                    anchors.centerIn: parent
+                    spacing: 6
+
+                    Repeater {
+                        model: Media.players
+
+                        Rectangle {
+                            required property var modelData
+
+                            anchors.verticalCenter: parent.verticalCenter
+                            width: modelData === root.player ? 16 : 6
+                            height: 6
+                            radius: 3
+                            color: modelData === root.player ? Theme.highlight : Theme.overlay0
+
+                            Behavior on width {
+                                NumberAnimation {
+                                    duration: Theme.animDuration
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            IconButton {
+                size: 24
+                icon: Icons.chevronRight
+                color: Theme.overlay1
+                onClicked: Media.step(1)
+            }
+        }
 
         RowLayout {
             Layout.fillWidth: true
@@ -144,72 +229,6 @@ Card {
                 icon: Icons.next
                 enabled: root.player?.canGoNext ?? false
                 onClicked: root.player.next()
-            }
-        }
-
-        ColumnLayout {
-            Layout.fillWidth: true
-            visible: Media.players.length > 1
-            spacing: 2
-
-            Repeater {
-                model: Media.players.length > 1 ? Media.players : []
-
-                MouseArea {
-                    id: playerRow
-
-                    required property MprisPlayer modelData
-                    readonly property bool current: modelData === root.player
-
-                    Layout.fillWidth: true
-                    implicitHeight: 36
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: Media.pinned = modelData
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: Theme.smallRadius
-                        color: playerRow.containsMouse ? Theme.hoverBg : "transparent"
-                    }
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.leftMargin: 8
-                        anchors.rightMargin: 2
-                        spacing: 10
-
-                        Icon {
-                            Layout.preferredWidth: 18
-                            text: Media.iconFor(playerRow.modelData)
-                            color: playerRow.current ? Theme.highlight : Theme.subtext0
-                        }
-
-                        StyledText {
-                            Layout.fillWidth: true
-                            text: {
-                                const p = playerRow.modelData;
-                                const track = p.trackTitle || Media.fileName(p.metadata?.["xesam:url"]);
-                                return track ? `${p.identity} · ${track}` : p.identity;
-                            }
-                            color: playerRow.current ? Theme.highlight : Theme.text
-                            elide: Text.ElideRight
-                        }
-
-                        IconButton {
-                            size: 28
-                            icon: playerRow.modelData.isPlaying ? Icons.pause : Icons.play
-                            color: playerRow.modelData.isPlaying ? Theme.highlight : Theme.overlay1
-                            enabled: playerRow.modelData.canTogglePlaying
-                            onClicked: {
-                                // starting a player also switches the card to it
-                                if (!playerRow.modelData.isPlaying)
-                                    Media.pinned = playerRow.modelData;
-                                playerRow.modelData.togglePlaying();
-                            }
-                        }
-                    }
-                }
             }
         }
     }

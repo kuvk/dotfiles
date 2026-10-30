@@ -78,6 +78,12 @@ PanelWindow {
             focus: root.shown
             Keys.onEscapePressed: Panels.controlCenter = false
             Keys.onPressed: event => {
+                // Left/Right switch between media players
+                if (event.key === Qt.Key_Left || event.key === Qt.Key_Right) {
+                    Media.step(event.key === Qt.Key_Left ? -1 : 1);
+                    event.accepted = true;
+                    return;
+                }
                 if (!(event.modifiers & Qt.ShiftModifier))
                     return;
                 if (event.key === Qt.Key_C) {

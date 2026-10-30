@@ -15,6 +15,8 @@ PanelWindow {
 
     required property var bar
     required property string name
+    // keys the panel doesn't handle itself (Escape closes it)
+    signal keyPressed(var event)
     property int contentWidth: 340
     default property alias content: column.data
 
@@ -79,6 +81,7 @@ PanelWindow {
 
             focus: root.shown
             Keys.onEscapePressed: Panels.closeDropdown(root.name)
+            Keys.onPressed: event => root.keyPressed(event)
 
             ColumnLayout {
                 id: column
