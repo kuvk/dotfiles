@@ -49,6 +49,8 @@ EXTRA_DESTINATIONS = {
     ],
     "cliamp.toml": HOME / ".config/cliamp/themes/system.toml",
     "herdr-config.toml": HOME / ".config/herdr/config.toml",
+    # GTK adds these to whatever theme is set (also replaces an old symlink here)
+    "gtk.css": [HOME / ".config/gtk-3.0/gtk.css", HOME / ".config/gtk-4.0/gtk.css"],
 }
 # Written only when the app's folder exists (don't create a half plugin dir)
 ONLY_IF_PRESENT = {"tmux.conf", "cliamp.toml"}
@@ -280,6 +282,35 @@ def hypr_running() -> bool:
     return bool(os.environ.get("HYPRLAND_INSTANCE_SIGNATURE")) and shutil.which("hyprctl") is not None
 
 
+def set_gtk_theme(light: bool) -> None:
+    """A base theme in the theme's mode; gtk.css (rendered above) brings the colors.
+    adw-gtk3, when installed, follows those colors in plain GTK3 and GTK4 apps too;
+    Adwaita only does in libadwaita apps."""
+    base = "adw-gtk3" if Path("/usr/share/themes/adw-gtk3").is_dir() else "Adwaita"
+    gtk_theme = base if light else f"{base}-dark"
+    icons = "Papirus" if light else "Papirus-Dark"
+    interface = "org.gnome.desktop.interface"
+    run_quiet(["gsettings", "set", interface, "gtk-theme", gtk_theme])
+    run_quiet(["gsettings", "set", interface, "icon-theme", icons])
+    run_quiet(["gsettings", "set", interface, "color-scheme", "prefer-light" if light else "prefer-dark"])
+
+    # XWayland GTK apps read these files instead
+    wanted = {
+        "gtk-theme-name": gtk_theme,
+        "gtk-icon-theme-name": icons,
+        "gtk-application-prefer-dark-theme": "0" if light else "1",
+    }
+    for folder in ("gtk-3.0", "gtk-4.0"):
+        path = HOME / ".config" / folder / "settings.ini"
+        try:
+            lines = path.read_text().splitlines()
+        except FileNotFoundError:
+            lines = ["[Settings]"]
+        kept = [line for line in lines if line.split("=")[0].strip() not in wanted]
+        kept[1:1] = [f"{key}={value}" for key, value in wanted.items()]
+        write_if_changed(path, "\n".join(kept) + "\n")
+
+
 def reload_apps(theme: dict) -> None:
     colors, strings = theme["colors"], theme["strings"]
 
@@ -319,8 +350,7 @@ def reload_apps(theme: dict) -> None:
 
     browsers(colors["base"])
 
-    scheme = "prefer-light" if strings["mode"] == "light" else "prefer-dark"
-    run_quiet(["gsettings", "set", "org.gnome.desktop.interface", "color-scheme", scheme])
+    set_gtk_theme(strings["mode"] == "light")
 
     wallpaper = strings.get("wallpaper")
     if wallpaper and hypr_running():
