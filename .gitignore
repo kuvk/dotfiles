@@ -28,6 +28,7 @@ btop/.config/btop/themes/current.theme
 cava/.config/cava/themes/
 starship/.config/starship.toml
 yazi/.config/yazi/theme.toml
+hypr/.config/hypr/hyprtoolkit.conf
 
 # ---------------------------------------------------------------- per-app state
 # zsh

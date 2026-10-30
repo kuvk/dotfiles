@@ -60,9 +60,14 @@ theme folder and set `wallpaper` under `[apps]`.
 | cliamp | `~/.config/cliamp/themes/system.toml` | live (`cliamp theme system`) |
 | ls, eza, zsh completion | `current/ls_colors.zsh` (`dircolors` output of `current/dir_colors`) | live in open shells (SIGUSR1) |
 | herdr | `~/.config/herdr/config.toml`, the whole file: edit `templates/herdr-config.toml.tpl`, not the output | live (`herdr server reload-config`) |
+| Qt apps | Kvantum theme `current` (`templates/kvantum-current.*`), `qt5ct.conf` and `qt6ct.conf`: edit the templates, not the output | when an app next starts |
+| hyprshutdown, Hyprland's update and donation windows | `~/.config/hypr/hyprtoolkit.conf` | when a window next opens |
+| Claude Code | `~/.claude/themes/current.json`, with `"theme": "custom:current"` and `claude-statusline.sh` | live |
 | swayimg | `current/swayimg.lua` (loaded by `~/.config/swayimg/init.lua`) | live (SIGUSR1) |
 | scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |
 | GTK apps | adw-gtk3 if installed, otherwise Adwaita, in the theme's mode; icons and `color-scheme` through `gsettings` and `settings.ini`; colors in `~/.config/gtk-{3,4}.0/gtk.css` | mode live; colors when an app next starts |
+
+Selected text uses the `selection_bg` and `selection_fg` roles in kitty, tmux, zsh, nvim, GTK, Qt, herdr and Claude Code.
 
 ## Power menu icons
 
