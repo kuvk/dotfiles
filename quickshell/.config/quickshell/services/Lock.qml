@@ -24,6 +24,14 @@ Singleton {
     property bool failed: false
     property bool capsLock: false
 
+    function setCursorHidden(hidden: bool): void {
+        Quickshell.execDetached(["hyprctl", "eval", `hl.config({ cursor = { invisible = ${hidden} } })`]);
+    }
+
+    // No pointer on the lock screen; also clears it after a crash while locked
+    onLockedChanged: setCursorHidden(locked)
+    Component.onCompleted: setCursorHidden(locked)
+
     function lock(): void {
         if (locked)
             return;

@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
+import QtQuick.Window
 import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
@@ -58,15 +59,6 @@ WlSessionLock {
 
             interval: 400
             onTriggered: surface.drop()
-        }
-
-        // No mouse pointer on the lock screen
-        MouseArea {
-            anchors.fill: parent
-            z: 100
-            hoverEnabled: true
-            acceptedButtons: Qt.NoButton
-            cursorShape: Qt.BlankCursor
         }
 
         ScreencopyView {
@@ -142,8 +134,22 @@ WlSessionLock {
 
             // Keyboard: every screen accepts the password, the main one shows it
             Item {
+                id: keyboard
+
                 anchors.fill: parent
                 focus: true
+
+                // keep-keyboard normally prevents losing the keyboard over a suspend. As a
+                // fallback, ask for activation and focus until the window is active again.
+                Timer {
+                    running: Lock.locked && !keyboard.Window.active
+                    repeat: true
+                    interval: 250
+                    onTriggered: {
+                        keyboard.forceActiveFocus();
+                        keyboard.Window.window?.requestActivate();
+                    }
+                }
 
                 Keys.onPressed: event => {
                     Lock.checkCapsLock();
