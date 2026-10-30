@@ -235,6 +235,12 @@ PanelWindow {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
 
+                    ScrollBar {
+                        id: notifScroll
+
+                        flick: notifList
+                    }
+
                     ListView {
                         id: notifList
 
@@ -270,7 +276,8 @@ PanelWindow {
                                 return icon.includes("://") ? icon : Quickshell.iconPath(icon, true);
                             }
 
-                            width: ListView.view.width
+                            // room for the scroll bar when the list scrolls
+                            width: ListView.view.width - (notifScroll.needed ? 12 : 0)
                             spacing: 6
 
                             // App header: icon, name, count, clear

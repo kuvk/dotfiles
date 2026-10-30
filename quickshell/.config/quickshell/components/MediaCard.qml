@@ -1,10 +1,12 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell.Services.Mpris
 import Quickshell.Widgets
 import qs.config
 import qs.services
 
-// Now playing: cover, title, progress and controls for Media.active
+// Now playing: cover, title, progress and controls for Media.active, and
+// with several players, a row per player to switch to it or play/pause it
 Card {
     id: root
 
@@ -142,6 +144,72 @@ Card {
                 icon: Icons.next
                 enabled: root.player?.canGoNext ?? false
                 onClicked: root.player.next()
+            }
+        }
+
+        ColumnLayout {
+            Layout.fillWidth: true
+            visible: Media.players.length > 1
+            spacing: 2
+
+            Repeater {
+                model: Media.players.length > 1 ? Media.players : []
+
+                MouseArea {
+                    id: playerRow
+
+                    required property MprisPlayer modelData
+                    readonly property bool current: modelData === root.player
+
+                    Layout.fillWidth: true
+                    implicitHeight: 36
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: Media.pinned = modelData
+
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: Theme.smallRadius
+                        color: playerRow.containsMouse ? Theme.hoverBg : "transparent"
+                    }
+
+                    RowLayout {
+                        anchors.fill: parent
+                        anchors.leftMargin: 8
+                        anchors.rightMargin: 2
+                        spacing: 10
+
+                        Icon {
+                            Layout.preferredWidth: 18
+                            text: Media.iconFor(playerRow.modelData)
+                            color: playerRow.current ? Theme.highlight : Theme.subtext0
+                        }
+
+                        StyledText {
+                            Layout.fillWidth: true
+                            text: {
+                                const p = playerRow.modelData;
+                                const track = p.trackTitle || Media.fileName(p.metadata?.["xesam:url"]);
+                                return track ? `${p.identity} · ${track}` : p.identity;
+                            }
+                            color: playerRow.current ? Theme.highlight : Theme.text
+                            elide: Text.ElideRight
+                        }
+
+                        IconButton {
+                            size: 28
+                            icon: playerRow.modelData.isPlaying ? Icons.pause : Icons.play
+                            color: playerRow.modelData.isPlaying ? Theme.highlight : Theme.overlay1
+                            enabled: playerRow.modelData.canTogglePlaying
+                            onClicked: {
+                                // starting a player also switches the card to it
+                                if (!playerRow.modelData.isPlaying)
+                                    Media.pinned = playerRow.modelData;
+                                playerRow.modelData.togglePlaying();
+                            }
+                        }
+                    }
+                }
             }
         }
     }
