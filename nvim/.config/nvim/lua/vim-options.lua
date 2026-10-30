@@ -67,7 +67,7 @@ end)
 -- Flash what was just copied
 vim.api.nvim_create_autocmd("TextYankPost", {
   callback = function()
-    vim.hl.on_yank({ timeout = 150 })
+    vim.hl.on_yank({ higroup = "YankHighlight", timeout = 150 })
   end,
 })
 
