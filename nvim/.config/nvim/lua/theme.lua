@@ -43,6 +43,18 @@ function M.apply()
   if theme.selection then
     vim.api.nvim_set_hl(0, "Visual", theme.selection)
   end
+  vim.api.nvim_set_hl(0, "YankHighlight", theme.yank or { link = "IncSearch" })
+end
+
+-- Square corners in Work-Game or with the corner radius at 0 (theme-set --shape)
+function M.square()
+  local file = io.open(dir .. "/shape")
+  if not file then
+    return false
+  end
+  local shape = file:read("*l")
+  file:close()
+  return shape == "square"
 end
 
 function M.setup()
@@ -61,6 +73,8 @@ function M.setup()
   watcher:start(dir, {}, vim.schedule_wrap(function(err, name)
     if not err and name == "nvim.lua" then
       M.apply()
+    elseif not err and name == "shape" then
+      vim.api.nvim_exec_autocmds("User", { pattern = "ThemeShape" })
     end
   end))
 end

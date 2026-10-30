@@ -27,15 +27,18 @@ local function fg(group)
 end
 
 local function setup()
+  local square = require("theme").square()
+  local left = square and "" or "\u{e0b6}"
+  local right = square and "" or "\u{e0b4}"
   require("lualine").setup({
     options = {
       icons_enabled = true,
       theme = "auto",
       component_separators = "",
-      section_separators = { left = "", right = "" },
+      section_separators = { left = right, right = left },
     },
     sections = {
-      lualine_a = { { "mode", separator = { left = "" }, right_padding = 2 } },
+      lualine_a = { { "mode", separator = { left = left }, right_padding = 2 } },
       lualine_b = {
         {
           "filename",
@@ -103,7 +106,7 @@ local function setup()
         end,
       },
       lualine_z = {
-        { "location", separator = { right = "" }, left_padding = 2 },
+        { "location", separator = { right = right }, left_padding = 2 },
       },
     },
     inactive_sections = {
@@ -125,5 +128,6 @@ return {
     setup()
     -- Colors come from the colorscheme, so rebuild when the theme changes
     vim.api.nvim_create_autocmd("ColorScheme", { callback = setup })
+    vim.api.nvim_create_autocmd("User", { pattern = "ThemeShape", callback = setup })
   end,
 }

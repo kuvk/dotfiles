@@ -62,3 +62,13 @@ selection {
   background-color: {{ selection_bg }};
   color: {{ selection_fg }};
 }
+
+/* Hyprland rounds windows itself, so they match its corners, square in Work-Game too */
+window,
+window.csd,
+window.background,
+window.messagedialog,
+dialog-host,
+dialog > .background {
+  border-radius: 0;
+}
