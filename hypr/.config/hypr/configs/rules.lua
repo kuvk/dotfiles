@@ -34,6 +34,7 @@ hl.window_rule({
   name = "xwayland",
   match = { xwayland = true },
   no_blur = true,
+  opaque = true,
 })
 
 -- Quickshell's Settings, Displays, Keybindings and System Information: floating and centered (the shell reopens one that gets tiled)
@@ -93,8 +94,6 @@ hl.window_rule({
   name = "spotify",
   match = { class = "Spotify" },
   opacity = "0.9 0.9 1",
-  -- it runs under XWayland: undo the xwayland rule's no_blur
-  no_blur = false,
 })
 
 -- Thunderbird
