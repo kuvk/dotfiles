@@ -88,8 +88,8 @@ window.text.color={{ text }}
 button.text.color={{ text }}
 disabled.text.color={{ surface2 }}
 tooltip.text.color={{ text }}
-highlight.text.color={{ selection_fg }}
-link.color={{ accent }}
+highlight.text.color={{ accent2 }}
+link.color={{ accent2 }}
 link.visited.color={{ accent2 }}
 
 [ItemView]
@@ -273,7 +273,7 @@ frame.left=1
 frame.right=1
 frame.expansion=0
 text.normal.color={{ text }}
-text.focus.color={{ accent }}
+text.focus.color={{ accent2 }}
 text.press.color={{ text }}
 text.toggle.color={{ text }}
 indicator.element=harrow
@@ -295,8 +295,8 @@ frame.left=4
 frame.right=4
 text.normal.color={{ text }}
 text.focus.color={{ text }}
-text.press.color={{ accent }}
-text.toggle.color={{ accent }}
+text.press.color={{ accent2 }}
+text.toggle.color={{ accent2 }}
 text.bold=false
 
 [MenuBar]

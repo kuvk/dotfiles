@@ -11,6 +11,9 @@ apps are told to reload.
   theme-set.py --list     list theme names
   theme-set.py --json     list themes with a few colors (used by quickshell)
   theme-set.py --current  print the current theme name
+  theme-set.py --shape rounded|square
+                          corners of the status lines in tmux, nvim, yazi and Claude
+                          Code (quickshell sets it: square in Work-Game or at radius 0)
 """
 
 import json
@@ -358,8 +361,10 @@ def reload_apps(theme: dict) -> None:
     if "cliamp.toml" in theme.get("changed", ()) and shutil.which("cliamp") and (HOME / ".config/cliamp/cliamp.sock").exists():
         run_quiet(["cliamp", "theme", "system"])
 
-    if "herdr-config.toml" in theme.get("changed", ()) and shutil.which("herdr"):
-        run_quiet(["herdr", "server", "reload-config"])
+    # ~/.local/bin isn't on PATH when the shell's theme picker runs this
+    herdr = shutil.which("herdr") or str(HOME / ".local/bin/herdr")
+    if "herdr-config.toml" in theme.get("changed", ()) and os.access(herdr, os.X_OK):
+        run_quiet([herdr, "server", "reload-config"])
 
     browsers(colors["base"])
 
@@ -461,9 +466,21 @@ def themes_json() -> str:
     return json.dumps(result)
 
 
+def set_shape(shape: str) -> None:
+    if not write_if_changed(CURRENT_DIR / "shape", shape + "\n"):
+        return
+    # nvim watches the file and Claude Code's status line reads it each time
+    if subprocess.run(["tmux", "info"], capture_output=True).returncode == 0:
+        run_quiet(["tmux", "source-file", str(HOME / ".tmux.conf")])
+    restart_yazi()
+
+
 def main(argv: list[str]) -> int:
     if argv and argv[0] in ("-h", "--help"):
         print(__doc__.strip())
+        return 0
+    if len(argv) == 2 and argv[0] == "--shape" and argv[1] in ("rounded", "square"):
+        set_shape(argv[1])
         return 0
     if argv and argv[0] == "--list":
         print("\n".join(available_themes()))

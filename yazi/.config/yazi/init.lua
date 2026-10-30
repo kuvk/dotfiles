@@ -10,6 +10,14 @@ local sep = {
   left = "\u{e0b6}",  -- rounded, opening to the right
   right = "\u{e0b4}", -- rounded, closing to the right
 }
+-- Square in Work-Game or with the corner radius at 0 (theme-set --shape)
+local shape_file = io.open(os.getenv("HOME") .. "/.config/theme/current/shape")
+if shape_file then
+  if shape_file:read("*l") == "square" then
+    sep = { left = "", right = "" }
+  end
+  shape_file:close()
+end
 local select_symbol = "\u{f4a7}"
 local yank_symbol = "\u{f0190}"
 local name_max = 24 -- truncate names longer than this
