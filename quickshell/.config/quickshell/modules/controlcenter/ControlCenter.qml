@@ -175,7 +175,7 @@ PanelWindow {
 
                     IconButton {
                         icon: Audio.icon
-                        color: Audio.muted ? Theme.red : Theme.highlight
+                        color: Audio.muted ? Theme.overlay1 : Theme.highlight
                         onClicked: Audio.toggleMute(Audio.sink)
                     }
 
