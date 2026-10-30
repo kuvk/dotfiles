@@ -57,3 +57,8 @@
 @define-color insensitive_bg_color {{ surface0 }};
 @define-color borders {{ surface1 }};
 @define-color unfocused_borders {{ surface0 }};
+
+selection {
+  background-color: {{ selection_bg }};
+  color: {{ selection_fg }};
+}

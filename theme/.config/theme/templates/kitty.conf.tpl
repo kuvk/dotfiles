@@ -3,8 +3,8 @@
 
 foreground              {{ text }}
 background              {{ base }}
-selection_foreground    {{ term_selection_fg }}
-selection_background    {{ term_selection_bg }}
+selection_foreground    {{ selection_fg }}
+selection_background    {{ selection_bg }}
 
 cursor                  {{ term_cursor }}
 cursor_text_color       {{ base }}
