@@ -10,6 +10,9 @@
 #     openrgb --startminimized -p vuk &
 # fi
 
+# Lets the lock screen keep the keyboard through suspend (keep-keyboard/keep-keyboard.c)
+make -s -C "$HOME/.config/scripts/keep-keyboard" && "${XDG_CACHE_HOME:-$HOME/.cache}/keep-keyboard/keep-keyboard" &
+
 # Clipboard history (ALT+SHIFT+V)
 if command -v cliphist >/dev/null; then
     wl-paste --type text --watch cliphist store &

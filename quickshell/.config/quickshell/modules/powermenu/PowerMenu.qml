@@ -65,7 +65,7 @@ Scope {
                 opacity: root.reveal
                 focus: root.shown && win.main
 
-                onFocusChanged: if (focus) forceActiveFocus()
+                onFocusChanged: if (focus && !activeFocus) forceActiveFocus()
 
                 Keys.onPressed: event => {
                     const n = root.actions.length;
