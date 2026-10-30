@@ -17,7 +17,7 @@ RowLayout {
 
     IconButton {
         icon: root.icon
-        color: root.node?.audio?.muted ? Theme.red : Theme.highlight
+        color: root.node?.audio?.muted ? Theme.overlay1 : Theme.highlight
         onClicked: Audio.toggleMute(root.node)
     }
 

@@ -6,7 +6,7 @@ import qs.services
 
 // Month view with ISO week numbers, like the waybar/Omarchy calendar.
 // Scroll or use the arrows to change month, click the title to go back to today.
-Popout {
+Dropdown {
     id: root
 
     name: "calendar"

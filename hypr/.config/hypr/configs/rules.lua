@@ -8,7 +8,7 @@ hl.layer_rule({
 -- Quickshell animates its dropdowns and tooltips itself
 hl.layer_rule({
   match = {
-    class = "^(quickshell-popout|quickshell-tooltip|quickshell-transition|quickshell-controlcenter|quickshell-appmenu)$",
+    class = "^(quickshell-dropdown|quickshell-tooltip|quickshell-transition|quickshell-controlcenter|quickshell-appmenu)$",
   },
   no_anim = true,
 })

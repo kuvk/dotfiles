@@ -18,7 +18,7 @@ PanelWindow {
     property int contentWidth: 340
     default property alias content: column.data
 
-    readonly property bool shown: Panels.popout === name && Panels.popoutScreen === bar.screen
+    readonly property bool shown: Panels.dropdown === name && Panels.dropdownScreen === bar.screen
     readonly property real reveal: revealer.value
 
     // Gap under the bar, and a transparent margin so fractional monitor
@@ -36,13 +36,13 @@ PanelWindow {
         left: true
     }
     margins {
-        left: Math.round(Math.max(2, Math.min((screen?.width ?? 0) - implicitWidth - 2, Panels.popoutX - implicitWidth / 2)))
+        left: Math.round(Math.max(2, Math.min((screen?.width ?? 0) - implicitWidth - 2, Panels.dropdownX - implicitWidth / 2)))
     }
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
     implicitWidth: panelWidth + pad * 2
     implicitHeight: panelHeight + gap + pad
-    WlrLayershell.namespace: "quickshell-popout"
+    WlrLayershell.namespace: "quickshell-dropdown"
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
@@ -57,7 +57,7 @@ PanelWindow {
         active: root.shown
         // the bars too: clicking another bar icon switches to its dropdown
         windows: [root].concat(Panels.bars)
-        onCleared: Panels.closePopout(root.name)
+        onCleared: Panels.closeDropdown(root.name)
     }
 
     // Clipped at the bar's edge, so the panel appears to drop out of it
@@ -78,7 +78,7 @@ PanelWindow {
             border.width: Theme.borderWidth
 
             focus: root.shown
-            Keys.onEscapePressed: Panels.closePopout(root.name)
+            Keys.onEscapePressed: Panels.closeDropdown(root.name)
 
             ColumnLayout {
                 id: column

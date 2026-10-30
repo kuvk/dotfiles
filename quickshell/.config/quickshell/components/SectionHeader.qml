@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.config
 
-// Title row for popouts: title on the left, optional controls on the right
+// Title row for dropdowns: title on the left, optional controls on the right
 RowLayout {
     id: root
 

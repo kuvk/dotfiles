@@ -5,7 +5,7 @@ import qs.config
 import qs.components
 import qs.services
 
-Popout {
+Dropdown {
     id: root
 
     name: "audio"
@@ -92,7 +92,7 @@ Popout {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
             onClicked: {
-                Panels.popout = "";
+                Panels.dropdown = "";
                 System.run(["pavucontrol"]);
             }
         }

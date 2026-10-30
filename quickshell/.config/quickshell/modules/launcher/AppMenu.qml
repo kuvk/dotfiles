@@ -46,7 +46,7 @@ PanelWindow {
         left: Math.max(2, Theme.barMargin - pad)
     }
     // panel size, plus the gap under the bar and a transparent margin (as in
-    // popouts/Popout.qml, so fractional scales never cut the border)
+    // dropdowns/Dropdown.qml, so fractional scales never cut the border)
     readonly property int gap: 6
     readonly property int pad: 4
     readonly property int panelWidth: 680

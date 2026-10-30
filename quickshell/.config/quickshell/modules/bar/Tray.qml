@@ -10,7 +10,7 @@ import qs.services
 Item {
     id: root
 
-    readonly property bool menuOpen: Panels.popout === "traymenu" && Panels.popoutScreen === QsWindow.window?.screen
+    readonly property bool menuOpen: Panels.dropdown === "traymenu" && Panels.dropdownScreen === QsWindow.window?.screen
     readonly property bool expanded: hover.hovered || menuOpen || collapseDelay.running
 
     property bool shown: true
@@ -80,13 +80,13 @@ Item {
                         } else if (mouse.button === Qt.MiddleButton) {
                             modelData.secondaryActivate();
                         } else if (modelData.hasMenu) {
-                            // themed menu (modules/popouts/TrayMenu.qml); the
+                            // themed menu (modules/dropdowns/TrayMenu.qml); the
                             // reopen guard only applies to the same app's menu
                             if (Panels.trayItem !== modelData)
                                 Panels.lastClosed = "";
                             Panels.trayItem = modelData;
                             const pos = item.mapToItem(null, item.width / 2, 0);
-                            Panels.togglePopout("traymenu", QsWindow.window.screen, pos.x + Theme.barMargin);
+                            Panels.toggleDropdown("traymenu", QsWindow.window.screen, pos.x + Theme.barMargin);
                         }
                     }
 

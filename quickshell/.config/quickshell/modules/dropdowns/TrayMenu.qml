@@ -8,7 +8,7 @@ import qs.services
 
 // Right-click menu of a tray app, drawn in the theme instead of the app's own
 // toolkit style. Submenus open in place with a back row at the top.
-Popout {
+Dropdown {
     id: root
 
     name: "traymenu"
@@ -77,7 +77,7 @@ Popout {
                             root.stack = [...root.stack, entry.modelData];
                         } else {
                             entry.modelData.triggered();
-                            Panels.closePopout("traymenu");
+                            Panels.closeDropdown("traymenu");
                         }
                     }
 
