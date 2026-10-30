@@ -4,11 +4,15 @@ local keymap = vim.keymap
 
 keymap.set("i", "jk", "<ESC>")
 
--- Navigate windows
-keymap.set("n", "<c-k>", ":wincmd k<CR>")
-keymap.set("n", "<c-j>", ":wincmd j<CR>")
-keymap.set("n", "<c-h>", ":wincmd h<CR>")
-keymap.set("n", "<c-l>", ":wincmd l<CR>")
+-- Clipboard: y, d and p use the system clipboard (vim-options.lua). Small edits
+-- stay out of it, and of the clipboard history
+for _, key in ipairs({ "x", "X", "c", "C" }) do
+  keymap.set({ "n", "x" }, key, '"_' .. key)
+end
+keymap.set("n", "s", '"_s')
+keymap.set({ "n", "x" }, "<leader>d", '"_d', { desc = "Delete without copying" })
+-- Pasting over a selection keeps the clipboard, so it can be pasted again
+keymap.set("x", "p", "P")
 
 -- Manage split windows
 keymap.set("n", "<leader>sv", "<C-w>v", { desc = "Split window vertically" })

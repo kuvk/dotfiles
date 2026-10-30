@@ -11,6 +11,7 @@
 .directory
 __pycache__/
 __init__.py
+*.zwc
 .mypy_cache/
 .qmlls.ini
 .qmllint.ini

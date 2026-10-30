@@ -48,6 +48,7 @@ EXTRA_DESTINATIONS = {
         HOME / ".tmux/plugins/tmux/themes/catppuccin_current_tmux.conf",
     ],
     "cliamp.toml": HOME / ".config/cliamp/themes/system.toml",
+    "herdr-config.toml": HOME / ".config/herdr/config.toml",
 }
 # Written only when the app's folder exists (don't create a half plugin dir)
 ONLY_IF_PRESENT = {"tmux.conf", "cliamp.toml"}
@@ -163,6 +164,8 @@ def render(text: str, theme: dict, source: str) -> str:
                 return ", ".join(str(int(value[i : i + 2], 16)) for i in (1, 3, 5))
             if fmt == "ansi":  # 24-bit SGR foreground code, e.g. for fastfetch
                 return "38;2;" + ";".join(str(int(value[i : i + 2], 16)) for i in (1, 3, 5))
+            if fmt == "ansi_bg":  # the same as a background
+                return "48;2;" + ";".join(str(int(value[i : i + 2], 16)) for i in (1, 3, 5))
         elif name in strings and fmt == "":
             return strings[name]
         raise KeyError(f"{source}: unknown placeholder {{{{ {key} }}}}")
@@ -230,6 +233,15 @@ def render_quickshell(theme: dict) -> None:
     write_if_changed(CURRENT_DIR / "quickshell.json", json.dumps(data, indent=2) + "\n")
 
 
+def render_ls_colors() -> None:
+    """dircolors' output for .zshrc, so shells set LS_COLORS without running it."""
+    out = subprocess.run(["dircolors", "-b", str(CURRENT_DIR / "dir_colors")], capture_output=True, text=True)
+    if out.returncode == 0:
+        write_if_changed(CURRENT_DIR / "ls_colors.zsh", out.stdout)
+    else:
+        print(f"theme-set: dircolors: {out.stderr.strip()}", file=sys.stderr)
+
+
 def generate(name: str) -> dict:
     theme = load_theme(name)
     theme["changed"] = set()
@@ -259,6 +271,7 @@ def generate(name: str) -> dict:
         if override.name != "colors.toml" and override.is_file():
             write_if_changed(CURRENT_DIR / override.name, override.read_text())
 
+    render_ls_colors()
     write_if_changed(STATE_FILE, name + "\n")
     return theme
 
@@ -300,6 +313,9 @@ def reload_apps(theme: dict) -> None:
     # a running cliamp re-reads the theme file when told to switch to it
     if "cliamp.toml" in theme.get("changed", ()) and shutil.which("cliamp") and (HOME / ".config/cliamp/cliamp.sock").exists():
         run_quiet(["cliamp", "theme", "system"])
+
+    if "herdr-config.toml" in theme.get("changed", ()) and shutil.which("herdr"):
+        run_quiet(["herdr", "server", "reload-config"])
 
     browsers(colors["base"])
 
