@@ -42,8 +42,12 @@ Singleton {
     // and the line is dropped. Sites without a web app stay as they are.
     readonly property var siteLine: /^\s*(<a\b[^>]*>)?(https?:\/\/)?((?:[\w-]+\.)+[a-z]{2,})(:\d+)?(\/\S*)?(<\/a>)?((\s*(\n|<br\s*\/?>))+|\s*$)/i
 
+    function fromBrowser(n: Notification): bool {
+        return /chrom|brave|vivaldi|edge|opera/i.test(n.appName + " " + n.desktopEntry);
+    }
+
     function webAppOf(n: Notification): var {
-        if (!/chrom|brave|vivaldi|edge|opera/i.test(n.appName + " " + n.desktopEntry))
+        if (!fromBrowser(n))
             return null;
         const m = n.body.match(siteLine);
         if (!m)

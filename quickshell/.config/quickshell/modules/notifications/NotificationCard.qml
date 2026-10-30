@@ -196,7 +196,9 @@ Item {
                 Repeater {
                     id: actionsRepeater
 
-                    model: root.notification.actions.filter(a => a.identifier !== "default")
+                    // Chromium adds a "Settings" button (the site's notification
+                    // settings, opened in a new browser tab) to every web notification
+                    model: root.notification.actions.filter(a => a.identifier !== "default" && !(a.identifier === "settings" && Notifs.fromBrowser(root.notification)))
 
                     MouseArea {
                         id: action
