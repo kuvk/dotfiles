@@ -288,6 +288,7 @@ def reload_apps(theme: dict) -> None:
     run_quiet(["pkill", "-USR1", "-x", "kitty"])
     run_quiet(["pkill", "-USR2", "-x", "btop"])
     run_quiet(["pkill", "-USR2", "-x", "cava"])  # reload colors
+    run_quiet(["pkill", "-USR1", "-x", "swayimg"])  # re-reads current/swayimg.lua
     # bat reads themes from a cache that must be rebuilt
     if "bat.tmTheme" in theme.get("changed", ()) and shutil.which("bat"):
         run_quiet(["bat", "cache", "--build"])

@@ -58,6 +58,7 @@ theme folder and set `wallpaper` under `[apps]`.
 | cava | `~/.config/cava/themes/current` | live (SIGUSR2) |
 | Chromium, Brave | managed policy `BrowserThemeColor` (one-time `browser-theme-setup.sh`) | live |
 | cliamp | `~/.config/cliamp/themes/system.toml` | live (`cliamp theme system`) |
+| swayimg | `current/swayimg.lua` (loaded by `~/.config/swayimg/init.lua`) | live (SIGUSR1) |
 | scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |
 | GTK apps | `gsettings ... color-scheme` | live (dark/light only) |
 

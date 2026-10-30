@@ -23,6 +23,10 @@ open = [
 play = [
 	{ run = "vlc %s", orphan = true, desc = "VLC", for = "linux" },
 ]
+# swayimg lists the image's whole folder (imagelist.adjacent), so H/L browse it
+swayimg = [
+	{ run = "setsid -f swayimg %s >/dev/null 2>&1", desc = "swayimg", for = "linux" },
+]
 pinta_image = [
 	{ run = "pinta %s", orphan = true, desc = "Pinta" },
 ]
@@ -32,7 +36,7 @@ pinta_image = [
 # replaced all of them, so only images could be opened.
 [open]
 prepend_rules = [
-	{ mime = "image/*", use = ["pinta_image", "open", "reveal"] },
+	{ mime = "image/*", use = ["swayimg", "pinta_image", "open", "reveal"] },
 ]
 
 [plugin]
