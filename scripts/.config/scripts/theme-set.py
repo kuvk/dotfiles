@@ -74,8 +74,10 @@ SLOTS = (
     "sapphire blue lavender text subtext1 subtext0 overlay2 overlay1 overlay0 "
     "surface2 surface1 surface0 base mantle crust"
 ).split()
-# selection_*: selected text in every app; surface1 reads well in all themes
-ROLES = {"accent": "peach", "accent2": "blue", "selection_bg": "surface1", "selection_fg": "text"}
+# selection_*: selected text in every app. selection_fg defaults to the accent, or
+# to the text color in themes where the accent can't be read on selection_bg.
+ROLES = {"accent": "peach", "accent2": "blue", "selection_bg": "surface1"}
+MIN_SELECTION_CONTRAST = 3.0
 CURSOR_THEME = "Adwaita"
 
 HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
@@ -106,6 +108,17 @@ def current_theme() -> str:
     return name or DEFAULT_THEME
 
 
+def luminance(color: str) -> float:
+    channels = [int(color[i : i + 2], 16) / 255 for i in (1, 3, 5)]
+    r, g, b = [c / 12.92 if c <= 0.03928 else ((c + 0.055) / 1.055) ** 2.4 for c in channels]
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b
+
+
+def contrast(a: str, b: str) -> float:
+    high, low = sorted((luminance(a), luminance(b)), reverse=True)
+    return (high + 0.05) / (low + 0.05)
+
+
 def load_theme(name: str) -> dict:
     path = THEMES_DIR / name / "colors.toml"
     with path.open("rb") as f:
@@ -129,6 +142,8 @@ def load_theme(name: str) -> dict:
 
     for role, default in ROLES.items():
         colors[role] = resolve(raw.get(role, default), f"colors.{role}")
+    readable = contrast(colors["accent"], colors["selection_bg"]) >= MIN_SELECTION_CONTRAST
+    colors["selection_fg"] = resolve(raw.get("selection_fg", "accent" if readable else "text"), "colors.selection_fg")
 
     terminal_defaults = {
         "color0": "surface1", "color8": "surface2",
