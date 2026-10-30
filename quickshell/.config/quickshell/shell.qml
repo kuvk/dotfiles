@@ -40,6 +40,8 @@ ShellRoot {
 
     Launcher {}
 
+    Clipboard {}
+
     AppMenu {}
 
     PowerMenu {}
@@ -80,6 +82,14 @@ ShellRoot {
     ThemePicker {}
 
     // qs ipc call <target> <function> [args]
+    IpcHandler {
+        target: "clipboard"
+
+        function toggle(): void {
+            Panels.toggleClipboard();
+        }
+    }
+
     IpcHandler {
         target: "launcher"
 

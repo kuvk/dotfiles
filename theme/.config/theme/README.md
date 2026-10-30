@@ -58,6 +58,8 @@ theme folder and set `wallpaper` under `[apps]`.
 | cava | `~/.config/cava/themes/current` | live (SIGUSR2) |
 | Chromium, Brave | managed policy `BrowserThemeColor` (one-time `browser-theme-setup.sh`) | live |
 | cliamp | `~/.config/cliamp/themes/system.toml` | live (`cliamp theme system`) |
+| ls, eza, zsh completion | `current/ls_colors.zsh` (`dircolors` output of `current/dir_colors`) | live in open shells (SIGUSR1) |
+| herdr | `~/.config/herdr/config.toml`, the whole file: edit `templates/herdr-config.toml.tpl`, not the output | live (`herdr server reload-config`) |
 | swayimg | `current/swayimg.lua` (loaded by `~/.config/swayimg/init.lua`) | live (SIGUSR1) |
 | scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |
 | GTK apps | `gsettings ... color-scheme` | live (dark/light only) |
