@@ -26,11 +26,12 @@ hl.config({
     force_zero_scaling = true,
   },
 })
+-- No `opaque`: XWayland menus are windows too, and it filled their
+-- transparent rounded corners with solid color
 hl.window_rule({
   name = "xwayland",
   match = { xwayland = true },
   no_blur = true,
-  opaque = true,
 })
 
 -- Quickshell's Settings, Displays, Keybindings and System Information: floating and centered (the shell reopens one that gets tiled)
@@ -144,14 +145,17 @@ local apps = {
   { name = "games", class = "steam_app.*", idle_inhibit = "always" },
   { name = "protonqt", class = "net.davidotek.pupgui2", float = true, center = true, size = "700 600" },
   { name = "zathura", class = "org.pwmt.zathura", float = true, center = true, size = "1100 1200" },
-  { name = "remmina", class = "org.remmina.Remmina", no_blur = true, opaque = true, float = true, center = true},
+  -- float/center only the main window (by title): under XWayland its right-click
+  -- menus are windows of the same class and were centered too
+  { name = "remmina", class = "org.remmina.Remmina", title = "^Remmina Remote Desktop Client$", float = true, center = true },
+  { name = "remmina-sessions", class = "org.remmina.Remmina", no_blur = true },
   { name = "davinci", class = "resolve", no_blur = true, opaque = true},
 }
 
 for _, app in ipairs(apps) do
   hl.window_rule({
     name = app.name,
-    match = { class = app.class },
+    match = { class = app.class, title = app.title },
     float = app.float,
     center = app.center,
     size = app.size,
