@@ -7,7 +7,9 @@ hl.layer_rule({
 
 -- Quickshell animates its dropdowns and tooltips itself
 hl.layer_rule({
-  match = { class = "^(quickshell-popout|quickshell-tooltip|quickshell-transition|quickshell-controlcenter|quickshell-appmenu)$" },
+  match = {
+    class = "^(quickshell-popout|quickshell-tooltip|quickshell-transition|quickshell-controlcenter|quickshell-appmenu)$",
+  },
   no_anim = true,
 })
 
@@ -79,7 +81,7 @@ hl.window_rule({
   opacity = "0.9 0.9 1",
 })
 
--- dolphin 
+-- dolphin
 hl.window_rule({
   name = "dolphin",
   match = { class = "org.kde.dolphin" },
@@ -129,7 +131,6 @@ local apps = {
   { name = "timeshift", class = "timeshift-gtk", float = true, center = true },
   { name = "frame-checker", class = "Frame Checker", float = true, center = true },
   { name = "pinta", class = ".*Pinta.*", float = true, center = true },
-  -- { name = "qs", class = "org.quickshell", float = true, center = true },	
   { name = "cliamp", class = "cliamp", float = true, center = true, size = "900 600" },
   { name = "localsend", class = "org.localsend.localsend_app", float = true, center = true, size = "900 450" },
   { name = "nwg-look", class = "nwg-look", float = true, center = true, size = "700 600" },
@@ -140,16 +141,22 @@ local apps = {
   { name = "virt-manager", class = "virt-manager", float = true, center = true, size = "800 700" },
   { name = "cameractrls", class = "hu.irl.cameractrls", float = true, center = true, size = "600 800" },
   -- { name = "lutris", class = "net.lutris.Lutris", no_blur = true, opaque = true, center = true, idle_inhibit = "always" },
-  { name = "heroic", class = ".*heroic.*", no_blur = true, opaque = true, center = true},
-  { name = "steam", class = "steam", no_blur = true, opaque = true, float = true, center = true},
+  { name = "heroic", class = ".*heroic.*", no_blur = true, opaque = true, center = true },
+  { name = "steam", class = "steam", no_blur = true, opaque = true, float = true, center = true },
   { name = "games", class = "steam_app.*", idle_inhibit = "always" },
   { name = "protonqt", class = "net.davidotek.pupgui2", float = true, center = true, size = "700 600" },
   { name = "zathura", class = "org.pwmt.zathura", float = true, center = true, size = "1100 1200" },
-  -- float/center only the main window (by title): under XWayland its right-click
-  -- menus are windows of the same class and were centered too
-  { name = "remmina", class = "org.remmina.Remmina", title = "^Remmina Remote Desktop Client$", float = true, center = true },
-  { name = "remmina-sessions", class = "org.remmina.Remmina", no_blur = true },
-  { name = "davinci", class = "resolve", no_blur = true, opaque = true},
+  {
+    name = "remmina",
+    class = "org.remmina.Remmina",
+    title = "^Remmina Remote Desktop Client$",
+    float = true,
+    center = true,
+    opaque = true,
+    no_blur = true,
+  },
+  { name = "remmina-sessions", class = "org.remmina.Remmina", no_blur = true, opaque = true },
+  { name = "davinci", class = "resolve", no_blur = true, opaque = true },
 }
 
 for _, app in ipairs(apps) do
@@ -177,7 +184,7 @@ hl.window_rule({
   name = "steam-main",
   match = { title = "Steam" },
   float = false,
-	center = true,
+  center = true,
 })
 
 -- Ubisoft Connect
