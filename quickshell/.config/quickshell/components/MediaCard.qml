@@ -147,9 +147,9 @@ Card {
                     font.weight: Font.DemiBold
                 }
 
+                // keeps its line when empty, like the progress below
                 StyledText {
                     Layout.fillWidth: true
-                    visible: text !== ""
                     text: root.player?.trackArtist ?? ""
                     color: Theme.subtext0
                 }
@@ -171,9 +171,13 @@ Card {
             color: Theme.highlight
         }
 
+        // Progress: always laid out (hidden when the player reports no
+        // length), so every player's card is the same size
         ColumnLayout {
             Layout.fillWidth: true
-            visible: (root.player?.lengthSupported ?? false) && root.player.length > 0
+            readonly property bool known: (root.player?.lengthSupported ?? false) && root.player.length > 0
+            opacity: known ? 1 : 0
+            enabled: known
             spacing: 2
 
             StyledSlider {
