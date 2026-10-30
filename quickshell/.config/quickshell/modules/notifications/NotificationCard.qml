@@ -28,7 +28,7 @@ Item {
         const img = notification.image;
         if (img)
             return img;
-        const icon = notification.appIcon;
+        const icon = Notifs.appIconOf(notification);
         if (!icon)
             return "";
         if (icon.startsWith("/"))
@@ -38,10 +38,9 @@ Item {
         return Quickshell.iconPath(icon, true);
     }
 
-    // Chromium-based browsers (and so web apps) put the site ("web.whatsapp.com",
-    // sometimes as a link) on the body's first line; the app name already says it
-    readonly property bool fromBrowser: /chrom|brave|vivaldi|edge|opera/i.test(notification.appName + " " + notification.desktopEntry)
-    readonly property string body: fromBrowser ? notification.body.replace(/^\s*(<a\b[^>]*>)?(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(:\d+)?(\/\S*)?(<\/a>)?((\s*(\n|<br\s*\/?>))+|\s*$)/i, "").trim() : notification.body
+    // web apps get their own name, icon and body without the site (Notifs)
+    readonly property string appName: Notifs.appNameOf(notification)
+    readonly property string body: Notifs.bodyOf(notification)
 
     function close(): void {
         if (popup)
@@ -144,7 +143,7 @@ Item {
                         StyledText {
                             Layout.fillWidth: true
                             visible: root.showAppName
-                            text: root.notification.appName || "Notification"
+                            text: root.appName
                             color: root.critical ? Theme.red : Theme.highlight
                             font.pixelSize: Theme.fontSize - 2
                             font.weight: Font.DemiBold
@@ -160,7 +159,7 @@ Item {
                     StyledText {
                         Layout.fillWidth: true
                         // a title that only repeats the app name adds nothing
-                        visible: text !== "" && !(root.showAppName && text === root.notification.appName)
+                        visible: text !== "" && !(root.showAppName && text === root.appName)
                         text: root.notification.summary
                         font.weight: Font.DemiBold
                         wrapMode: Text.Wrap
