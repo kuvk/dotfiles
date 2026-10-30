@@ -62,7 +62,7 @@ theme folder and set `wallpaper` under `[apps]`.
 | herdr | `~/.config/herdr/config.toml`, the whole file: edit `templates/herdr-config.toml.tpl`, not the output | live (`herdr server reload-config`) |
 | swayimg | `current/swayimg.lua` (loaded by `~/.config/swayimg/init.lua`) | live (SIGUSR1) |
 | scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |
-| GTK apps | `gsettings ... color-scheme` | live (dark/light only) |
+| GTK apps | adw-gtk3 if installed, otherwise Adwaita, in the theme's mode; icons and `color-scheme` through `gsettings` and `settings.ini`; colors in `~/.config/gtk-{3,4}.0/gtk.css` | mode live; colors when an app next starts |
 
 ## Power menu icons
 
