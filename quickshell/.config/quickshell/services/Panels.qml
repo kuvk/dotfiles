@@ -55,6 +55,7 @@ Singleton {
         dropdown = "";
     }
     property bool launcher: false
+    property bool clipboard: false // clipboard history picker
     property string launcherMode: "apps" // "apps" | "themes"
 
     readonly property var focusedScreen: {
@@ -114,6 +115,7 @@ Singleton {
             return;
         controlCenter = false;
         launcher = false;
+        clipboard = false;
         appMenu = false;
         powerMenu = false;
         wallpapers = "";
@@ -192,10 +194,18 @@ Singleton {
         launcher = open;
     }
 
+    function toggleClipboard(): void {
+        const open = !clipboard;
+        closeAll();
+        pinScreen(open);
+        clipboard = open;
+    }
+
     function closeAll(): void {
         dropdown = "";
         controlCenter = false;
         launcher = false;
+        clipboard = false;
         appMenu = false;
         powerMenu = false;
         wallpapers = "";

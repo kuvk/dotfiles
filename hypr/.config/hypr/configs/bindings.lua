@@ -7,6 +7,7 @@ local fileManager = terminal .. " -e ~/.config/scripts/yazi-live.sh"
 -- local fileManager = "dolphin"
 local menu = "qs ipc call launcher toggle"
 local appMenu = "qs ipc call launcher menu"
+local clipboard = "qs ipc call clipboard toggle"
 local themes = "qs ipc call themes toggle"
 local browser = "brave"
 local notifications = "qs ipc call notifications toggle"
@@ -47,6 +48,7 @@ hl.bind(mainMod .. " + Q", hl.dsp.window.close()) -- Close window
 hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd(lock)) -- Lock screen
 hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(powermenu)) -- Power menu
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" })) -- Float / tile window
+hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(clipboard)) -- Clipboard history
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen()) -- Fullscreen
 hl.bind(mainMod .. " + S", hl.dsp.layout("togglesplit")) -- Toggle split direction
 hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("~/.config/scripts/hypr-monitors.py")) -- Re-apply the monitor profile

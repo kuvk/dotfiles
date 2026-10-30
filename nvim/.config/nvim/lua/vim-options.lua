@@ -7,50 +7,26 @@ opt.expandtab = false
 opt.autoindent = true
 opt.fillchars = { eob = " " }
 
--- Set tab width for specific filetypes
+-- Tab width by filetype: 2 for these, 4 for the rest
+local two_space_ft = {
+  lua = true,
+  html = true,
+  ["jinja.html"] = true,
+  javascript = true,
+  jquery = true,
+  json = true,
+  jsonc = true,
+  xml = true,
+  scss = true,
+  css = true,
+  django = true,
+}
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = {
-    "lua",
-    "html",
-    "jinja.html",
-    "javascript",
-    "jquery",
-    "json",
-    "jsonc",
-    "xml",
-    "scss",
-    "django",
-    "css",
-  },
-  callback = function()
-    vim.opt_local.tabstop = 2
-    vim.opt_local.shiftwidth = 2
-    vim.opt_local.softtabstop = 2
-  end,
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "*" },
-  callback = function()
-    local two_space_ft = {
-      lua = true,
-      html = true,
-      ["jinja.html"] = true,
-      javascript = true,
-      jquery = true,
-      json = true,
-      jsonc = true,
-      xml = true,
-      scss = true,
-      css = true,
-      django = true,
-    }
-    local ft = vim.bo.filetype
-    if not two_space_ft[ft] then
-      vim.opt_local.tabstop = 4
-      vim.opt_local.shiftwidth = 4
-      vim.opt_local.softtabstop = 4
-    end
+  callback = function(ev)
+    local width = two_space_ft[ev.match] and 2 or 4
+    vim.opt_local.tabstop = width
+    vim.opt_local.shiftwidth = width
+    vim.opt_local.softtabstop = width
   end,
 })
 
@@ -79,8 +55,21 @@ opt.mousemoveevent = true
 opt.splitright = true
 opt.splitbelow = true
 
--- Yank to clipboard
-opt.clipboard:append("unnamedplus")
+-- System clipboard for y, d and p. Set after startup, since finding the provider
+-- takes a moment. Over SSH, through the terminal (OSC 52) instead.
+if vim.env.SSH_TTY then
+  vim.g.clipboard = "osc52"
+end
+vim.schedule(function()
+  opt.clipboard:append("unnamedplus")
+end)
+
+-- Flash what was just copied
+vim.api.nvim_create_autocmd("TextYankPost", {
+  callback = function()
+    vim.hl.on_yank({ timeout = 150 })
+  end,
+})
 
 -- Backspace
 opt.backspace = "indent,eol,start"
