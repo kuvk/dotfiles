@@ -24,6 +24,9 @@ hl.config({
   },
   cursor = {
     no_hardware_cursors = 1,
+    -- XCursor themes only: otherwise Hyprland starts with the first hyprcursor theme it
+    -- finds, as Adwaita isn't one, until autostart sets the cursor
+    enable_hyprcursor = false,
   },
 })
 
