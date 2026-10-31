@@ -8,8 +8,6 @@ Singleton {
     function g(cp: int): string {
         return String.fromCodePoint(cp);
     }
-
-    readonly property string arch: g(0xf303)
     readonly property string search: g(0xf002)
     readonly property string power: g(0xf011)
     readonly property string close: g(0xf00d)
@@ -28,7 +26,6 @@ Singleton {
     readonly property string nightlight: g(0xf4ee)
     readonly property string gamepad: g(0xf11b)
     readonly property string keyboard: g(0xf11c)
-    readonly property string calendar: g(0xf073)
     readonly property string coffee: g(0xf0f4)
     readonly property string rocket: g(0xf135)
     readonly property string sliders: g(0xf1de)
@@ -37,7 +34,6 @@ Singleton {
     readonly property string signOut: g(0xf08b)
     readonly property string bed: g(0xf236)
     readonly property string reboot: g(0xf01e)
-    readonly property string user: g(0xf007)
     readonly property string mapMarker: g(0xf041)
     readonly property string tint: g(0xf043)
     readonly property string wind: g(0xf059d)
@@ -93,13 +89,9 @@ Singleton {
     // Network
     readonly property var wifiLevels: [g(0xf092f), g(0xf091f), g(0xf0922), g(0xf0925), g(0xf0928)]
     readonly property string wifiOff: g(0xf092d)
-    readonly property string wifiUnknown: g(0xf092b)
     readonly property string ethernet: g(0xf0200)
-    readonly property string linked: g(0xf0319)
     readonly property string shield: g(0xf132)
     readonly property string gauge: g(0xf0e4)
-    readonly property string arrowDown: g(0xf063)
-    readonly property string arrowUp: g(0xf062)
     readonly property string plus: g(0xf067)
     readonly property string info: g(0xf05a)
 
@@ -115,7 +107,6 @@ Singleton {
 
     // Notifications
     readonly property string bell: g(0xf009a)
-    readonly property string bellBadge: g(0xf116b)
     readonly property string bellDnd: g(0xf00a0)
     readonly property string clearAll: g(0xf039f)
 }
