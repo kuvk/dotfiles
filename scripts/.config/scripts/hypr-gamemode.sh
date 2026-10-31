@@ -26,103 +26,10 @@ set_shell_gamemode() {
     qs ipc call theme gamemode "$1" >/dev/null 2>&1 || true
 }
 
-# set_mainmod_for_gaming() {
-#     local gamemode="$1"
-#     local file="$HOME/.config/hypr/configs/bindings.lua"
-#
-#     if [[ ! -f "$file" ]]; then
-#         notify "Error: file not found: $file"
-#         echo "Error: file not found: $file" >&2
-#         return 1
-#     fi
-#
-#     # Normalize boolean-ish input
-#     case "${gamemode,,}" in
-#         true|1|yes|on)   target="SUPER" ;;
-#         false|0|no|off)  target="ALT" ;;
-#         *)
-#             echo "Usage: set_mainmod_for_gaming <true|false>" >&2
-#             return 2
-#             ;;
-#     esac
-#
-#     # If already set correctly, do nothing
-#     if grep -Eq "^local[[:space:]]+mainMod[[:space:]]*=[[:space:]]*\"$target\"[[:space:]]*$" "$file"; then
-#         echo "mainMod already $target (no change)"
-#         notify "mainMod already $target (no change)"
-#         return 0
-#     fi
-#
-#     # Change only the opposite value; if neither exists, report
-#     if [[ "$target" == "SUPER" ]]; then
-#         if grep -Eq '^local[[:space:]]+mainMod[[:space:]]*=[[:space:]]*"ALT"[[:space:]]*$' "$file"; then
-#             sed -i 's/^local[[:space:]]\+mainMod[[:space:]]*=[[:space:]]*"ALT"[[:space:]]*$/local mainMod = "SUPER"/' "$file"
-#             echo 'mainMod changed: ALT -> SUPER'
-#             notify 'mainMod changed: ALT -> SUPER'
-#         else
-#             echo 'No mainMod line found to change. Check bindings.lua'
-#             notify 'No mainMod line found to change. Check bindings.lua'
-#             return 1
-#         fi
-#     else
-#         if grep -Eq '^local[[:space:]]+mainMod[[:space:]]*=[[:space:]]*"SUPER"[[:space:]]*$' "$file"; then
-#             sed -i 's/^local[[:space:]]\+mainMod[[:space:]]*=[[:space:]]*"SUPER"[[:space:]]*$/local mainMod = "ALT"/' "$file"
-#             echo 'mainMod changed: SUPER -> ALT'
-#             notify 'mainMod changed: SUPER -> ALT'
-#         else
-#             echo 'No ALT/SUPER mainMod line found to change'
-#             notify 'No mainMod line found to change. Check bindings.lua'
-#             return 1
-#         fi
-#     fi
-# }
-
-# set_kb_options_by_gamemode() {
-#     local gamemode="$1"
-#     local file="$HOME/.config/hypr/configs/input.lua"
-#     local target
-#
-#     if [[ ! -f "$file" ]]; then
-#         echo "Error: file not found: $file" >&2
-#         return 1
-#     fi
-#
-#     case "${gamemode,,}" in
-#         true|1|yes|on)   target='ctrl:nocaps,grp:alt_space_toggle' ;;
-#         false|0|no|off)  target='ctrl:nocaps,grp:win_space_toggle' ;;
-#         *)
-#             echo "Usage: set_kb_options_by_gamemode <true|false>" >&2
-#             return 2
-#             ;;
-#     esac
-#
-#     # Already in desired state
-#     if grep -Eq "^[[:space:]]*kb_options[[:space:]]*=[[:space:]]*\"$target\",[[:space:]]*$" "$file"; then
-#         echo "kb_options already set to: $target (no change)"
-#         return 0
-#     fi
-#
-#     # Replace only the grp toggle part on the kb_options line, keep indent/comma and other options
-#     sed -Ei \
-#         's/^([[:space:]]*kb_options[[:space:]]*=[[:space:]]*"[^"]*grp:)(win_space_toggle|alt_space_toggle)([^"]*",?[[:space:]]*)$/\1'"$([[ "$target" == *alt_space_toggle ]] && echo alt_space_toggle || echo win_space_toggle)"'\3/' \
-#         "$file"
-#
-#     # Verify
-#     if grep -Eq "^[[:space:]]*kb_options[[:space:]]*=[[:space:]]*\"$target\",[[:space:]]*$" "$file"; then
-#         echo "kb_options updated to: $target"
-#         return 0
-#     else
-#         echo "No matching kb_options grp toggle found to change" >&2
-#         return 1
-#     fi
-# }
-
 enable() {
     touch "$FLAG"
 
     set_shell_gamemode true
-    # set_mainmod_for_gaming true
-    # set_kb_options_by_gamemode true    # -> grp:alt_space_toggle
 
     hyprctl eval "
 hl.config({
@@ -153,8 +60,6 @@ hl.window_rule({ name = 'thunderbird', match = { class = 'org.mozilla.Thunderbir
 disable() {
     rm -f "$FLAG"
     set_shell_gamemode false
-    # set_mainmod_for_gaming false
-    # set_kb_options_by_gamemode false   # -> grp:win_space_toggle
 
     hyprctl eval "
 hl.config({
