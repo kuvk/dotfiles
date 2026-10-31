@@ -2,8 +2,8 @@
    Loaded by GTK apps on top of the base theme that theme-set picks.
    The names are libadwaita's (GTK4), then GTK3's. */
 
-@define-color accent_color {{ accent }};
-@define-color accent_bg_color {{ accent }};
+@define-color accent_color {{ accent2 }};
+@define-color accent_bg_color {{ accent2 }};
 @define-color accent_fg_color {{ base }};
 @define-color destructive_color {{ red }};
 @define-color destructive_bg_color {{ red }};
@@ -51,7 +51,7 @@
 @define-color theme_fg_color {{ text }};
 @define-color theme_base_color {{ base }};
 @define-color theme_text_color {{ text }};
-@define-color theme_selected_bg_color {{ accent }};
+@define-color theme_selected_bg_color {{ accent2 }};
 @define-color theme_selected_fg_color {{ base }};
 @define-color insensitive_fg_color {{ overlay0 }};
 @define-color insensitive_bg_color {{ surface0 }};
