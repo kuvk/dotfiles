@@ -11,7 +11,6 @@ import qs.modules.controlcenter
 import qs.modules.displays
 import qs.modules.keybinds
 import qs.modules.launcher
-import qs.modules.lock
 import qs.modules.notifications
 import qs.modules.powermenu
 import qs.modules.settings
@@ -64,8 +63,6 @@ ShellRoot {
 
         DisplaysPanel {}
     }
-
-    LockScreen {}
 
     LazyLoader {
         active: Panels.settings
@@ -170,19 +167,6 @@ ShellRoot {
         function gamemode(enabled: bool): void {
             Theme.gamemode = enabled;
             System.setGamemode(enabled);
-        }
-    }
-
-    IpcHandler {
-        target: "lock"
-
-        function lock(): void {
-            Lock.lock();
-        }
-
-        // No slide animation, for before_sleep_cmd
-        function lockNow(): void {
-            Lock.lockNow();
         }
     }
 

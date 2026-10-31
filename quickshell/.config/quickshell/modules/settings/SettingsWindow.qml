@@ -18,7 +18,6 @@ FloatingWindow {
         { id: "bar", label: "Bar", icon: Icons.sliders },
         { id: "windows", label: "Windows", icon: Icons.display },
         { id: "notifications", label: "Notifications", icon: Icons.bell },
-        { id: "lock", label: "Lock Screen", icon: Icons.lock },
         { id: "tray", label: "Tray & Player", icon: Icons.music }
     ]
     property string section: "appearance"
@@ -566,68 +565,6 @@ FloatingWindow {
                                 value: Config.displayFont
                                 options: fontsPage.displayFonts
                                 onPicked: family => Config.displayFont = family
-                            }
-                        }
-
-                        // ------------------------------------------------ Lock screen
-                        ColumnLayout {
-                            Layout.fillWidth: true
-                            visible: root.section === "lock"
-                            spacing: 12
-
-                            SettingRow {
-                                label: "Digital rain"
-
-                                Switch {
-                                    checked: Config.lockMatrix
-                                    onToggled: Config.lockMatrix = !Config.lockMatrix
-                                }
-                            }
-
-                            SettingRow {
-                                label: "Blur the desktop behind it"
-                                hint: "Off: fully opaque"
-
-                                Switch {
-                                    checked: Config.lockBlur
-                                    onToggled: Config.lockBlur = !Config.lockBlur
-                                }
-                            }
-
-                            Repeater {
-                                model: [
-                                    { label: "Clock and date", key: "lockClockColor" },
-                                    { label: "Digital rain", key: "lockRainColor" },
-                                    { label: "Outlines and avatar ring", key: "lockOutlineColor" },
-                                    { label: "Typing dots and user name", key: "lockDotsColor" },
-                                    { label: "Text", key: "lockTextColor" }
-                                ]
-
-                                ColumnLayout {
-                                    id: colorRow
-
-                                    required property var modelData
-
-                                    Layout.fillWidth: true
-                                    spacing: 4
-
-                                    StyledText {
-                                        text: colorRow.modelData.label
-                                    }
-
-                                    ColorChoice {
-                                        value: Config[colorRow.modelData.key]
-                                        onPicked: name => Config[colorRow.modelData.key] = name
-                                    }
-                                }
-                            }
-
-                            TextButton {
-                                text: "Preview (locks the screen)"
-                                onClicked: {
-                                    Panels.closeAll();
-                                    Lock.lock();
-                                }
                             }
                         }
 

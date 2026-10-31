@@ -63,6 +63,7 @@ theme folder and set `wallpaper` under `[apps]`.
 | Qt apps | Kvantum theme `current` (`templates/kvantum-current.*`), `qt5ct.conf` and `qt6ct.conf`: edit the templates, not the output | when an app next starts |
 | hyprshutdown, Hyprland's update and donation windows | `~/.config/hypr/hyprtoolkit.conf` | when a window next opens |
 | Claude Code | `~/.claude/themes/current.json`, with `"theme": "custom:current"` and `claude-statusline.sh` | live |
+| hyprlock | `current/hyprlock.conf` (`lockscreen.sh` fills in the monitor) | next lock |
 | swayimg | `current/swayimg.lua` (loaded by `~/.config/swayimg/init.lua`) | live (SIGUSR1) |
 | scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |
 | GTK apps | adw-gtk3 if installed, otherwise Adwaita, in the theme's mode; icons and `color-scheme` through `gsettings` and `settings.ini`; colors in `~/.config/gtk-{3,4}.0/gtk.css` | mode live; colors when an app next starts |
