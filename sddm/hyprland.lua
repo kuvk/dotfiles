@@ -31,17 +31,19 @@ hl.config({
 
 hl.monitor({ output = "", mode = "highrr", position = "auto", scale = "1" })
 
--- Each monitor's last scale from your session (hypr-monitors.py writes them). The file is
--- yours to write and this runs as the greeter's user, so it's only read as data, never run.
-local scales = io.open("/var/lib/kuvk-shell/monitors.conf")
-if scales then
-  for line in scales:lines() do
-    local output, scale = line:match("^([^\t]+)\t([%d.]+)$")
-    if output then
-      hl.monitor({ output = output, mode = "highrr", position = "auto", scale = scale })
+-- Your session's monitor layout (hypr-monitors.py writes it). The file is yours to write and
+-- this runs as the greeter's user, so it's only read as data, never run.
+local layout = io.open("/var/lib/kuvk-shell/monitors.conf")
+if layout then
+  for line in layout:lines() do
+    local output, scale, position, transform = line:match("^([^\t]+)\t([%d.]+)\t([^\t]+)\t(%d+)$")
+    if output and position == "disabled" then
+      hl.monitor({ output = output, disabled = true })
+    elseif output then
+      hl.monitor({ output = output, mode = "highrr", position = position, scale = scale, transform = tonumber(transform) })
     end
   end
-  scales:close()
+  layout:close()
 end
 
 hl.window_rule({
@@ -49,6 +51,5 @@ hl.window_rule({
   match = { class = "^(sddm-greeter)$" },
   workspace = "emptym",
   fullscreen = true,
-  stay_focused = true,
   no_anim = true,
 })
