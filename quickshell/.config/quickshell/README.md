@@ -82,10 +82,15 @@ visualizer and its bar count). They are saved to Quickshell's state folder
 
 ## Lock screen
 
-Locking uses hyprlock (`~/.config/scripts/lockscreen.sh`): a fullscreen kitty running
-unimatrix on every monitor, showing through hyprlock's transparent background
-(`misc:session_lock_xray`), with the clock and password on the monitor focused when locking.
-Its config is `theme/.config/theme/templates/hyprlock.conf.tpl`. hypridle runs the script on
+Locking uses hyprlock (`~/.config/scripts/lockscreen.sh`), with the clock and password on the
+monitor focused when locking. Settings > Lock Screen picks the background:
+
+- **Rain**: a fullscreen kitty running unimatrix on every monitor, showing through hyprlock's
+  transparent background (`misc:session_lock_xray`). It locks about a second later, once the
+  rain is on screen, so that's the frame a wake-up shows first.
+- **Picture**: the current wallpaper. It locks immediately and always covers the desktop.
+
+The look is in `theme/.config/theme/templates/hyprlock.conf.tpl`. hypridle runs the script on
 `loginctl lock-session` and before sleep.
 
 ## Web apps

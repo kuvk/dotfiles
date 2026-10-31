@@ -18,6 +18,7 @@ FloatingWindow {
         { id: "bar", label: "Bar", icon: Icons.sliders },
         { id: "windows", label: "Windows", icon: Icons.display },
         { id: "notifications", label: "Notifications", icon: Icons.bell },
+        { id: "lock", label: "Lock Screen", icon: Icons.lock },
         { id: "tray", label: "Tray & Player", icon: Icons.music }
     ]
     property string section: "appearance"
@@ -453,6 +454,23 @@ FloatingWindow {
                                 Stepper {
                                     text: `${Config.notificationTimeout} s`
                                     onStep: d => Config.notificationTimeout = root.clamp(Config.notificationTimeout + d, 2, 60)
+                                }
+                            }
+                        }
+
+                        // ------------------------------------------------ Lock screen
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            visible: root.section === "lock"
+                            spacing: 12
+
+                            SettingRow {
+                                label: "Background"
+                                hint: Config.lockStyle === "picture" ? "Your wallpaper; locks immediately and always covers the desktop" : "Falling rain; locks about a second later, after it's on screen"
+
+                                Stepper {
+                                    text: Config.lockStyle === "picture" ? "Picture" : "Rain"
+                                    onStep: d => Config.lockStyle = root.cycle(["rain", "picture"], Config.lockStyle, d)
                                 }
                             }
                         }
