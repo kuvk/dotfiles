@@ -1,11 +1,12 @@
 import QtQuick
 import QtQuick.Effects
 import QtQuick.Layouts
+import QtQuick.Window
 import SddmComponents
 
 // Login screen in the look of the lock screen (theme/.config/theme/templates/hyprlock.conf.tpl):
 // wallpaper, clock top right, avatar and password in a centered card. The card and
-// controls only show on the primary screen.
+// controls show on the monitor with the keyboard, which follows the mouse.
 Rectangle {
     id: root
 
@@ -37,6 +38,8 @@ Rectangle {
     }
 
     color: c.base
+
+    Window.onActiveChanged: if (Window.active) password.forceActiveFocus()
 
     Timer {
         interval: 1000
@@ -70,7 +73,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.margins: 30
-        visible: primaryScreen
+        visible: Window.active
         spacing: 0
 
         layer.enabled: true
@@ -103,7 +106,7 @@ Rectangle {
         id: card
 
         anchors.centerIn: parent
-        visible: primaryScreen
+        visible: Window.active
         width: 340
         height: box.implicitHeight + 48
         radius: 9
@@ -228,11 +231,10 @@ Rectangle {
                     font.pixelSize: 11
                     font.letterSpacing: 3
                     clip: true
-                    focus: primaryScreen
+                    focus: true
                     onTextEdited: root.failed = false
                     onAccepted: root.login()
                     Keys.onEscapePressed: text = ""
-                    Component.onCompleted: if (primaryScreen) forceActiveFocus()
                 }
 
                 Text {
@@ -264,7 +266,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.margins: 30
-        visible: primaryScreen
+        visible: Window.active
         label: root.sessionName
         onStepped: d => root.sessionIndex = root.step(root.sessionIndex, d, sessionModel.rowCount())
     }
@@ -274,7 +276,7 @@ Rectangle {
         anchors.right: parent.right
         anchors.bottom: parent.bottom
         anchors.margins: 30
-        visible: primaryScreen
+        visible: Window.active
         spacing: 8
 
         Repeater {
