@@ -12,6 +12,12 @@ Singleton {
     // Look
     property alias radius: adapter.radius
     property alias lockStyle: adapter.lockStyle
+    property alias lockImage: adapter.lockImage
+    property alias lockMatrixColor: adapter.lockMatrixColor
+    property alias lockClockColor: adapter.lockClockColor
+    property alias lockOutlineColor: adapter.lockOutlineColor
+    property alias lockDotsColor: adapter.lockDotsColor
+    property alias lockTextColor: adapter.lockTextColor
     property alias borderWidth: adapter.borderWidth
     property alias barOpacity: adapter.barOpacity
     // Floating bar: margins around it and rounded corners
@@ -99,6 +105,12 @@ Singleton {
         adapter.panelOpacity = 0.9;
         adapter.animations = true;
         adapter.lockStyle = "rain";
+        adapter.lockImage = "";
+        adapter.lockMatrixColor = "cyan";
+        adapter.lockClockColor = "sky";
+        adapter.lockOutlineColor = "accent2";
+        adapter.lockDotsColor = "peach";
+        adapter.lockTextColor = "text";
         adapter.clockFormat = "dddd HH:mm";
         adapter.barHiddenPrimary = [];
         adapter.barHiddenOthers = [];
@@ -147,7 +159,14 @@ Singleton {
             property int version: 0
             property int radius: 8
             // read by scripts/lockscreen.sh
-            property string lockStyle: "rain"
+            property string lockStyle: "rain" // "rain" (Matrix) | "picture" (Background) | "image"
+            property string lockImage: ""
+            property string lockMatrixColor: "cyan" // a unimatrix color name
+            // theme color names
+            property string lockClockColor: "sky"
+            property string lockOutlineColor: "accent2"
+            property string lockDotsColor: "peach"
+            property string lockTextColor: "text"
             property int borderWidth: 1
             property real barOpacity: 0.9
             property bool barFloating: false
