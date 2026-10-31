@@ -61,6 +61,7 @@ EXTRA_DESTINATIONS = {
     "gtk.css": HOME / ".config/gtk-3.0/gtk.css",
     "gtk4.css": HOME / ".config/gtk-4.0/gtk.css",
     "gtk-settings.ini": [HOME / ".config/gtk-3.0/settings.ini", HOME / ".config/gtk-4.0/settings.ini"],
+    "kdeglobals": HOME / ".config/kdeglobals",
     "qt5ct.conf": HOME / ".config/qt5ct/qt5ct.conf",
     "qt6ct.conf": HOME / ".config/qt6ct/qt6ct.conf",
     "kvantum.kvconfig": HOME / ".config/Kvantum/kvantum.kvconfig",

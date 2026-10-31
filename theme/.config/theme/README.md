@@ -61,6 +61,7 @@ theme folder and set `wallpaper` under `[apps]`.
 | ls, eza, zsh completion | `current/ls_colors.zsh` (`dircolors` output of `current/dir_colors`) | live in open shells (SIGUSR1) |
 | herdr | `~/.config/herdr/config.toml`, the whole file: edit `templates/herdr-config.toml.tpl`, not the output | live (`herdr server reload-config`) |
 | Qt apps | Kvantum theme `current` (`templates/kvantum-current.*`), `qt5ct.conf` and `qt6ct.conf`: edit the templates, not the output | when an app next starts |
+| KDE apps | `~/.config/kdeglobals` | when an app next starts |
 | hyprshutdown, Hyprland's update and donation windows | `~/.config/hypr/hyprtoolkit.conf` | when a window next opens |
 | Claude Code | `~/.claude/themes/current.json`, with `"theme": "custom:current"` and `claude-statusline.sh` | live |
 | hyprlock | `current/hyprlock.conf` (`lockscreen.sh` fills in the monitor) | next lock |
