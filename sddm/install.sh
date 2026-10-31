@@ -16,12 +16,13 @@ fi
 here=$(dirname "$(readlink -f "$0")")
 home=$(getent passwd "$SUDO_USER" | cut -d: -f6)
 shared=/var/lib/kuvk-shell
-theme=/usr/share/sddm/themes/kuvk-shell
+theme=/usr/share/sddm/themes/kuvk
 
 install -d -m 0755 -o "$SUDO_USER" "$shared"
 
+rm -rf /usr/share/sddm/themes/kuvk-shell
 install -d -m 0755 "$theme"
-install -m 0644 "$here"/kuvk-shell/* "$theme"/
+install -m 0644 "$here"/kuvk/* "$theme"/
 ln -sfn "$shared/theme.conf" "$theme/theme.conf.user"
 
 install -d -m 0755 /usr/share/sddm/hypr
@@ -42,5 +43,4 @@ Installed. It takes effect at your next logout. Now run these without sudo, from
   ~/.config/scripts/wallpaper.py export-greeter
   ~/.config/scripts/hypr-monitors.py export-greeter
 
-To go back to the old theme: set Current=kuvk in /etc/sddm.conf
 MSG
