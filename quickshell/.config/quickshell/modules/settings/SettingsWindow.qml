@@ -461,11 +461,14 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Window buttons"
-                                hint: "Close button on the shell's windows (Settings, Displays)"
+                                hint: "Close button on the shell's windows and GTK apps"
 
                                 Switch {
                                     checked: Config.windowButtons
-                                    onToggled: Config.windowButtons = !Config.windowButtons
+                                    onToggled: {
+                                        Config.windowButtons = !Config.windowButtons;
+                                        Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--window-buttons", Config.windowButtons ? "on" : "off"]);
+                                    }
                                 }
                             }
 
@@ -677,7 +680,7 @@ FloatingWindow {
 
                             StyledText {
                                 Layout.fillWidth: true
-                                text: "Terminals keep their own fonts (kitty.conf); these are for the bar, panels and the shell's windows."
+                                text: "For the shell, GTK and Qt apps, Hyprland's windows, and the lock and login screens. Terminals keep their own fonts (kitty.conf). Open apps pick up changes when reopened."
                                 color: Theme.overlay1
                                 font.pixelSize: Theme.fontSize - 1
                                 wrapMode: Text.Wrap
@@ -689,7 +692,10 @@ FloatingWindow {
 
                                 Switch {
                                     checked: Config.nerdFontOnly
-                                    onToggled: Config.nerdFontOnly = !Config.nerdFontOnly
+                                    onToggled: {
+                                        Config.nerdFontOnly = !Config.nerdFontOnly;
+                                        fontApply.restart();
+                                    }
                                 }
                             }
 
@@ -713,7 +719,10 @@ FloatingWindow {
                                 value: Config.nerdFont
                                 options: fontsPage.nerdFonts
                                 sample: Distro.logo + " " + Icons.cog + " 0O1lI"
-                                onPicked: family => Config.nerdFont = family
+                                onPicked: family => {
+                                    Config.nerdFont = family;
+                                    fontApply.restart();
+                                }
                             }
 
                             StyledText {
@@ -727,7 +736,45 @@ FloatingWindow {
                                 enabled: !Config.nerdFontOnly
                                 value: Config.displayFont
                                 options: fontsPage.displayFonts
-                                onPicked: family => Config.displayFont = family
+                                onPicked: family => {
+                                    Config.displayFont = family;
+                                    fontApply.restart();
+                                }
+                            }
+
+                            SettingRow {
+                                Layout.topMargin: 4
+                                label: "Hinting"
+                                hint: "Fits letters to the pixel grid. Slight keeps their shapes and spacing"
+
+                                Stepper {
+                                    text: Config.fontHinting.charAt(0).toUpperCase() + Config.fontHinting.slice(1)
+                                    onStep: d => {
+                                        Config.fontHinting = root.cycle(["none", "slight", "medium", "full"], Config.fontHinting, d);
+                                        fontApply.restart();
+                                    }
+                                }
+                            }
+
+                            SettingRow {
+                                label: "Antialiasing"
+                                hint: "Subpixel is sharpest on RGB screens; grayscale has no color fringes"
+
+                                Stepper {
+                                    text: ({ none: "None", grayscale: "Grayscale", rgba: "Subpixel" })[Config.fontAntialiasing]
+                                    onStep: d => {
+                                        Config.fontAntialiasing = root.cycle(["none", "grayscale", "rgba"], Config.fontAntialiasing, d);
+                                        fontApply.restart();
+                                    }
+                                }
+                            }
+
+                            // Stepping through several options applies only the last
+                            Timer {
+                                id: fontApply
+
+                                interval: 400
+                                onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--fonts", Config.nerdFont, Config.displayFont, Config.nerdFontOnly ? "on" : "off", Config.fontHinting, Config.fontAntialiasing])
                             }
                         }
 

@@ -90,6 +90,8 @@ Singleton {
     property alias nerdFont: adapter.nerdFont
     property alias displayFont: adapter.displayFont
     property alias nerdFontOnly: adapter.nerdFontOnly
+    property alias fontHinting: adapter.fontHinting
+    property alias fontAntialiasing: adapter.fontAntialiasing
     property alias nerdSymbols: adapter.nerdSymbols
     property alias windowButtons: adapter.windowButtons
     property alias gapsIn: adapter.gapsIn
@@ -131,6 +133,8 @@ Singleton {
         adapter.nerdFont = "JetBrainsMono Nerd Font";
         adapter.displayFont = "SF Pro Display";
         adapter.nerdFontOnly = false;
+        adapter.fontHinting = "slight";
+        adapter.fontAntialiasing = "rgba";
         adapter.nerdSymbols = true;
         adapter.windowButtons = false;
         adapter.gapsIn = 2;
@@ -199,6 +203,8 @@ Singleton {
             property string nerdFont: "JetBrainsMono Nerd Font"
             property string displayFont: "SF Pro Display"
             property bool nerdFontOnly: false
+            property string fontHinting: "slight"
+            property string fontAntialiasing: "rgba"
             property bool nerdSymbols: true
             property bool windowButtons: false
             property int gapsIn: 2

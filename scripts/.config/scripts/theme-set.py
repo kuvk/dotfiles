@@ -16,6 +16,12 @@ apps are told to reload.
   theme-set.py --icons NAME  apply an icon theme (Settings > Appearance saves the choice)
   theme-set.py --cursor NAME SIZE
                           apply a cursor everywhere (Settings > Appearance saves the choice)
+  theme-set.py --fonts NERD DISPLAY on|off HINTING ANTIALIASING
+                          apply fonts everywhere (Settings > Fonts saves the choice); on means
+                          Nerd Fonts only. HINTING: none|slight|medium|full,
+                          ANTIALIASING: none|grayscale|rgba
+  theme-set.py --window-buttons on|off
+                          close button in GTK apps (Settings > Windows saves the choice)
   theme-set.py --shape rounded|square
                           corners of the status lines in tmux, nvim, yazi and Claude
                           Code (quickshell sets it: square in Work-Game or at radius 0)
@@ -93,6 +99,9 @@ ROLES = {"accent": "peach", "accent2": "blue", "selection_bg": "surface1"}
 MIN_SELECTION_CONTRAST = 3.0
 CURSOR_DIRS = (HOME / ".icons", HOME / ".local/share/icons", Path("/usr/share/icons"))
 
+HINTINGS = ("none", "slight", "medium", "full")
+ANTIALIASINGS = ("none", "grayscale", "rgba")
+
 # --cursor sets these: Quickshell may not have saved the choice to its file yet
 SETTINGS_OVERRIDE: dict = {}
 
@@ -140,6 +149,10 @@ def shell_settings() -> dict:
     settings = {
         "displayFont": "SF Pro Display",
         "nerdFont": "JetBrainsMono Nerd Font",
+        "nerdFontOnly": False,
+        "fontHinting": "slight",
+        "fontAntialiasing": "rgba",
+        "windowButtons": False,
         "cursorTheme": "Adwaita",
         "cursorSize": 24,
         "iconTheme": "Papirus",
@@ -230,6 +243,7 @@ def load_theme(name: str) -> dict:
         raise ValueError(f"{path}: mode must be 'dark' or 'light'")
 
     shell = shell_settings()
+    hinting, antialiasing = shell["fontHinting"], shell["fontAntialiasing"]
     strings = {
         "theme": name,
         "theme_name": data.get("name", name),
@@ -238,6 +252,18 @@ def load_theme(name: str) -> dict:
         "cursor_size": str(shell["cursorSize"]),
         "display_font": shell["displayFont"],
         "nerd_font": shell["nerdFont"],
+        # what apps show text in: "Nerd Fonts only" replaces the display font
+        "text_font": shell["nerdFont"] if shell["nerdFontOnly"] else shell["displayFont"],
+        "font_hinting": hinting,
+        "font_antialiasing": antialiasing,
+        "fc_antialias": "false" if antialiasing == "none" else "true",
+        "fc_hinting": "false" if hinting == "none" else "true",
+        "fc_hintstyle": f"hint{hinting}",
+        "fc_rgba": "rgb" if antialiasing == "rgba" else "none",
+        "fc_lcdfilter": "lcddefault" if antialiasing == "rgba" else "lcdnone",
+        "xft_antialias": "0" if antialiasing == "none" else "1",
+        "xft_hinting": "0" if hinting == "none" else "1",
+        "decoration_layout": ":close" if shell["windowButtons"] else ":",
         "icon_theme": icon_theme_for(shell["iconTheme"], mode),
         "prefer_dark": "0" if mode == "light" else "1",
         # adw-gtk3, when installed, follows gtk.css in plain GTK3 and GTK4 apps too;
@@ -393,12 +419,28 @@ def apply_cursor(strings: dict) -> None:
         run_quiet(["hyprctl", "setcursor", strings["cursor_theme"], strings["cursor_size"]])
 
 
+def apply_fonts(strings: dict) -> None:
+    interface = "org.gnome.desktop.interface"
+    run_quiet(["gsettings", "set", interface, "font-name", f"{strings['text_font']} 10"])
+    run_quiet(["gsettings", "set", interface, "document-font-name", f"{strings['text_font']} 10"])
+    run_quiet(["gsettings", "set", interface, "monospace-font-name", f"{strings['nerd_font']} 10"])
+    run_quiet(["gsettings", "set", interface, "font-hinting", strings["font_hinting"]])
+    run_quiet(["gsettings", "set", interface, "font-antialiasing", strings["font_antialiasing"]])
+    run_quiet(["gsettings", "set", interface, "font-rgba-order", "rgb"])
+
+
+def apply_window_buttons(strings: dict) -> None:
+    run_quiet(["gsettings", "set", "org.gnome.desktop.wm.preferences", "button-layout", strings["decoration_layout"]])
+
+
 def set_gtk_theme(strings: dict) -> None:
     """Wayland GTK apps read these; settings.ini (rendered above) is for XWayland ones."""
     interface = "org.gnome.desktop.interface"
     run_quiet(["gsettings", "set", interface, "gtk-theme", strings["gtk_theme"]])
     run_quiet(["gsettings", "set", interface, "icon-theme", strings["icon_theme"]])
     apply_cursor(strings)
+    apply_fonts(strings)
+    apply_window_buttons(strings)
     run_quiet(["gsettings", "set", interface, "color-scheme", f"prefer-{strings['mode']}"])
 
 
@@ -583,6 +625,19 @@ def main(argv: list[str]) -> int:
         SETTINGS_OVERRIDE.update(iconTheme=argv[1])
         strings = generate(current_theme())["strings"]
         run_quiet(["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", strings["icon_theme"]])
+        return 0
+    if len(argv) == 6 and argv[0] == "--fonts":
+        nerd, display, only, hinting, antialiasing = argv[1:]
+        if only not in ("on", "off") or hinting not in HINTINGS or antialiasing not in ANTIALIASINGS:
+            print(f"Unknown font options '{only} {hinting} {antialiasing}'", file=sys.stderr)
+            return 1
+        SETTINGS_OVERRIDE.update(nerdFont=nerd, displayFont=display, nerdFontOnly=only == "on",
+                                 fontHinting=hinting, fontAntialiasing=antialiasing)
+        apply_fonts(generate(current_theme())["strings"])
+        return 0
+    if len(argv) == 2 and argv[0] == "--window-buttons" and argv[1] in ("on", "off"):
+        SETTINGS_OVERRIDE.update(windowButtons=argv[1] == "on")
+        apply_window_buttons(generate(current_theme())["strings"])
         return 0
     if argv and argv[0] == "--current":
         print(current_theme())

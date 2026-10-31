@@ -72,3 +72,24 @@ dialog-host,
 dialog > .background {
   border-radius: 0;
 }
+
+/* The only window button is close (Settings > Windows), drawn like the shell's:
+   a bare X that turns the accent color on hover. headerbar is GTK3, windowcontrols GTK4 */
+headerbar button.titlebutton.close,
+.titlebar button.titlebutton.close,
+windowcontrols > button.close,
+windowcontrols > button.close > image {
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: {{ subtext0 }};
+}
+
+headerbar button.titlebutton.close:hover,
+.titlebar button.titlebutton.close:hover,
+windowcontrols > button.close:hover,
+windowcontrols > button.close:hover > image {
+  background: none;
+  box-shadow: none;
+  color: {{ accent }};
+}
