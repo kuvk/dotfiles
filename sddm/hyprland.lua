@@ -1,6 +1,5 @@
 -- Environment Variables
 hl.env("AQ_DRM_DEVICES", "/dev/dri/card1:/dev/dri/card0")
-hl.env("WLR_NO_HARDWARE_CURSORS", "1")
 hl.env("XCURSOR_THEME", "Adwaita")
 hl.env("XCURSOR_SIZE", "24")
 hl.env("HYPRCURSOR_SIZE", "24")

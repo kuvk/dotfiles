@@ -13,7 +13,7 @@ config="$XDG_RUNTIME_DIR/hyprlock.conf"
 
 cleanup() {
     pkill -f "kitty --title $TITLE" 2>/dev/null
-    qs ipc call bar show >/dev/null 2>&1
+    qs ipc call bar reveal >/dev/null 2>&1
     qs ipc call notifications dnd false >/dev/null 2>&1
 }
 trap cleanup EXIT INT TERM
