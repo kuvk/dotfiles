@@ -261,12 +261,12 @@ Rectangle {
         }
     }
 
-    // Session, bottom left
+    // Session, bottom left; only with several to choose from
     Controls {
         anchors.left: parent.left
         anchors.bottom: parent.bottom
         anchors.margins: 30
-        visible: Window.active
+        visible: Window.active && sessionModel.rowCount() > 1
         label: root.sessionName
         onStepped: d => root.sessionIndex = root.step(root.sessionIndex, d, sessionModel.rowCount())
     }
@@ -281,9 +281,9 @@ Rectangle {
 
         Repeater {
             model: [
-                { glyph: "", enabled: sddm.canSuspend, action: () => sddm.suspend() },
-                { glyph: "", enabled: sddm.canReboot, action: () => sddm.reboot() },
-                { glyph: "", enabled: sddm.canPowerOff, action: () => sddm.powerOff() }
+                { glyph: "", tip: "Suspend", enabled: sddm.canSuspend, action: () => sddm.suspend() },
+                { glyph: "", tip: "Reboot", enabled: sddm.canReboot, action: () => sddm.reboot() },
+                { glyph: "", tip: "Shut down", enabled: sddm.canPowerOff, action: () => sddm.powerOff() }
             ]
 
             MouseArea {
@@ -311,6 +311,29 @@ Rectangle {
                     color: power.containsMouse ? root.c.dots : root.c.text
                     font.family: root.c.iconFont
                     font.pixelSize: 16
+                }
+
+                // Tooltip above the button, aligned to its right so it stays on screen
+                Rectangle {
+                    anchors.bottom: parent.top
+                    anchors.bottomMargin: 6
+                    anchors.right: parent.right
+                    visible: power.containsMouse
+                    width: tip.implicitWidth + 16
+                    height: tip.implicitHeight + 8
+                    radius: 6
+                    color: Qt.alpha(root.c.base, 0.95)
+                    border.color: Qt.alpha(root.c.outline, 0.3)
+
+                    Text {
+                        id: tip
+
+                        anchors.centerIn: parent
+                        text: power.modelData.tip
+                        color: root.c.text
+                        font.family: root.c.font
+                        font.pixelSize: 12
+                    }
                 }
             }
         }
