@@ -62,6 +62,8 @@ EXTRA_DESTINATIONS = {
     "kvantum-current.svg": HOME / ".config/Kvantum/current/current.svg",
     "hyprtoolkit.conf": HOME / ".config/hypr/hyprtoolkit.conf",
     "cursor-index.theme": HOME / ".icons/default/index.theme",
+    # the login screen; that folder only exists after sddm/install.sh
+    "sddm-theme.conf": Path("/var/lib/kuvk-shell/theme.conf"),
     "claude-theme.json": HOME / ".claude/themes/current.json",
 }
 # Written only when the app's folder exists (don't create a half plugin dir)
@@ -122,6 +124,19 @@ def contrast(a: str, b: str) -> float:
     return (high + 0.05) / (low + 0.05)
 
 
+def shell_fonts() -> tuple[str, str]:
+    """The fonts chosen in Quickshell's Settings."""
+    display, nerd = "SF Pro Display", "JetBrainsMono Nerd Font"
+    for path in (HOME / ".local/state/quickshell/by-shell").glob("*/settings.json"):
+        try:
+            settings = json.loads(path.read_text())
+        except (OSError, json.JSONDecodeError):
+            continue
+        display = settings.get("displayFont", display)
+        nerd = settings.get("nerdFont", nerd)
+    return display, nerd
+
+
 def load_theme(name: str) -> dict:
     path = THEMES_DIR / name / "colors.toml"
     with path.open("rb") as f:
@@ -173,6 +188,8 @@ def load_theme(name: str) -> dict:
         "theme_name": data.get("name", name),
         "mode": mode,
         "cursor_theme": CURSOR_THEME,
+        "display_font": shell_fonts()[0],
+        "nerd_font": shell_fonts()[1],
         "icon_theme": "Papirus" if mode == "light" else "Papirus-Dark",
         "prefer_dark": "0" if mode == "light" else "1",
         # adw-gtk3, when installed, follows gtk.css in plain GTK3 and GTK4 apps too;
@@ -290,6 +307,8 @@ def generate(name: str) -> dict:
         targets = EXTRA_DESTINATIONS.get(out_name, [])
         for dest in targets if isinstance(targets, list) else [targets]:
             if out_name in ONLY_IF_PRESENT and not dest.parent.parent.is_dir():
+                continue
+            if out_name == "sddm-theme.conf" and not dest.parent.is_dir():
                 continue
             if out_name == "tmux.conf" and not (dest.parent.parent / "catppuccin.tmux").is_file():
                 continue  # some other plugin named "tmux"

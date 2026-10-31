@@ -1,0 +1,10 @@
+[SddmGreeterTheme]
+Name=kuvk-shell
+Description=Login screen matching the lock screen and system theme
+Type=sddm-theme
+Version=1.0
+Theme-Id=kuvk-shell
+Theme-API=2.0
+MainScript=Main.qml
+ConfigFile=theme.conf
+QtVersion=6
