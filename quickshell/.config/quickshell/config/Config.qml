@@ -66,8 +66,6 @@ Singleton {
     property alias notificationTimeout: adapter.notificationTimeout
 
     // Lock screen
-    property alias lockMatrix: adapter.lockMatrix
-    property alias lockBlur: adapter.lockBlur
 
     // Tray and player
     property alias trayMonochrome: adapter.trayMonochrome
@@ -90,11 +88,6 @@ Singleton {
     property alias gameGapsOut: adapter.gameGapsOut
 
     // Lock screen colors, as theme color names (green, blue, accent, ...)
-    property alias lockClockColor: adapter.lockClockColor
-    property alias lockRainColor: adapter.lockRainColor
-    property alias lockOutlineColor: adapter.lockOutlineColor
-    property alias lockDotsColor: adapter.lockDotsColor
-    property alias lockTextColor: adapter.lockTextColor
 
     function reset(): void {
         adapter.radius = 8;
@@ -110,8 +103,6 @@ Singleton {
         adapter.weatherLocation = "";
         adapter.weatherFahrenheit = false;
         adapter.notificationTimeout = 10;
-        adapter.lockMatrix = true;
-        adapter.lockBlur = false;
         adapter.trayMonochrome = false;
         adapter.trayTint = false;
         adapter.trayKeepColors = "rog-control-center";
@@ -126,11 +117,6 @@ Singleton {
         adapter.gapsOut = 4;
         adapter.gameGapsIn = 0;
         adapter.gameGapsOut = 0;
-        adapter.lockClockColor = "green";
-        adapter.lockRainColor = "green";
-        adapter.lockOutlineColor = "green";
-        adapter.lockDotsColor = "blue";
-        adapter.lockTextColor = "text";
         adapter.version = root.version;
     }
 
@@ -170,8 +156,6 @@ Singleton {
             property string weatherLocation: ""
             property bool weatherFahrenheit: false
             property int notificationTimeout: 10
-            property bool lockMatrix: true
-            property bool lockBlur: false
             property bool trayMonochrome: false
             property bool trayTint: false
             // tray apps whose icon colors carry meaning (e.g. the ROG dGPU
@@ -188,11 +172,6 @@ Singleton {
             property int gapsOut: 4
             property int gameGapsIn: 0
             property int gameGapsOut: 0
-            property string lockClockColor: "green"
-            property string lockRainColor: "green"
-            property string lockOutlineColor: "green"
-            property string lockDotsColor: "blue"
-            property string lockTextColor: "text"
         }
     }
 }

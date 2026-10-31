@@ -84,14 +84,11 @@ visualizer and its bar count). They are saved to Quickshell's state folder
 
 ## Lock screen
 
-A curtain of digital rain drops from the top on every monitor. The focused
-monitor also shows the clock, `~/.face` and the password field. It uses the
-`ext-session-lock` protocol, so if Quickshell crashes the session stays locked.
-The password is checked with PAM using `pam/password.conf`
-(`auth required pam_unix.so`).
-
-hypridle runs `qs ipc call lock lock` on `loginctl lock-session`, and
-`lock lockNow` (no animation) before sleep.
+Locking uses hyprlock (`~/.config/scripts/lockscreen.sh`): a fullscreen kitty running
+unimatrix on every monitor, showing through hyprlock's transparent background
+(`misc:session_lock_xray`), with the clock and password on the monitor focused when locking.
+Its config is `theme/.config/theme/templates/hyprlock.conf.tpl`. hypridle runs the script on
+`loginctl lock-session` and before sleep.
 
 ## Web apps
 
@@ -146,7 +143,6 @@ services/          state singletons: Audio, Bluetooth, Displays, Hypr, Lock,
 components/        small reusable widgets
 modules/           bar, dropdowns, notifications, controlcenter, launcher,
                    powermenu, lock, displays
-pam/               PAM config for the lock screen
 ```
 
 ## IPC
@@ -156,7 +152,6 @@ qs ipc call launcher toggle | menu
 qs ipc call themes toggle
 qs ipc call notifications toggle | clear | toggleDnd | dnd true
 qs ipc call bar show | hide | toggle | floating
-qs ipc call lock lock | lockNow
 qs ipc call power toggle
 qs ipc call displays toggle
 qs ipc call theme reload | gamemode true

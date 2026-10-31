@@ -86,7 +86,7 @@ Singleton {
     function runAction(id: string): void {
         switch (id) {
         case "lock":
-            Lock.lock();
+            Quickshell.execDetached([scripts + "lockscreen.sh"]);
             break;
         case "suspend":
             // hypridle locks before sleeping (before_sleep_cmd)

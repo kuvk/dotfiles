@@ -89,6 +89,13 @@ hl.window_rule({
   opacity = "0.9 0.9 1",
 })
 
+-- Matrix Lock
+hl.window_rule({
+  name = "matrix-lock",
+  match = { title = "MATRIXLOCK" },
+  stay_focused = true,
+})
+
 -- Spotify
 hl.window_rule({
   name = "spotify",
