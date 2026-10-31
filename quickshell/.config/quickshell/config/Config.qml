@@ -11,6 +11,7 @@ Singleton {
 
     // Look
     property alias radius: adapter.radius
+    property alias lockStyle: adapter.lockStyle
     property alias borderWidth: adapter.borderWidth
     property alias barOpacity: adapter.barOpacity
     // Floating bar: margins around it and rounded corners
@@ -97,6 +98,7 @@ Singleton {
         adapter.barMargin = 6;
         adapter.panelOpacity = 0.9;
         adapter.animations = true;
+        adapter.lockStyle = "rain";
         adapter.clockFormat = "dddd HH:mm";
         adapter.barHiddenPrimary = [];
         adapter.barHiddenOthers = [];
@@ -144,6 +146,8 @@ Singleton {
 
             property int version: 0
             property int radius: 8
+            // read by scripts/lockscreen.sh
+            property string lockStyle: "rain"
             property int borderWidth: 1
             property real barOpacity: 0.9
             property bool barFloating: false
