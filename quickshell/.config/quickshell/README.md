@@ -74,7 +74,7 @@ radius, border width, opacity, animations), Fonts (a Nerd Font and a display
 font, with "Nerd Fonts only" and "Use Nerd Symbols font" switches), Bar (full width or floating with
 margins and rounded corners, clock format, weather location and unit, and which modules show on the primary monitor's bar and on
 the others; the clock always shows), Windows (window buttons, gaps for regular
-and Work-Game), Notifications,
+and Work-Game), Notifications, Lock Screen (style and colors),
 and Tray & Player (tray icon style, apps that keep their own colors, the
 visualizer and its bar count). They are saved to Quickshell's state folder
 (`~/.local/state/quickshell/by-shell/<id>/settings.json`). Defaults are in
@@ -83,12 +83,13 @@ visualizer and its bar count). They are saved to Quickshell's state folder
 ## Lock screen
 
 Locking uses hyprlock (`~/.config/scripts/lockscreen.sh`), with the clock and password on the
-monitor focused when locking. Settings > Lock Screen picks the background:
+monitor focused when locking. Settings > Lock Screen sets its colors and style:
 
-- **Rain**: a fullscreen kitty running unimatrix on every monitor, showing through hyprlock's
+- **Matrix**: a fullscreen kitty running unimatrix on every monitor, showing through hyprlock's
   transparent background (`misc:session_lock_xray`). It locks about a second later, once the
   rain is on screen, so that's the frame a wake-up shows first.
-- **Picture**: the current wallpaper. It locks immediately and always covers the desktop.
+- **Background**: the current wallpaper, opaque.
+- **Image**: an image you choose, opaque; the wallpaper if none is chosen.
 
 The look is in `theme/.config/theme/templates/hyprlock.conf.tpl`. hypridle runs the script on
 `loginctl lock-session` and before sleep.

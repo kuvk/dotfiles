@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import qs.config
 import qs.components
 import qs.services
@@ -465,12 +466,85 @@ FloatingWindow {
                             spacing: 12
 
                             SettingRow {
-                                label: "Background"
-                                hint: Config.lockStyle === "picture" ? "Your wallpaper; locks immediately and always covers the desktop" : "Falling rain; locks about a second later, after it's on screen"
+                                label: "Style"
+                                hint: ({
+                                    rain: "Falling characters; locks about a second later, once they're on screen",
+                                    picture: "Your current wallpaper",
+                                    image: "An image you choose"
+                                })[Config.lockStyle] ?? ""
 
                                 Stepper {
-                                    text: Config.lockStyle === "picture" ? "Picture" : "Rain"
-                                    onStep: d => Config.lockStyle = root.cycle(["rain", "picture"], Config.lockStyle, d)
+                                    text: ({ rain: "Matrix", picture: "Background", image: "Image" })[Config.lockStyle] ?? "Matrix"
+                                    onStep: d => Config.lockStyle = root.cycle(["rain", "picture", "image"], Config.lockStyle, d)
+                                }
+                            }
+
+                            SettingRow {
+                                visible: Config.lockStyle === "rain"
+                                label: "Matrix color"
+                                hint: "The terminal's color of that name, so the exact shade follows the theme"
+
+                                Stepper {
+                                    text: Config.lockMatrixColor
+                                    onStep: d => Config.lockMatrixColor = root.cycle(["green", "cyan", "blue", "magenta", "red", "yellow", "white"], Config.lockMatrixColor, d)
+                                }
+                            }
+
+                            SettingRow {
+                                visible: Config.lockStyle === "image"
+                                label: "Image"
+                                hint: Config.lockImage || "None chosen: the wallpaper is used"
+
+                                TextButton {
+                                    text: "Choose…"
+                                    onClicked: lockImagePicker.running = true
+                                }
+
+                                Process {
+                                    id: lockImagePicker
+
+                                    command: ["zenity", "--file-selection", "--title=Lock screen image", "--file-filter=Images | *.png *.jpg *.jpeg *.webp"]
+                                    stdout: StdioCollector {
+                                        onStreamFinished: {
+                                            if (text.trim() !== "")
+                                                Config.lockImage = text.trim();
+                                        }
+                                    }
+                                }
+                            }
+
+                            Repeater {
+                                model: [
+                                    { label: "Clock and date", key: "lockClockColor" },
+                                    { label: "Outlines and avatar ring", key: "lockOutlineColor" },
+                                    { label: "Typing dots and user name", key: "lockDotsColor" },
+                                    { label: "Text", key: "lockTextColor" }
+                                ]
+
+                                ColumnLayout {
+                                    id: lockColor
+
+                                    required property var modelData
+
+                                    Layout.fillWidth: true
+                                    spacing: 4
+
+                                    StyledText {
+                                        text: lockColor.modelData.label
+                                    }
+
+                                    ColorChoice {
+                                        value: Config[lockColor.modelData.key]
+                                        onPicked: name => Config[lockColor.modelData.key] = name
+                                    }
+                                }
+                            }
+
+                            TextButton {
+                                text: "Preview (locks the screen)"
+                                onClicked: {
+                                    Panels.closeAll();
+                                    System.runAction("lock");
                                 }
                             }
                         }
