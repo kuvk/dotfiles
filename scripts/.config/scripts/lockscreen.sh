@@ -63,6 +63,7 @@ start_rain() {
     sleep 0.5
 }
 
+hyprlock_args=()
 picture=""
 color=$rain_color
 if [[ $style == rain ]]; then
@@ -72,8 +73,9 @@ else
     [[ $style == image && -f $image ]] && picture=$image
     [[ -n $picture ]] || picture=$(readlink -f "$HOME/.local/state/wallpaper/current")
     [[ -f $picture ]] || picture=""
-    # Hold a suspend until the lock has reached the screen, so a wake-up shows it first
-    systemd-inhibit --what=sleep --mode=delay --who=lockscreen --why="Showing the lock screen" sleep 1 9>&- >/dev/null 2>&1 &
+    # The first frame is the whole lock: a suspend can freeze the screen right after it,
+    # and partway through a fade the desktop would still show on wake
+    hyprlock_args+=(--no-fade-in --immediate-render)
 fi
 
 escape() { sed 's/[&|\\]/\\&/g' <<<"$1"; }
@@ -82,7 +84,7 @@ install -m 600 /dev/null "$config"
 sed -e "s|@MONITOR@|$focused|g" -e "s|@PICTURE@|$(escape "$picture")|" -e "s|@COLOR@|$color|" \
     -e "s|@CLOCK@|$(hex "${clock:-sky}")|g" -e "s|@OUTLINE@|$(hex "${outline:-accent2}")|g" \
     -e "s|@DOTS@|$(hex "${dots:-peach}")|g" -e "s|@TEXT@|$(hex "${text_name:-text}")|g" "$TEMPLATE" >"$config"
-hyprlock --config "$config" &
+hyprlock --config "$config" "${hyprlock_args[@]}" &
 wait $!
 
 if [[ -n $focused ]]; then
