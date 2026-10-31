@@ -39,7 +39,7 @@ katakana in the lock screen's digital rain.
 | App menu: categories on the left, apps on the right | `modules/launcher/AppMenu.qml` + `services/Apps.qml` | the Arch icon, or `ALT+CTRL+Space` |
 | Theme carousel (each card the theme's palette as bars, type to search; other monitors are blurred) | `modules/themes/ThemePicker.qml` | `ALT+SHIFT+T`, or the Theme tile |
 | Power menu (the old wlogout layout) | `modules/powermenu/PowerMenu.qml` | `ALT+SHIFT+E`, or the power icon |
-| Lock screen | `modules/lock/LockScreen.qml` | `` ALT+` ``, hypridle, before sleep |
+| Lock screen | hyprlock with `scripts/lockscreen.sh` | `` ALT+` ``, hypridle |
 | Wallpaper carousel (type to search; other monitors are blurred) | `modules/wallpaper/WallpaperPicker.qml` | `ALT+W`, Tab for live wallpapers |
 | System information (fastfetch's output in a window sized to it) | `modules/sysinfo/SysinfoWindow.qml` | the ⓘ button in the app menu and Control Center |
 | Keybindings (built from `bindings.lua`, type to filter) | `modules/keybinds/KeybindsWindow.qml` + `scripts/hypr-keybinds.py` | `ALT+SHIFT+/` |
@@ -75,7 +75,7 @@ radius, border width, opacity, animations), Fonts (a Nerd Font and a display
 font, with "Nerd Fonts only" and "Use Nerd Symbols font" switches), Bar (full width or floating with
 margins and rounded corners, clock format, weather location and unit, and which modules show on the primary monitor's bar and on
 the others; the clock always shows), Windows (window buttons, gaps for regular
-and Work-Game), Notifications, Lock Screen
+and Work-Game), Notifications
 (effects and the colors of the clock, rain, outlines, password dots and text),
 and Tray & Player (tray icon style, apps that keep their own colors, the
 visualizer and its bar count). They are saved to Quickshell's state folder
@@ -151,7 +151,7 @@ modules/           bar, dropdowns, notifications, controlcenter, launcher,
 qs ipc call launcher toggle | menu
 qs ipc call themes toggle
 qs ipc call notifications toggle | clear | toggleDnd | dnd true
-qs ipc call bar show | hide | toggle | floating
+qs ipc call bar reveal | hide | toggle | floating
 qs ipc call power toggle
 qs ipc call displays toggle
 qs ipc call theme reload | gamemode true

@@ -143,7 +143,8 @@ ShellRoot {
             Config.barFloating = !Config.barFloating;
         }
 
-        function show(): void {
+        // not "show": `qs ipc call bar show` would run qs's own `ipc show`
+        function reveal(): void {
             Panels.barVisible = true;
         }
 
