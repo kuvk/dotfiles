@@ -10,7 +10,6 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("sleep 1; ~/.config/scripts/wallpaper.py restore")
   hl.exec_cmd("~/.config/scripts/autostart.sh")
   hl.exec_cmd("systemctl --user start hyprpolkitagent")
-  hl.exec_cmd("hyprctl setcursor Adwaita 24")
 end)
 
 -- Switch to the saved layout for whatever monitors are now connected

@@ -11,6 +11,9 @@ apps are told to reload.
   theme-set.py --list     list theme names
   theme-set.py --json     list themes with a few colors (used by quickshell)
   theme-set.py --current  print the current theme name
+  theme-set.py --cursors  list the installed cursor themes as JSON
+  theme-set.py --cursor NAME SIZE
+                          apply a cursor everywhere (Settings > Appearance saves the choice)
   theme-set.py --shape rounded|square
                           corners of the status lines in tmux, nvim, yazi and Claude
                           Code (quickshell sets it: square in Work-Game or at radius 0)
@@ -62,6 +65,7 @@ EXTRA_DESTINATIONS = {
     "kvantum-current.svg": HOME / ".config/Kvantum/current/current.svg",
     "hyprtoolkit.conf": HOME / ".config/hypr/hyprtoolkit.conf",
     "cursor-index.theme": HOME / ".icons/default/index.theme",
+    "sddm-cursor.conf": Path("/var/lib/kuvk-shell/cursor.conf"),
     # the login screen; that folder only exists after sddm/install.sh
     "sddm-theme.conf": Path("/var/lib/kuvk-shell/theme.conf"),
     "claude-theme.json": HOME / ".claude/themes/current.json",
@@ -83,7 +87,10 @@ SLOTS = (
 # to the text color in themes where the accent can't be read on selection_bg.
 ROLES = {"accent": "peach", "accent2": "blue", "selection_bg": "surface1"}
 MIN_SELECTION_CONTRAST = 3.0
-CURSOR_THEME = "Adwaita"
+CURSOR_DIRS = (HOME / ".icons", HOME / ".local/share/icons", Path("/usr/share/icons"))
+
+# --cursor sets these: Quickshell may not have saved the choice to its file yet
+SETTINGS_OVERRIDE: dict = {}
 
 HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 PLACEHOLDER_RE = re.compile(r"\{\{\s*([\w.]+)\s*\}\}")
@@ -124,17 +131,31 @@ def contrast(a: str, b: str) -> float:
     return (high + 0.05) / (low + 0.05)
 
 
-def shell_fonts() -> tuple[str, str]:
-    """The fonts chosen in Quickshell's Settings."""
-    display, nerd = "SF Pro Display", "JetBrainsMono Nerd Font"
+def shell_settings() -> dict:
+    """What's chosen in Quickshell's Settings."""
+    settings = {
+        "displayFont": "SF Pro Display",
+        "nerdFont": "JetBrainsMono Nerd Font",
+        "cursorTheme": "Adwaita",
+        "cursorSize": 24,
+    }
     for path in (HOME / ".local/state/quickshell/by-shell").glob("*/settings.json"):
         try:
-            settings = json.loads(path.read_text())
+            saved = json.loads(path.read_text())
         except (OSError, json.JSONDecodeError):
             continue
-        display = settings.get("displayFont", display)
-        nerd = settings.get("nerdFont", nerd)
-    return display, nerd
+        settings.update({key: saved[key] for key in settings if key in saved})
+    return settings | SETTINGS_OVERRIDE
+
+
+def cursor_themes() -> list[str]:
+    names = {
+        path.parent.parent.name
+        for folder in CURSOR_DIRS
+        for path in folder.glob("*/cursors/left_ptr")
+        if path.parent.parent.name != "default"
+    }
+    return sorted(names, key=str.lower)
 
 
 def load_theme(name: str) -> dict:
@@ -183,13 +204,15 @@ def load_theme(name: str) -> dict:
     if mode not in ("dark", "light"):
         raise ValueError(f"{path}: mode must be 'dark' or 'light'")
 
+    shell = shell_settings()
     strings = {
         "theme": name,
         "theme_name": data.get("name", name),
         "mode": mode,
-        "cursor_theme": CURSOR_THEME,
-        "display_font": shell_fonts()[0],
-        "nerd_font": shell_fonts()[1],
+        "cursor_theme": shell["cursorTheme"],
+        "cursor_size": str(shell["cursorSize"]),
+        "display_font": shell["displayFont"],
+        "nerd_font": shell["nerdFont"],
         "icon_theme": "Papirus" if mode == "light" else "Papirus-Dark",
         "prefer_dark": "0" if mode == "light" else "1",
         # adw-gtk3, when installed, follows gtk.css in plain GTK3 and GTK4 apps too;
@@ -308,7 +331,7 @@ def generate(name: str) -> dict:
         for dest in targets if isinstance(targets, list) else [targets]:
             if out_name in ONLY_IF_PRESENT and not dest.parent.parent.is_dir():
                 continue
-            if out_name == "sddm-theme.conf" and not dest.parent.is_dir():
+            if out_name.startswith("sddm-") and not dest.parent.is_dir():
                 continue
             if out_name == "tmux.conf" and not (dest.parent.parent / "catppuccin.tmux").is_file():
                 continue  # some other plugin named "tmux"
@@ -337,12 +360,20 @@ def hypr_running() -> bool:
     return bool(os.environ.get("HYPRLAND_INSTANCE_SIGNATURE")) and shutil.which("hyprctl") is not None
 
 
+def apply_cursor(strings: dict) -> None:
+    interface = "org.gnome.desktop.interface"
+    run_quiet(["gsettings", "set", interface, "cursor-theme", strings["cursor_theme"]])
+    run_quiet(["gsettings", "set", interface, "cursor-size", strings["cursor_size"]])
+    if hypr_running():
+        run_quiet(["hyprctl", "setcursor", strings["cursor_theme"], strings["cursor_size"]])
+
+
 def set_gtk_theme(strings: dict) -> None:
     """Wayland GTK apps read these; settings.ini (rendered above) is for XWayland ones."""
     interface = "org.gnome.desktop.interface"
     run_quiet(["gsettings", "set", interface, "gtk-theme", strings["gtk_theme"]])
     run_quiet(["gsettings", "set", interface, "icon-theme", strings["icon_theme"]])
-    run_quiet(["gsettings", "set", interface, "cursor-theme", strings["cursor_theme"]])
+    apply_cursor(strings)
     run_quiet(["gsettings", "set", interface, "color-scheme", f"prefer-{strings['mode']}"])
 
 
@@ -506,6 +537,16 @@ def main(argv: list[str]) -> int:
         return 0
     if argv and argv[0] == "--json":
         print(themes_json())
+        return 0
+    if argv and argv[0] == "--cursors":
+        print(json.dumps(cursor_themes()))
+        return 0
+    if len(argv) == 3 and argv[0] == "--cursor":
+        if argv[1] not in cursor_themes() or not argv[2].isdigit():
+            print(f"Unknown cursor '{argv[1]} {argv[2]}'", file=sys.stderr)
+            return 1
+        SETTINGS_OVERRIDE.update(cursorTheme=argv[1], cursorSize=int(argv[2]))
+        apply_cursor(generate(current_theme())["strings"])
         return 0
     if argv and argv[0] == "--current":
         print(current_theme())
