@@ -24,16 +24,23 @@ focused=$(jq -r '.[] | select(.focused) | .name' <<<"$monitors" | head -n1)
 qs ipc call bar hide >/dev/null 2>&1
 qs ipc call notifications dnd true >/dev/null 2>&1
 
+# The rain goes up first and hyprlock only after it's on screen: the desktop shows through
+# hyprlock, and hypridle holds the suspend until the session is locked, so this way a
+# wake-up finds the rain rather than the desktop. Capped, so it locks even if kitty fails.
+windows=$(jq length <<<"$monitors")
+jq -r '.[].activeWorkspace.id' <<<"$monitors" | while read -r workspace; do
+    hyprctl eval "hl.exec_cmd('kitty --title $TITLE --start-as=fullscreen unimatrix -c cyan -b -s 96 -f -l m', { workspace = '$workspace' })" >/dev/null
+done
+for _ in {1..30}; do
+    mapped=$(hyprctl -j clients | jq --arg title "$TITLE" '[.[] | select(.title == $title and .mapped)] | length')
+    ((mapped >= windows)) && break
+    sleep 0.05
+done
+
 install -m 600 /dev/null "$config"
 sed "s/@MONITOR@/$focused/" "$HOME/.config/theme/current/hyprlock.conf" >"$config"
 hyprlock --config "$config" &
 lock=$!
-
-# Locked first, so input is never open; then the rain covers the desktop
-sleep 0.2
-jq -r '.[].activeWorkspace.id' <<<"$monitors" | while read -r workspace; do
-    hyprctl eval "hl.exec_cmd('kitty --title $TITLE --start-as=fullscreen unimatrix -c cyan -b -s 96 -f -l m', { workspace = '$workspace' })" >/dev/null
-done
 
 wait "$lock"
 
