@@ -24,6 +24,7 @@ FloatingWindow {
     ]
     property string section: "appearance"
     property var cursorThemes: ["Adwaita"]
+    property var iconThemes: ["Papirus"]
 
     function cycle(list: var, value: var, step: int): var {
         const i = Math.max(0, list.indexOf(value));
@@ -202,6 +203,34 @@ FloatingWindow {
                                         Config.cursorSize = root.clamp(Config.cursorSize + d * 4, 16, 64);
                                         cursorApply.restart();
                                     }
+                                }
+                            }
+
+                            SettingRow {
+                                label: "Icons"
+                                hint: "GTK apps change now, Qt apps and the shell when restarted. A theme with -Light and -Dark versions follows the color theme"
+
+                                Stepper {
+                                    text: Config.iconTheme
+                                    onStep: d => {
+                                        Config.iconTheme = root.cycle(root.iconThemes, Config.iconTheme, d);
+                                        iconApply.restart();
+                                    }
+                                }
+                            }
+
+                            Timer {
+                                id: iconApply
+
+                                interval: 400
+                                onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--icons", Config.iconTheme])
+                            }
+
+                            Process {
+                                running: true
+                                command: [Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--icon-themes"]
+                                stdout: StdioCollector {
+                                    onStreamFinished: root.iconThemes = JSON.parse(text)
                                 }
                             }
 
