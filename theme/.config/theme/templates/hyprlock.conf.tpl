@@ -28,7 +28,7 @@ label {
     text = $TIME
     color = rgb(@CLOCK@)
     font_size = 120
-    font_family = SF Pro Display
+    font_family = {{ text_font }}
     position = -30, -10
     halign = right
     valign = top
@@ -40,7 +40,7 @@ label {
     text = cmd[update:60000] date +"%A, %-d %B %Y"
     color = rgb(@CLOCK@)
     font_size = 33
-    font_family = SF Pro Display
+    font_family = {{ text_font }}
     position = -30, -170
     halign = right
     valign = top

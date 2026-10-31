@@ -9,5 +9,5 @@ link_text = rgba({{ accent2.hex }}ff)
 accent = rgba({{ accent2.hex }}ff)
 accent_secondary = rgba({{ accent.hex }}ff)
 icon_theme = {{ icon_theme }}
-font_family = SF Pro Display
-font_family_monospace = JetBrainsMono Nerd Font
+font_family = {{ text_font }}
+font_family_monospace = {{ nerd_font }}

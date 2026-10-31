@@ -5,8 +5,8 @@ standard_dialogs=gtk3
 style=kvantum
 
 [Fonts]
-fixed="JetBrainsMono Nerd Font,11,-1,5,50,0,0,0,0,0"
-general="SF Pro Display,11,-1,5,50,0,0,0,0,0"
+fixed="{{ nerd_font }},11,-1,5,50,0,0,0,0,0"
+general="{{ text_font }},11,-1,5,50,0,0,0,0,0"
 
 [Interface]
 activate_item_on_single_click=1
