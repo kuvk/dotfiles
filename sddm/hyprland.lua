@@ -1,7 +1,21 @@
 -- The greeter's compositor, /usr/share/sddm/hypr/hyprland.lua, installed by sddm/install.sh
 hl.env("AQ_DRM_DEVICES", "/dev/dri/card1:/dev/dri/card0")
-hl.env("XCURSOR_THEME", "Adwaita")
-hl.env("XCURSOR_SIZE", "24")
+
+-- Your cursor from Settings (theme-set.py writes it), if the greeter can read that theme.
+-- Read as data, as below.
+local cursor_theme, cursor_size = "Adwaita", "24"
+local cursor = io.open("/var/lib/kuvk-shell/cursor.conf")
+if cursor then
+  local name, size = (cursor:read("l") or ""):match("^([%w%._-]+)\t(%d+)$")
+  cursor:close()
+  local installed = name and io.open("/usr/share/icons/" .. name .. "/cursors/left_ptr")
+  if installed then
+    installed:close()
+    cursor_theme, cursor_size = name, size
+  end
+end
+hl.env("XCURSOR_THEME", cursor_theme)
+hl.env("XCURSOR_SIZE", cursor_size)
 
 hl.config({
   ecosystem = {
