@@ -12,6 +12,8 @@ apps are told to reload.
   theme-set.py --json     list themes with a few colors (used by quickshell)
   theme-set.py --current  print the current theme name
   theme-set.py --cursors  list the installed cursor themes as JSON
+  theme-set.py --icon-themes  list the installed icon themes as JSON
+  theme-set.py --icons NAME  apply an icon theme (Settings > Appearance saves the choice)
   theme-set.py --cursor NAME SIZE
                           apply a cursor everywhere (Settings > Appearance saves the choice)
   theme-set.py --shape rounded|square
@@ -138,6 +140,7 @@ def shell_settings() -> dict:
         "nerdFont": "JetBrainsMono Nerd Font",
         "cursorTheme": "Adwaita",
         "cursorSize": 24,
+        "iconTheme": "Papirus",
     }
     for path in (HOME / ".local/state/quickshell/by-shell").glob("*/settings.json"):
         try:
@@ -156,6 +159,26 @@ def cursor_themes() -> list[str]:
         if path.parent.parent.name != "default"
     }
     return sorted(names, key=str.lower)
+
+
+def icon_themes() -> list[str]:
+    names = set()
+    for folder in CURSOR_DIRS:
+        for index in folder.glob("*/index.theme"):
+            if index.parent.name in ("default", "hicolor"):
+                continue
+            text = index.read_text(errors="ignore")
+            # cursor themes have an index.theme too, without icon folders
+            if re.search(r"^Directories\s*=\s*\S", text, re.M) and not re.search(r"^Hidden\s*=\s*true", text, re.M | re.I):
+                names.add(index.parent.name)
+    return sorted(names, key=str.lower)
+
+
+def icon_theme_for(name: str, mode: str) -> str:
+    """A theme with a variant for the mode uses it, so Papirus follows light and dark;
+    choosing the variant itself (Papirus-Dark) keeps it in both."""
+    variant = f"{name}-{mode.capitalize()}"
+    return variant if variant in icon_themes() else name
 
 
 def load_theme(name: str) -> dict:
@@ -213,7 +236,7 @@ def load_theme(name: str) -> dict:
         "cursor_size": str(shell["cursorSize"]),
         "display_font": shell["displayFont"],
         "nerd_font": shell["nerdFont"],
-        "icon_theme": "Papirus" if mode == "light" else "Papirus-Dark",
+        "icon_theme": icon_theme_for(shell["iconTheme"], mode),
         "prefer_dark": "0" if mode == "light" else "1",
         # adw-gtk3, when installed, follows gtk.css in plain GTK3 and GTK4 apps too;
         # Adwaita only does in libadwaita apps
@@ -547,6 +570,17 @@ def main(argv: list[str]) -> int:
             return 1
         SETTINGS_OVERRIDE.update(cursorTheme=argv[1], cursorSize=int(argv[2]))
         apply_cursor(generate(current_theme())["strings"])
+        return 0
+    if argv and argv[0] == "--icon-themes":
+        print(json.dumps(icon_themes()))
+        return 0
+    if len(argv) == 2 and argv[0] == "--icons":
+        if argv[1] not in icon_themes():
+            print(f"Unknown icon theme '{argv[1]}'", file=sys.stderr)
+            return 1
+        SETTINGS_OVERRIDE.update(iconTheme=argv[1])
+        strings = generate(current_theme())["strings"]
+        run_quiet(["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", strings["icon_theme"]])
         return 0
     if argv and argv[0] == "--current":
         print(current_theme())
