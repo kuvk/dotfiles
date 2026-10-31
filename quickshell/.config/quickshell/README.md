@@ -14,8 +14,7 @@ sudo pacman -S ddcutil && sudo usermod -aG i2c "$USER"   # then log in again
 ```
 
 Needs Quickshell 0.2 or newer. No other notification daemon may run: only one
-can own the D-Bus name. `noto-fonts-cjk` provides the
-katakana in the lock screen's digital rain.
+can own the D-Bus name.
 
 ## What's in it
 
@@ -75,8 +74,7 @@ radius, border width, opacity, animations), Fonts (a Nerd Font and a display
 font, with "Nerd Fonts only" and "Use Nerd Symbols font" switches), Bar (full width or floating with
 margins and rounded corners, clock format, weather location and unit, and which modules show on the primary monitor's bar and on
 the others; the clock always shows), Windows (window buttons, gaps for regular
-and Work-Game), Notifications
-(effects and the colors of the clock, rain, outlines, password dots and text),
+and Work-Game), Notifications,
 and Tray & Player (tray icon style, apps that keep their own colors, the
 visualizer and its bar count). They are saved to Quickshell's state folder
 (`~/.local/state/quickshell/by-shell/<id>/settings.json`). Defaults are in
