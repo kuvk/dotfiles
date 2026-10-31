@@ -58,7 +58,8 @@ EXTRA_DESTINATIONS = {
     "cliamp.toml": HOME / ".config/cliamp/themes/system.toml",
     "herdr-config.toml": HOME / ".config/herdr/config.toml",
     # GTK adds these to whatever theme is set (also replaces an old symlink here)
-    "gtk.css": [HOME / ".config/gtk-3.0/gtk.css", HOME / ".config/gtk-4.0/gtk.css"],
+    "gtk.css": HOME / ".config/gtk-3.0/gtk.css",
+    "gtk4.css": HOME / ".config/gtk-4.0/gtk.css",
     "gtk-settings.ini": [HOME / ".config/gtk-3.0/settings.ini", HOME / ".config/gtk-4.0/settings.ini"],
     "qt5ct.conf": HOME / ".config/qt5ct/qt5ct.conf",
     "qt6ct.conf": HOME / ".config/qt6ct/qt6ct.conf",
