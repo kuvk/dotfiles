@@ -42,6 +42,8 @@ GENERATED_FILE = HOME / ".config/hypr/configs/generated/monitors.lua"
 GAMEMODE = Path("/tmp/hypr-gamemode")
 LOG_FILE = HOME / ".cache/hypr-monitors.log"
 LOCK_FILE = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "hypr-monitors.lock"
+LAST_RUN_FILE = LOCK_FILE.with_name("hypr-monitors.last")
+LAST_RUN_WINDOW = 10.0  # s; the same monitors again this soon need nothing done
 GAMEMODE_SCRIPT = HOME / ".config/scripts/hypr-gamemode.sh"
 
 INTERNAL_PREFIXES = ("eDP", "LVDS", "DSI")
@@ -489,6 +491,20 @@ def wake_dark_monitors(data: dict, live: list[dict]) -> None:
     run(["hyprctl", "dispatch", 'hl.dsp.dpms({ action = "on" })'])
 
 
+def last_run_id(key: str) -> str:
+    return f"{os.environ.get('HYPRLAND_INSTANCE_SIGNATURE', '')}\n{key}"
+
+
+def handled_just_now(key: str) -> bool:
+    try:
+        return (
+            LAST_RUN_FILE.read_text() == last_run_id(key)
+            and time.time() - LAST_RUN_FILE.stat().st_mtime < LAST_RUN_WINDOW
+        )
+    except OSError:
+        return False
+
+
 def hotplug(startup: bool = False) -> int:
     """Monitors were plugged in or out (or the session just started): switch
     to the saved profile for the connected set. Waits for the set to settle;
@@ -508,6 +524,9 @@ def hotplug(startup: bool = False) -> int:
             descs = [(m.get("description") or "").strip() for m in live]
             DUPLICATES.update(d for d in descs if d and descs.count(d) > 1)
             key = profile_key(live)
+            # Login fires both the monitor.added event and `startup`: one run does the work
+            if handled_just_now(key):
+                return 0
             state = ", ".join(
                 f"{m['name']}{' disabled' if m.get('disabled') else ''}{' dpms-off' if not m.get('dpmsStatus', True) else ''}"
                 for m in live
@@ -515,14 +534,15 @@ def hotplug(startup: bool = False) -> int:
             log(f"{'startup' if startup else 'hotplug'}: applying profile '{key}' ({state})")
             data = load_profiles()
             apply(data, live)
+            # start from the first workspace on the new layout
+            run(["hyprctl", "dispatch", "hl.dsp.focus({ workspace = 1 })"])
             time.sleep(1)
             again = settle(4) or live
             if profile_key(again) == key:
                 wake_dark_monitors(data, again)
+                LAST_RUN_FILE.write_text(last_run_id(key))
                 break
             live = again
-        # start from the first workspace on the new layout
-        run(["hyprctl", "dispatch", "hl.dsp.focus({ workspace = 1 })"])
     return 0
 
 
