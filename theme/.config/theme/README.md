@@ -64,6 +64,7 @@ theme folder and set `wallpaper` under `[apps]`.
 | hyprshutdown, Hyprland's update and donation windows | `~/.config/hypr/hyprtoolkit.conf` | when a window next opens |
 | Claude Code | `~/.claude/themes/current.json`, with `"theme": "custom:current"` and `claude-statusline.sh` | live |
 | hyprlock | `current/hyprlock.conf` (`lockscreen.sh` fills in the monitor) | next lock |
+| Login screen (SDDM) | `/var/lib/kuvk-shell/theme.conf`, once `sddm/install.sh` has run | next logout |
 | swayimg | `current/swayimg.lua` (loaded by `~/.config/swayimg/init.lua`) | live (SIGUSR1) |
 | scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |
 | GTK apps | adw-gtk3 if installed, otherwise Adwaita, in the theme's mode; icons and `color-scheme` through `gsettings` and `settings.ini`; colors in `~/.config/gtk-{3,4}.0/gtk.css` | mode live; colors when an app next starts |

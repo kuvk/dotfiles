@@ -11,6 +11,7 @@ last until logout.
   wallpaper.py set static|live PATH [MONITOR]   apply (all monitors if none)
   wallpaper.py stop [MONITOR]            stop live wallpapers
   wallpaper.py pause                     pause/resume live wallpapers
+  wallpaper.py export-greeter            copy the wallpaper for the login screen
   wallpaper.py restore                   re-apply the saved static wallpapers (autostart)
 """
 
@@ -43,6 +44,7 @@ SKIP_DIRS = {"source"}
 
 STATE_DIR = Path(os.environ.get("XDG_STATE_HOME", HOME / ".local/state")) / "wallpaper"
 STATE_FILE = STATE_DIR / "state.json"
+GREETER_DIR = Path("/var/lib/kuvk-shell")  # only exists after sddm/install.sh
 CURRENT_LINK = STATE_DIR / "current"  # hyprpaper.conf points here
 CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME", HOME / ".cache")) / "wallpaper-thumbs"
 RUNTIME_DIR = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "wallpaper"
@@ -185,7 +187,20 @@ def set_static(path: Path, monitor: str | None) -> None:
         STATE_DIR.mkdir(parents=True, exist_ok=True)
         CURRENT_LINK.unlink(missing_ok=True)
         CURRENT_LINK.symlink_to(path)
+        export_greeter()
     save_state(state)
+
+
+def export_greeter() -> None:
+    """The login screen can't read your home folder, so it gets its own copy."""
+    if not GREETER_DIR.is_dir() or not CURRENT_LINK.exists():
+        return
+    tmp = GREETER_DIR / "wallpaper.tmp"
+    try:
+        shutil.copyfile(CURRENT_LINK, tmp)
+        tmp.replace(GREETER_DIR / "wallpaper")
+    except OSError as e:
+        print(f"wallpaper: could not copy for the login screen: {e}", file=sys.stderr)
 
 
 # ---------------------------------------------------------------- live
@@ -338,6 +353,8 @@ def run_command(argv: list[str]) -> int:
         out = list_json(args[0])
         debug(f"list {args[0]}: {len(json.loads(out))} items from {DIRS[args[0]]} (exists={DIRS[args[0]].is_dir()}), {len(out)} bytes")
         print(out, flush=True)
+    elif cmd == "export-greeter":
+        export_greeter()
     elif cmd == "thumbs" and args and args[0] in DIRS:
         thumbs(args[0])
     elif cmd == "set" and len(args) >= 2 and args[0] in DIRS:

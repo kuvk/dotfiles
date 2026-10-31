@@ -12,6 +12,7 @@ current live layout, and workspaces are split across the monitors.
   hypr-monitors.py startup              same, at login (waits for late outputs)
   hypr-monitors.py state                print the current profile as JSON (Quickshell)
   hypr-monitors.py set '<json>'         save and apply changes from Quickshell
+  hypr-monitors.py export-greeter       save each monitor's scale for the login screen
   hypr-monitors.py brightness           print brightness per monitor as JSON
   hypr-monitors.py brightness NAME PCT  set brightness (backlight or DDC/CI)
 
@@ -40,6 +41,7 @@ HOME = Path.home()
 PROFILES_FILE = HOME / ".config/hypr/monitors.json"
 GENERATED_FILE = HOME / ".config/hypr/configs/generated/monitors.lua"
 GAMEMODE = Path("/tmp/hypr-gamemode")
+GREETER_SCALES = Path("/var/lib/kuvk-shell/monitors.conf")  # only after sddm/install.sh
 LOG_FILE = HOME / ".cache/hypr-monitors.log"
 LOCK_FILE = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "hypr-monitors.lock"
 LAST_RUN_FILE = LOCK_FILE.with_name("hypr-monitors.last")
@@ -299,8 +301,33 @@ def apply_text_size(size: int) -> None:
         run(["pkill", "-USR1", "-x", "kitty"])
 
 
+def export_greeter_scales(profile: dict, live: list[dict]) -> None:
+    """Each monitor's latest scale for the login screen. Monitors not connected now keep
+    the one they had, so any monitor you plug in comes up at its last scale."""
+    if not GREETER_SCALES.parent.is_dir():
+        return
+    scales: dict[str, str] = {}
+    try:
+        for line in GREETER_SCALES.read_text().splitlines():
+            output, _, scale = line.partition("\t")
+            scales[output] = scale
+    except OSError:
+        pass
+    by_id = {ident(m): m for m in live}
+    for mid, mon in profile["monitors"].items():
+        if mid in by_id and mon.get("enabled", True):
+            scales[selector(mid, by_id)] = f"{mon.get('scale', 1)}"
+    content = "".join(f"{output}\t{scale}\n" for output, scale in scales.items())
+    try:
+        if not GREETER_SCALES.exists() or GREETER_SCALES.read_text() != content:
+            GREETER_SCALES.write_text(content)
+    except OSError as e:
+        log(f"could not write {GREETER_SCALES}: {e}")
+
+
 def apply(data: dict, live: list[dict], *, force_reload: bool = False) -> None:
     key, profile = current_profile(data, live)
+    export_greeter_scales(profile, live)
     content = render_lua(profile, live)
 
     GENERATED_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -561,6 +588,8 @@ def main(argv: list[str]) -> int:
     if cmd == "apply":
         log(f"apply: profile '{profile_key(live)}'")
         apply(data, live, force_reload="--reload" in argv)
+    elif cmd == "export-greeter":
+        export_greeter_scales(current_profile(data, live)[1], live)
     elif cmd == "state":
         print(json.dumps(state(data, live)))
     elif cmd == "set" and len(argv) > 1:
