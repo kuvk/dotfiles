@@ -64,6 +64,7 @@ theme folder and set `wallpaper` under `[apps]`.
 | hyprshutdown, Hyprland's update and donation windows | `~/.config/hypr/hyprtoolkit.conf` | when a window next opens |
 | Claude Code | `~/.claude/themes/current.json`, with `"theme": "custom:current"` and `claude-statusline.sh` | live |
 | hyprlock | `current/hyprlock.conf` (`lockscreen.sh` fills in the monitor) | next lock |
+| Cursor | Settings > Appearance; `theme-set.py` writes it to Hyprland, GTK, XWayland and the login screen | now; open apps when restarted |
 | Login screen (SDDM) | `/var/lib/kuvk-shell/theme.conf`, once `sddm/install.sh` has run | next logout |
 | swayimg | `current/swayimg.lua` (loaded by `~/.config/swayimg/init.lua`) | live (SIGUSR1) |
 | scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |

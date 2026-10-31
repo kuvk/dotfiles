@@ -11,6 +11,8 @@ Singleton {
 
     // Look
     property alias radius: adapter.radius
+    property alias cursorTheme: adapter.cursorTheme
+    property alias cursorSize: adapter.cursorSize
     property alias lockStyle: adapter.lockStyle
     property alias lockImage: adapter.lockImage
     property alias lockMatrixColor: adapter.lockMatrixColor
@@ -104,6 +106,8 @@ Singleton {
         adapter.barMargin = 6;
         adapter.panelOpacity = 0.9;
         adapter.animations = true;
+        adapter.cursorTheme = "Adwaita";
+        adapter.cursorSize = 24;
         adapter.lockStyle = "rain";
         adapter.lockImage = "";
         adapter.lockMatrixColor = "cyan";
@@ -158,6 +162,9 @@ Singleton {
 
             property int version: 0
             property int radius: 8
+            // read by scripts/theme-set.py
+            property string cursorTheme: "Adwaita"
+            property int cursorSize: 24
             // read by scripts/lockscreen.sh
             property string lockStyle: "rain" // "rain" (Matrix) | "picture" (Background) | "image"
             property string lockImage: ""

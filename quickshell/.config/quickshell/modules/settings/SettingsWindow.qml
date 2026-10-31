@@ -23,6 +23,7 @@ FloatingWindow {
         { id: "tray", label: "Tray & Player", icon: Icons.music }
     ]
     property string section: "appearance"
+    property var cursorThemes: ["Adwaita"]
 
     function cycle(list: var, value: var, step: int): var {
         const i = Math.max(0, list.indexOf(value));
@@ -176,6 +177,47 @@ FloatingWindow {
                                 Stepper {
                                     text: `${Config.radius} px`
                                     onStep: d => Config.radius = root.clamp(Config.radius + d, 0, 20)
+                                }
+                            }
+
+                            SettingRow {
+                                label: "Cursor"
+                                hint: "New apps pick it up; open ones when restarted. Only themes in /usr/share/icons reach the login screen"
+
+                                Stepper {
+                                    text: Config.cursorTheme
+                                    onStep: d => {
+                                        Config.cursorTheme = root.cycle(root.cursorThemes, Config.cursorTheme, d);
+                                        cursorApply.restart();
+                                    }
+                                }
+                            }
+
+                            SettingRow {
+                                label: "Cursor size"
+
+                                Stepper {
+                                    text: `${Config.cursorSize} px`
+                                    onStep: d => {
+                                        Config.cursorSize = root.clamp(Config.cursorSize + d * 4, 16, 64);
+                                        cursorApply.restart();
+                                    }
+                                }
+                            }
+
+                            // Stepping through several themes applies only the last
+                            Timer {
+                                id: cursorApply
+
+                                interval: 400
+                                onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--cursor", Config.cursorTheme, String(Config.cursorSize)])
+                            }
+
+                            Process {
+                                running: true
+                                command: [Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--cursors"]
+                                stdout: StdioCollector {
+                                    onStreamFinished: root.cursorThemes = JSON.parse(text)
                                 }
                             }
 
