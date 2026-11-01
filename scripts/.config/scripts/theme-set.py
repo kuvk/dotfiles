@@ -370,18 +370,6 @@ def render_ls_colors() -> None:
         print(f"theme-set: dircolors: {out.stderr.strip()}", file=sys.stderr)
 
 
-def render_folder_icons(theme: dict) -> None:
-    """Icon themes like Papirus draw 16px folders (file dialog lists) in the text color. A
-    tinted copy in the user's icon folder takes priority, in accent2 like the larger ones."""
-    name = theme["strings"]["icon_theme"]
-    root = Path("/usr/share/icons", name)
-    for source in [*root.glob("16x16*/places/folder*.svg"), *root.glob("16x16*/places/inode-directory.svg")]:
-        text = source.read_text(errors="ignore")
-        tinted = re.sub(r"(\.ColorScheme-Text\s*\{\s*color:\s*)#[0-9a-fA-F]+", rf"\g<1>{theme['colors']['accent2']}", text)
-        if tinted != text:
-            write_if_changed(HOME / ".local/share/icons" / name / source.relative_to(source.parents[2]), tinted)
-
-
 def generate(name: str) -> dict:
     theme = load_theme(name)
     theme["changed"] = set()
@@ -414,7 +402,6 @@ def generate(name: str) -> dict:
             write_if_changed(CURRENT_DIR / override.name, override.read_text())
 
     render_ls_colors()
-    render_folder_icons(theme)
     write_if_changed(STATE_FILE, name + "\n")
     return theme
 

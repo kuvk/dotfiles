@@ -67,7 +67,6 @@ theme folder and set `wallpaper` under `[apps]`.
 | Cursor | Settings > Appearance; `theme-set.py` writes it to Hyprland, GTK, XWayland and the login screen | now; open apps when restarted |
 | Icons | Settings > Appearance; `theme-set.py` writes it to GTK, Qt and hyprtoolkit | GTK now; Qt when restarted |
 | Fonts | Settings > Fonts; `theme-set.py` writes them to `gsettings`, `settings.ini`, qt5ct, qt6ct, hyprtoolkit, hyprlock, SDDM, and hinting and antialiasing to `current/fontconfig.conf` | reopened apps |
-| 16px folder icons | `~/.local/share/icons/<icon theme>/16x16*/`, copies in `accent2` for themes that draw them in the text color, such as Papirus | when an app next starts |
 | File dialogs | `xdg-desktop-portal-gtk`, restarted when `gtk.css` changes | live |
 | Window buttons | Settings > Windows; `theme-set.py` writes `gtk-decoration-layout` and `gsettings` (close only); `gtk.css` styles the button | GTK apps with a title bar, when reopened |
 | Login screen (SDDM) | `/var/lib/kuvk-shell/theme.conf`, once `sddm/install.sh` has run | next logout |
