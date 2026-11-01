@@ -54,16 +54,15 @@ EXTRA_DESTINATIONS = {
     "bat.tmTheme": HOME / ".config/bat/themes/Current.tmTheme",
     "cava": HOME / ".config/cava/themes/current",
     "yazi-theme.toml": HOME / ".config/yazi/theme.toml",
-    # catppuccin/tmux may be installed twice: cloned by hand to
-    # plugins/catppuccin/tmux and by TPM to plugins/tmux. Every copy that is
-    # there gets the flavor, or the one loaded last keeps the old colors.
+    # catppuccin/tmux may be at plugins/catppuccin/tmux and, through TPM, at
+    # plugins/tmux. Every copy gets the flavor, since the last one loaded wins.
     "tmux.conf": [
         HOME / ".tmux/plugins/catppuccin/tmux/themes/catppuccin_current_tmux.conf",
         HOME / ".tmux/plugins/tmux/themes/catppuccin_current_tmux.conf",
     ],
     "cliamp.toml": HOME / ".config/cliamp/themes/system.toml",
     "herdr-config.toml": HOME / ".config/herdr/config.toml",
-    # GTK adds these to whatever theme is set (also replaces an old symlink here)
+    # GTK adds these to whatever theme is set
     "gtk.css": HOME / ".config/gtk-3.0/gtk.css",
     "gtk4.css": HOME / ".config/gtk-4.0/gtk.css",
     "gtk-settings.ini": [HOME / ".config/gtk-3.0/settings.ini", HOME / ".config/gtk-4.0/settings.ini"],

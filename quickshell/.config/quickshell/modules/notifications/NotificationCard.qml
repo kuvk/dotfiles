@@ -130,11 +130,21 @@ Item {
                 Layout.fillWidth: true
                 spacing: 12
 
+                Icon {
+                    Layout.alignment: Qt.AlignTop
+                    Layout.preferredWidth: 40
+                    Layout.preferredHeight: 40
+                    visible: text !== ""
+                    text: Notifs.appGlyphs[root.appName] ?? ""
+                    color: Theme.highlight
+                    font.pixelSize: 26
+                }
+
                 IconImage {
                     Layout.alignment: Qt.AlignTop
                     implicitSize: 40
                     source: root.imageSource
-                    visible: root.imageSource !== ""
+                    visible: root.imageSource !== "" && !Notifs.appGlyphs[root.appName]
                 }
 
                 ColumnLayout {

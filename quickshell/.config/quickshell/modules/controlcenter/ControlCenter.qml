@@ -291,10 +291,16 @@ PanelWindow {
                                 Layout.fillWidth: true
                                 spacing: 8
 
+                                Icon {
+                                    visible: text !== ""
+                                    text: Notifs.appGlyphs[group.modelData.app] ?? ""
+                                    color: Theme.highlight
+                                }
+
                                 IconImage {
                                     implicitSize: 18
                                     source: group.iconSource
-                                    visible: group.iconSource !== ""
+                                    visible: group.iconSource !== "" && !Notifs.appGlyphs[group.modelData.app]
                                 }
 
                                 StyledText {

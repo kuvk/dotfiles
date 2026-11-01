@@ -5,7 +5,7 @@ import Quickshell
 import Quickshell.Services.Notifications
 import qs.config
 
-// Notification daemon (replaces swaync). Tracked notifications are the
+// Notification daemon. Tracked notifications are the
 // history shown in the control center; `popups` are the ones on screen.
 Singleton {
     id: root
@@ -61,6 +61,14 @@ Singleton {
     function appIconOf(n: Notification): string {
         return webAppOf(n)?.icon || n.appIcon;
     }
+
+    // Shell glyphs for the dotfiles' own scripts, matching the bar and Control
+    // Center. Add a script here by its notify-send -a name.
+    readonly property var appGlyphs: ({
+            "Work-Game": Icons.rocket,
+            "Theme": Icons.palette,
+            "Wallpapers": Icons.image
+        })
 
     function bodyOf(n: Notification): string {
         return webAppOf(n) ? n.body.replace(siteLine, "").trim() : n.body;

@@ -6,7 +6,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// Every keybinding, like Omarchy's keybindings menu (ALT+SHIFT+/). Hyprland's
+// Every keybinding (ALT+SHIFT+/). Hyprland's
 // come from ~/.config/hypr/configs/bindings.lua through hypr-keybinds.py, so
 // the list follows that file; the shell's own keys inside its windows are
 // listed below them. Type to filter. A regular window like Settings and

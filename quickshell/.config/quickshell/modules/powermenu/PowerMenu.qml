@@ -7,8 +7,8 @@ import qs.config
 import qs.components
 import qs.services
 
-// Replacement for wlogout: every monitor gets a blurred, dimmed overlay and the
-// focused one shows a row of icon buttons (same proportions as before).
+// Every monitor gets a blurred, dimmed overlay and the
+// focused one shows a row of icon buttons.
 // Keys: l e u r s, arrows/Tab + Enter; Esc or a click on the background closes.
 Scope {
     id: root

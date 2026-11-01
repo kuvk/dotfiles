@@ -95,8 +95,7 @@ setopt auto_cd
 
 HISTSIZE=100000
 SAVEHIST=100000
-# Outside the dotfiles repo. A shell still open from before the move keeps
-# writing to the old file, so whatever lands there is merged in.
+# Outside the dotfiles repo; a history file found in $ZDOTDIR is merged in.
 HISTFILE=${XDG_STATE_HOME:-$HOME/.local/state}/zsh/history
 [[ -d ${HISTFILE:h} ]] || mkdir -p ${HISTFILE:h}
 if [[ -f $ZDOTDIR/.zsh_history ]]; then

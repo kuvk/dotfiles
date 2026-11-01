@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # One-time setup so theme-set.py can color Chromium and Brave (Settings >
-# Appearance > Theme must be "Classic"). Same approach as Omarchy: the color
+# Appearance > Theme must be "Classic"). The color
 # goes into the browsers' managed policy (BrowserThemeColor). Those folders
 # belong to root, so this installs a small root-owned helper that only accepts
 # a 6-digit hex color, and a sudoers rule that lets you run exactly that

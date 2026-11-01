@@ -7,7 +7,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// Name of the focused app, shown on the focused monitor (like waybar's separate-outputs)
+// Name of the focused app, shown on the focused monitor
 Row {
     id: root
 

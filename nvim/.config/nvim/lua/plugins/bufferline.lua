@@ -1,5 +1,4 @@
 -- Highlights that differ from bufferline's defaults, from the current theme
--- (they used to be hardcoded Mocha values)
 local function custom_highlights()
   local p = require("theme").palette
   local fill = p.dark_bg

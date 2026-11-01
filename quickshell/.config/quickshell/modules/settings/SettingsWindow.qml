@@ -183,7 +183,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Cursor"
-                                hint: "New apps pick it up; open ones when restarted. Only themes in /usr/share/icons reach the login screen"
+                                hint: "Restart open apps to apply"
 
                                 Stepper {
                                     text: Config.cursorTheme
@@ -208,7 +208,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Icons"
-                                hint: "GTK apps change now, Qt apps and the shell when restarted. A theme with -Light and -Dark versions follows the color theme"
+                                hint: "Restart Qt apps to apply"
 
                                 Stepper {
                                     text: Config.iconTheme
@@ -261,7 +261,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Bar opacity"
-                                hint: "Below 50% Hyprland stops blurring it"
+                                hint: "No blur below 50%"
 
                                 Stepper {
                                     text: `${Math.round(Config.barOpacity * 100)}%`
@@ -271,7 +271,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Panel opacity"
-                                hint: "Dropdowns, launchers, tooltips, Control Center"
+                                hint: "Dropdowns, launchers, tooltips"
 
                                 Stepper {
                                     text: `${Math.round(Config.panelOpacity * 100)}%`
@@ -297,7 +297,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Floating bar"
-                                hint: "Margins around the bar and rounded corners; off: full width, square"
+                                hint: "Off: full width, square"
 
                                 Switch {
                                     checked: Config.barFloating
@@ -308,7 +308,7 @@ FloatingWindow {
                             SettingRow {
                                 visible: Config.barFloating
                                 label: "Bar margin"
-                                hint: "Space to the left, right and top of the floating bar"
+                                hint: "Space around the floating bar"
 
                                 Stepper {
                                     text: `${Config.barMargin} px`
@@ -327,7 +327,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Weather location"
-                                hint: "City name, or empty to detect from your IP"
+                                hint: "Empty: detect from IP"
 
                                 Rectangle {
                                     implicitWidth: 220
@@ -374,7 +374,7 @@ FloatingWindow {
                             StyledText {
                                 Layout.topMargin: 8
                                 Layout.fillWidth: true
-                                text: "Modules on the primary monitor's bar and on the other bars. The clock is always shown."
+                                text: "Modules for each bar. The clock always shows."
                                 color: Theme.overlay1
                                 wrapMode: Text.Wrap
                             }
@@ -461,7 +461,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Window buttons"
-                                hint: "Close button on the shell's windows and GTK apps"
+                                hint: "Close button on shell and GTK windows"
 
                                 Switch {
                                     checked: Config.windowButtons
@@ -473,7 +473,7 @@ FloatingWindow {
                             }
 
                             StyledText {
-                                text: "Gaps between windows (inner) and to the screen edge (outer)."
+                                text: "Inner: between windows. Outer: to the screen edge."
                                 color: Theme.overlay1
                                 wrapMode: Text.Wrap
                                 Layout.fillWidth: true
@@ -524,7 +524,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Popup timeout"
-                                hint: "Critical notifications stay until closed"
+                                hint: "Critical ones stay until closed"
 
                                 Stepper {
                                     text: `${Config.notificationTimeout} s`
@@ -542,8 +542,8 @@ FloatingWindow {
                             SettingRow {
                                 label: "Style"
                                 hint: ({
-                                    rain: "Falling characters; locks about a second later, once they're on screen",
-                                    picture: "Your current wallpaper",
+                                    rain: "Falling characters",
+                                    picture: "Current wallpaper",
                                     image: "An image you choose"
                                 })[Config.lockStyle] ?? ""
 
@@ -556,7 +556,7 @@ FloatingWindow {
                             SettingRow {
                                 visible: Config.lockStyle === "rain"
                                 label: "Matrix color"
-                                hint: "The terminal's color of that name, so the exact shade follows the theme"
+                                hint: "Shade follows the theme"
 
                                 Stepper {
                                     text: Config.lockMatrixColor
@@ -567,7 +567,7 @@ FloatingWindow {
                             SettingRow {
                                 visible: Config.lockStyle === "image"
                                 label: "Image"
-                                hint: Config.lockImage || "None chosen: the wallpaper is used"
+                                hint: Config.lockImage || "None: uses the wallpaper"
 
                                 TextButton {
                                     text: "Choose…"
@@ -680,7 +680,7 @@ FloatingWindow {
 
                             StyledText {
                                 Layout.fillWidth: true
-                                text: "For the shell, GTK and Qt apps, Hyprland's windows, and the lock and login screens. Terminals keep their own fonts (kitty.conf). Open apps pick up changes when reopened."
+                                text: "Used everywhere but terminals. Reopen apps to apply."
                                 color: Theme.overlay1
                                 font.pixelSize: Theme.fontSize - 1
                                 wrapMode: Text.Wrap
@@ -688,7 +688,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Nerd Fonts only"
-                                hint: "Text uses the Nerd Font too; the display font is not used"
+                                hint: "Nerd Font for all text"
 
                                 Switch {
                                     checked: Config.nerdFontOnly
@@ -701,7 +701,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Use Nerd Symbols font"
-                                hint: "Icons from Symbols Nerd Font; off: from the Nerd Font"
+                                hint: "Off: icons from the Nerd Font"
 
                                 Switch {
                                     checked: Config.nerdSymbols
@@ -745,7 +745,7 @@ FloatingWindow {
                             SettingRow {
                                 Layout.topMargin: 4
                                 label: "Hinting"
-                                hint: "Fits letters to the pixel grid. Slight keeps their shapes and spacing"
+                                hint: "Slight suits most screens"
 
                                 Stepper {
                                     text: Config.fontHinting.charAt(0).toUpperCase() + Config.fontHinting.slice(1)
@@ -758,7 +758,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Antialiasing"
-                                hint: "Subpixel is sharpest on RGB screens; grayscale has no color fringes"
+                                hint: "Grayscale avoids color fringes"
 
                                 Stepper {
                                     text: ({ none: "None", grayscale: "Grayscale", rgba: "Subpixel" })[Config.fontAntialiasing]
@@ -786,7 +786,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Tray icons"
-                                hint: "Tinted blends them toward the theme, monochrome draws them in one color"
+                                hint: "Blend with the theme, or one color"
 
                                 Stepper {
                                     text: Config.trayMonochrome ? "Monochrome" : (Config.trayTint ? "Tinted" : "Original")
@@ -802,7 +802,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Keep original colors for"
-                                hint: "Tray apps whose icon color means something, comma separated"
+                                hint: "App names, comma separated"
 
                                 Rectangle {
                                     implicitWidth: 220

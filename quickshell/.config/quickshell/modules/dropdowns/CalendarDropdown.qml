@@ -4,7 +4,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// Month view with ISO week numbers, like the waybar/Omarchy calendar.
+// Month view with ISO week numbers.
 // Scroll or use the arrows to change month, click the title to go back to today.
 Dropdown {
     id: root

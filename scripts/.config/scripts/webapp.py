@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Web apps like Omarchy's: a site in its own browser window (no tabs, no
+"""Web apps: a site in its own browser window (no tabs, no
 address bar, no extension icons) with a launcher entry and an icon, so it
 shows up in the search launcher and the app menu (Internet).
 

@@ -1,7 +1,6 @@
 # Themes
 
-Works like Omarchy's theme switching: one palette per theme, rendered into
-every app's format, with running apps reloaded.
+One palette per theme, rendered into every app's format, with running apps reloaded.
 
 ```
 themes/<name>/colors.toml   the palette, the only file a theme needs
@@ -40,7 +39,7 @@ Omarchy themes are semantic (background, foreground, accent, ANSI colors), so
 the importer interpolates the in-between shades. Terminal colors match Omarchy's
 kitty template. Neovim uses the theme's own colorscheme where Omarchy names one,
 and otherwise [aether](https://github.com/omacom/aether.nvim) built from the
-palette, as Omarchy does. Wallpapers aren't imported (161 MB); put one in a
+palette. Wallpapers aren't imported (161 MB); put one in a
 theme folder and set `wallpaper` under `[apps]`.
 
 | App | Reads | Reload |
@@ -67,10 +66,14 @@ theme folder and set `wallpaper` under `[apps]`.
 | hyprlock | `current/hyprlock.conf` (`lockscreen.sh` fills in the monitor) | next lock |
 | Cursor | Settings > Appearance; `theme-set.py` writes it to Hyprland, GTK, XWayland and the login screen | now; open apps when restarted |
 | Icons | Settings > Appearance; `theme-set.py` writes it to GTK, Qt and hyprtoolkit | GTK now; Qt when restarted |
+| Fonts | Settings > Fonts; `theme-set.py` writes them to `gsettings`, `settings.ini`, qt5ct, qt6ct, hyprtoolkit, hyprlock, SDDM, and hinting and antialiasing to `current/fontconfig.conf` | reopened apps |
+| Window buttons | Settings > Windows; `theme-set.py` writes `gtk-decoration-layout` and `gsettings` (close only); `gtk.css` styles the button | GTK apps with a title bar, when reopened |
 | Login screen (SDDM) | `/var/lib/kuvk-shell/theme.conf`, once `sddm/install.sh` has run | next logout |
 | swayimg | `current/swayimg.lua` (loaded by `~/.config/swayimg/init.lua`) | live (SIGUSR1) |
 | scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |
 | GTK apps | adw-gtk3 if installed, otherwise Adwaita, in the theme's mode; icons and `color-scheme` through `gsettings` and `settings.ini`; colors in `~/.config/gtk-{3,4}.0/gtk.css` | mode live; colors when an app next starts |
+
+fastfetch uses `~/.config/fastfetch/config.jsonc`, generated from `base.jsonc` on each theme switch.
 
 `theme-set.py --shape rounded|square` sets the status line corners in tmux, nvim, yazi and Claude Code. Quickshell calls it: square in Work-Game or with the corner radius at 0.
 
@@ -78,7 +81,7 @@ Selected text uses the `selection_bg` (gray) and `selection_fg` (accent, or text
 
 ## Power menu icons
 
-The power menu and the Control Center use wlogout's icons, recolored per theme
+The power menu and the Control Center use icons from wlogout, recolored per theme
 (lock green, sleep peach, log out teal, reboot mauve, shut down red). The
 sources are in `icons/source/`, and `~/.config/scripts/theme-icons.py` writes
 `icons/<theme>/*.svg` for every theme (`--missing` only for themes without a
@@ -107,6 +110,3 @@ Add `templates/<output-file>.tpl` with placeholders such as `{{ base }}` (`#1e1e
 `{{ term_color1 }}`, `{{ mode }}`, `{{ theme_name }}`, or any `[apps]` key. Point the
 app at `~/.config/theme/current/<output-file>`, and add a reload command to
 `reload_apps()` in `theme-set.py` if the app supports one.
-
-Not wired up yet: yazi, lazygit, bat, fastfetch, cava, the GTK/Qt widget themes,
-and SDDM.

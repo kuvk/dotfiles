@@ -104,7 +104,7 @@ ShellRoot {
             Panels.toggleLauncher("apps");
         }
 
-        // the theme carousel (kept here for old bindings)
+        // the theme carousel
         function themes(): void {
             Panels.toggleThemes();
         }

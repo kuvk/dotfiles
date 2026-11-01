@@ -17,7 +17,7 @@ fi
 
 notify() {
     command -v notify-send >/dev/null 2>&1 || return 0
-    notify-send -a "Work-Game" -i input-gaming -t 1500 "$1"
+    notify-send -a "Work-Game" -i input-gaming "$1"
 }
 
 # Work-Game: no animations, blur or rounding. Quickshell goes opaque,
@@ -39,7 +39,6 @@ hl.config({
         blur = { enabled = false },
         inactive_opacity = 1,
         rounding = 0,
-        rounding_power = 0,
     },
     general = {
         border_size = 2,
@@ -52,7 +51,7 @@ hl.config({
 hl.window_rule({ name = 'kitty', match = { class = 'kitty' }, opaque = true, no_blur = true  })
 hl.window_rule({ name = 'spotify', match = { class = 'spotify' }, opaque = true, no_blur = true })
 hl.window_rule({ name = 'thunderbird', match = { class = 'org.mozilla.Thunderbird' }, opaque = true, no_blur = true })
-"
+" || true
 
     notify "Work-Game mode is ON"
 }
@@ -82,7 +81,7 @@ hl.config({
 hl.window_rule({ name = 'kitty', match = { class = 'kitty' }, opaque = false, no_blur = false })
 hl.window_rule({ name = 'spotify', match = { class = 'spotify' }, opaque = false, no_blur = false })
 hl.window_rule({ name = 'thunderbird', match = { class = 'org.mozilla.Thunderbird' }, opaque = false, no_blur = false  })
-"
+" || true
     notify "Work-Game mode is OFF"
 }
 

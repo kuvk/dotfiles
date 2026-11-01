@@ -9,7 +9,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// Omarchy-style wallpaper carousel: the selected wallpaper is a large slanted
+// Wallpaper carousel: the selected wallpaper is a large slanted
 // card in the middle, the others are narrow slanted slices to the left and
 // right. Same picker for static (~/Pictures/Wallpapers) and live
 // (~/Pictures/WallpapersLive) wallpapers; Tab switches between them.
@@ -21,9 +21,7 @@ PanelWindow {
 
     readonly property string kind: Panels.wallpapers
     // For bindings only. Code that runs when `kind` changes must test `kind`
-    // itself: in onKindChanged this binding still holds its old value, which
-    // made every fresh opening skip its load (empty carousel) and every close
-    // run `wallpaper.py list ""`. Tab worked because `shown` was already true.
+    // itself: in onKindChanged this binding still holds its previous value.
     readonly property bool shown: kind !== ""
     readonly property string script: Quickshell.env("HOME") + "/.config/scripts/wallpaper.py"
 
@@ -37,15 +35,13 @@ PanelWindow {
     // the current wallpaper
     property bool moved: false
 
-    // Lists kept between openings and loaded at startup (like Omarchy's
-    // picker rows), so the previews are there the moment it opens; every
+    // Lists kept between openings and loaded at startup, so the previews are there the moment it opens; every
     // opening refreshes them in the background.
     property var cache: ({ static: null, live: null })
 
     // A freshly mapped layer surface starts with a small size and scale 1;
     // the output's real size and (fractional) scale arrive a frame or two
-    // later. Cards built before that never showed until Tab rebuilt them.
-    // As in Omarchy's OverlayWindow, the content stays transparent and the
+    // later, so the content stays transparent and the
     // cards aren't created until the window matches its monitor.
     readonly property var targetMonitor: {
         const mons = Hyprland.monitors.values;

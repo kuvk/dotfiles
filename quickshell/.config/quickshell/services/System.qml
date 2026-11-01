@@ -18,7 +18,7 @@ Singleton {
     property bool gamemode: false
     // Stay Awake was switched on by Work-Game, so leaving it switches it off
     property bool awakeForGamemode: false
-    // Something is playing: keep the screen awake (replaces media-inhibit.sh)
+    // Something is playing: keep the screen awake
     readonly property bool mediaPlaying: Media.players.some(p => p.isPlaying)
 
     // Work-Game makes the bar full width; ALT+B can still float it while it
@@ -74,7 +74,7 @@ Singleton {
     }
 
     // Shared by the power menu and the control center. `key` is the power
-    // menu shortcut, `color` a Theme color name (same colors as the old wlogout icons).
+    // menu shortcut, `color` a Theme color name.
     readonly property var sessionActions: [
         { id: "lock", label: "Lock", icon: Icons.lock, key: "l", color: "green" },
         { id: "suspend", label: "Sleep", icon: Icons.bed, key: "u", color: "peach" },
