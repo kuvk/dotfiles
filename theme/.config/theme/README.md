@@ -17,7 +17,7 @@ current/                    generated (gitignored); app configs point here
 ~/.config/scripts/theme-set.py --list
 ```
 
-Or press `ALT+SHIFT+T`, or use the Theme tile in the control center.
+Or press `SUPER+CTRL+T`, or use the Theme tile in the control center.
 
 ## Included themes
 
@@ -53,7 +53,7 @@ theme folder and set `wallpaper` under `[apps]`.
 | tmux | `~/.tmux/plugins/catppuccin/tmux/themes/catppuccin_current_tmux.conf`, a catppuccin/tmux flavor (the plugin is loaded by `.tmux.conf`, not TPM) | live (`source-file`) |
 | starship | `~/.config/starship.toml` (generated from `~/.config/starship/base.toml` + palette) | next prompt |
 | lazygit | `current/lazygit.yml` (via `LG_CONFIG_FILE`) | next start |
-| yazi | `~/.config/yazi/theme.toml` | live for yazi started with `yazi-live.sh` (`ALT+E`, `y`): it reopens in the same folder |
+| yazi | `~/.config/yazi/theme.toml` | live for yazi started with `yazi-live.sh` (`SUPER+E`, `y`): it reopens in the same folder |
 | cava | `~/.config/cava/themes/current` | live (SIGUSR2) |
 | Chromium, Brave | managed policy `BrowserThemeColor` (one-time `browser-theme-setup.sh`) | live |
 | cliamp | `~/.config/cliamp/themes/system.toml` | live (`cliamp theme system`) |

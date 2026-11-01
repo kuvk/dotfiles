@@ -221,9 +221,12 @@ PanelWindow {
                     title: "Notifications"
 
                     MouseArea {
+                        id: clearButton
+
                         visible: Notifs.count > 0
                         implicitWidth: clearLabel.implicitWidth + 16
                         implicitHeight: 26
+                        hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: Notifs.clearAll()
 
@@ -232,7 +235,7 @@ PanelWindow {
 
                             anchors.centerIn: parent
                             text: `${Icons.clearAll}  Clear`
-                            color: Theme.subtext0
+                            color: clearButton.containsMouse ? Theme.accent2 : Theme.subtext0
                         }
                     }
                 }

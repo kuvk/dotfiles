@@ -11,7 +11,7 @@ stow hypr quickshell theme scripts fontconfig kitty tmux zsh nvim yazi   # or an
 
 | Package | What it has |
 |---|---|
-| `hypr` | Hyprland config in Lua, hypridle, Work-Game, window rules. `ALT+SHIFT+/` lists every key |
+| `hypr` | Hyprland config in Lua, hypridle, Work-Game, window rules. `SUPER+/` lists every key |
 | `quickshell` | Bar, notifications, launchers, clipboard history, panels, settings. See [its README](quickshell/.config/quickshell/README.md) |
 | `theme` | One palette rendered into every app, with live reloads. See [its README](theme/.config/theme/README.md) |
 | `scripts` | `theme-set.py`, `wallpaper.py`, `hypr-monitors.py`, `lockscreen.sh`, `webapp.py`, `network.py`, `sysmaintenance.sh` and others |
@@ -19,6 +19,12 @@ stow hypr quickshell theme scripts fontconfig kitty tmux zsh nvim yazi   # or an
 | `fontconfig` | Font folders; rendering comes from Settings > Fonts |
 | `kitty`, `tmux`, `zsh` | Terminal, multiplexer and shell (below) |
 | `nvim`, `lazygit`, `yazi`, `bat`, `btop`, `cava`, `fastfetch`, `starship`, `swayimg`, `spotify`, `cliamp` | App configs; those with colors follow the theme |
+
+## Window manager keys
+
+The main modifier is `SUPER`, set by `mainMod` in `hypr/.config/hypr/configs/bindings.lua`. Left Alt and
+left Super are swapped (`altwin:swap_lalt_lwin` in `input.lua`), so `SUPER` is the physical left Alt key.
+Alt+Space switches keyboard layout. `SUPER+/` lists every binding.
 
 ## Terminal keys
 

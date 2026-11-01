@@ -21,7 +21,7 @@ Singleton {
     // Something is playing: keep the screen awake
     readonly property bool mediaPlaying: Media.players.some(p => p.isPlaying)
 
-    // Work-Game makes the bar full width; ALT+B can still float it while it
+    // Work-Game makes the bar full width; SUPER+CTRL+B can still float it while it
     // lasts, and leaving restores what it was before
     property var floatingBeforeGame: null
 

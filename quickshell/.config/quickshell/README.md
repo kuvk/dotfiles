@@ -21,7 +21,7 @@ can own the D-Bus name.
 
 | Part | File | Opens with |
 |---|---|---|
-| Top bar (one per monitor), tooltips on hover | `modules/bar/Bar.qml` | starts with `qs`; `ALT+SHIFT+Space` hides/shows it, `ALT+B` floats it |
+| Top bar (one per monitor), tooltips on hover | `modules/bar/Bar.qml` | starts with `qs`; `SUPER+SHIFT+B` hides/shows it, `SUPER+CTRL+B` floats it |
 | Clock and calendar (week numbers, scroll for months) | `modules/dropdowns/CalendarDropdown.qml` | click the clock |
 | Weather (wttr.in) | `modules/dropdowns/WeatherDropdown.qml` | click the temperature |
 | Network: Wi-Fi, wired on/off, WireGuard/VPN (import `.conf` from `~/.config/wireguard` or `~/Downloads`), details, live throughput, DNS, speed test | `modules/dropdowns/NetworkDropdown.qml` + `scripts/network.py` | click the network icon |
@@ -32,20 +32,20 @@ can own the D-Bus name.
 | Battery, power mode (Quiet / Balanced / Performance) | `modules/dropdowns/BatteryDropdown.qml` | click the battery |
 | Night light | `scripts/nightlight-toggle.sh` + `services/System.qml` | the Control Center tile |
 | Stay awake | `services/System.qml` | the coffee icon (holds an idle inhibitor); while media plays an inhibitor is held automatically |
-| Work-Game (no blur/animations/rounding, game gaps, turns Stay Awake on) | `scripts/hypr-gamemode.sh` + `services/System.qml` | the rocket icon, the Control Center tile, or `ALT+G` |
-| Displays | `modules/displays/DisplaysPanel.qml` | the monitor icon, or `ALT+CTRL+M` |
+| Work-Game (no blur/animations/rounding, game gaps, turns Stay Awake on) | `scripts/hypr-gamemode.sh` + `services/System.qml` | the rocket icon, the Control Center tile, or `SUPER+G` |
+| Displays | `modules/displays/DisplaysPanel.qml` | the monitor icon, or `SUPER+CTRL+M` |
 | Notification popups, with actions and inline replies; web apps show their own name and icon | `modules/notifications/NotificationPopups.qml` | |
-| Clipboard history: text and images, type to filter | `modules/launcher/Clipboard.qml` | `ALT+SHIFT+V` |
-| Control Center: toggles, sliders, media (with visualizer), notifications grouped by app, session buttons | `modules/controlcenter/ControlCenter.qml` | `ALT+N`, or the sliders icon (right-click toggles DND) |
-| Search launcher (just the field; apps appear as you type) | `modules/launcher/Launcher.qml` | `ALT+Space` |
-| App menu: categories on the left, apps on the right | `modules/launcher/AppMenu.qml` + `services/Apps.qml` | the Arch icon, or `ALT+CTRL+Space` |
-| Theme carousel (each card the theme's palette as bars, type to search; other monitors are blurred) | `modules/themes/ThemePicker.qml` | `ALT+SHIFT+T`, or the Theme tile |
-| Power menu | `modules/powermenu/PowerMenu.qml` | `ALT+SHIFT+E`, or the power icon |
-| Lock screen | hyprlock with `scripts/lockscreen.sh` | `` ALT+` ``, hypridle |
-| Wallpaper carousel (type to search; other monitors are blurred) | `modules/wallpaper/WallpaperPicker.qml` | `ALT+W`, Tab for live wallpapers |
+| Clipboard history: text and images, type to filter | `modules/launcher/Clipboard.qml` | `SUPER+SHIFT+V` |
+| Control Center: toggles, sliders, media (with visualizer), notifications grouped by app, session buttons | `modules/controlcenter/ControlCenter.qml` | `SUPER+N`, or the sliders icon (right-click toggles DND) |
+| Search launcher (just the field; apps appear as you type) | `modules/launcher/Launcher.qml` | `SUPER+Space` |
+| App menu: categories on the left, apps on the right | `modules/launcher/AppMenu.qml` + `services/Apps.qml` | the Arch icon, or `SUPER+CTRL+Space` |
+| Theme carousel (each card the theme's palette as bars, type to search; other monitors are blurred) | `modules/themes/ThemePicker.qml` | `SUPER+CTRL+T`, or the Theme tile |
+| Power menu | `modules/powermenu/PowerMenu.qml` | `SUPER+CTRL+Q`, or the power icon |
+| Lock screen | hyprlock with `scripts/lockscreen.sh` | `` SUPER+` ``, hypridle |
+| Wallpaper carousel (type to search; other monitors are blurred) | `modules/wallpaper/WallpaperPicker.qml` | `SUPER+W`, Tab for live wallpapers |
 | System information (fastfetch's output in a window sized to it) | `modules/sysinfo/SysinfoWindow.qml` | the ⓘ button in the app menu and Control Center |
-| Keybindings (built from `bindings.lua`, type to filter) | `modules/keybinds/KeybindsWindow.qml` + `scripts/hypr-keybinds.py` | `ALT+SHIFT+/` |
-| Settings | `modules/settings/SettingsWindow.qml` | `ALT+CTRL+P`, or the gear in the Control Center |
+| Keybindings (built from `bindings.lua`, type to filter) | `modules/keybinds/KeybindsWindow.qml` + `scripts/hypr-keybinds.py` | `SUPER+/` |
+| Settings | `modules/settings/SettingsWindow.qml` | `SUPER+CTRL+S`, or the gear in the Control Center |
 
 The search launcher takes arrows, Tab, Ctrl+J/K and Ctrl+N/P to move, Enter to
 launch, and Esc to clear and close. The app menu switches categories with ←/→
@@ -133,8 +133,8 @@ Appearance > "Use system title bar and borders".
 `~/Pictures/Wallpapers` (hyprpaper), live ones in `~/Pictures/WallpapersLive`
 (mpvpaper, one process per monitor, paused while covered by windows). Enter
 applies to every monitor, Shift+Enter to the focused one only. The choice is
-saved and restored at login. `ALT+CTRL+W` stops live wallpapers and
-`ALT+SHIFT+W` pauses them. Put source videos in `~/Pictures/WallpapersLive/source`
+saved and restored at login. `SUPER+CTRL+W` stops live wallpapers and
+`SUPER+SHIFT+W` pauses them. Put source videos in `~/Pictures/WallpapersLive/source`
 and run `convert-live-wallpapers.py` to make lighter 1440p/30fps copies.
 
 ## Displays

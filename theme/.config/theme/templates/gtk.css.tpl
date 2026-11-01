@@ -96,25 +96,25 @@ windowcontrols > button.close:hover > image {
 
 /* Main dialog buttons (OK, Open): a clearer hover, and readable while disabled */
 button.suggested-action {
-  background-color: {{ accent2 }};
+  background-color: shade({{ accent2 }}, 0.6);
   background-image: none;
-  color: {{ base }};
+  color: {{ subtext0 }};
 }
 
 button.suggested-action:hover {
-  background-color: shade({{ accent2 }}, 1.2);
+  background-color: shade({{ accent2 }}, 1);
   background-image: none;
-  color: {{ base }};
+  color: {{ text }};
 }
 
 button.suggested-action:active {
-  background-color: shade({{ accent2 }}, 0.85);
+  background-color: shade({{ accent2 }}, 1);
   background-image: none;
-  color: {{ base }};
+  color: {{ text }};
 }
 
 button.suggested-action:disabled {
-  background-color: {{ surface1 }};
+  background-color: mix({{ accent2 }}, {{ base }}, 0.2);
   background-image: none;
   color: {{ subtext0 }};
   opacity: 1;

@@ -24,41 +24,41 @@ local gamemode = "~/.config/scripts/hypr-gamemode.sh"
 ---------------------
 ---- KEYBINDINGS ----
 ---------------------
--- The Keybindings window (mainMod + SHIFT + /) is built from this file by
+-- The Keybindings window (mainMod + /) is built from this file by
 -- ~/.config/scripts/hypr-keybinds.py: a "-- Name" line starts a section, a
 -- trailing "-- text" describes a bind, and "--> keys | text" lines describe
 -- binds made in loops.
-local mainMod = "ALT"
+local mainMod = "SUPER"
 
 -- General Binds
 hl.bind(mainMod .. " + return", hl.dsp.exec_cmd(terminal)) -- Terminal
 hl.bind(mainMod .. " + CONTROL + return", hl.dsp.exec_cmd(browser)) -- Browser
-hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(email)) -- Email
-hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(notifications)) -- Control Center
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager)) -- File manager
+hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(email)) -- Email
+hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(notifications)) -- Control Center
 hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(menu)) -- Search apps
 hl.bind(mainMod .. " + CONTROL + space", hl.dsp.exec_cmd(appMenu)) -- App menu with categories
-hl.bind(mainMod .. " + SHIFT + space", hl.dsp.exec_cmd(bar)) -- Show / hide the bar
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("qs ipc call bar floating")) -- Floating / full-width bar
-hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd(themes)) -- Theme carousel
+hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(bar)) -- Show / hide the bar
+hl.bind(mainMod .. " + CONTROL + B", hl.dsp.exec_cmd("qs ipc call bar floating")) -- Floating / full-width bar
+hl.bind(mainMod .. " + CONTROL + T", hl.dsp.exec_cmd(themes)) -- Theme carousel
 hl.bind(mainMod .. " + CONTROL + M", hl.dsp.exec_cmd(displays)) -- Displays
-hl.bind(mainMod .. " + CONTROL + P", hl.dsp.exec_cmd(settings)) -- Settings
+hl.bind(mainMod .. " + CONTROL + S", hl.dsp.exec_cmd(settings)) -- Settings
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(music)) -- Music player (cliamp)
 hl.bind(mainMod .. " + Q", hl.dsp.window.close()) -- Close window
+hl.bind(mainMod .. " + CONTROL + Q", hl.dsp.exec_cmd(powermenu)) -- Power menu
 hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd(lock)) -- Lock screen
-hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(powermenu)) -- Power menu
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" })) -- Float / tile window
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(clipboard)) -- Clipboard history
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen()) -- Fullscreen
 hl.bind(mainMod .. " + S", hl.dsp.layout("togglesplit")) -- Toggle split direction
 hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("~/.config/scripts/hypr-monitors.py")) -- Re-apply the monitor profile
 hl.bind(mainMod .. " + G", hl.dsp.exec_cmd(gamemode)) -- Work-Game
-hl.bind(mainMod .. " + SHIFT + slash", hl.dsp.exec_cmd(keybinds)) -- This list of keybindings
+hl.bind(mainMod .. " + slash", hl.dsp.exec_cmd(keybinds)) -- This list of keybindings
 
 -- Screenshots
-hl.bind("PRINT", hl.dsp.exec_cmd("hyprshot -m window -o ~/Pictures/Screenshots")) -- Screenshot of a window
+hl.bind("PRINT", hl.dsp.exec_cmd("hyprshot -m output -o ~/Pictures/Screenshots")) -- Screenshot of a monitor
+hl.bind("CONTROL + PRINT", hl.dsp.exec_cmd("hyprshot -m window -o ~/Pictures/Screenshots")) -- Screenshot of a window
 hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd("hyprshot -m region -o ~/Pictures/Screenshots")) -- Screenshot of a region
-hl.bind("CONTROL + SHIFT + PRINT", hl.dsp.exec_cmd("hyprshot -m output -o ~/Pictures/Screenshots")) -- Screenshot of a monitor
 
 -- Wallpapers
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc call wallpaper toggle")) -- Wallpaper picker (Tab: live wallpapers)
