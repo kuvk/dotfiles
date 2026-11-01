@@ -155,6 +155,7 @@ local apps = {
   { name = "protonqt", class = "net.davidotek.pupgui2", float = true, center = true, size = "700 600" },
   { name = "zathura", class = "org.pwmt.zathura", float = true, center = true, size = "1100 1200" },
   { name = "swayimg", class = "^swayimg$", float = true, center = true, size = "1400 900" },
+  { name = "gimp", class = "gimp", center = true, opaque = true, no_blur = true },
   {
     name = "remmina",
     class = "org.remmina.Remmina",

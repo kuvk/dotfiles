@@ -102,25 +102,25 @@ button.suggested-action {
 }
 
 button.suggested-action:hover {
-  background-color: shade({{ accent2 }}, 1);
+  background-color: shade({{ accent2 }}, 0.8);
   background-image: none;
   color: {{ text }};
 }
 
 button.suggested-action:active {
-  background-color: shade({{ accent2 }}, 1);
+  background-color: shade({{ accent2 }}, 0.6);
   background-image: none;
   color: {{ text }};
 }
 
 button.suggested-action:disabled {
-  background-color: mix({{ accent2 }}, {{ base }}, 0.2);
+  background-color: shade({{ accent2 }}, 0.2);
   background-image: none;
-  color: {{ subtext0 }};
+  color: {{ text }};
   opacity: 1;
 }
 
 button.suggested-action:disabled > label {
-  color: {{ subtext0 }};
+  color: {{ text }};
   opacity: 1;
 }
