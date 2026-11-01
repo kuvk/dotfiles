@@ -27,7 +27,7 @@ label {
     monitor = @MONITOR@
     text = $TIME
     color = rgb(@CLOCK@)
-    font_size = 120
+    font_size = 72
     font_family = {{ text_font }}
     position = -30, -10
     halign = right
@@ -37,11 +37,11 @@ label {
 
 label {
     monitor = @MONITOR@
-    text = cmd[update:60000] date +"%A, %-d %B %Y"
+    text = cmd[update:60000] date +"%a %-d %b"
     color = rgb(@CLOCK@)
-    font_size = 33
+    font_size = 28
     font_family = {{ text_font }}
-    position = -30, -170
+    position = -30, -120
     halign = right
     valign = top
     shadow_passes = 3
@@ -50,11 +50,11 @@ label {
 # Card behind the avatar and password
 shape {
     monitor = @MONITOR@
-    size = 340, 290
+    size = 380, 300
     color = rgba({{ base.hex }}bf)
-    rounding = 9
-    border_size = 1
-    border_color = rgba(@OUTLINE@4d)
+    rounding = 6
+    border_size = 2
+    border_color = rgb(@OUTLINE@)
     position = 0, 0
     halign = center
     valign = center
@@ -76,7 +76,7 @@ input-field {
     size = 260, 36
     rounding = -1
     outline_thickness = 1
-    dots_size = 0.25
+    dots_size = 0.3
     dots_spacing = 0.3
     dots_center = true
     outer_color = rgb(@OUTLINE@)
@@ -91,4 +91,5 @@ input-field {
     position = 0, -85
     halign = center
     valign = center
+    font_family = {{ text_font }}
 }
