@@ -20,6 +20,7 @@ marker_marked   = { fg = "{{ teal }}", bg = "{{ teal }}" }
 marker_selected = { fg = "{{ yellow }}", bg = "{{ yellow }}" }
 
 # Count
+symlink_target = { fg = "{{ blue }}" }
 count_copied   = { fg = "{{ base }}", bg = "{{ green }}" }
 count_cut      = { fg = "{{ base }}", bg = "{{ red }}" }
 count_selected = { fg = "{{ base }}", bg = "{{ yellow }}" }
@@ -165,11 +166,12 @@ unset_alt  = { fg = "{{ flamingo }}", bg = "{{ surface0 }}" }
 [filetype]
 rules = [
 	# Image
-	{ mime = "**/image/*", fg = "{{ teal }}" },
+	{ mime = "**/image/*", fg = "{{ mauve }}", bold = true },
 	# Media
-	{ mime = "**/{audio,video}/*", fg = "{{ yellow }}" },
+	{ mime = "**/video/*", fg = "{{ mauve }}", bold = true },
+	{ mime = "**/audio/*", fg = "{{ teal }}" },
 	# Archive
-	{ mime = "**/application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "{{ pink }}" },
+	{ mime = "**/application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "{{ red }}", bold = true },
 	# Document
 	{ mime = "**/application/{pdf,doc,rtf}", fg = "{{ green }}" },
 	# Virtual file system
@@ -180,13 +182,14 @@ rules = [
     { mime = "**/application/ms-*", fg = "{{ green }}" },
     { mime = "**/application/msword", fg = "{{ green }}" },
 
-	{ url = "*", is = "orphan", fg = "{{ red }}" },
-	{ url = "*/", is = "orphan", fg = "{{ red }}" },
-	{ url = "*", is = "link", fg = "{{ teal }}" },
-	{ url = "*/", is = "link", fg = "{{ teal }}" },
+	{ url = "*", is = "orphan", fg = "{{ teal }}", bold = true },
+	{ url = "*/", is = "orphan", fg = "{{ teal }}", bold = true },
+	{ url = "*", is = "link", fg = "{{ teal }}", bold = true },
+	{ url = "*/", is = "link", fg = "{{ teal }}", bold = true },
+	{ url = "*", is = "exec", fg = "{{ green }}", bold = true },
 	# Fallback
-	{ url = "*", fg = "{{ subtext1 }}" },
-	{ url = "*/", fg = "{{ blue }}" },
+	{ url = "*", fg = "{{ text }}" },
+	{ url = "*/", fg = "{{ blue }}", bold = true },
 ]
 
 [icon]
@@ -195,23 +198,23 @@ dirs = [
 	{ name = ".git", text = "", fg = "{{ blue }}" },
 	{ name = ".github", text = "", fg = "{{ blue }}" },
 	{ name = ".npm", text = "", fg = "{{ blue }}" },
-	{ name = "Projects", text = "󰲋", fg = "{{ blue }}" },
-	{ name = "projects", text = "󰲋", fg = "{{ blue }}" },
+	{ name = "Projects", text = "", fg = "{{ blue }}" },
+	{ name = "projects", text = "", fg = "{{ blue }}" },
 	{ name = "Desktop", text = "", fg = "{{ blue }}" },
 	{ name = "Development", text = "", fg = "{{ blue }}" },
-	{ name = "Documents", text = "", fg = "{{ blue }}" },
-	{ name = "Downloads", text = "", fg = "{{ blue }}" },
+	{ name = "Documents", text = "󰲂", fg = "{{ blue }}" },
+	{ name = "Downloads", text = "󰉍", fg = "{{ blue }}" },
 	{ name = "Library", text = "", fg = "{{ blue }}" },
 	{ name = "Movies", text = "", fg = "{{ blue }}" },
-	{ name = "Music", text = "", fg = "{{ blue }}" },
-	{ name = "Pictures", text = "", fg = "{{ blue }}" },
-	{ name = "Public", text = "", fg = "{{ blue }}" },
-	{ name = "Videos", text = "", fg = "{{ blue }}" },
+	{ name = "Music", text = "󱍙", fg = "{{ blue }}" },
+	{ name = "Pictures", text = "󰉏", fg = "{{ blue }}" },
+	{ name = "Public", text = "", fg = "{{ blue }}" },
+	{ name = "Videos", text = "", fg = "{{ blue }}" },
 ]
 conds = [
 	# Special files
-	{ if = "orphan", text = "󰌺", fg = "{{ red }}" },
-	{ if = "link", text = "", fg = "{{ teal }}" },
+	{ if = "orphan", text = "󰡯", fg = "{{ teal }}" },
+	{ if = "link", text = "󰡯", fg = "{{ teal }}" },
 	{ if = "block", text = "", fg = "{{ flamingo }}" },
 	{ if = "char", text = "", fg = "{{ flamingo }}" },
 	{ if = "fifo", text = "", fg = "{{ flamingo }}" },
@@ -223,4 +226,26 @@ conds = [
 	{ if = "dir", text = "", fg = "{{ blue }}" },
 	{ if = "exec", text = "", fg = "{{ green }}" },
 	{ if = "!dir", text = "", fg = "{{ subtext1 }}" },
+]
+# Same glyphs and colors as eza
+prepend_exts = [
+	{ name = "png", text = "", fg = "{{ mauve }}" },
+	{ name = "jpg", text = "", fg = "{{ mauve }}" },
+	{ name = "jpeg", text = "", fg = "{{ mauve }}" },
+	{ name = "webp", text = "", fg = "{{ mauve }}" },
+	{ name = "mp4", text = "", fg = "{{ mauve }}" },
+	{ name = "mkv", text = "", fg = "{{ mauve }}" },
+	{ name = "webm", text = "", fg = "{{ mauve }}" },
+	{ name = "mp3", text = "", fg = "{{ teal }}" },
+	{ name = "flac", text = "", fg = "{{ teal }}" },
+	{ name = "pdf", text = "", fg = "{{ green }}" },
+	{ name = "zip", text = "", fg = "{{ red }}" },
+	{ name = "gz", text = "", fg = "{{ red }}" },
+	{ name = "tar", text = "", fg = "{{ red }}" },
+	{ name = "txt", text = "", fg = "{{ text }}" },
+	{ name = "md", text = "", fg = "{{ text }}" },
+	{ name = "sh", text = "", fg = "{{ text }}" },
+	{ name = "py", text = "", fg = "{{ yellow }}" },
+	{ name = "lua", text = "", fg = "{{ yellow }}" },
+	{ name = "json", text = "", fg = "{{ text }}" },
 ]

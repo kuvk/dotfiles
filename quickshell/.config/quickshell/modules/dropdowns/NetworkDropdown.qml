@@ -10,12 +10,34 @@ Dropdown {
     id: root
 
     name: "network"
-    contentWidth: 380
+    // 380, or wider if the font doesn't fit the DNS choices on one line
+    contentWidth: Math.max(380, dnsRowWidth + Theme.padding * 2)
 
     property string tab: "wifi"
     // SSID whose password field is open
     property string askPassword: ""
     property string customDns: ""
+
+    readonly property var dnsChoices: [
+        { id: "auto", label: "Automatic" },
+        { id: "cloudflare", label: "Cloudflare" },
+        { id: "google", label: "Google" },
+        { id: "quad9", label: "Quad9" },
+        { id: "custom", label: "Custom" }
+    ]
+
+    readonly property int dnsRowWidth: {
+        // advanceWidth() alone doesn't update when the font changes
+        dnsMetrics.font;
+        return dnsChoices.reduce((sum, choice) => sum + Math.ceil(dnsMetrics.advanceWidth(choice.label)) + 20 + 6, -6);
+    }
+
+    FontMetrics {
+        id: dnsMetrics
+
+        font.family: Theme.font
+        font.pixelSize: Theme.fontSize - 1
+    }
 
     readonly property var tabs: [
         { id: "wifi", label: "Wi-Fi", icon: Icons.wifiLevels[4] },
@@ -372,18 +394,12 @@ Dropdown {
             font.pixelSize: Theme.fontSize - 1
         }
 
-        Flow {
+        RowLayout {
             Layout.fillWidth: true
             spacing: 6
 
             Repeater {
-                model: [
-                    { id: "auto", label: "Automatic" },
-                    { id: "cloudflare", label: "Cloudflare" },
-                    { id: "google", label: "Google" },
-                    { id: "quad9", label: "Quad9" },
-                    { id: "custom", label: "Custom" }
-                ]
+                model: root.dnsChoices
 
                 MouseArea {
                     id: dnsChip
@@ -391,8 +407,9 @@ Dropdown {
                     required property var modelData
                     readonly property bool current: (Network.details.dns?.mode ?? "auto") === modelData.id
 
-                    width: dnsLabel.implicitWidth + 20
-                    height: 28
+                    Layout.fillWidth: true
+                    Layout.preferredWidth: dnsLabel.implicitWidth + 20
+                    Layout.preferredHeight: 28
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: {

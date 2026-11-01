@@ -135,3 +135,19 @@ end
 
 Status:children_add(Status.files, 4000, Status.LEFT)
 Status:children_add(Status.modified, 0, Status.RIGHT)
+
+-- Link targets like eza's: blue (theme's symlink_target), red when broken
+function Entity:symlink()
+  if not rt.mgr.show_symlink then
+    return ""
+  end
+  local to = self._file.link_to
+  if not to then
+    return ""
+  end
+  local span = ui.Span(string.format(" -> %s", to))
+  if self._file.cha.is_orphan then
+    return span:fg(th.notify.title_error:fg() or "red")
+  end
+  return span:style(th.mgr.symlink_target)
+end
