@@ -70,7 +70,7 @@ theme folder and set `wallpaper` under `[apps]`.
 | File dialogs | `xdg-desktop-portal-gtk`, restarted when `gtk.css` changes | live |
 | Screen share picker | `hyprland-share-picker`, a Qt app using the Qt theme | next open |
 | Window buttons | Settings > Windows; `theme-set.py` writes `gtk-decoration-layout` and `gsettings` (close only); `gtk.css` styles the button | GTK apps with a title bar, when reopened |
-| Login screen (SDDM) | `/var/lib/kuvk-shell/theme.conf`, once `sddm/install.sh` has run | next logout |
+| Login screen (SDDM) | `/var/lib/kuvk-shell/theme.conf`, once `sddm/install.sh` has run; colors come from Settings > Lock Screen | next logout |
 | swayimg | `current/swayimg.lua` (loaded by `~/.config/swayimg/init.lua`) | live (SIGUSR1) |
 | scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |
 | GTK apps | adw-gtk3 if installed, otherwise Adwaita, in the theme's mode; icons and `color-scheme` through `gsettings` and `settings.ini`; colors in `~/.config/gtk-{3,4}.0/gtk.css` | mode live; colors when an app next starts |

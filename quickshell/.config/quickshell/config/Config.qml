@@ -18,9 +18,21 @@ Singleton {
     property alias lockImage: adapter.lockImage
     property alias lockMatrixColor: adapter.lockMatrixColor
     property alias lockClockColor: adapter.lockClockColor
-    property alias lockOutlineColor: adapter.lockOutlineColor
+    property alias lockDateColor: adapter.lockDateColor
+    property alias lockAvatarColor: adapter.lockAvatarColor
+    property alias lockBoxOutlineColor: adapter.lockBoxOutlineColor
+    property alias lockBoxColor: adapter.lockBoxColor
+    property alias lockInputOutlineColor: adapter.lockInputOutlineColor
+    property alias lockInputColor: adapter.lockInputColor
+    property alias lockUserColor: adapter.lockUserColor
+    property alias lockCheckColor: adapter.lockCheckColor
+    property alias lockFailColor: adapter.lockFailColor
+    property alias lockCapsColor: adapter.lockCapsColor
+    property alias lockBoxOpacity: adapter.lockBoxOpacity
+    property alias lockInputOpacity: adapter.lockInputOpacity
     property alias lockDotsColor: adapter.lockDotsColor
     property alias lockTextColor: adapter.lockTextColor
+    property alias lockSolidColor: adapter.lockSolidColor
     property alias borderWidth: adapter.borderWidth
     property alias barOpacity: adapter.barOpacity
     // Floating bar: margins around it and rounded corners
@@ -102,52 +114,92 @@ Singleton {
     // Lock screen colors, as theme color names (green, blue, accent, ...)
 
     function reset(): void {
+        // Saved with "Save as defaults", written in one go: setting values one at a
+        // time saves after each, and the reload that causes can undo the later ones
+        try {
+            const saved = JSON.parse(defaultsFile.text());
+            saved.version = root.version;
+            settingsFile.setText(JSON.stringify(saved, null, 2) + "\n");
+            return;
+        } catch (e) {
+            console.warn("Config: no usable defaults.json, using the built-in defaults", e);
+        }
         adapter.radius = 8;
         adapter.borderWidth = 1;
-        adapter.barOpacity = 0.9;
+        adapter.barOpacity = 0.85;
         adapter.barFloating = false;
         adapter.barMargin = 6;
-        adapter.panelOpacity = 0.9;
+        adapter.panelOpacity = 0.85;
         adapter.animations = true;
         adapter.cursorTheme = "Adwaita";
         adapter.cursorSize = 24;
         adapter.iconTheme = "Papirus";
-        adapter.lockStyle = "rain";
+        adapter.lockStyle = "picture";
         adapter.lockImage = "";
-        adapter.lockMatrixColor = "cyan";
-        adapter.lockClockColor = "sky";
-        adapter.lockOutlineColor = "accent2";
-        adapter.lockDotsColor = "peach";
+        adapter.lockMatrixColor = "magenta";
+        adapter.lockClockColor = "accent2";
+        adapter.lockDateColor = "accent2";
+        adapter.lockAvatarColor = "accent2";
+        adapter.lockBoxOutlineColor = "accent";
+        adapter.lockBoxColor = "base";
+        adapter.lockInputOutlineColor = "accent2";
+        adapter.lockInputColor = "subtext0";
+        adapter.lockUserColor = "accent";
+        adapter.lockCheckColor = "green";
+        adapter.lockFailColor = "red";
+        adapter.lockCapsColor = "yellow";
+        adapter.lockBoxOpacity = 85;
+        adapter.lockInputOpacity = 25;
+        adapter.lockDotsColor = "accent2";
         adapter.lockTextColor = "text";
+        adapter.lockSolidColor = "base";
         adapter.clockFormat = "dddd HH:mm";
-        adapter.barHiddenPrimary = [];
-        adapter.barHiddenOthers = [];
+        adapter.barHiddenPrimary = ["displays"];
+        adapter.barHiddenOthers = ["power", "weather", "layout", "media", "displays"];
         adapter.weatherLocation = "";
         adapter.weatherFahrenheit = false;
-        adapter.notificationTimeout = 10;
+        adapter.notificationTimeout = 5;
         adapter.trayMonochrome = false;
         adapter.trayTint = false;
-        adapter.trayKeepColors = "rog-control-center";
+        adapter.trayKeepColors = "";
         adapter.cava = true;
-        adapter.cavaBars = 24;
+        adapter.cavaBars = 40;
         adapter.nerdFont = "JetBrainsMono Nerd Font";
         adapter.displayFont = "SF Pro Display";
-        adapter.nerdFontOnly = false;
+        adapter.nerdFontOnly = true;
         adapter.fontHinting = "slight";
         adapter.fontAntialiasing = "rgba";
         adapter.nerdSymbols = true;
         adapter.windowButtons = false;
-        adapter.gapsIn = 2;
+        adapter.gapsIn = 3;
         adapter.gapsOut = 4;
-        adapter.gameGapsIn = 0;
-        adapter.gameGapsOut = 0;
+        adapter.gameGapsIn = 3;
+        adapter.gameGapsOut = 6;
         adapter.version = root.version;
+    }
+
+    // Current settings become what Reset (and a first start) applies
+    function saveDefaults(): void {
+        const current = JSON.parse(settingsFile.text());
+        delete current.version;
+        defaultsFile.setText(JSON.stringify(current, null, 2) + "\n");
     }
 
     // Bump when defaults change; older settings files are reset once
     readonly property int version: 2
 
     FileView {
+        id: defaultsFile
+
+        path: Quickshell.shellPath("config/defaults.json")
+        blockLoading: true
+        watchChanges: true
+        onFileChanged: reload()
+    }
+
+    FileView {
+        id: settingsFile
+
         path: Quickshell.statePath("settings.json")
         watchChanges: true
         onFileChanged: reload()
@@ -158,8 +210,7 @@ Singleton {
         }
         onLoadFailed: error => {
             if (error === FileViewError.FileNotFound) {
-                adapter.version = root.version;
-                writeAdapter();
+                root.reset();
             }
         }
 
@@ -173,44 +224,56 @@ Singleton {
             property int cursorSize: 24
             property string iconTheme: "Papirus"
             // read by scripts/lockscreen.sh
-            property string lockStyle: "rain" // "rain" (Matrix) | "picture" (Background) | "image"
+            property string lockStyle: "picture" // "rain" (Matrix) | "picture" (Background) | "image" | "solid"
             property string lockImage: ""
-            property string lockMatrixColor: "cyan" // a unimatrix color name
+            property string lockMatrixColor: "magenta" // a unimatrix color name
             // theme color names
-            property string lockClockColor: "sky"
-            property string lockOutlineColor: "accent2"
-            property string lockDotsColor: "peach"
+            property string lockClockColor: "accent2"
+            property string lockDateColor: "accent2"
+            property string lockAvatarColor: "accent2"
+            property string lockBoxOutlineColor: "accent"
+            property string lockBoxColor: "base"
+            property string lockInputOutlineColor: "accent2"
+            property string lockInputColor: "subtext0"
+            property string lockUserColor: "accent"
+            property string lockCheckColor: "green"
+            property string lockFailColor: "red"
+            property string lockCapsColor: "yellow"
+            property int lockBoxOpacity: 85 // percent
+            property int lockInputOpacity: 25 // percent
+            property string lockDotsColor: "accent2"
             property string lockTextColor: "text"
+            property string lockSolidColor: "base" // background of the "solid" style
             property int borderWidth: 1
-            property real barOpacity: 0.9
+            property real barOpacity: 0.85
             property bool barFloating: false
             property int barMargin: 6
-            property real panelOpacity: 0.9
+            property real panelOpacity: 0.85
             property bool animations: true
             property string clockFormat: "dddd HH:mm"
-            property var barHiddenPrimary: []
-            property var barHiddenOthers: []
+            property var barHiddenPrimary: ["displays"]
+            property var barHiddenOthers: ["power", "weather", "layout", "media", "displays"]
             property string weatherLocation: ""
             property bool weatherFahrenheit: false
-            property int notificationTimeout: 10
+            property int notificationTimeout: 5
             property bool trayMonochrome: false
             property bool trayTint: false
             // tray apps whose icon colors carry meaning (e.g. the ROG dGPU
             // state) and stay original in monochrome/tinted mode; comma separated
-            property string trayKeepColors: "rog-control-center"
+            property string trayKeepColors: ""
             property bool cava: true
-            property int cavaBars: 24
+            property int cavaBars: 40
             property string nerdFont: "JetBrainsMono Nerd Font"
             property string displayFont: "SF Pro Display"
-            property bool nerdFontOnly: false
+            property bool nerdFontOnly: true
             property string fontHinting: "slight"
             property string fontAntialiasing: "rgba"
             property bool nerdSymbols: true
             property bool windowButtons: false
-            property int gapsIn: 2
+            property int gapsIn: 3
             property int gapsOut: 4
-            property int gameGapsIn: 0
-            property int gameGapsOut: 0
+            property int gameGapsIn: 3
+            property int gameGapsOut: 6
         }
     }
 }

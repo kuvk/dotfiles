@@ -30,7 +30,7 @@ can own the D-Bus name.
 | Now playing; with several players a card each, switched with the arrows or Left/Right (also in the Control Center) | `components/MediaCard.qml`, `modules/dropdowns/MediaDropdown.qml` | click the track; middle-click play/pause, right-click next player |
 | System tray, themed right-click menus | `modules/bar/Tray.qml`, `modules/dropdowns/TrayMenu.qml` | hover the arrow; right-click an icon |
 | Battery, power mode (Quiet / Balanced / Performance) | `modules/dropdowns/BatteryDropdown.qml` | click the battery |
-| Night light | `scripts/nightlight-toggle.sh` + `services/System.qml` | the Control Center tile |
+| Night light | `scripts/nightlight-toggle.sh` + `services/System.qml` | the Control Center tile, or `SUPER+CTRL+N` |
 | Stay awake | `services/System.qml` | the coffee icon (holds an idle inhibitor); while media plays an inhibitor is held automatically |
 | Work-Game (no blur/animations/rounding, game gaps, turns Stay Awake on) | `scripts/hypr-gamemode.sh` + `services/System.qml` | the rocket icon, the Control Center tile, or `SUPER+G` |
 | Displays | `modules/displays/DisplaysPanel.qml` | the monitor icon, or `SUPER+CTRL+M` |
@@ -80,8 +80,9 @@ the others; the clock always shows), Windows (window buttons, gaps for regular
 and Work-Game), Notifications, Lock Screen (style and colors),
 and Tray & Player (tray icon style, apps that keep their own colors, the
 visualizer and its bar count). They are saved to Quickshell's state folder
-(`~/.local/state/quickshell/by-shell/<id>/settings.json`). Defaults are in
-`config/Config.qml`.
+(`~/.local/state/quickshell/by-shell/<id>/settings.json`). **Save as defaults** writes them to
+`config/defaults.json` in this repo; a first start and **Reset to defaults** apply that file, then
+`config/Config.qml` covers anything it lacks.
 
 Fonts apply to the shell, GTK, Qt, Hyprland's own windows and the lock and login screens; terminals
 set theirs in `kitty.conf`. Slight hinting suits most screens, and grayscale antialiasing avoids
@@ -106,15 +107,19 @@ Screenshots (`hyprshot`) send their own notification. Neovim and yazi show their
 ## Lock screen
 
 Locking uses hyprlock (`~/.config/scripts/lockscreen.sh`), with the clock and password on the
-monitor focused when locking. Settings > Lock Screen sets its colors and style:
+monitor focused when locking. Settings > Lock Screen sets its style and a color for the clock, date,
+avatar outline, box and input outline and background (with opacity), typing dots, user name, text,
+and the checking, wrong password and Caps Lock states:
 
 - **Matrix**: a fullscreen kitty running unimatrix on every monitor, showing through hyprlock's
   transparent background (`misc:session_lock_xray`). It locks about a second later, once the
   rain is on screen, so that's the frame a wake-up shows first.
 - **Background**: the current wallpaper, opaque.
 - **Image**: an image you choose, opaque; the wallpaper if none is chosen.
+- **Solid color**: a theme color you choose, opaque.
 
-The look is in `theme/.config/theme/templates/hyprlock.conf.tpl`. hypridle runs the script on
+The look is in `theme/.config/theme/templates/hyprlock.conf.tpl`. The login screen (`sddm/kuvk`) shares
+the colors and opacity and always uses the wallpaper as its background. hypridle runs the script on
 `loginctl lock-session` and before sleep.
 
 ## Web apps

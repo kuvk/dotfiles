@@ -20,6 +20,7 @@ local keybinds = "qs ipc call keybinds toggle"
 local music = "kitty --class cliamp -e cliamp"
 local email = "thunderbird"
 local gamemode = "~/.config/scripts/hypr-gamemode.sh"
+local nightlight = "~/.config/scripts/nightlight-toggle.sh"
 
 ---------------------
 ---- KEYBINDINGS ----
@@ -53,6 +54,7 @@ hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen()) -- Fullscreen
 hl.bind(mainMod .. " + S", hl.dsp.layout("togglesplit")) -- Toggle split direction
 hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("~/.config/scripts/hypr-monitors.py")) -- Re-apply the monitor profile
 hl.bind(mainMod .. " + G", hl.dsp.exec_cmd(gamemode)) -- Work-Game
+hl.bind(mainMod .. " + CONTROL + N", hl.dsp.exec_cmd(nightlight)) -- Night light
 hl.bind(mainMod .. " + slash", hl.dsp.exec_cmd(keybinds)) -- This list of keybindings
 
 -- Screenshots

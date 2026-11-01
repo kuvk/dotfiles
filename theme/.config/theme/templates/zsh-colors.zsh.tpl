@@ -3,3 +3,6 @@
 ZVM_VI_HIGHLIGHT_BACKGROUND='{{ selection_bg }}'
 ZVM_VI_HIGHLIGHT_FOREGROUND='{{ selection_fg }}'
 zle_highlight=(region:bg={{ selection_bg }},fg={{ selection_fg }} paste:none)
+# Up/down history search: the matching text, or the line when nothing matches
+HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg={{ selection_bg }},fg={{ selection_fg }}'
+HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='fg={{ red }},bold'

@@ -10,8 +10,8 @@ Rectangle {
     implicitWidth: row.implicitWidth + 12
     implicitHeight: 36
     radius: 9
-    color: Qt.alpha(config.base, 0.75)
-    border.color: Qt.alpha(config.outline, 0.3)
+    color: Qt.alpha(config.box, Number(config.boxOpacity))
+    border.color: config.boxOutline
 
     Row {
         id: row

@@ -123,6 +123,21 @@ FloatingWindow {
 
                     TextButton {
                         Layout.fillWidth: true
+                        text: defaultsSaved.running ? "Saved" : "Save as defaults"
+                        onClicked: {
+                            Config.saveDefaults();
+                            defaultsSaved.restart();
+                        }
+
+                        Timer {
+                            id: defaultsSaved
+
+                            interval: 1500
+                        }
+                    }
+
+                    TextButton {
+                        Layout.fillWidth: true
                         text: "Reset to defaults"
                         onClicked: Config.reset()
                     }
@@ -544,12 +559,13 @@ FloatingWindow {
                                 hint: ({
                                     rain: "Falling characters",
                                     picture: "Current wallpaper",
-                                    image: "An image you choose"
+                                    image: "An image you choose",
+                                    solid: "A theme color you choose"
                                 })[Config.lockStyle] ?? ""
 
                                 Stepper {
-                                    text: ({ rain: "Matrix", picture: "Background", image: "Image" })[Config.lockStyle] ?? "Matrix"
-                                    onStep: d => Config.lockStyle = root.cycle(["rain", "picture", "image"], Config.lockStyle, d)
+                                    text: ({ rain: "Matrix", picture: "Background", image: "Image", solid: "Solid color" })[Config.lockStyle] ?? "Matrix"
+                                    onStep: d => Config.lockStyle = root.cycle(["rain", "picture", "image", "solid"], Config.lockStyle, d)
                                 }
                             }
 
@@ -587,12 +603,38 @@ FloatingWindow {
                                 }
                             }
 
+                            ColumnLayout {
+                                Layout.fillWidth: true
+                                visible: Config.lockStyle === "solid"
+                                spacing: 4
+
+                                StyledText {
+                                    text: "Background color"
+                                }
+
+                                ColorChoice {
+                                    Layout.fillWidth: true
+                                    names: ["mantle", "crust", "surface0", "surface1", ...defaultNames]
+                                    value: Config.lockSolidColor
+                                    onPicked: name => Config.lockSolidColor = name
+                                }
+                            }
+
                             Repeater {
                                 model: [
-                                    { label: "Clock and date", key: "lockClockColor" },
-                                    { label: "Outlines and avatar ring", key: "lockOutlineColor" },
-                                    { label: "Typing dots and user name", key: "lockDotsColor" },
-                                    { label: "Text", key: "lockTextColor" }
+                                    { label: "Clock", key: "lockClockColor" },
+                                    { label: "Date", key: "lockDateColor" },
+                                    { label: "Avatar outline", key: "lockAvatarColor" },
+                                    { label: "Box outline", key: "lockBoxOutlineColor" },
+                                    { label: "Box background", key: "lockBoxColor", opacity: "lockBoxOpacity" },
+                                    { label: "Input outline", key: "lockInputOutlineColor" },
+                                    { label: "Input background", key: "lockInputColor", opacity: "lockInputOpacity" },
+                                    { label: "Typing dots", key: "lockDotsColor" },
+                                    { label: "User name", key: "lockUserColor" },
+                                    { label: "Text", key: "lockTextColor" },
+                                    { label: "Checking password", key: "lockCheckColor" },
+                                    { label: "Wrong password", key: "lockFailColor" },
+                                    { label: "Caps Lock on", key: "lockCapsColor" }
                                 ]
 
                                 ColumnLayout {
@@ -608,10 +650,35 @@ FloatingWindow {
                                     }
 
                                     ColorChoice {
+                                        Layout.fillWidth: true
                                         value: Config[lockColor.modelData.key]
-                                        onPicked: name => Config[lockColor.modelData.key] = name
+                                        onPicked: name => {
+                                            Config[lockColor.modelData.key] = name;
+                                            loginApply.restart();
+                                        }
+                                    }
+
+                                    SettingRow {
+                                        visible: lockColor.modelData.opacity !== undefined
+                                        label: "Opacity"
+
+                                        Stepper {
+                                            text: `${Config[lockColor.modelData.opacity]}%`
+                                            onStep: d => {
+                                                Config[lockColor.modelData.opacity] = root.clamp(Config[lockColor.modelData.opacity] + d * 5, 0, 100);
+                                                loginApply.restart();
+                                            }
+                                        }
                                     }
                                 }
+                            }
+
+                            // The login screen shares these colors. Long enough for Config to save them.
+                            Timer {
+                                id: loginApply
+
+                                interval: 800
+                                onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--login"])
                             }
 
                             TextButton {
