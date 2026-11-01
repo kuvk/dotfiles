@@ -133,7 +133,7 @@ FloatingWindow {
     }
 
     // Hyprland accepts only scales that divide the mode into whole logical
-    // pixels, in 1/120 steps (same rule Omarchy uses); round up to the next one
+    // pixels, in 1/120 steps; round up to the next one
     function cleanScale(scale: real, mode: string): real {
         const r = /(\d+)x(\d+)/.exec(mode);
         if (!r)

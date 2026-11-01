@@ -121,7 +121,7 @@ def available_modes(m: dict) -> list[str]:
 
 def clean_scale(scale: float, width: int, height: int) -> float:
     """Hyprland only accepts scales that divide the mode into whole logical
-    pixels, in 1/120 steps. Round up to the nearest such scale (as Omarchy does)."""
+    pixels, in 1/120 steps. Round up to the nearest such scale."""
     from math import gcd
 
     g = gcd(width * 120, height * 120)

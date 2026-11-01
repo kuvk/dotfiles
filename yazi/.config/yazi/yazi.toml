@@ -12,9 +12,8 @@ tab_size = 4
 show_symlink = true
 
 [opener]
-# Files are passed as %s1 (the first) and %s (all), quoted by yazi: current
-# yazi no longer sets the shell's "$1"/"$@", which left xdg-open without a
-# file. Default app (xdg-open) in its own session: setsid -f returns at once,
+# Files are passed as %s1 (the first) and %s (all), quoted by yazi; it doesn't
+# set the shell's "$1"/"$@". Default app (xdg-open) in its own session: setsid -f returns at once,
 # so yazi forgets it and the app outlives yazi. Text and the like still open
 # in $EDITOR in the terminal (yazi's `edit` rule).
 open = [
@@ -33,7 +32,7 @@ pinta_image = [
 
 # prepend_rules keeps yazi's own rules after these (Enter opens anything
 # else with the default app, through xdg-open). A plain `rules = [...]`
-# replaced all of them, so only images could be opened.
+# would replace them all.
 [open]
 prepend_rules = [
 	{ mime = "image/*", use = ["swayimg", "pinta_image", "open", "reveal"] },

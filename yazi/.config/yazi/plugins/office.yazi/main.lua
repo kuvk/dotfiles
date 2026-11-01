@@ -13,7 +13,7 @@ local function file_name(job)
   return job.file.name or (url and url.name) or tostring(url):match("([^/]+)$")
 end
 
--- `preview_widget(job, err)` now; `preview_widgets(job, {})` before
+-- `preview_widget(job, err)` on current yazi, `preview_widgets(job, {})` on older ones
 local function finish(job, err)
   if ya.preview_widget then
     ya.preview_widget(job, err)
