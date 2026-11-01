@@ -7,7 +7,7 @@ the system theme (see `~/.config/theme/README.md`).
 
 ```sh
 sudo pacman -S quickshell networkmanager bluez bluez-utils pipewire wireplumber \
-  upower power-profiles-daemon brightnessctl curl ttf-nerd-fonts-symbols noto-fonts-cjk \
+  upower power-profiles-daemon brightnessctl curl ttf-nerd-fonts-symbols noto-fonts-cjk noto-fonts-emoji \
   hyprpaper mpvpaper imagemagick ffmpeg cava cliphist wl-clipboard hyprlock hypridle \
   kitty   # the Matrix lock style also needs unimatrix (AUR)
 # optional: brightness of external monitors over DDC/CI
@@ -30,7 +30,7 @@ can own the D-Bus name.
 | Now playing; with several players a card each, switched with the arrows or Left/Right (also in the Control Center) | `components/MediaCard.qml`, `modules/dropdowns/MediaDropdown.qml` | click the track; middle-click play/pause, right-click next player |
 | System tray, themed right-click menus | `modules/bar/Tray.qml`, `modules/dropdowns/TrayMenu.qml` | hover the arrow; right-click an icon |
 | Battery, power mode (Quiet / Balanced / Performance) | `modules/dropdowns/BatteryDropdown.qml` | click the battery |
-| Night light | `scripts/nightlight-toggle.sh` + `services/System.qml` | the Control Center tile, or `SUPER+CTRL+N` |
+| Night light | `scripts/nightlight-toggle.sh` + `services/System.qml` | the Control Center tile, or `SUPER+CTRL+N`; temperature and schedule in Settings |
 | Stay awake | `services/System.qml` | the coffee icon (holds an idle inhibitor); while media plays an inhibitor is held automatically |
 | Work-Game (no blur/animations/rounding, game gaps, turns Stay Awake on) | `scripts/hypr-gamemode.sh` + `services/System.qml` | the rocket icon, the Control Center tile, or `SUPER+G` |
 | Displays | `modules/displays/DisplaysPanel.qml` | the monitor icon, or `SUPER+CTRL+M` |

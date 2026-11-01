@@ -56,6 +56,63 @@ Singleton {
         brightnessProc.running = true;
     }
 
+    function inNightlightHours(): bool {
+        const minutes = value => {
+            const [h, m] = value.split(":").map(Number);
+            return h * 60 + m;
+        };
+        const d = new Date();
+        const now = d.getHours() * 60 + d.getMinutes();
+        const start = minutes(Config.nightlightStart);
+        const end = minutes(Config.nightlightEnd);
+        return start <= end ? now >= start && now < end : now >= start || now < end;
+    }
+
+    // Night light schedule: acts only when the hours start or end, so a manual
+    // toggle holds until then. On startup it only turns on, never off.
+    property var wasInNightlightHours: null
+
+    function checkNightlightSchedule(): void {
+        if (!Config.nightlightSchedule) {
+            wasInNightlightHours = null;
+            return;
+        }
+        const inHours = inNightlightHours();
+        if (inHours !== wasInNightlightHours && (inHours || wasInNightlightHours !== null)) {
+            Quickshell.execDetached([scripts + "nightlight-toggle.sh", inHours ? "on" : "off"]);
+            nightlight = inHours;
+            delayedRefresh.restart();
+        }
+        wasInNightlightHours = inHours;
+    }
+
+    Connections {
+        target: Config
+
+        function onNightlightScheduleChanged(): void {
+            root.checkNightlightSchedule();
+        }
+
+        function onNightlightStartChanged(): void {
+            root.checkNightlightSchedule();
+        }
+
+        function onNightlightEndChanged(): void {
+            root.checkNightlightSchedule();
+        }
+    }
+
+    Timer {
+        interval: 30 * 1000
+        running: true
+        repeat: true
+        triggeredOnStart: true
+        onTriggered: {
+            root.checkNightlightSchedule();
+            statusProc.running = true;
+        }
+    }
+
     function toggleNightlight(): void {
         Quickshell.execDetached([scripts + "nightlight-toggle.sh"]);
         nightlight = !nightlight;

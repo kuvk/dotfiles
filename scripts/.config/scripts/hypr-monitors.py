@@ -53,7 +53,8 @@ WORKSPACES = 10
 MAX_PER_MONITOR = 5
 PROFILE_VERSION = 2
 
-TEXT_SIZE_DEFAULT = 13  # px, the shell's base font size
+TEXT_SIZE_DEFAULT = 12  # px, for a setup with no saved size
+TEXT_SIZE_BASE = 13  # px that GTK's scaling factor 1 and kitty.conf's font size correspond to
 KITTY_FONT_DEFAULT = 11  # pt in kitty.conf, matching 13 px
 KITTY_TEXT_SIZE_FILE = HOME / ".config/kitty/text-size.conf"
 
@@ -152,7 +153,8 @@ def load_profiles() -> dict:
     except (FileNotFoundError, json.JSONDecodeError):
         data = {}
     if "text_size" not in data:
-        data["text_size"] = round(TEXT_SIZE_DEFAULT * float(data.pop("text_scale", 1.0)))
+        scale = data.pop("text_scale", None)
+        data["text_size"] = round(TEXT_SIZE_BASE * float(scale)) if scale else TEXT_SIZE_DEFAULT
     data.setdefault("profiles", {})
     return data
 
@@ -287,10 +289,10 @@ def apply_text_size(size: int) -> None:
             pt = float(name.rsplit(" ", 1)[-1])
         except ValueError:
             pt = 11.0
-        factor = round(pt * size / TEXT_SIZE_DEFAULT) / pt
+        factor = round(pt * size / TEXT_SIZE_BASE) / pt
         run(["gsettings", "set", "org.gnome.desktop.interface", "text-scaling-factor", f"{factor:.4f}"])
 
-    kitty_pt = round(size * KITTY_FONT_DEFAULT / TEXT_SIZE_DEFAULT)
+    kitty_pt = round(size * KITTY_FONT_DEFAULT / TEXT_SIZE_BASE)
     content = f"# Written by hypr-monitors.py (Displays > Text size)\nfont_size {kitty_pt}.0\n"
     try:
         current = KITTY_TEXT_SIZE_FILE.read_text()
