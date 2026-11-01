@@ -68,13 +68,28 @@ PanelWindow {
         }
 
         ScreencopyView {
+            id: view
+
             width: root.w
             height: root.h
             live: false
-            captureSource: SwitchFx.phase === "capture" || hasContent && root.running ? root.screen : null
             onHasContentChanged: if (hasContent && SwitchFx.phase === "capture") root.captured++
             transform: Matrix4x4 {
                 matrix: Qt.matrix4x4(1, root.k, 0, -(root.skew + half.edge), 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
+            }
+
+            // Set per phase, as a binding on hasContent would loop. Without a frame
+            // by the end of the capture phase the source goes, so it can't capture
+            // the new look late.
+            Connections {
+                target: SwitchFx
+
+                function onPhaseChanged(): void {
+                    if (SwitchFx.phase === "capture")
+                        view.captureSource = root.screen;
+                    else if (SwitchFx.phase === "idle" || !view.hasContent)
+                        view.captureSource = null;
+                }
             }
         }
     }
