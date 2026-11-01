@@ -17,7 +17,7 @@ FloatingWindow {
     // Editable copy of Displays.info
     property var mons: []
     property var workspaces: ({})
-    property int textSize: 13
+    property int textSize: 12
     property string primary: ""
     property int selected: 0
     property bool dirty: false
@@ -29,7 +29,7 @@ FloatingWindow {
         const s = Displays.info;
         mons = (s.monitors ?? []).map(m => Object.assign({}, m));
         workspaces = Object.assign({}, s.workspaces ?? {});
-        textSize = s.text_size ?? 13;
+        textSize = s.text_size ?? 12;
         primary = s.primary ?? "";
         selected = Math.min(selected, Math.max(0, mons.length - 1));
         dirty = false;
@@ -587,9 +587,9 @@ FloatingWindow {
                     font.pixelSize: Theme.fontSize - 2
                 }
 
-                // 9 .. 20 px, 13 is the default
+                // 9 .. 20 px, 12 is the default
                 Stepper {
-                    text: `${root.textSize} px${root.textSize === 13 ? " (default)" : ""}`
+                    text: `${root.textSize} px${root.textSize === 12 ? " (default)" : ""}`
                     onStep: d => {
                         root.textSize = Math.max(9, Math.min(20, root.textSize + d));
                         root.dirty = true;

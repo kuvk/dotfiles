@@ -14,6 +14,10 @@ Singleton {
     property alias cursorTheme: adapter.cursorTheme
     property alias cursorSize: adapter.cursorSize
     property alias iconTheme: adapter.iconTheme
+    property alias nightlightSchedule: adapter.nightlightSchedule
+    property alias nightlightStart: adapter.nightlightStart
+    property alias nightlightEnd: adapter.nightlightEnd
+    property alias nightlightTemperature: adapter.nightlightTemperature
     property alias lockStyle: adapter.lockStyle
     property alias lockImage: adapter.lockImage
     property alias lockMatrixColor: adapter.lockMatrixColor
@@ -134,6 +138,10 @@ Singleton {
         adapter.cursorTheme = "Adwaita";
         adapter.cursorSize = 24;
         adapter.iconTheme = "Papirus";
+        adapter.nightlightSchedule = false;
+        adapter.nightlightStart = "20:00";
+        adapter.nightlightEnd = "07:00";
+        adapter.nightlightTemperature = 4500;
         adapter.lockStyle = "picture";
         adapter.lockImage = "";
         adapter.lockMatrixColor = "magenta";
@@ -223,6 +231,10 @@ Singleton {
             property string cursorTheme: "Adwaita"
             property int cursorSize: 24
             property string iconTheme: "Papirus"
+            property bool nightlightSchedule: false
+            property string nightlightStart: "20:00" // the schedule may cross midnight
+            property string nightlightEnd: "07:00"
+            property int nightlightTemperature: 4500 // kelvin, read by scripts/nightlight-toggle.sh
             // read by scripts/lockscreen.sh
             property string lockStyle: "picture" // "rain" (Matrix) | "picture" (Background) | "image" | "solid"
             property string lockImage: ""

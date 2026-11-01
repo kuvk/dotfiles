@@ -76,12 +76,12 @@ Rectangle {
         visible: Window.active
         spacing: 0
 
-        layer.enabled: true
-        layer.effect: MultiEffect {
-            shadowEnabled: true
-            shadowColor: "black"
-            shadowBlur: 0.8
-        }
+        // layer.enabled: true
+        // layer.effect: MultiEffect {
+        //     shadowEnabled: true
+        //     shadowColor: "black"
+        //     shadowBlur: 0.8
+        // }
 
         Text {
             anchors.right: parent.right
@@ -282,9 +282,9 @@ Rectangle {
 
         Repeater {
             model: [
-                { glyph: "", tip: "Suspend", enabled: sddm.canSuspend, action: () => sddm.suspend() },
-                { glyph: "", tip: "Reboot", enabled: sddm.canReboot, action: () => sddm.reboot() },
-                { glyph: "", tip: "Shut down", enabled: sddm.canPowerOff, action: () => sddm.powerOff() }
+                { glyph: "\u{f03e6}", tip: "Suspend", enabled: sddm.canSuspend, action: () => sddm.suspend() },
+                { glyph: "\u{f0709}", tip: "Reboot", enabled: sddm.canReboot, action: () => sddm.reboot() },
+                { glyph: "\u{f0425}", tip: "Shut down", enabled: sddm.canPowerOff, action: () => sddm.powerOff() }
             ]
 
             MouseArea {
@@ -311,7 +311,7 @@ Rectangle {
                     text: power.modelData.glyph
                     color: power.containsMouse ? root.c.dots : root.c.text
                     font.family: root.c.iconFont
-                    font.pixelSize: 16
+                    font.pixelSize: 20
                 }
 
                 // Tooltip above the button, aligned to its right so it stays on screen

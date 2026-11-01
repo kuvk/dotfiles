@@ -20,6 +20,7 @@ FloatingWindow {
         { id: "windows", label: "Windows", icon: Icons.display },
         { id: "notifications", label: "Notifications", icon: Icons.bell },
         { id: "lock", label: "Lock Screen", icon: Icons.lock },
+        { id: "nightlight", label: "Night Light", icon: Icons.nightlight },
         { id: "tray", label: "Tray & Player", icon: Icons.music }
     ]
     property string section: "appearance"
@@ -29,6 +30,13 @@ FloatingWindow {
     function cycle(list: var, value: var, step: int): var {
         const i = Math.max(0, list.indexOf(value));
         return list[(i + step + list.length) % list.length];
+    }
+
+    // "HH:mm" moved by some minutes, wrapping around midnight
+    function stepTime(value: string, minutes: int): string {
+        const [h, m] = value.split(":").map(Number);
+        const total = (h * 60 + m + minutes + 1440) % 1440;
+        return String(Math.floor(total / 60)).padStart(2, "0") + ":" + String(total % 60).padStart(2, "0");
     }
 
     function clamp(v: real, lo: real, hi: real): real {
@@ -686,6 +694,64 @@ FloatingWindow {
                                 onClicked: {
                                     Panels.closeAll();
                                     System.runAction("lock");
+                                }
+                            }
+                        }
+
+                        // ------------------------------------------------ Night light
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            visible: root.section === "nightlight"
+                            spacing: 12
+
+                            SettingRow {
+                                label: "Temperature"
+                                hint: "Lower is warmer"
+
+                                Stepper {
+                                    text: `${Config.nightlightTemperature} K`
+                                    onStep: d => {
+                                        Config.nightlightTemperature = root.clamp(Config.nightlightTemperature + d * 100, 1000, 6500);
+                                        nightlightApply.restart();
+                                    }
+                                }
+                            }
+
+                            // Stepping through several values applies only the last
+                            Timer {
+                                id: nightlightApply
+
+                                interval: 400
+                                onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/nightlight-toggle.sh", "apply"])
+                            }
+
+                            SettingRow {
+                                label: "Schedule"
+                                hint: "A manual toggle holds until the next change"
+
+                                Switch {
+                                    checked: Config.nightlightSchedule
+                                    onToggled: Config.nightlightSchedule = !Config.nightlightSchedule
+                                }
+                            }
+
+                            SettingRow {
+                                visible: Config.nightlightSchedule
+                                label: "Start"
+
+                                Stepper {
+                                    text: Config.nightlightStart
+                                    onStep: d => Config.nightlightStart = root.stepTime(Config.nightlightStart, d * 15)
+                                }
+                            }
+
+                            SettingRow {
+                                visible: Config.nightlightSchedule
+                                label: "End"
+
+                                Stepper {
+                                    text: Config.nightlightEnd
+                                    onStep: d => Config.nightlightEnd = root.stepTime(Config.nightlightEnd, d * 15)
                                 }
                             }
                         }

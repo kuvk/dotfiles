@@ -73,7 +73,7 @@ Singleton {
     }
     readonly property string monoFont: Config.nerdFont || "JetBrainsMono Nerd Font"
     // Text size in px from the Displays panel (~/.config/hypr/monitors.json)
-    property int textSize: 13
+    property int textSize: 12
     readonly property int fontSize: textSize
     readonly property int iconSize: textSize + 1
     readonly property int barHeight: Math.max(34, Math.round(textSize * 2.6))
@@ -124,7 +124,7 @@ Singleton {
         onLoaded: {
             try {
                 const d = JSON.parse(text());
-                root.textSize = d.text_size ?? Math.round(13 * (d.text_scale ?? 1));
+                root.textSize = d.text_size ?? (d.text_scale ? Math.round(13 * d.text_scale) : 12);
             } catch (e) {}
         }
     }

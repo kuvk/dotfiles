@@ -32,7 +32,7 @@ label {
     position = -30, -10
     halign = right
     valign = top
-    shadow_passes = 3
+    # shadow_passes = 3
 }
 
 label {
@@ -44,7 +44,7 @@ label {
     position = -30, -120
     halign = right
     valign = top
-    shadow_passes = 3
+    # shadow_passes = 3
 }
 
 # Card behind the avatar and password
