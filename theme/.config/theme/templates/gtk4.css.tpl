@@ -8,3 +8,9 @@
   --accent-fg-color: {{ base }};
   --accent-color: {{ accent2 }};
 }
+
+/* GTK4 dims disabled widgets with a filter; gtk.css sets their colors instead */
+button.suggested-action:disabled,
+button.suggested-action:disabled > label {
+  filter: none;
+}

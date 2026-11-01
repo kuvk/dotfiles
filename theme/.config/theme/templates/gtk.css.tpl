@@ -93,3 +93,34 @@ windowcontrols > button.close:hover > image {
   box-shadow: none;
   color: {{ accent }};
 }
+
+/* Main dialog buttons (OK, Open): a clearer hover, and readable while disabled */
+button.suggested-action {
+  background-color: {{ accent2 }};
+  background-image: none;
+  color: {{ base }};
+}
+
+button.suggested-action:hover {
+  background-color: shade({{ accent2 }}, 1.2);
+  background-image: none;
+  color: {{ base }};
+}
+
+button.suggested-action:active {
+  background-color: shade({{ accent2 }}, 0.85);
+  background-image: none;
+  color: {{ base }};
+}
+
+button.suggested-action:disabled {
+  background-color: {{ surface1 }};
+  background-image: none;
+  color: {{ subtext0 }};
+  opacity: 1;
+}
+
+button.suggested-action:disabled > label {
+  color: {{ subtext0 }};
+  opacity: 1;
+}

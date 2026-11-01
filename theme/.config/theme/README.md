@@ -68,6 +68,7 @@ theme folder and set `wallpaper` under `[apps]`.
 | Icons | Settings > Appearance; `theme-set.py` writes it to GTK, Qt and hyprtoolkit | GTK now; Qt when restarted |
 | Fonts | Settings > Fonts; `theme-set.py` writes them to `gsettings`, `settings.ini`, qt5ct, qt6ct, hyprtoolkit, hyprlock, SDDM, and hinting and antialiasing to `current/fontconfig.conf` | reopened apps |
 | File dialogs | `xdg-desktop-portal-gtk`, restarted when `gtk.css` changes | live |
+| Screen share picker | `hyprland-share-picker`, a Qt app using the Qt theme | next open |
 | Window buttons | Settings > Windows; `theme-set.py` writes `gtk-decoration-layout` and `gsettings` (close only); `gtk.css` styles the button | GTK apps with a title bar, when reopened |
 | Login screen (SDDM) | `/var/lib/kuvk-shell/theme.conf`, once `sddm/install.sh` has run | next logout |
 | swayimg | `current/swayimg.lua` (loaded by `~/.config/swayimg/init.lua`) | live (SIGUSR1) |
