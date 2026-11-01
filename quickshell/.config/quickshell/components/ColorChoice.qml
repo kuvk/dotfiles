@@ -1,14 +1,15 @@
 import QtQuick
 import qs.config
 
-// Row of theme colors to pick from; `value` is the color's name in Theme
-Row {
+// Theme colors to pick from, wrapping to fit; `value` is the color's name in Theme
+Flow {
     id: root
 
     property string value
     signal picked(string name)
 
-    readonly property var names: ["text", "subtext0", "accent", "accent2", "red", "maroon", "peach", "yellow", "green", "teal", "sky", "blue", "lavender", "mauve", "pink"]
+    readonly property var defaultNames: ["text", "subtext1", "subtext0", "base", "accent", "accent2", "red", "maroon", "peach", "yellow", "green", "teal", "sky", "blue", "lavender", "mauve", "pink"]
+    property var names: defaultNames
 
     spacing: 4
 
@@ -32,8 +33,9 @@ Row {
                 height: width
                 radius: width / 2
                 color: Theme[swatch.modelData]
-                border.color: Theme.text
-                border.width: root.value === swatch.modelData ? 2 : 0
+                border.color: root.value === swatch.modelData ? Theme.text : Theme.overlay0
+                // the outline keeps background colors visible on the window
+                border.width: root.value === swatch.modelData ? 2 : 1
             }
         }
     }

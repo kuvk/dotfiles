@@ -38,7 +38,7 @@ label {
 label {
     monitor = @MONITOR@
     text = cmd[update:60000] date +"%a %-d %b"
-    color = rgb(@CLOCK@)
+    color = rgb(@DATE@)
     font_size = 28
     font_family = {{ text_font }}
     position = -30, -120
@@ -51,10 +51,10 @@ label {
 shape {
     monitor = @MONITOR@
     size = 380, 300
-    color = rgba({{ base.hex }}bf)
+    color = rgba(@BOX_BG@)
     rounding = 6
     border_size = 2
-    border_color = rgb(@OUTLINE@)
+    border_color = rgb(@BOX_OUTLINE@)
     position = 0, 0
     halign = center
     valign = center
@@ -65,7 +65,7 @@ image {
     path = $HOME/.face
     size = 135
     border_size = 2
-    border_color = rgb(@OUTLINE@)
+    border_color = rgb(@AVATAR@)
     position = 0, 45
     halign = center
     valign = center
@@ -79,14 +79,14 @@ input-field {
     dots_size = 0.3
     dots_spacing = 0.3
     dots_center = true
-    outer_color = rgb(@OUTLINE@)
-    inner_color = rgba({{ subtext1.hex }}33)
+    outer_color = rgb(@INPUT_OUTLINE@)
+    inner_color = rgba(@INPUT_BG@)
     font_color = rgb(@DOTS@)
-    check_color = rgb(@DOTS@)
-    fail_color = rgb({{ red.hex }})
-    capslock_color = rgb({{ yellow.hex }})
+    check_color = rgb(@CHECK@)
+    fail_color = rgb(@FAIL@)
+    capslock_color = rgb(@CAPS@)
     fade_on_empty = false
-    placeholder_text = <span foreground="##@TEXT@"><i>󰌾  Logged in as </i></span><b><span foreground="##@DOTS@">$USER</span></b>
+    placeholder_text = <span foreground="##@TEXT@"><i>󰌾  Logged in as </i></span><b><span foreground="##@USER@">$USER</span></b>
     fail_text = <i>ACCESS DENIED</i>
     position = 0, -85
     halign = center

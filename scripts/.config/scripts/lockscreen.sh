@@ -8,6 +8,7 @@
 #            are off meanwhile, or they'd draw over it.
 #   picture  (Background) the current wallpaper, opaque.
 #   image    (Image) the chosen image, opaque; the wallpaper if there is none.
+#   solid    (Solid color) the theme color chosen in Settings, opaque.
 set -uo pipefail
 
 exec 9>"${XDG_RUNTIME_DIR:-/tmp}/lockscreen.lock"
@@ -18,11 +19,15 @@ TITLE=MATRIXLOCK
 TEMPLATE="$HOME/.config/theme/current/hyprlock.conf"
 config="$XDG_RUNTIME_DIR/hyprlock.conf"
 settings=("$HOME"/.local/state/quickshell/by-shell/*/settings.json)
-IFS=$'\x1f' read -r saved image matrix clock outline dots text_name < <(jq -r '[
-    .lockStyle // "rain", .lockImage // "", .lockMatrixColor // "cyan", .lockClockColor // "sky",
-    .lockOutlineColor // "accent2", .lockDotsColor // "peach", .lockTextColor // "text"
+IFS=$'\x1f' read -r saved image matrix clock date avatar box_outline box_bg box_opacity \
+    input_outline input_bg input_opacity dots user_color text_name check fail caps solid < <(jq -r '[
+    .lockStyle // "picture", .lockImage // "", .lockMatrixColor // "magenta", .lockClockColor // "accent2", .lockDateColor // "accent2",
+    .lockAvatarColor // "accent2", .lockBoxOutlineColor // "accent", .lockBoxColor // "base", .lockBoxOpacity // 85,
+    .lockInputOutlineColor // "accent2", .lockInputColor // "subtext0", .lockInputOpacity // 25,
+    .lockDotsColor // "accent2", .lockUserColor // "accent", .lockTextColor // "text",
+    .lockCheckColor // "green", .lockFailColor // "red", .lockCapsColor // "yellow", .lockSolidColor // "base"
 ] | join("\u001f")' "${settings[0]}" 2>/dev/null)
-style=${1:-${saved:-rain}}
+style=${1:-${saved:-picture}}
 
 # Theme color by name, without the #
 . "$HOME/.config/theme/current/colors.sh"
@@ -30,6 +35,11 @@ hex() {
     local value=${!1:-}
     value=${value:-$text}
     printf '%s' "${value#\#}"
+}
+
+# Color and opacity (percent) as rrggbbaa
+hex_alpha() {
+    printf '%s%02x' "$(hex "$1")" $(($2 * 255 / 100))
 }
 
 monitors=$(hyprctl -j monitors)
@@ -51,7 +61,7 @@ start_rain() {
     local windows mapped workspace
     windows=$(jq length <<<"$monitors")
     jq -r '.[].activeWorkspace.id' <<<"$monitors" | while read -r workspace; do
-        hyprctl eval "hl.exec_cmd('kitty --title $TITLE --start-as=fullscreen unimatrix -c ${matrix:-cyan} -b -s 96 -f -l m', { workspace = '$workspace' })" >/dev/null
+        hyprctl eval "hl.exec_cmd('kitty --title $TITLE --start-as=fullscreen unimatrix -c ${matrix:-magenta} -b -s 96 -f -l m', { workspace = '$workspace' })" >/dev/null
     done
     # Capped, so it locks even if kitty fails
     for _ in {1..30}; do
@@ -70,9 +80,13 @@ if [[ $style == rain ]]; then
     start_rain
 else
     color=$solid_color
-    [[ $style == image && -f $image ]] && picture=$image
-    [[ -n $picture ]] || picture=$(readlink -f "$HOME/.local/state/wallpaper/current")
-    [[ -f $picture ]] || picture=""
+    if [[ $style == solid ]]; then
+        color="rgb($(hex "${solid:-base}"))"
+    else
+        [[ $style == image && -f $image ]] && picture=$image
+        [[ -n $picture ]] || picture=$(readlink -f "$HOME/.local/state/wallpaper/current")
+        [[ -f $picture ]] || picture=""
+    fi
     # The first frame is the whole lock: a suspend can freeze the screen right after it,
     # and partway through a fade the desktop would still show on wake
     hyprlock_args+=(--no-fade-in --immediate-render)
@@ -82,8 +96,11 @@ escape() { sed 's/[&|\\]/\\&/g' <<<"$1"; }
 
 install -m 600 /dev/null "$config"
 sed -e "s|@MONITOR@|$focused|g" -e "s|@PICTURE@|$(escape "$picture")|" -e "s|@COLOR@|$color|" \
-    -e "s|@CLOCK@|$(hex "${clock:-sky}")|g" -e "s|@OUTLINE@|$(hex "${outline:-accent2}")|g" \
-    -e "s|@DOTS@|$(hex "${dots:-peach}")|g" -e "s|@TEXT@|$(hex "${text_name:-text}")|g" "$TEMPLATE" >"$config"
+    -e "s|@CLOCK@|$(hex "${clock:-accent2}")|g" -e "s|@DATE@|$(hex "${date:-accent2}")|g" -e "s|@AVATAR@|$(hex "${avatar:-accent2}")|g" \
+    -e "s|@BOX_OUTLINE@|$(hex "${box_outline:-accent}")|g" -e "s|@BOX_BG@|$(hex_alpha "${box_bg:-base}" "${box_opacity:-85}")|g" \
+    -e "s|@INPUT_OUTLINE@|$(hex "${input_outline:-accent2}")|g" -e "s|@INPUT_BG@|$(hex_alpha "${input_bg:-subtext0}" "${input_opacity:-25}")|g" \
+    -e "s|@DOTS@|$(hex "${dots:-accent2}")|g" -e "s|@USER@|$(hex "${user_color:-accent}")|g" -e "s|@TEXT@|$(hex "${text_name:-text}")|g" \
+    -e "s|@CHECK@|$(hex "${check:-green}")|g" -e "s|@FAIL@|$(hex "${fail:-red}")|g" -e "s|@CAPS@|$(hex "${caps:-yellow}")|g" "$TEMPLATE" >"$config"
 hyprlock --config "$config" "${hyprlock_args[@]}" &
 wait $!
 

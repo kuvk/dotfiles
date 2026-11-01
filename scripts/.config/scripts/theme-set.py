@@ -20,6 +20,7 @@ apps are told to reload.
                           apply fonts everywhere (Settings > Fonts saves the choice); on means
                           Nerd Fonts only. HINTING: none|slight|medium|full,
                           ANTIALIASING: none|grayscale|rgba
+  theme-set.py --login    rewrite the login screen's colors from Settings > Lock Screen
   theme-set.py --window-buttons on|off
                           close button in GTK apps (Settings > Windows saves the choice)
   theme-set.py --shape rounded|square
@@ -148,10 +149,25 @@ def shell_settings() -> dict:
     settings = {
         "displayFont": "SF Pro Display",
         "nerdFont": "JetBrainsMono Nerd Font",
-        "nerdFontOnly": False,
+        "nerdFontOnly": True,
         "fontHinting": "slight",
         "fontAntialiasing": "rgba",
         "windowButtons": False,
+        "lockClockColor": "accent2",
+        "lockDateColor": "accent2",
+        "lockAvatarColor": "accent2",
+        "lockBoxOutlineColor": "accent",
+        "lockBoxColor": "base",
+        "lockInputOutlineColor": "accent2",
+        "lockInputColor": "subtext0",
+        "lockDotsColor": "accent2",
+        "lockUserColor": "accent",
+        "lockTextColor": "text",
+        "lockCheckColor": "green",
+        "lockFailColor": "red",
+        "lockCapsColor": "yellow",
+        "lockBoxOpacity": 85,
+        "lockInputOpacity": 25,
         "cursorTheme": "Adwaita",
         "cursorSize": 24,
         "iconTheme": "Papirus",
@@ -263,6 +279,22 @@ def load_theme(name: str) -> dict:
         "xft_antialias": "0" if antialiasing == "none" else "1",
         "xft_hinting": "0" if hinting == "none" else "1",
         "decoration_layout": ":close" if shell["windowButtons"] else ":",
+        # the login screen uses the lock screen's colors
+        "login_clock": colors.get(shell["lockClockColor"], colors["text"]),
+        "login_date": colors.get(shell["lockDateColor"], colors["text"]),
+        "login_avatar": colors.get(shell["lockAvatarColor"], colors["text"]),
+        "login_boxOutline": colors.get(shell["lockBoxOutlineColor"], colors["text"]),
+        "login_box": colors.get(shell["lockBoxColor"], colors["text"]),
+        "login_inputOutline": colors.get(shell["lockInputOutlineColor"], colors["text"]),
+        "login_input": colors.get(shell["lockInputColor"], colors["text"]),
+        "login_dots": colors.get(shell["lockDotsColor"], colors["text"]),
+        "login_user": colors.get(shell["lockUserColor"], colors["text"]),
+        "login_text": colors.get(shell["lockTextColor"], colors["text"]),
+        "login_check": colors.get(shell["lockCheckColor"], colors["text"]),
+        "login_fail": colors.get(shell["lockFailColor"], colors["text"]),
+        "login_caps": colors.get(shell["lockCapsColor"], colors["text"]),
+        "login_box_opacity": str(shell["lockBoxOpacity"] / 100),
+        "login_input_opacity": str(shell["lockInputOpacity"] / 100),
         "icon_theme": icon_theme_for(shell["iconTheme"], mode),
         "prefer_dark": "0" if mode == "light" else "1",
         # adw-gtk3, when installed, follows gtk.css in plain GTK3 and GTK4 apps too;
@@ -639,6 +671,9 @@ def main(argv: list[str]) -> int:
         SETTINGS_OVERRIDE.update(nerdFont=nerd, displayFont=display, nerdFontOnly=only == "on",
                                  fontHinting=hinting, fontAntialiasing=antialiasing)
         apply_fonts(generate(current_theme())["strings"])
+        return 0
+    if argv == ["--login"]:
+        generate(current_theme())
         return 0
     if len(argv) == 2 and argv[0] == "--window-buttons" and argv[1] in ("on", "off"):
         SETTINGS_OVERRIDE.update(windowButtons=argv[1] == "on")

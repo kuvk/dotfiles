@@ -95,7 +95,7 @@ Rectangle {
         Text {
             anchors.right: parent.right
             text: Qt.formatDateTime(root.now, "dddd, d MMMM yyyy")
-            color: root.c.clock
+            color: root.c.date
             font.family: root.c.font
             font.pixelSize: 33
         }
@@ -107,11 +107,12 @@ Rectangle {
 
         anchors.centerIn: parent
         visible: Window.active
-        width: 340
+        width: 380
         height: box.implicitHeight + 48
-        radius: 9
-        color: Qt.alpha(root.c.base, 0.75)
-        border.color: Qt.alpha(root.c.outline, 0.3)
+        radius: 6
+        color: Qt.alpha(root.c.box, Number(root.c.boxOpacity))
+        border.width: 2
+        border.color: root.c.boxOutline
 
         // Fades in
         opacity: 0
@@ -137,7 +138,7 @@ Rectangle {
                 Rectangle {
                     anchors.fill: parent
                     radius: width / 2
-                    color: root.c.outline
+                    color: root.c.avatar
                 }
 
                 Image {
@@ -177,7 +178,7 @@ Rectangle {
                     anchors.centerIn: parent
                     visible: avatar.status !== Image.Ready
                     text: ""
-                    color: root.c.base
+                    color: root.c.box
                     font.family: root.c.iconFont
                     font.pixelSize: 56
                 }
@@ -198,9 +199,9 @@ Rectangle {
                 implicitWidth: 260
                 implicitHeight: 36
                 radius: height / 2
-                color: Qt.alpha(root.c.subtext, 0.2)
+                color: Qt.alpha(root.c.input, Number(root.c.inputOpacity))
                 border.width: 1
-                border.color: root.failed ? root.c.red : (root.busy ? root.c.dots : root.c.outline)
+                border.color: root.failed ? root.c.fail : (root.busy ? root.c.check : root.c.inputOutline)
 
                 transform: Translate {
                     id: offset
@@ -244,8 +245,8 @@ Rectangle {
                     visible: password.text === ""
                     elide: Text.ElideRight
                     textFormat: Text.StyledText
-                    text: root.failed ? "<i>ACCESS DENIED</i>" : `<i>\u{f033e}  Log in as </i><b><font color="${root.c.dots}">${root.userName}</font></b>`
-                    color: root.failed ? root.c.red : root.c.text
+                    text: root.failed ? "<i>ACCESS DENIED</i>" : `<i>\u{f033e}  Log in as </i><b><font color="${root.c.user}">${root.userName}</font></b>`
+                    color: root.failed ? root.c.fail : root.c.text
                     font.family: root.c.font
                     font.pixelSize: 14
                 }
@@ -254,7 +255,7 @@ Rectangle {
             Text {
                 Layout.alignment: Qt.AlignHCenter
                 text: keyboard.capsLock ? "Caps Lock is on" : " "
-                color: root.c.yellow
+                color: root.c.caps
                 font.family: root.c.font
                 font.pixelSize: 12
             }
@@ -301,8 +302,8 @@ Rectangle {
                 Rectangle {
                     anchors.fill: parent
                     radius: 9
-                    color: Qt.alpha(root.c.base, power.containsMouse ? 0.95 : 0.75)
-                    border.color: Qt.alpha(root.c.outline, 0.3)
+                    color: Qt.alpha(root.c.box, power.containsMouse ? 0.95 : Number(root.c.boxOpacity))
+                    border.color: root.c.boxOutline
                 }
 
                 Text {
@@ -322,8 +323,8 @@ Rectangle {
                     width: tip.implicitWidth + 16
                     height: tip.implicitHeight + 8
                     radius: 6
-                    color: Qt.alpha(root.c.base, 0.95)
-                    border.color: Qt.alpha(root.c.outline, 0.3)
+                    color: Qt.alpha(root.c.box, 0.95)
+                    border.color: root.c.boxOutline
 
                     Text {
                         id: tip
