@@ -363,7 +363,9 @@ def render_quickshell(theme: dict) -> None:
 
 def render_ls_colors() -> None:
     """dircolors' output for .zshrc, so shells set LS_COLORS without running it."""
-    out = subprocess.run(["dircolors", "-b", str(CURRENT_DIR / "dir_colors")], capture_output=True, text=True)
+    # dircolors outputs nothing unless TERM matches, and the shell's picker and autostart have none
+    env = os.environ | {"TERM": "xterm-256color"}
+    out = subprocess.run(["dircolors", "-b", str(CURRENT_DIR / "dir_colors")], capture_output=True, text=True, env=env)
     if out.returncode == 0:
         write_if_changed(CURRENT_DIR / "ls_colors.zsh", out.stdout)
     else:
