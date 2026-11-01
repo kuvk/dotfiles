@@ -4,7 +4,9 @@ hl.config({
     kb_layout = "us,hr",
     kb_variant = "",
     kb_model = "",
-    kb_options = "ctrl:nocaps,grp:win_space_toggle",
+    kb_options = "ctrl:nocaps,altwin:swap_lalt_lwin,grp:alt_space_toggle",
+    -- kb_options = "ctrl:nocaps,grp:win_space_toggle",
+		-- swap alt and super - altwin:swap_lalt_lwin
     kb_rules = "",
     numlock_by_default = true,
     follow_mouse = 1,

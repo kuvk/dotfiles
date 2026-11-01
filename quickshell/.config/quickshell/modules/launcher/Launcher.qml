@@ -8,9 +8,9 @@ import qs.config
 import qs.components
 import qs.services
 
-// Search launcher (ALT+Space): only the input field, a quarter down the
+// Search launcher (SUPER+Space): only the input field, a quarter down the
 // screen; matching apps appear under it once something is typed. The menu
-// with categories is modules/launcher/AppMenu.qml (ALT+CTRL+Space, Arch icon).
+// with categories is modules/launcher/AppMenu.qml (SUPER+CTRL+Space, Arch icon).
 PanelWindow {
     id: root
 

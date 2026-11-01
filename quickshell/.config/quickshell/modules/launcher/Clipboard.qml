@@ -8,7 +8,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// Clipboard history (ALT+SHIFT+V), from cliphist: type to filter, Enter puts
+// Clipboard history (SUPER+SHIFT+V), from cliphist: type to filter, Enter puts
 // the entry back on the clipboard, Ctrl+D deletes it, Ctrl+J/K move.
 PanelWindow {
     id: root

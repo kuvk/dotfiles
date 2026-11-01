@@ -6,7 +6,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// Settings (gear in the Control Center, ALT+CTRL+P). Sections in a sidebar;
+// Settings (gear in the Control Center, SUPER+CTRL+S). Sections in a sidebar;
 // changes apply immediately and are saved by Config.
 FloatingWindow {
     id: root

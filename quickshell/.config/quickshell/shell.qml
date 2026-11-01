@@ -138,7 +138,7 @@ ShellRoot {
     IpcHandler {
         target: "bar"
 
-        // ALT+B: full width / floating
+        // SUPER+CTRL+B: full width / floating
         function floating(): void {
             Config.barFloating = !Config.barFloating;
         }
@@ -198,7 +198,7 @@ ShellRoot {
             Panels.toggleWallpapers("live");
         }
 
-        // ALT+W: opens on static wallpapers, Tab switches to live
+        // SUPER+W: opens on static wallpapers, Tab switches to live
         function toggle(): void {
             Panels.toggleWallpapers(Panels.wallpapers !== "" ? Panels.wallpapers : "static");
         }

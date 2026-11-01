@@ -8,7 +8,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// App menu: drops from the Arch icon in the top-left corner (or ALT+CTRL+Space)
+// App menu: drops from the Arch icon in the top-left corner (or SUPER+CTRL+Space)
 // with the categories on the left and their apps on the right. Typing
 // filters the current category. ↑/↓ apps, ←/→ or Tab categories, Enter
 // launches, Esc clears the filter, then closes.

@@ -10,7 +10,7 @@
 #     openrgb --startminimized -p vuk &
 # fi
 
-# Clipboard history (ALT+SHIFT+V)
+# Clipboard history (SUPER+SHIFT+V)
 if command -v cliphist >/dev/null; then
     wl-paste --type text --watch cliphist store &
     wl-paste --type image --watch cliphist store &

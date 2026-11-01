@@ -3,7 +3,7 @@
 # so theme-set.py asks every yazi started through here to quit (it remembers
 # its folder) and this starts it again in the same folder, in the same window.
 #
-#   yazi-live.sh [yazi args]     use instead of `yazi` (ALT+E, the `y` shell function)
+#   yazi-live.sh [yazi args]     use instead of `yazi` (SUPER+E, the `y` shell function)
 #   YAZI_LIVE_CWD_OUT=FILE       write the last folder there on exit (for `y`)
 set -u
 

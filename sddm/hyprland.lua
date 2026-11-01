@@ -29,8 +29,8 @@ hl.config({
     force_default_wallpaper = 0,
   },
   input = {
-    kb_layout = "us,hr",
-    kb_options = "ctrl:nocaps,grp:win_space_toggle",
+    kb_layout = "us",
+    kb_options = "ctrl:nocaps",
     numlock_by_default = true,
     touchpad = {
       disable_while_typing = true,

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Claude Code status line: the vim mode as a colored bubble, like lualine in nvim
 # (square in Work-Game or at radius 0), then the folder and how full the context is.
-# Also sets the cursor by mode, as Claude Code itself doesn't: block, beam in insert.
+# Also keeps the cursor a block in every mode: to follow the mode instead, set `cursor` per mode below.
 # settings.json: statusLine.command
 . "$HOME/.config/theme/current/colors.sh" 2>/dev/null
 
@@ -11,11 +11,12 @@ rgb() { printf '%d;%d;%d' "0x${1:1:2}" "0x${1:3:2}" "0x${1:5:2}"; }
 IFS=$'\x1f' read -r mode dir used < <(jq -r '[.vim.mode // "", .workspace.current_dir // "", (.context_window.used_percentage // "" | tostring)] | join("\u001f")')
 
 case $mode in
-    NORMAL) color=$blue cursor=1 ;;
-    INSERT) color=$green cursor=5 ;;
-    VISUAL*) color=$mauve cursor=1 ;;
-    *) color= cursor= ;;
+    NORMAL) color=$blue ;;
+    INSERT) color=$green ;;
+    VISUAL*) color=$mauve ;;
+    *) color= ;;
 esac
+cursor=1
 # Claude Code runs this without a controlling terminal, so find its own (stdin)
 if [[ -n $cursor ]]; then
     pid=$PPID
