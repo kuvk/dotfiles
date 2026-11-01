@@ -46,6 +46,8 @@ _compiled $ZDOTDIR/.zshrc nosource
 
 ## File colors from the theme (theme-set.py writes them; see TRAPUSR1 below)
 _ls_colors=$HOME/.config/theme/current/ls_colors.zsh
+# Broken link targets in eza: red, without the underline
+export EZA_COLORS="bO=0"
 _load_ls_colors() {
     [[ -r $_ls_colors ]] && source $_ls_colors
     [[ -r $_ls_colors:h/zsh-colors.zsh ]] && source $_ls_colors:h/zsh-colors.zsh
