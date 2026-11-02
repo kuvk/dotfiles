@@ -3,10 +3,7 @@ return {
   dependencies = {
     "preservim/vimux",
   },
-  keys = {
-    { "<leader>nt", "<cmd>TestNearest<CR>" },
-    { "<leader>T", "<cmd>TestFile<CR>" },
-  },
+  cmd = { "TestNearest", "TestFile" },
   config = function()
     vim.g["test#strategy"] = "vimux"
   end,

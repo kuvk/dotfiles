@@ -7,7 +7,6 @@ return {
           border = "rounded",
         },
       })
-      vim.keymap.set("n", "<leader>mm", "<cmd>Mason<CR>")
     end,
   },
   {
@@ -116,20 +115,6 @@ return {
         end,
       })
 
-      -- Only in buffers with a language server
-      vim.api.nvim_create_autocmd("LspAttach", {
-        callback = function(ev)
-          local opts = { buffer = ev.buf }
-          vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-          vim.keymap.set("n", "<leader>gd", vim.lsp.buf.definition, opts)
-          vim.keymap.set("n", "<leader>gr", vim.lsp.buf.references, opts)
-          vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
-        end,
-      })
-      vim.cmd([[highlight DiagnosticVirtualTextError guibg=none]])
-      vim.cmd([[highlight DiagnosticVirtualTextWarn guibg=none]])
-      vim.cmd([[highlight DiagnosticVirtualTextInfo guibg=none]])
-      vim.cmd([[highlight DiagnosticVirtualTextHint guibg=none]])
     end,
   },
 }

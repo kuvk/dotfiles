@@ -18,6 +18,33 @@ end
 -- Palette of the current theme (aether keys: bg, dark_bg, fg, blue, ...)
 M.palette = {}
 
+-- Highlights the config sets itself, in the current theme's colors. Change them here.
+local function custom_highlights()
+  local p = M.palette
+  local set = vim.api.nvim_set_hl
+  set(0, "LazyGitBorder", { fg = p.accent })
+  set(0, "AlphaHeader", { fg = p.blue })
+  set(0, "AlphaButtons", { fg = p.accent })
+  set(0, "AlphaShortcut", { fg = p.blue })
+  set(0, "AlphaFooter", { fg = p.magenta, italic = true })
+  -- Diagnostic text at the end of a line, with no background
+  for _, level in ipairs({ "Error", "Warn", "Info", "Hint" }) do
+    local group = "DiagnosticVirtualText" .. level
+    local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
+    hl.bg = nil
+    set(0, group, hl)
+  end
+end
+
+-- An open LazyGit rereads its config when it regains focus, which brings its new colors
+local function refresh_lazygit()
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.bo[buf].buftype == "terminal" and vim.api.nvim_buf_get_name(buf):find("lazygit", 1, true) then
+      vim.fn.chansend(vim.b[buf].terminal_job_id, "\27[O\27[I")
+    end
+  end
+end
+
 function M.apply()
   local theme = read()
   if M.current == theme.name and vim.g.colors_name == theme.colorscheme then
@@ -44,6 +71,7 @@ function M.apply()
     vim.api.nvim_set_hl(0, "Visual", theme.selection)
   end
   vim.api.nvim_set_hl(0, "YankHighlight", theme.yank or { link = "IncSearch" })
+  refresh_lazygit()
 end
 
 -- Square corners in Work-Game or with the corner radius at 0 (theme-set --shape)
@@ -62,6 +90,7 @@ function M.setup()
     return
   end
   M.started = true
+  vim.api.nvim_create_autocmd("ColorScheme", { callback = custom_highlights })
   M.apply()
 
   if vim.fn.isdirectory(dir) == 0 then
