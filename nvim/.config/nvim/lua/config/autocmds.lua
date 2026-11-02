@@ -29,6 +29,14 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
+-- Undo history is stored as plain text, so not for these
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
+  pattern = { "/tmp/*", "/dev/shm/*", "/run/user/*", "*/.ssh/*", "*/.gnupg/*", "*/.password-store/*", "*.env", ".env*" },
+  callback = function(ev)
+    vim.bo[ev.buf].undofile = false
+  end,
+})
+
 -- Flash what was just copied
 vim.api.nvim_create_autocmd("TextYankPost", {
   callback = function()

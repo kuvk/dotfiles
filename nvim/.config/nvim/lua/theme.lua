@@ -23,6 +23,9 @@ local function custom_highlights()
   local p = M.palette
   local set = vim.api.nvim_set_hl
   set(0, "LazyGitBorder", { fg = p.accent })
+  set(0, "NoiceConfirmBorder", { fg = p.accent })
+  -- TODO in comments, as text without a background
+  set(0, "@comment.todo", { fg = p.accent, bold = true })
   -- Command and search windows (noice.lua)
   for _, group in ipairs({ "Border", "BorderSearch", "Title" }) do
     set(0, "NoiceCmdlinePopup" .. group, { fg = p.accent })

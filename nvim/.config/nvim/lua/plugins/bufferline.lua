@@ -13,7 +13,6 @@ local function custom_highlights()
 end
 
 local options = {
-  -- mode = "tabs",
   always_show_bufferline = false,
   themable = true,
   color_icons = true,
@@ -21,9 +20,7 @@ local options = {
     icon = "", -- "▎" this should be omitted if indicator style is not 'icon'
     style = "none", -- "icon" | "underline" | "none",
   },
-  -- style_preset = require("bufferline").style_preset.minimal,
   tab_size = 20,
-  -- separator_style = "slant",
   enforce_regular_tabs = true,
   hover = {
     enabled = true,
@@ -54,7 +51,6 @@ end
 
 return {
   "akinsho/bufferline.nvim",
-  -- version = "*",
   dependencies = "nvim-tree/nvim-web-devicons",
   config = function()
     setup()

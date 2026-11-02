@@ -41,6 +41,22 @@ vim.schedule(function()
   opt.clipboard:append("unnamedplus")
 end)
 
+-- Keep lines in view around the cursor, preview :s while typing, respond faster
+-- (diagnostics, git signs), and ask to save instead of refusing to quit
+opt.scrolloff = 8
+opt.inccommand = "split"
+opt.updatetime = 250
+opt.confirm = true
+
+-- Undo survives closing a file (autocmds.lua leaves out private files)
+opt.undofile = true
+
+-- No plugins here use these language hosts
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_node_provider = 0
+vim.g.loaded_python3_provider = 0
+
 -- Backspace
 opt.backspace = "indent,eol,start"
 
