@@ -35,7 +35,7 @@ can own the D-Bus name.
 | Work-Game (no blur/animations/rounding, game gaps, turns Stay Awake on) | `scripts/hypr-gamemode.sh` + `services/System.qml` | the rocket icon, the Control Center tile, or `SUPER+G` |
 | Displays | `modules/displays/DisplaysPanel.qml` | the monitor icon, or `SUPER+CTRL+M` |
 | Notification popups, with actions and inline replies; web apps show their own name and icon | `modules/notifications/NotificationPopups.qml` | |
-| Clipboard history: text and images, type to filter | `modules/launcher/Clipboard.qml` | `SUPER+SHIFT+V` |
+| Clipboard history in RAM (a reboot wipes it): text and images, type to filter | `modules/launcher/Clipboard.qml` | `SUPER+SHIFT+V` |
 | Control Center: toggles, sliders, media (with visualizer), notifications grouped by app, session buttons | `modules/controlcenter/ControlCenter.qml` | `SUPER+N`, or the sliders icon (right-click toggles DND) |
 | Search launcher (just the field; apps appear as you type) | `modules/launcher/Launcher.qml` | `SUPER+Space` |
 | App menu: categories on the left, apps on the right | `modules/launcher/AppMenu.qml` + `services/Apps.qml` | the Arch icon, or `SUPER+CTRL+Space` |
