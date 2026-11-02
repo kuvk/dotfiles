@@ -1,0 +1,4 @@
+# Flatpak apps (Flathub IDs)
+com.heroicgameslauncher.hgl
+md.obsidian.Obsidian
+com.github.tchx84.Flatseal

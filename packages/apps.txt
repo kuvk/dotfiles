@@ -1,0 +1,23 @@
+# Apps with window rules in hypr/.config/hypr/configs/rules.lua. Optional: the dotfiles work
+# without them. "# AUR" marks AUR packages. Installed by hand: DaVinci Resolve (its PKGBUILD
+# needs editing) and Frame Checker (github.com/kuvk/frame-checker). Dolphin's rule has no
+# package here.
+chromium                 # web apps (webapp.py)
+blueman
+brasero
+gimp
+cameractrls
+lutris
+steam
+gamescope
+protonup-qt              # AUR
+thunderbird
+pavucontrol
+qbittorrent
+remmina
+spotify-launcher
+timeshift
+virt-manager
+vlc
+libreoffice-fresh        # also yazi's office previews
+localsend-bin            # AUR

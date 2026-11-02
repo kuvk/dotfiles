@@ -1,0 +1,3 @@
+# Desktop PC. "# AUR" marks AUR packages.
+coolercontrol-bin        # AUR
+openrgb
