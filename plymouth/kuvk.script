@@ -19,6 +19,10 @@ global.real_progress = 0.0;
 global.fake_progress_active = 0;
 global.fake_progress_start_time = 0.0;  # Track when fake progress started
 global.password_shown = 0;  # Track if password dialog has been shown
+global.password_sent = 0;  # A password was entered; asked again means it was wrong
+global.wrong_count = 0;  # Wrong passwords so far
+global.farewell = 0;  # The farewell screen is up; nothing else draws
+global.checking_frame = -1;  # Frame a password was entered on, while it's being checked
 global.max_progress = 0.0;  # Track the maximum progress reached to prevent backwards movement
 
 # Window size the sprites were last laid out for
@@ -34,6 +38,11 @@ fun refresh_callback() {
   }
 
   global.animation_frame++;
+
+  # A password has been checked for 3 seconds with no answer either way: show the progress
+  if (global.checking_frame >= 0 && global.animation_frame - global.checking_frame > 150) {
+    start_boot_progress();
+  }
 
   # Animate fake progress to limit over time with easing
   if (global.fake_progress_active == 1) {
@@ -121,31 +130,80 @@ entry.sprite.SetOpacity(0);
 
 # Hint under the password field
 hint.image = Image("hint.png");
+wrong1.image = Image("wrong1.png");
+wrong2.image = Image("wrong2.png");
 hint.sprite = Sprite(hint.image);
 hint.sprite.SetOpacity(0);
 
+# The line under the field: the hint, or "wrong password" after a failed try
+fun set_hint(image) {
+  hint.sprite.SetImage(image);
+  hint.sprite.SetX(global.layout_width / 2 - image.GetWidth() / 2);
+}
+
 # Bullet array
 bullet.sprites = [];
+global.bullet_count = 0;
 
+# Dots are 7px with 5px gaps, centered in the field as a group
 fun position_bullet(index) {
-  bullet.sprites[index].SetPosition(entry.x + 20 + index * (7 + 5), entry.y + entry.image.GetHeight() / 2 - 3.5, 10002);
+  row_width = global.bullet_count * (7 + 5) - 5;
+  x = entry.x + entry.image.GetWidth() / 2 - row_width / 2 + index * (7 + 5);
+  bullet.sprites[index].SetPosition(x, entry.y + entry.image.GetHeight() / 2 - 3.5, 10002);
 }
 
 fun display_normal_callback() {
+  if (global.farewell == 1) return;
+  if (global.password_shown == 1) {
+    # A password was entered. Keep the field up while it's checked, so a wrong one doesn't
+    # flash the progress bar; the bar comes when the boot moves on (update_status_callback).
+    global.password_sent = 1;
+    global.checking_frame = global.animation_frame;
+    return;
+  }
+  hide_password_dialog();
+}
+
+fun start_boot_progress() {
+  global.checking_frame = -1;
+  if (global.farewell == 1) return;
   hide_password_dialog();
 
-  # Get current mode
-  mode = Plymouth.GetMode();
-
   # Only show progress bar for boot and resume modes
-  if ((mode == "boot" || mode == "resume") && global.password_shown == 1) {
+  mode = Plymouth.GetMode();
+  if (mode == "boot" || mode == "resume") {
     show_progress_bar();
     start_fake_progress();
   }
 }
 
+# systemd reports units starting: after a password, the boot carries on. Wait a moment
+# (15 frames) before showing the progress: when the drives failed to unlock, the unit
+# starting is luks-poweroff, and its farewell message arrives right after.
+fun update_status_callback(status) {
+  if (global.farewell == 0 && global.checking_frame >= 0) {
+    global.checking_frame = global.animation_frame - 150 + 15;
+  }
+}
+
+Plymouth.SetUpdateStatusFunction(update_status_callback);
+
 fun display_password_callback(prompt, bullets) {
+  if (global.farewell == 1) return;
+  global.checking_frame = -1;
   global.password_shown = 1;  # Mark that password dialog has been shown
+
+  # Asked again after a password was entered: it was wrong. A different line for each try;
+  # the last failure powers off (luks-poweroff), shown by display_message_callback.
+  if (global.password_sent == 1 && bullets == 0) {
+    global.password_sent = 0;
+    global.wrong_count++;
+    if (global.wrong_count == 1) {
+      set_hint(wrong1.image);
+    } else {
+      set_hint(wrong2.image);
+    }
+  }
 
   # Stop fake progress when password dialog appears
   stop_fake_progress();
@@ -157,20 +215,21 @@ fun display_password_callback(prompt, bullets) {
     bullet.sprites[index].SetOpacity(0);
   }
 
-  # Create and show bullets for current password (max 21)
-  max_bullets = 21;
+  # Create and show bullets for current password, as many as fit in the field
+  max_bullets = Math.Int((entry.image.GetWidth() - 40) / (7 + 5));
   bullets_to_show = bullets;
   if (bullets_to_show > max_bullets) {
     bullets_to_show = max_bullets;
   }
 
+  global.bullet_count = bullets_to_show;
   for (index = 0; index < bullets_to_show; index++) {
     if (!bullet.sprites[index]) {
       # Scale bullet image to 7x7 pixels
       bullet.sprites[index] = Sprite(bullet.image.Scale(7, 7));
-      position_bullet(index);
     }
 
+    position_bullet(index);
     bullet.sprites[index].SetOpacity(1);
   }
 }
@@ -236,6 +295,10 @@ fun layout() {
   progress_bar.x = global.layout_width / 2 - progress_bar.original_image.GetWidth() / 2;
   progress_bar.y = progress_box.y + (progress_box.image.GetHeight() - progress_bar.original_image.GetHeight()) / 2;
   progress_bar.sprite.SetPosition(progress_bar.x, progress_bar.y, 1);
+
+  if (global.farewell == 1) {
+    position_farewell();
+  }
 }
 
 layout();
@@ -245,7 +308,35 @@ layout();
 message_sprite = Sprite();
 message_sprite.SetPosition(10, 10, 10000);
 
+# Farewell screen before luks-poweroff turns the machine off: only the line, on the background
+# Farewell before luks-poweroff turns the machine off: the logo stays, and the field and
+# its message give way to one larger line, drawn with the hint's sprite in the field's place.
+farewell_line.image = Image("farewell.png");
+
+fun position_farewell() {
+  hint.sprite.SetX(Window.GetWidth() / 2 - farewell_line.image.GetWidth() / 2);
+  hint.sprite.SetY(entry.y + entry.image.GetHeight() / 2 - farewell_line.image.GetHeight() / 2);
+}
+
+fun show_farewell() {
+  global.farewell = 1;
+  global.checking_frame = -1;
+  stop_fake_progress();
+  hide_progress_bar();
+  hide_password_dialog();
+  message_sprite.SetOpacity(0);
+  hint.sprite.SetImage(farewell_line.image);
+  position_farewell();
+  hint.sprite.SetOpacity(1);
+}
+
+# luks-poweroff sends "kuvk-farewell" when the drives didn't unlock
 fun display_message_callback(text) {
+  if (text == "kuvk-farewell") {
+    show_farewell();
+    return;
+  }
+  if (global.farewell == 1) return;
   message = Image.Text(text, @TEXT_RGB@);
   message_sprite.SetImage(message);
   message_sprite.SetOpacity(1);
@@ -257,3 +348,13 @@ fun hide_message_callback(text) {
 
 Plymouth.SetDisplayMessageFunction(display_message_callback);
 Plymouth.SetHideMessageFunction(hide_message_callback);
+
+#----------------------------------------- Shutdown --------------------------------
+
+# Shutdown and reboot: the logo with the progress bar from the start, filling in a few seconds
+if (Plymouth.GetMode() == "shutdown" || Plymouth.GetMode() == "reboot") {
+  global.fake_progress_limit = 1.0;
+  global.fake_progress_duration = 4.0;
+  show_progress_bar();
+  start_fake_progress();
+}

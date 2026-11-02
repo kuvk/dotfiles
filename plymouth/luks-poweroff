@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# mkinitcpio hook, installed by plymouth/install.sh: in the initramfs only, power off when
+# unlocking a drive fails. With rd.luks.options=timeout=90s,tries=3 that is 90 seconds
+# without a password, or three wrong ones. The splash shows "Go back to the Shadow!" first.
+# The drives unlock one after another, so the prompts and tries all belong to the first.
+
+build() {
+    add_binary sleep
+
+    install -D -m 0644 /dev/stdin "$BUILDROOT/etc/systemd/system/luks-poweroff.service" <<'EOF'
+[Unit]
+Description=Power off after failing to unlock the drives
+DefaultDependencies=no
+
+[Service]
+Type=oneshot
+# The splash script takes this message as its cue for the farewell line
+ExecStart=-/usr/bin/plymouth display-message --text=kuvk-farewell
+ExecStart=/usr/bin/sleep 2
+ExecStart=/usr/bin/systemctl --no-block poweroff
+EOF
+
+    install -D -m 0644 /dev/stdin "$BUILDROOT/etc/systemd/system/systemd-cryptsetup@.service.d/poweroff.conf" <<'EOF'
+[Unit]
+OnFailure=luks-poweroff.service
+EOF
+
+    # Unlock the drives one after another, in kernel command line order. Asked together, a
+    # wrong password reaches both and each asks again on its own; one at a time, every prompt
+    # is the first drive's, and the rest reuse its cached password.
+    local cmdline name prev=
+    cmdline=$(cat /etc/kernel/cmdline 2>/dev/null || cat /proc/cmdline)
+    for name in $(grep -o 'rd\.luks\.name=[^ ]*' <<<"$cmdline" | sed 's/.*=//'); do
+        if [[ -n $prev ]]; then
+            install -D -m 0644 /dev/stdin "$BUILDROOT/etc/systemd/system/systemd-cryptsetup@$name.service.d/after-$prev.conf" <<EOF
+[Unit]
+Requires=systemd-cryptsetup@$prev.service
+After=systemd-cryptsetup@$prev.service
+EOF
+        fi
+        prev=$name
+    done
+}
+
+help() {
+    echo "Powers off when unlocking an encrypted drive fails (sd-encrypt)."
+}
