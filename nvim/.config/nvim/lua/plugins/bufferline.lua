@@ -42,6 +42,20 @@ local options = {
   },
 }
 
+-- The tab line, and its "File Explorer" title, shows with one buffer only while Neo-tree is open
+local function update_tabline()
+  local tree_open = false
+  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
+    if vim.bo[vim.api.nvim_win_get_buf(win)].filetype == "neo-tree" then
+      tree_open = true
+    end
+  end
+  options.always_show_bufferline = tree_open
+  require("bufferline.config").get().options.always_show_bufferline = tree_open
+  local several = #vim.fn.getbufinfo({ buflisted = 1 }) > 1
+  vim.o.showtabline = (tree_open or several) and 2 or 0
+end
+
 local function setup()
   -- Re-running setup rebuilds bufferline's highlights, file icon backgrounds
   -- included, from the colorscheme now in use
@@ -54,6 +68,11 @@ return {
   dependencies = "nvim-tree/nvim-web-devicons",
   config = function()
     setup()
+    vim.api.nvim_create_autocmd({ "BufWinEnter", "WinClosed", "BufAdd", "BufDelete", "TabEnter" }, {
+      callback = function()
+        vim.schedule(update_tabline)
+      end,
+    })
     vim.api.nvim_create_autocmd("ColorScheme", {
       callback = function()
         vim.schedule(setup)

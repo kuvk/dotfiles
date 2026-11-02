@@ -22,7 +22,26 @@ M.palette = {}
 local function custom_highlights()
   local p = M.palette
   local set = vim.api.nvim_set_hl
-  set(0, "LazyGitBorder", { fg = p.accent })
+  -- Window borders. The command line, search and the quit confirmation stay in the accent
+  -- below, matching lualine's command mode.
+  for _, group in ipairs({
+    "FloatBorder",
+    "LazyGitBorder",
+    "WhichKeyBorder",
+    "TelescopeBorder",
+    "TelescopePromptBorder",
+    "TelescopeResultsBorder",
+    "TelescopePreviewBorder",
+    "BlinkCmpMenuBorder",
+    "BlinkCmpDocBorder",
+    "BlinkCmpSignatureHelpBorder",
+    "NeoTreeFloatBorder",
+    "NoicePopupBorder",
+    "NoiceSplitBorder",
+    "NullLsInfoBorder",
+  }) do
+    set(0, group, { fg = M.accent2 })
+  end
   set(0, "NoiceConfirmBorder", { fg = p.accent })
   -- TODO in comments, as text without a background
   set(0, "@comment.todo", { fg = p.accent, bold = true })
@@ -59,6 +78,7 @@ function M.apply()
   end
   M.current = theme.name
   M.palette = theme.aether or {}
+  M.accent2 = theme.accent2 or M.palette.blue
   vim.o.background = theme.background or "dark"
 
   -- aether builds its colors from the palette, so it needs setup per theme
