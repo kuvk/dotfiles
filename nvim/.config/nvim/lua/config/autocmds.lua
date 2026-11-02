@@ -3,7 +3,6 @@
 local two_space_ft = {
   lua = true,
   html = true,
-  ["jinja.html"] = true,
   javascript = true,
   jquery = true,
   json = true,
@@ -65,8 +64,30 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "jinja", "jinja.html" },
+  pattern = { "jinja" },
   callback = function(ev)
     vim.bo[ev.buf].commentstring = "{# %s #}"
   end,
+})
+
+-- Jinja templates: .j2, .jinja and .jinja2 files, and HTML with template tags in
+-- its first 50 lines. Highlighted by treesitter (after/queries/jinja/injections.scm).
+vim.filetype.add({
+  extension = {
+    j2 = "jinja",
+    jinja = "jinja",
+    jinja2 = "jinja",
+    html = function(_, bufnr)
+      for _, line in ipairs(vim.api.nvim_buf_get_lines(bufnr, 0, 50, false)) do
+        if line:find("{{.*}}") or line:find("{%%%-?%s*%a") or line:find("{#") then
+          return "jinja"
+        end
+      end
+      return "html"
+    end,
+  },
+  pattern = {
+    [".*%.jinja%.html"] = "jinja",
+    [".*%.html%.j2"] = "jinja",
+  },
 })

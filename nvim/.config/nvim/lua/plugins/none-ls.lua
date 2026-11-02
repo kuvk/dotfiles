@@ -41,6 +41,7 @@ return {
         }),
         -- Jinja formatting setup
         null_ls.builtins.formatting.djlint.with({
+          filetypes = { "django", "jinja", "htmldjango" },
           extra_args = {
             "--indent",
             "2",
@@ -53,7 +54,7 @@ return {
             "--quiet",
           },
         }),
-        null_ls.builtins.diagnostics.djlint,
+        null_ls.builtins.diagnostics.djlint.with({ filetypes = { "django", "jinja", "htmldjango" } }),
         -- C/C++ setup with cppcheck and astyle (installed manually)
         null_ls.builtins.diagnostics.cppcheck,
         null_ls.builtins.formatting.astyle,
@@ -64,7 +65,7 @@ return {
           extra_args = { "--ignore-path", ".prettierignore" },
           disabled_filetypes = {
             "htmldjango",
-            "jinja.html",
+            "jinja",
           },
         }),
 
