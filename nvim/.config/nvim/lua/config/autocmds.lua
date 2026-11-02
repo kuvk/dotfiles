@@ -37,6 +37,18 @@ vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
   end,
 })
 
+-- Lazy's dimmed backdrop would otherwise get winborder's border around the whole screen
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "lazy_backdrop",
+  callback = function(ev)
+    vim.schedule(function()
+      for _, win in ipairs(vim.fn.win_findbuf(ev.buf)) do
+        vim.api.nvim_win_set_config(win, { border = "none" })
+      end
+    end)
+  end,
+})
+
 -- Flash what was just copied
 vim.api.nvim_create_autocmd("TextYankPost", {
   callback = function()
