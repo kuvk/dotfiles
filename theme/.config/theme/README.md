@@ -77,7 +77,7 @@ theme folder and set `wallpaper` under `[apps]`.
 
 fastfetch uses `~/.config/fastfetch/config.jsonc`, generated from `base.jsonc` on each theme switch.
 
-`theme-set.py --shape rounded|square` sets the status line corners in tmux, nvim, yazi and Claude Code. Quickshell calls it: square in Work-Game or with the corner radius at 0.
+`theme-set.py --shape rounded|square` sets the status line corners in tmux, nvim, yazi and Claude Code, the corners of Neovim's windows and LazyGit, and the starship prompt's. Quickshell calls it: square in Work-Game or with the corner radius at 0.
 
 Selected text uses the `selection_bg` (gray) and `selection_fg` (accent, or text where the accent is unreadable on it) roles in kitty, tmux, zsh, nvim, GTK and Qt. herdr and Claude Code only take the background.
 

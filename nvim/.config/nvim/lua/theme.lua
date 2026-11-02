@@ -42,7 +42,18 @@ local function custom_highlights()
   }) do
     set(0, group, { fg = M.accent2 })
   end
+  -- The completion menu without its own background, like the other floating windows
+  local menu = vim.api.nvim_get_hl(0, { name = "Pmenu", link = false })
+  set(0, "BlinkCmpMenu", { fg = menu.fg })
   set(0, "NoiceConfirmBorder", { fg = p.accent })
+  -- Its choices as plain text without a background, the default one (Enter) in the accent
+  set(0, "NoiceFormatConfirm", { fg = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).fg })
+  set(0, "NoiceFormatConfirmDefault", { fg = p.accent })
+  -- Lines between splits (shapes in options.lua fillchars), in the file tree's background
+  local tree = vim.api.nvim_get_hl(0, { name = "NeoTreeNormal", link = false }).bg
+  local divider = tree and string.format("#%06x", tree) or p.dark_bg
+  set(0, "WinSeparator", { fg = divider })
+  set(0, "NeoTreeWinSeparator", { fg = divider })
   -- TODO in comments, as text without a background
   set(0, "@comment.todo", { fg = p.accent, bold = true })
   -- Command and search windows (noice.lua)
@@ -112,12 +123,50 @@ function M.square()
   return shape == "square"
 end
 
+-- Window corners: square in Work-Game or with the corner radius at 0, rounded otherwise.
+-- Most windows follow vim.o.winborder; the rest are updated here. The command line,
+-- search and confirm windows (noice) and the completion menu (blink.cmp) keep their
+-- corners until Neovim restarts.
+function M.border()
+  return M.square() and "single" or "rounded"
+end
+
+function M.apply_shape()
+  local border = M.border()
+  vim.o.winborder = border
+  vim.g.lazygit_floating_window_border_chars = border == "single"
+      and { "┌", "─", "┐", "│", "┘", "─", "└", "│" }
+    or { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
+  -- theme-set rewrites LazyGit's config with the new corners right after; an open one rereads it
+  vim.defer_fn(refresh_lazygit, 500)
+  local ok, lazy_config = pcall(require, "lazy.core.config")
+  if ok then
+    lazy_config.options.ui.border = border
+  end
+  if package.loaded["telescope.config"] then
+    require("telescope.config").values.borderchars = border == "single"
+        and { "─", "│", "─", "│", "┌", "┐", "┘", "└" }
+      or { "─", "│", "─", "│", "╭", "╮", "╯", "╰" }
+  end
+  local which_key = package.loaded["which-key.config"] and require("which-key.config").options
+  if which_key then
+    which_key.win.border = border
+  end
+  local views = package.loaded["noice.config"] and require("noice.config").options.views
+  if views then
+    for _, view in ipairs({ "cmdline_popup", "confirm" }) do
+      views[view] = vim.tbl_deep_extend("force", views[view] or {}, { border = { style = border } })
+    end
+  end
+end
+
 function M.setup()
   if M.started then
     return
   end
   M.started = true
   vim.api.nvim_create_autocmd("ColorScheme", { callback = custom_highlights })
+  vim.api.nvim_create_autocmd("User", { pattern = { "ThemeShape", "VeryLazy" }, callback = M.apply_shape })
   M.apply()
 
   if vim.fn.isdirectory(dir) == 0 then

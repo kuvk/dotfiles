@@ -2,11 +2,7 @@ return {
   {
     "williamboman/mason.nvim",
     config = function()
-      require("mason").setup({
-        ui = {
-          border = "rounded",
-        },
-      })
+      require("mason").setup()
     end,
   },
   {
@@ -31,9 +27,6 @@ return {
     "neovim/nvim-lspconfig",
     config = function()
       local capabilities = require("blink.cmp").get_lsp_capabilities()
-      require("lspconfig.ui.windows").default_options = {
-        border = "rounded",
-      }
 
       vim.diagnostic.config({
         signs = {

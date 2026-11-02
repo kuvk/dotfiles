@@ -39,7 +39,6 @@ return {
         -- Nothing is selected until Tab, so Enter only accepts what you chose
         list = { selection = { preselect = false, auto_insert = true } },
         menu = {
-          border = "rounded",
           scrollbar = false,
           -- Below noice's command window rather than over its bottom edge
           cmdline_position = function()
@@ -61,7 +60,7 @@ return {
             },
           },
         },
-        documentation = { auto_show = true, window = { border = "rounded" } },
+        documentation = { auto_show = true },
       },
       sources = {
         default = { "lsp", "snippets", "path", "buffer" },

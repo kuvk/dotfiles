@@ -38,6 +38,8 @@ local options = {
       text = "File Explorer",
       highlight = "StatusLine",
       text_align = "left",
+      -- covers the divider's column too, so the line beside the tree reaches the top
+      padding = 1,
     },
   },
 }
