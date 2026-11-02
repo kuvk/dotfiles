@@ -170,6 +170,7 @@ local apps = {
   { name = "davinci", class = "resolve", no_blur = true, opaque = true },
   { name = "netflix", class = "brave-netflix.*", no_blur = true, opaque = true },
   { name = "eontv", class = "brave-eon.*", no_blur = true, opaque = true },
+  { name = "whatsapp", class = "^(brave|chromium)-web\\.whatsapp\\.com__.*", float = true, center = true, size = "900 500" },
 }
 
 for _, app in ipairs(apps) do
