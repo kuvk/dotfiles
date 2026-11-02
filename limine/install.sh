@@ -20,6 +20,7 @@ kernels=/efi/arch
 mode=install
 use_theme=false
 resolution=
+options="$*"  # kept in limine.conf, so update.sh can run this again the same way
 while (($#)); do
     case $1 in
         --theme) use_theme=true ;;
@@ -118,6 +119,7 @@ wallpaper() {
 config() {
     cat <<EOF
 # Written by limine/install.sh in the dotfiles; edit that and run it again.
+# Options: $options
 timeout: 3
 default_entry: 2
 terse: yes
