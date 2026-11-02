@@ -17,6 +17,10 @@ return {
     "nvim-telescope/telescope-ui-select.nvim",
     config = function()
       require("telescope").setup({
+        defaults = {
+          -- q closes in normal mode (jk or Esc from the prompt) and types a q in insert mode
+          mappings = { n = { q = "close" } },
+        },
         extensions = {
           ["ui-select"] = {
             require("telescope.themes").get_dropdown({}),
