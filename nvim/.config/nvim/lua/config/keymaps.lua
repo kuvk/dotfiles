@@ -117,6 +117,23 @@ map("n", "<leader>Di", dap("step_into"), { desc = "Step into" })
 map("n", "<leader>Dt", dap("terminate"), { desc = "Stop debugging" })
 
 -- Tools
-map("n", "<leader>mp", "<cmd>MarkdownPreviewToggle<CR>", { desc = "Toggle markdown preview" })
+map("n", "<leader>mp", "<cmd>RenderMarkdown toggle<CR>", { desc = "Toggle markdown rendering" })
+-- Previews the current file, or stops if that's the one being previewed. Each start gets
+-- a free port, so other Neovims and browser tabs of an earlier preview can't get in the way.
+local previewed_file
+map("n", "<leader>mb", function()
+  local file = vim.api.nvim_buf_get_name(0)
+  if require("livepreview").is_running() and file == previewed_file then
+    vim.cmd.LivePreview("close")
+    return
+  end
+  local socket = vim.uv.new_tcp()
+  socket:bind("127.0.0.1", 0)
+  local port = socket:getsockname().port
+  socket:close()
+  require("livepreview.config").set({ port = port, dynamic_root = true })
+  vim.cmd.LivePreview("start")
+  previewed_file = file
+end, { desc = "Preview markdown file in browser, or stop" })
 map("n", "<leader>mm", "<cmd>Mason<CR>", { desc = "Open Mason" })
 map("n", "<leader>ll", "<cmd>Lazy<CR>", { desc = "Open Lazy" })
