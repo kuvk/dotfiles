@@ -15,7 +15,7 @@ return {
         mason = true,
         telescope = true,
         dap = true,
-        cmp = true,
+        blink_cmp = true,
       },
     })
     -- Apply the system theme here, before other plugins (bufferline, lualine)

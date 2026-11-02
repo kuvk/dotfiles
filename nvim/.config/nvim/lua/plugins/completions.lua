@@ -1,26 +1,17 @@
+local source_labels = {
+  lsp = "[LSP]",
+  snippets = "[SNIP]",
+  path = "[PATH]",
+  buffer = "[BUF]",
+  cmdline = "[CMD]",
+}
+
 return {
   {
-    "hrsh7th/cmp-nvim-lsp",
-  },
-  -- {
-  --   "github/copilot.vim",
-  --   config = function()
-  --     vim.g.copilot_no_tab_map = true
-  --     vim.api.nvim_set_keymap(
-  --       "i",
-  --       "<C-Y>",
-  --       'copilot#Accept("<CR>")',
-  --       { expr = true, silent = true, noremap = true, replace_keycodes = false }
-  --     )
-  --   end,
-  -- },
-  {
     "L3MON4D3/LuaSnip",
-    version = "v2.*", -- Replace <CurrentMajor> by the latest released major (first number of latest release)
-    -- install jsregexp (optional!).
+    version = "v2.*",
     build = "make install_jsregexp",
     dependencies = {
-      "saadparwaiz1/cmp_luasnip",
       "rafamadriz/friendly-snippets",
     },
     config = function()
@@ -29,87 +20,52 @@ return {
     end,
   },
   {
-    "hrsh7th/nvim-cmp",
-    dependencies = {
-      "hrsh7th/cmp-path",
-      "hrsh7th/cmp-buffer",
+    "saghen/blink.cmp",
+    -- Stable releases, with a prebuilt matcher. Version 2 is still changing.
+    version = "1.*",
+    dependencies = { "L3MON4D3/LuaSnip" },
+    opts = {
+      snippets = { preset = "luasnip" },
+      keymap = {
+        preset = "none",
+        ["<C-b>"] = { "scroll_documentation_up", "fallback" },
+        ["<C-f>"] = { "scroll_documentation_down", "fallback" },
+        ["<C-e>"] = { "cancel", "fallback" },
+        ["<CR>"] = { "accept", "fallback" },
+        ["<Tab>"] = { "select_next", "snippet_forward", "fallback" },
+        ["<S-Tab>"] = { "select_prev", "snippet_backward", "fallback" },
+      },
+      completion = {
+        -- Nothing is selected until Tab, so Enter only accepts what you chose
+        list = { selection = { preselect = false, auto_insert = true } },
+        menu = {
+          border = "rounded",
+          scrollbar = false,
+          draw = {
+            columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "kind" }, { "source" } },
+            components = {
+              source = {
+                text = function(ctx)
+                  return source_labels[ctx.source_id] or ctx.source_id
+                end,
+                highlight = "BlinkCmpSource",
+              },
+            },
+          },
+        },
+        documentation = { auto_show = true, window = { border = "rounded" } },
+      },
+      sources = {
+        default = { "lsp", "snippets", "path", "buffer" },
+        providers = {
+          buffer = { min_keyword_length = 3, score_offset = -10 },
+        },
+      },
+      -- Suggestions for : commands and / searches
+      cmdline = {
+        keymap = { preset = "cmdline" },
+        completion = { menu = { auto_show = true } },
+      },
     },
-    config = function()
-      local border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
-      local luasnip = require("luasnip")
-      local cmp = require("cmp")
-
-      cmp.setup({
-        snippet = {
-          -- REQUIRED - you must specify a snippet engine
-          expand = function(args)
-            require("luasnip").lsp_expand(args.body) -- For `luasnip` users.
-          end,
-        },
-        window = {
-          completion = cmp.config.window.bordered({ border = border, scrollbar = false }),
-          documentation = cmp.config.window.bordered({ border = border }),
-        },
-        mapping = cmp.mapping.preset.insert({
-          ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-          ["<C-f>"] = cmp.mapping.scroll_docs(4),
-          ["<CR>"] = cmp.mapping({
-            i = function(fallback)
-              if cmp.visible() and cmp.get_active_entry() then
-                cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false })
-              else
-                fallback()
-              end
-            end,
-            s = cmp.mapping.confirm({ select = true }),
-            c = cmp.mapping.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true }),
-          }),
-
-          ["<Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_next_item()
-            elseif luasnip.locally_jumpable(1) then
-              luasnip.jump(1)
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-
-          ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
-            elseif luasnip.locally_jumpable(-1) then
-              luasnip.jump(-1)
-            else
-              fallback()
-            end
-          end, { "i", "s" }),
-          ["<C-e>"] = cmp.mapping.abort(),
-        }),
-        formatting = {
-          -- fields = { "kind", "menu", "abbr" },
-          format = function(entry, vim_item)
-            vim_item.menu = ({
-              buffer = "[BUF]",
-              nvim_lsp = "[LSP]",
-              nvim_lua = "[API]",
-              path = "[PATH]",
-              luasnip = "[SNIP]",
-              npm = "[NPM]",
-              neorg = "[NEORG]",
-            })[entry.source.name]
-            return vim_item
-          end,
-        },
-        -- In this order. Buffer words only when nothing above matches.
-        sources = cmp.config.sources({
-          { name = "nvim_lsp" },
-          { name = "luasnip" },
-          { name = "path" },
-        }, {
-          { name = "buffer", keyword_length = 3 },
-        }),
-      })
-    end,
   },
 }
