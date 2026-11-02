@@ -21,7 +21,6 @@ return {
     })
     local null_ls = require("null-ls")
     null_ls.setup({
-      debug = true, -- Turn on debug for :NullLsLog
       sources = {
         require("none-ls.diagnostics.ruff").with({
           -- Ignore imports not at the top and already provided diagnostics by mypy
@@ -70,6 +69,8 @@ return {
 
         -- Prettier
         null_ls.builtins.formatting.prettier.with({
+          -- Prettier skips anything in .gitignore by default; only .prettierignore here
+          extra_args = { "--ignore-path", ".prettierignore" },
           disabled_filetypes = {
             "htmldjango",
             "jinja.html",

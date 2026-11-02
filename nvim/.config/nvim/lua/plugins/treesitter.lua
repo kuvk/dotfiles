@@ -7,6 +7,7 @@ return {
     -- extension = {
     -- },
     -- })
+    vim.treesitter.language.register("qmljs", "qml")
     vim.api.nvim_create_autocmd("FileType", {
       pattern = {
         "c",
@@ -17,7 +18,7 @@ return {
         "go",
         "java",
         "javascript",
-        "jsx",
+        "javascriptreact",
         "json",
         "jsonc",
         "html",
@@ -32,7 +33,7 @@ return {
         "sshconfig",
         "scfg",
         "typescript",
-        "tsx",
+        "typescriptreact",
         "vim",
         "vue",
         "zsh",
@@ -41,6 +42,7 @@ return {
         "yaml",
         "toml",
         "rasi",
+        "qml",
       },
       callback = function()
         vim.treesitter.start() -- highlighting
