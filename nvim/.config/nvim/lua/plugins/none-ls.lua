@@ -71,23 +71,13 @@ return {
         -- Python formatting: isort, then Black. Ruff is a language server (lsp-config.lua)
         null_ls.builtins.formatting.isort,
         null_ls.builtins.formatting.black,
-				null_ls.builtins.formatting.qmlformat,
+				-- Qt 6's, as /usr/bin/qmlformat is Qt 5's and has no indent option
+        null_ls.builtins.formatting.qmlformat.with({
+          command = "/usr/lib/qt6/bin/qmlformat",
+          extra_args = { "--indent-width", "2" },
+        }),
 
       },
     })
-
-    local lsp_formatting = function(bufnr)
-      vim.lsp.buf.format({
-        filter = function(client)
-          return client.name == "null-ls"
-        end,
-        bufnr = bufnr,
-        timeout_ms = 3200,
-      })
-    end
-
-    vim.keymap.set("n", "<leader>gf", function()
-      lsp_formatting(0)
-    end)
   end,
 }

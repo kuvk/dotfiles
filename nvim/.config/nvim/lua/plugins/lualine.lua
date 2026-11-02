@@ -19,6 +19,20 @@ local conditions = {
   end,
 }
 
+-- The buffer's language server, and how many more: "󰒍 pyright +1". Nothing without one.
+local function lsp_status()
+  local names = {}
+  for _, client in ipairs(vim.lsp.get_clients({ bufnr = 0 })) do
+    if client.name ~= "null-ls" then
+      table.insert(names, client.name)
+    end
+  end
+  if #names == 0 then
+    return ""
+  end
+  return "\u{f048d} " .. names[1] .. (#names > 1 and " +" .. (#names - 1) or "")
+end
+
 -- Foreground of a highlight group only. Passing a group name to lualine
 -- would also take its background and break the section's look.
 local function fg(group)
@@ -55,30 +69,14 @@ local function setup()
           },
         },
       },
-      lualine_c = {
-        "%=",
+      lualine_c = {},
+      lualine_x = {
         {
-          function()
-            local msg = "No Active Lsp"
-            local buf_ft = vim.api.nvim_buf_get_option(0, "filetype")
-            local clients = vim.lsp.get_clients()
-            if next(clients) == nil then
-              return msg
-            end
-            for _, client in ipairs(clients) do
-              local filetypes = client.config.filetypes
-              if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
-                return client.name
-              end
-            end
-            return msg
-          end,
-          icon = " LSP:",
+          lsp_status,
           color = fg("DiagnosticHint"),
           cond = conditions.hide_in_width,
         },
       },
-      lualine_x = {},
       lualine_y = {
         {
           "diagnostics",

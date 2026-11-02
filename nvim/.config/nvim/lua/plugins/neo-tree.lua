@@ -74,7 +74,5 @@ return {
         },
       },
     })
-    vim.keymap.set("n", "<C-n>", ":Neotree toggle<CR>", {})
-    vim.keymap.set("n", "<C-f>", ":Neotree focus<CR>", {})
   end,
 }

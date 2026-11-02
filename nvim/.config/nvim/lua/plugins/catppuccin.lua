@@ -17,14 +17,6 @@ return {
         dap = true,
         cmp = true,
       },
-      custom_highlights = function(colors)
-        return {
-          AlphaHeader = { fg = colors.blue },
-          AlphaButtons = { fg = colors.peach },
-          AlphaShortcut = { fg = colors.blue },
-          AlphaFooter = { fg = colors.mauve, style = { "italic" } },
-        }
-      end,
     })
     -- Apply the system theme here, before other plugins (bufferline, lualine)
     -- set up their highlights. See lua/theme.lua.

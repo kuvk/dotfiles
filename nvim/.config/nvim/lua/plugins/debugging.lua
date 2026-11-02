@@ -55,13 +55,6 @@ return {
       dapui.close()
     end
 
-    vim.keymap.set("n", "<Leader>db", dap.toggle_breakpoint, {})
-    vim.keymap.set("n", "<Leader>dc", dap.continue, {})
-    vim.keymap.set("n", "<Leader>dd", dap.step_over, {})
-    vim.keymap.set("n", "<Leader>do", dap.step_out, {})
-    vim.keymap.set("n", "<Leader>di", dap.step_into, {})
-    vim.keymap.set("n", "<Leader>dt", dap.terminate, {})
-
     vim.fn.sign_define("DapBreakpoint", { text = "", texthl = "DapBreakpoint" })
     vim.fn.sign_define("DapBreakpointCondition", { text = "ﳁ ", texthl = "DapBreakpoint" })
     vim.fn.sign_define("DapBreakpointRejected", { text = " ", texthl = "DapBreakpoint" })

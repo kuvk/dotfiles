@@ -63,8 +63,5 @@ return {
         vim.schedule(setup)
       end,
     })
-    vim.keymap.set("n", "<leader>co", ":BufferLineCloseOthers<CR>", {})
-    vim.keymap.set("n", "<leader>,", ":BufferLineCyclePrev<CR>", {})
-    vim.keymap.set("n", "<leader>.", ":BufferLineCycleNext<CR>", {})
   end,
 }
