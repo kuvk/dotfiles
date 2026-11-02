@@ -17,6 +17,7 @@ stow hypr quickshell theme scripts fontconfig kitty tmux zsh nvim yazi   # or an
 | `scripts` | `theme-set.py`, `wallpaper.py`, `hypr-monitors.py`, `lockscreen.sh`, `webapp.py`, `network.py`, `sysmaintenance.sh` and others |
 | `sddm` | Login screen: your wallpaper, fonts, cursor and monitor scales. Not stowed; install with `sudo sddm/install.sh` |
 | `plymouth` | Boot splash: the fastfetch logo, a password field for the encrypted drives and a progress bar. Not stowed; install with `sudo plymouth/install.sh` (`--theme` for the current theme's colors, `--preview FILE` to see it first) |
+| `limine` | Boot menu: the fastfetch logo above an Omarchy-style tree of kernels, in the theme's colors. Not stowed; install with `sudo limine/install.sh` (`--theme` for the current theme's colors, `--print` for the config, `--preview FILE` for the wallpaper) |
 | `fontconfig` | Font folders; rendering comes from Settings > Fonts |
 | `kitty`, `tmux`, `zsh` | Terminal, multiplexer and shell (below) |
 | `nvim`, `lazygit`, `yazi`, `bat`, `btop`, `cava`, `fastfetch`, `starship`, `swayimg`, `spotify`, `cliamp` | App configs; those with colors follow the theme |
