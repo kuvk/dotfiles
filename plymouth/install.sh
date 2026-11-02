@@ -8,6 +8,10 @@
 #   plymouth/install.sh --preview FILE     draw the password step to an image, without installing
 #   plymouth/install.sh --preview-progress FILE   the same for the progress bar (at 60%)
 #
+# Also installs the luks-poweroff mkinitcpio hook (after sd-encrypt): failing to unlock the
+# drives powers off. The limits come from the kernel options in /etc/kernel/cmdline:
+# rd.luks.options=timeout=90s,tries=3 systemd.default_device_timeout_sec=infinity
+#
 # Back to the previous splash: sudo plymouth-set-default-theme -R rog_2
 set -euo pipefail
 
@@ -55,13 +59,16 @@ rgb() { awk -v r=$((16#${1:1:2})) -v g=$((16#${1:3:2})) -v b=$((16#${1:5:2})) 'B
 build=$(mktemp -d)
 trap 'rm -rf "$build"' EXIT
 
-# Images: the hint under the password field in subtext0, the logo in fastfetch's color, the password field in surface0 with an accent outline, dots and progress bar in accent2
+# Images: the hint under the password field in subtext0 (accent2, then accent after wrong passwords; the farewell line in mauve), the logo in fastfetch's color, the password field in surface0 with an accent outline, dots and progress bar in accent2
 magick -background none -fill "$mauve" -font "$font" -pointsize 18 label:@"$logo_text" "$build/logo.png"
 # The password field and progress bar are as wide as the logo
 ew=$(magick identify -format %w "$build/logo.png")
 magick -size "${ew}x48" xc:none -fill "$surface0" -stroke "$accent" -strokewidth 2 \
     -draw "roundrectangle 1,1 $((ew - 2)),46 23,23" "$build/entry.png"
 magick -background none -fill "$subtext0" -font "$font" -pointsize 16 label:"Speak, friend, and enter!" "$build/hint.png"
+magick -background none -fill "$accent2" -font "$font" -pointsize 16 label:"Tell me, friend, when did you abandon reason for madness?" "$build/wrong1.png"
+magick -background none -fill "$accent" -font "$font" -pointsize 16 label:"You shall not pass!" "$build/wrong2.png"
+magick -background none -fill "$mauve" -font "$font" -pointsize 28 label:"Go back to the Shadow!" "$build/farewell.png"
 magick -size 14x14 xc:none -fill "$accent2" -draw "circle 7,7 7,1" "$build/bullet.png"
 magick -size "${ew}x10" xc:none -fill "$surface0" -draw "roundrectangle 0,0 $((ew - 1)),9 5,5" "$build/progress_box.png"
 magick -size "${ew}x10" xc:none -fill "$accent2" -draw "roundrectangle 0,0 $((ew - 1)),9 5,5" "$build/progress_bar.png"
@@ -85,9 +92,9 @@ if [[ $mode == preview* ]]; then
     magick -size 1920x1080 "xc:$base" \
         "$build/logo.png" -geometry +$((960 - lw / 2))+$ly -composite \
         "$build/entry.png" -geometry +$ex+$ey -composite \
-        \( "$build/bullet.png" -resize 7x7 \) -geometry +$((ex + 20))+$((ey + 20)) -composite \
-        \( "$build/bullet.png" -resize 7x7 \) -geometry +$((ex + 32))+$((ey + 20)) -composite \
-        \( "$build/bullet.png" -resize 7x7 \) -geometry +$((ex + 44))+$((ey + 20)) -composite \
+        \( "$build/bullet.png" -resize 7x7 \) -geometry +$((ex + ew / 2 - 15))+$((ey + 20)) -composite \
+        \( "$build/bullet.png" -resize 7x7 \) -geometry +$((ex + ew / 2 - 3))+$((ey + 20)) -composite \
+        \( "$build/bullet.png" -resize 7x7 \) -geometry +$((ex + ew / 2 + 9))+$((ey + 20)) -composite \
         "$build/hint.png" -geometry +$((960 - $(magick identify -format %w "$build/hint.png") / 2))+$((ey + 48 + 16)) -composite \
         "$preview"
     echo "Preview: $preview"
@@ -97,5 +104,9 @@ fi
 theme=/usr/share/plymouth/themes/kuvk
 install -d -m 0755 "$theme"
 install -m 0644 "$build"/* "$theme"/
+install -D -m 0644 "$here/luks-poweroff" /etc/initcpio/install/luks-poweroff
+if ! grep -q '^HOOKS=.*\bluks-poweroff\b' /etc/mkinitcpio.conf; then
+    sed -i '/^HOOKS=/s/\bsd-encrypt\b/sd-encrypt luks-poweroff/' /etc/mkinitcpio.conf
+fi
 plymouth-set-default-theme -R kuvk
 echo "Installed. The boot splash shows at the next boot."
