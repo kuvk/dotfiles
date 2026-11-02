@@ -23,6 +23,10 @@ local function custom_highlights()
   local p = M.palette
   local set = vim.api.nvim_set_hl
   set(0, "LazyGitBorder", { fg = p.accent })
+  -- Command and search windows (noice.lua)
+  for _, group in ipairs({ "Border", "BorderSearch", "Title" }) do
+    set(0, "NoiceCmdlinePopup" .. group, { fg = p.accent })
+  end
   set(0, "AlphaHeader", { fg = p.blue })
   set(0, "AlphaButtons", { fg = p.accent })
   set(0, "AlphaShortcut", { fg = p.blue })

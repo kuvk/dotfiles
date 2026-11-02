@@ -33,6 +33,12 @@ local function lsp_status()
   return "\u{f048d} " .. names[1] .. (#names > 1 and " +" .. (#names - 1) or "")
 end
 
+-- The macro being recorded; there's no command line row to show it in
+local function recording_status()
+  local register = vim.fn.reg_recording()
+  return register ~= "" and "recording @" .. register or ""
+end
+
 -- Foreground of a highlight group only. Passing a group name to lualine
 -- would also take its background and break the section's look.
 local function fg(group)
@@ -71,6 +77,10 @@ local function setup()
       },
       lualine_c = {},
       lualine_x = {
+        {
+          recording_status,
+          color = fg("DiagnosticWarn"),
+        },
         {
           lsp_status,
           color = fg("DiagnosticHint"),
@@ -127,5 +137,12 @@ return {
     -- Colors come from the colorscheme, so rebuild when the theme changes
     vim.api.nvim_create_autocmd("ColorScheme", { callback = setup })
     vim.api.nvim_create_autocmd("User", { pattern = "ThemeShape", callback = setup })
+    vim.api.nvim_create_autocmd({ "RecordingEnter", "RecordingLeave" }, {
+      callback = function()
+        vim.schedule(function()
+          require("lualine").refresh({ place = { "statusline" } })
+        end)
+      end,
+    })
   end,
 }

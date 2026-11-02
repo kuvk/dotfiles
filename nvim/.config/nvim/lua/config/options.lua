@@ -44,17 +44,8 @@ end)
 -- Backspace
 opt.backspace = "indent,eol,start"
 
--- Hide cmdline and strech status line
--- opt.cmdheight = 0
+-- No command line row, noice.lua draws it. One status line across splits.
+opt.cmdheight = 0
 opt.laststatus = 3
 
 opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"
-
--- Add height to cmdline when recording macros
--- vim.cmd([[
---   augroup cmd_macro
---     autocmd!
---     autocmd RecordingEnter * set cmdheight=1
---     autocmd RecordingLeave * set cmdheight=0
---   augroup END
--- ]])
