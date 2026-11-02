@@ -75,6 +75,13 @@ def hypr_json(what: str) -> list:
         return []
 
 
+def active_workspace() -> int | None:
+    try:
+        return json.loads(run(["hyprctl", "-j", "activeworkspace"]) or "{}").get("id")
+    except (json.JSONDecodeError, AttributeError):
+        return None
+
+
 def is_internal(name: str) -> bool:
     return name.startswith(INTERNAL_PREFIXES)
 
@@ -303,12 +310,35 @@ def apply_text_size(size: int) -> None:
         run(["pkill", "-USR1", "-x", "kitty"])
 
 
-def export_greeter_layout(profile: dict, live: list[dict]) -> None:
+def boot_gpu_outputs() -> set[str] | None:
+    """Connector names (eDP-1, HDMI-A-1...) on the GPU the login screen uses: the kernel's
+    boot display, as sddm/hyprland.lua picks it. None if that can't be told."""
+    drm = Path("/sys/class/drm")
+    for card in drm.glob("card[0-9]*"):
+        if "-" in card.name:
+            continue
+        try:
+            if (card / "device/boot_vga").read_text().strip() != "1":
+                continue
+        except OSError:
+            continue
+        return {c.name.split("-", 1)[1] for c in drm.glob(card.name + "-*")}
+    return None
+
+
+def export_greeter_layout(data: dict, profile: dict, live: list[dict]) -> None:
     """The login screen's monitors, one per line: output, scale, position, transform.
-    Connected monitors get this profile's layout (position "disabled" if turned off); others
-    keep their last scale at an automatic position, for when they're plugged in."""
+    It only drives the boot GPU's monitors, so those take their own saved profile when there
+    is one (a laptop's screen alone, though a dGPU monitor is plugged in too); otherwise this
+    profile's layout (position "disabled" if turned off). Monitors not connected keep their
+    last scale at an automatic position, for when they're plugged in."""
     if not GREETER_LAYOUT.parent.is_dir():
         return
+    outputs = boot_gpu_outputs()
+    shown = [m for m in live if outputs is None or m["name"] in outputs] or live
+    if len(shown) < len(live):
+        profile = data["profiles"].get(profile_key(shown), profile)
+        live = shown
     rows: dict[str, tuple[str, str, str]] = {}
     try:
         for line in GREETER_LAYOUT.read_text().splitlines():
@@ -337,7 +367,7 @@ def export_greeter_layout(profile: dict, live: list[dict]) -> None:
 
 def apply(data: dict, live: list[dict], *, force_reload: bool = False) -> None:
     key, profile = current_profile(data, live)
-    export_greeter_layout(profile, live)
+    export_greeter_layout(data, profile, live)
     content = render_lua(profile, live)
 
     GENERATED_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -571,8 +601,9 @@ def hotplug(startup: bool = False) -> int:
             log(f"{'startup' if startup else 'hotplug'}: applying profile '{key}' ({state})")
             data = load_profiles()
             apply(data, live)
-            # start from the first workspace on the new layout
-            run(["hyprctl", "dispatch", "hl.dsp.focus({ workspace = 1 })"])
+            # start from the first workspace on the new layout (at login autostart already did)
+            if active_workspace() != 1:
+                run(["hyprctl", "dispatch", "hl.dsp.focus({ workspace = 1 })"])
             time.sleep(1)
             again = settle(4) or live
             if profile_key(again) == key:
@@ -599,7 +630,7 @@ def main(argv: list[str]) -> int:
         log(f"apply: profile '{profile_key(live)}'")
         apply(data, live, force_reload="--reload" in argv)
     elif cmd == "export-greeter":
-        export_greeter_layout(current_profile(data, live)[1], live)
+        export_greeter_layout(data, current_profile(data, live)[1], live)
     elif cmd == "state":
         print(json.dumps(state(data, live)))
     elif cmd == "set" and len(argv) > 1:
