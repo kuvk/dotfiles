@@ -9,7 +9,7 @@ return {
   config = function()
     require("neo-tree").setup({
       close_if_last_window = true,
-      popup_border_style = "rounded", -- "double", "none", "rounded", "shadow", "single" or "solid"
+      popup_border_style = "", -- follows winborder
       default_component_configs = {
         diagnostics = {
           symbols = {

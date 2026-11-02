@@ -3,7 +3,6 @@ local opt = vim.opt
 -- Indentation and Tabs
 opt.expandtab = true
 opt.autoindent = true
-opt.fillchars = { eob = " " }
 
 opt.number = true
 opt.relativenumber = true
@@ -20,8 +19,20 @@ opt.smartcase = true
 opt.termguicolors = true
 opt.background = "dark"
 opt.signcolumn = "yes"
--- Rounded floating windows, LSP hover and signature help included
-opt.winborder = "rounded"
+-- Rounded floating windows, square in Work-Game (theme.lua), hover and signature help included
+opt.winborder = require("theme").border()
+-- Split dividers: the vertical ones fill their column and the horizontal ones half a
+-- row, in the file tree's background (theme.lua), so they look about equally thick
+opt.fillchars = {
+  eob = " ",
+  vert = "█",
+  vertleft = "█",
+  vertright = "█",
+  verthoriz = "█",
+  horiz = "▀",
+  horizup = "▀",
+  horizdown = "▀",
+}
 opt.cursorline = true
 
 -- Turn off swap and enable mouse

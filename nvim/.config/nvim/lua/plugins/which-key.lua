@@ -5,7 +5,7 @@ return {
   event = "VeryLazy",
   opts = {
     delay = 500, -- ms before the popup opens
-    win = { border = "rounded" },
+    win = { border = require("theme").border() },
     spec = {
       { "<leader>D", group = "Debug" },
       { "<leader>S", group = "Sessions" },

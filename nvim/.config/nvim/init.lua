@@ -24,7 +24,7 @@ require("lazy").setup({
     { import = "plugins" },
   },
   ui = {
-    border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
+    border = require("theme").border(),
   },
   install = { colorscheme = { "catppuccin" } },
   rocks = { enabled = false },

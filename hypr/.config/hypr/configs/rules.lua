@@ -138,7 +138,6 @@ local apps = {
   { name = "coolercontrol", class = "org.coolercontrol.CoolerControl", float = true, center = true, size = "1100 700" },
   { name = "timeshift", class = "timeshift-gtk", float = true, center = true },
   { name = "frame-checker", class = "Frame Checker", float = true, center = true },
-  { name = "pinta", class = ".*Pinta.*", float = true, center = true },
   { name = "cliamp", class = "cliamp", float = true, center = true, size = "900 600" },
   { name = "localsend", class = "org.localsend.localsend_app", float = true, center = true, size = "900 450" },
   { name = "nwg-look", class = "nwg-look", float = true, center = true, size = "700 600" },
@@ -148,9 +147,11 @@ local apps = {
   { name = "nvidia-settings", class = "nvidia-settings", float = true, center = true, size = "800 700" },
   { name = "virt-manager", class = "virt-manager", float = true, center = true, size = "800 700" },
   { name = "cameractrls", class = "hu.irl.cameractrls", float = true, center = true, size = "600 800" },
-  -- { name = "lutris", class = "net.lutris.Lutris", no_blur = true, opaque = true, center = true, idle_inhibit = "always" },
+  { name = "lutris", class = "net.lutris.Lutris", no_blur = true, opaque = true, center = true },
   { name = "heroic", class = ".*heroic.*", no_blur = true, opaque = true, center = true },
-  { name = "steam", class = "steam", no_blur = true, opaque = true, float = true, center = true },
+  { name = "steam", class = "steam", no_blur = true, opaque = true, float = true },
+  -- Only windows with a title: Steam's menus are untitled windows of the same class
+  { name = "steam-center", class = "steam", title = ".+", center = true },
   { name = "games", class = "steam_app.*", idle_inhibit = "always" },
   { name = "protonqt", class = "net.davidotek.pupgui2", float = true, center = true, size = "700 600" },
   { name = "zathura", class = "org.pwmt.zathura", float = true, center = true, size = "1100 1200" },
@@ -167,6 +168,8 @@ local apps = {
   },
   { name = "remmina-sessions", class = "org.remmina.Remmina", no_blur = true, opaque = true },
   { name = "davinci", class = "resolve", no_blur = true, opaque = true },
+  { name = "netflix", class = "brave-netflix.*", no_blur = true, opaque = true },
+  { name = "eontv", class = "brave-eon.*", no_blur = true, opaque = true },
 }
 
 for _, app in ipairs(apps) do
@@ -181,13 +184,6 @@ for _, app in ipairs(apps) do
     idle_inhibit = app.idle_inhibit,
   })
 end
-
--- WhatsApp
-hl.window_rule({
-  name = "whatsapp",
-  match = { title = "WhatsApp Web" },
-  float = false,
-})
 
 -- Steam
 hl.window_rule({
