@@ -32,7 +32,7 @@ can own the D-Bus name.
 | Battery, power mode (Quiet / Balanced / Performance) | `modules/dropdowns/BatteryDropdown.qml` | click the battery |
 | Night light | `scripts/nightlight-toggle.sh` + `services/System.qml` | the Control Center tile, or `SUPER+CTRL+N`; temperature and schedule in Settings |
 | Stay awake | `services/System.qml` | the coffee icon (holds an idle inhibitor); while media plays an inhibitor is held automatically |
-| Work-Game (no blur/animations/rounding, game gaps, turns Stay Awake on) | `scripts/hypr-gamemode.sh` + `services/System.qml` | the rocket icon, the Control Center tile, or `SUPER+G` |
+| Work-Game: **Work** mode (no blur, animations or rounding, own gaps, live wallpapers paused) and **Game** mode (the same, plus a plain US keyboard and Stay Awake) | `scripts/hypr-gamemode.sh` + `services/System.qml` | `SUPER+G` Work, `SUPER+CTRL+G` Game (each again for off); the rocket icon or Control Center tile goes normal, Work, Game. The icon is mauve in Work, peach in Game |
 | Displays | `modules/displays/DisplaysPanel.qml` | the monitor icon, or `SUPER+CTRL+M` |
 | Notification popups, with actions and inline replies; web apps show their own name and icon | `modules/notifications/NotificationPopups.qml` | |
 | Clipboard history in RAM (a reboot wipes it): text and images, type to filter | `modules/launcher/Clipboard.qml` | `SUPER+SHIFT+V` |
@@ -98,7 +98,7 @@ icon, add its `notify-send -a` name to `appGlyphs` in `services/Notifs.qml`.
 
 | App name | Sent by | When |
 |---|---|---|
-| Work-Game | `hypr-gamemode.sh` | turned on or off |
+| Work-Game | `hypr-gamemode.sh` | Work or Game mode on, or off |
 | Theme | `theme-set.py` | a theme is applied by name, or applying fails |
 | Wallpapers | `wallpaper.py` | live wallpapers pause or resume, none is running, or mpvpaper is missing |
 

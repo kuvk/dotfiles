@@ -22,9 +22,11 @@ stow hypr quickshell theme scripts fontconfig kitty tmux zsh nvim yazi   # or an
 
 ## Window manager keys
 
-The main modifier is `SUPER`, set by `mainMod` in `hypr/.config/hypr/configs/bindings.lua`. Left Alt and
-left Super are swapped (`altwin:swap_lalt_lwin` in `input.lua`), so `SUPER` is the physical left Alt key.
-Alt+Space switches keyboard layout. `SUPER+/` lists every binding.
+The main modifier is `SUPER`, set by `mainMod` in `hypr/.config/hypr/configs/bindings.lua`. Alt and Super
+are swapped (`altwin:swap_alt_win` in `input.lua`), so `SUPER` is the physical Alt key, and Alt+Space
+switches keyboard layout. In Work-Game's Game mode (`SUPER+CTRL+G`) the keyboard is plain US with no swap
+and no layout switching, so games get Alt where it's printed and `SUPER` is the key with the Windows logo;
+Work mode (`SUPER+G`) keeps the keyboard as it is. `SUPER+/` lists every binding.
 
 ## Terminal keys
 

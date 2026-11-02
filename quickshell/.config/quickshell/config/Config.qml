@@ -50,22 +50,24 @@ Singleton {
     // Bar modules hidden on the primary monitor's bar and on the others
     property alias barHiddenPrimary: adapter.barHiddenPrimary
     property alias barHiddenOthers: adapter.barHiddenOthers
+    // In the bar's order, left to right
     readonly property var barModules: [
         { id: "launcher", label: "App launcher" },
         { id: "workspaces", label: "Workspaces" },
         { id: "windowTitle", label: "Window title" },
         { id: "layout", label: "Keyboard layout" },
+        { id: "clock", label: "Clock" },
         { id: "weather", label: "Weather" },
         { id: "media", label: "Media player" },
         { id: "tray", label: "System tray" },
-        { id: "workGame", label: "Work-Game" },
         { id: "stayAwake", label: "Stay Awake" },
+        { id: "workGame", label: "Work-Game" },
         { id: "audio", label: "Volume" },
         { id: "bluetooth", label: "Bluetooth" },
         { id: "network", label: "Network" },
         { id: "battery", label: "Battery" },
-        { id: "controlCenter", label: "Control Center" },
         { id: "displays", label: "Displays" },
+        { id: "controlCenter", label: "Control Center" },
         { id: "power", label: "Power menu" }
     ]
 

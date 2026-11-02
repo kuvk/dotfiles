@@ -53,7 +53,8 @@ hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(clipboard)) -- Clipboard hist
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen()) -- Fullscreen
 hl.bind(mainMod .. " + S", hl.dsp.layout("togglesplit")) -- Toggle split direction
 hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("~/.config/scripts/hypr-monitors.py")) -- Re-apply the monitor profile
-hl.bind(mainMod .. " + G", hl.dsp.exec_cmd(gamemode)) -- Work-Game
+hl.bind(mainMod .. " + G", hl.dsp.exec_cmd(gamemode .. " work")) -- Work-Game: Work mode on / off
+hl.bind(mainMod .. " + CONTROL + G", hl.dsp.exec_cmd(gamemode .. " game")) -- Work-Game: Game mode on / off
 hl.bind(mainMod .. " + CONTROL + N", hl.dsp.exec_cmd(nightlight)) -- Night light
 hl.bind(mainMod .. " + slash", hl.dsp.exec_cmd(keybinds)) -- This list of keybindings
 

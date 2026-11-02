@@ -10,7 +10,7 @@ last until logout.
   wallpaper.py thumbs static|live        create missing thumbnails
   wallpaper.py set static|live PATH [MONITOR]   apply (all monitors if none)
   wallpaper.py stop [MONITOR]            stop live wallpapers
-  wallpaper.py pause                     pause/resume live wallpapers
+  wallpaper.py pause [on|off]            pause/resume live wallpapers (toggles without on|off)
   wallpaper.py export-greeter            copy the wallpaper for the login screen
   wallpaper.py restore                   re-apply the saved static wallpapers (autostart)
 """
@@ -278,13 +278,19 @@ def mpv_command(mon: str, command: list) -> dict | None:
         return None
 
 
-def pause() -> None:
+def pause(state: str | None = None) -> None:
     mons = [p.name[len("mpv-"):-len(".sock")] for p in RUNTIME_DIR.glob("mpv-*.sock")]
     if not mons:
-        notify("No live wallpaper is running")
+        if state is None:
+            notify("No live wallpaper is running")
         return
     for mon in mons:
-        mpv_command(mon, ["cycle", "pause"])
+        if state is None:
+            mpv_command(mon, ["cycle", "pause"])
+        else:
+            mpv_command(mon, ["set_property", "pause", state == "on"])
+    if state is not None:
+        return  # Work-Game says so itself
     reply = mpv_command(mons[0], ["get_property", "pause"])
     notify("Live wallpapers paused" if reply and reply.get("data") else "Live wallpapers resumed")
 
@@ -367,7 +373,7 @@ def run_command(argv: list[str]) -> int:
     elif cmd == "stop":
         stop(args[0] if args else None)
     elif cmd == "pause":
-        pause()
+        pause(args[0] if args and args[0] in ("on", "off") else None)
     elif cmd == "restore":
         restore()
     else:

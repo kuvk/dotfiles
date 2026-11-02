@@ -14,9 +14,12 @@ Singleton {
     property bool nightlight: false
     // Holds a systemd idle inhibitor, which hypridle respects
     property bool stayAwake: false
-    // Work-Game (hypr-gamemode.sh reports its state over IPC)
-    property bool gamemode: false
-    // Stay Awake was switched on by Work-Game, so leaving it switches it off
+    // Work-Game: "normal", "work" or "game" (hypr-gamemode.sh reports it over IPC)
+    property string mode: "normal"
+    readonly property bool gamemode: mode !== "normal"
+    // For the bar's tooltip and the Control Center tile
+    readonly property string modeLabel: ({ normal: "Off", work: "Work", game: "Game" })[mode] ?? "Off"
+    // Stay Awake was switched on by Game mode, so leaving it switches it off
     property bool awakeForGamemode: false
     // Something is playing: keep the screen awake
     readonly property bool mediaPlaying: Media.players.some(p => p.isPlaying)
@@ -25,7 +28,8 @@ Singleton {
     // lasts, and leaving restores what it was before
     property var floatingBeforeGame: null
 
-    function setGamemode(on: bool): void {
+    function setMode(name: string): void {
+        const on = name !== "normal";
         if (on && !gamemode) {
             floatingBeforeGame = Config.barFloating;
             Config.barFloating = false;
@@ -33,11 +37,11 @@ Singleton {
             Config.barFloating = floatingBeforeGame;
             floatingBeforeGame = null;
         }
-        gamemode = on;
-        if (on && !stayAwake) {
+        mode = name;
+        if (name === "game" && !stayAwake) {
             stayAwake = true;
             awakeForGamemode = true;
-        } else if (!on && awakeForGamemode) {
+        } else if (name !== "game" && awakeForGamemode) {
             stayAwake = false;
             awakeForGamemode = false;
         }
@@ -119,9 +123,9 @@ Singleton {
         delayedRefresh.restart();
     }
 
-    function toggleGamemode(): void {
-        // the script reports back through `qs ipc call theme gamemode`
-        Quickshell.execDetached([scripts + "hypr-gamemode.sh"]);
+    // normal, Work, Game, normal; the script reports back through `qs ipc call theme mode`
+    function cycleMode(): void {
+        Quickshell.execDetached([scripts + "hypr-gamemode.sh", "cycle"]);
     }
 
     function setBrightness(value: real): void {
@@ -187,11 +191,12 @@ Singleton {
     Process {
         id: statusProc
 
-        command: ["sh", "-c", "pgrep -x hyprsunset >/dev/null && echo nightlight; test -e /tmp/hypr-gamemode && echo gamemode; true"]
+        command: ["sh", "-c", "pgrep -x hyprsunset >/dev/null && echo nightlight; test -e /tmp/hypr-gamemode && echo \"mode:$(cat /tmp/hypr-gamemode)\"; true"]
         stdout: StdioCollector {
             onStreamFinished: {
                 root.nightlight = text.includes("nightlight");
-                root.gamemode = text.includes("gamemode");
+                const found = text.match(/mode:(\w*)/);
+                root.mode = found ? (found[1] || "work") : "normal";
             }
         }
     }
