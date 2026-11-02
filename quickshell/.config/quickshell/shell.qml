@@ -165,9 +165,10 @@ ShellRoot {
             Theme.reload();
         }
 
-        function gamemode(enabled: bool): void {
-            Theme.gamemode = enabled;
-            System.setGamemode(enabled);
+        // "normal", "work" or "game", from hypr-gamemode.sh
+        function mode(name: string): void {
+            Theme.gamemode = name !== "normal";
+            System.setMode(name);
         }
     }
 

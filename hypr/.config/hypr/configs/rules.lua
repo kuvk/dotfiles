@@ -185,6 +185,13 @@ for _, app in ipairs(apps) do
   })
 end
 
+-- Games skip vsync for lower input latency (general.allow_tearing)
+hl.window_rule({
+  name = "games-tearing",
+  match = { class = "^(steam_app_.*|gamescope)$" },
+  immediate = true,
+})
+
 -- Steam
 hl.window_rule({
   name = "steam-main",

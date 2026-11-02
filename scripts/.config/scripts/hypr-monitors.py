@@ -351,7 +351,7 @@ def apply(data: dict, live: list[dict], *, force_reload: bool = False) -> None:
     if changed or force_reload:
         # A reload resets the runtime gamemode tweaks, so leave gamemode first
         if GAMEMODE.exists() and GAMEMODE_SCRIPT.exists():
-            run(["bash", str(GAMEMODE_SCRIPT)])
+            run(["bash", str(GAMEMODE_SCRIPT), "normal"])
         run(["hyprctl", "reload"])
 
     # Workspace rules only apply to new workspaces; move the existing ones

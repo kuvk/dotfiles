@@ -397,7 +397,7 @@ FloatingWindow {
                             StyledText {
                                 Layout.topMargin: 8
                                 Layout.fillWidth: true
-                                text: "Modules for each bar. The clock always shows."
+                                text: "Modules for each bar, in their order on it."
                                 color: Theme.overlay1
                                 wrapMode: Text.Wrap
                             }

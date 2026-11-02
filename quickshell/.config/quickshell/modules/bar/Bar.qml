@@ -106,6 +106,7 @@ PanelWindow {
         id: clockButton
 
         anchors.centerIn: parent
+        visible: barWindow.shows("clock")
         active: barWindow.isOpen("calendar")
         tooltip: Qt.formatDateTime(Time.date, "dddd\nd MMMM yyyy")
         onClicked: barWindow.toggle("calendar", clockButton)
@@ -179,17 +180,6 @@ PanelWindow {
         }
 
         BarButton {
-            visible: barWindow.shows("workGame")
-            tooltip: System.gamemode ? "Leave Work-Game" : "Work-Game"
-            onClicked: System.toggleGamemode()
-
-            Icon {
-                text: Icons.rocket
-                color: System.gamemode ? Theme.mauve : Theme.overlay1
-            }
-        }
-
-        BarButton {
             visible: barWindow.shows("stayAwake")
             tooltip: System.stayAwake ? "Allow Idle Lock & Screensaver" : "Stay Awake"
             onClicked: System.stayAwake = !System.stayAwake
@@ -197,6 +187,18 @@ PanelWindow {
             Icon {
                 text: Icons.coffee
                 color: System.stayAwake ? Theme.accent : Theme.overlay1
+            }
+        }
+
+        // Click: normal, Work, Game, normal
+        BarButton {
+            visible: barWindow.shows("workGame")
+            tooltip: `Work-Game: ${System.modeLabel}`
+            onClicked: System.cycleMode()
+
+            Icon {
+                text: Icons.rocket
+                color: System.mode === "game" ? Theme.peach : System.mode === "work" ? Theme.mauve : Theme.overlay1
             }
         }
 

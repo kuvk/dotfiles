@@ -162,8 +162,9 @@ PanelWindow {
                     QuickToggle {
                         icon: Icons.rocket
                         label: "Work-Game"
+                        sublabel: System.modeLabel
                         checked: System.gamemode
-                        onClicked: System.toggleGamemode()
+                        onClicked: System.cycleMode()
                     }
 
                     QuickToggle {

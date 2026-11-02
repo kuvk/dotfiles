@@ -13,7 +13,8 @@ hl.config({
       active_border = theme.active_border,
       inactive_border = theme.inactive_border,
     },
-    allow_tearing = false,
+    -- Only windows with an `immediate` rule tear (games, rules.lua): lower input latency
+    allow_tearing = true,
     layout = "dwindle",
   },
 
@@ -34,5 +35,7 @@ hl.config({
     disable_splash_rendering = true,
     initial_workspace_tracking = 1,
     allow_session_lock_restore = true,
+    -- Variable refresh rate for fullscreen windows, where the monitor supports it
+    vrr = 2,
   },
 })
