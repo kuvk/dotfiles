@@ -46,7 +46,6 @@ return {
           with_expanders = true,
           expander_collapsed = "",
           expander_expanded = "",
-          -- padding = 2,
         },
       },
       window = {

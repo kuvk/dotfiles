@@ -8,8 +8,6 @@ return {
   config = function()
     local dap = require("dap")
     local dapui = require("dapui")
-
-    -- require("dapui").setup()
     require("dap-python").setup("~/.local/share/nvim/mason/packages/debugpy/venv/bin/python")
 
     -- C/C++ (cpptools)

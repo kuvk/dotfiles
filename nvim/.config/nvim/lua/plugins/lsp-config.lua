@@ -108,7 +108,7 @@ return {
       vim.lsp.config("qmlls", {
         capabilities = capabilities,
         cmd = { "qmlls6" },
-        filetypes = { "qml", "qmljs" },
+        filetypes = { "qml" },
         offset_encoding = "utf-8", -- sometimes helps with token position bugs
         on_attach = function(client, _)
           client.server_capabilities.semanticTokensProvider = nil

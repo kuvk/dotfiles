@@ -2,7 +2,6 @@ return {
   "nvimtools/none-ls.nvim",
   dependencies = {
     "nvimtools/none-ls-extras.nvim",
-    "gbprod/none-ls-shellcheck.nvim",
     "jay-babu/mason-null-ls.nvim",
   },
   config = function()
@@ -16,21 +15,14 @@ return {
         "ruff",
         "beautysh",
         "debugpy",
+        "cpptools",
+        "clang-format",
       },
     })
     local null_ls = require("null-ls")
     null_ls.setup({
       sources = {
         require("none-ls.formatting.beautysh"),
-        -- Shellcheck diagnostics not neccessary if using bashls
-        -- require("none-ls-shellcheck.diagnostics"),
-        -- require("none-ls-shellcheck.code_actions"),
-        -- null_ls.builtins.formatting.shfmt.with({
-        --   extra_args = {
-        --     "-i",
-        --     "4",
-        --   },
-        -- }),
         null_ls.builtins.formatting.stylua.with({
           extra_args = {
             "--indent-type",
@@ -55,9 +47,9 @@ return {
           },
         }),
         null_ls.builtins.diagnostics.djlint.with({ filetypes = { "django", "jinja", "htmldjango" } }),
-        -- C/C++ setup with cppcheck and astyle (installed manually)
+        -- C/C++. Style comes from the project's .clang-format, if it has one
         null_ls.builtins.diagnostics.cppcheck,
-        null_ls.builtins.formatting.astyle,
+        null_ls.builtins.formatting.clang_format,
 
         -- Prettier
         null_ls.builtins.formatting.prettier.with({
@@ -72,7 +64,7 @@ return {
         -- Python formatting: isort, then Black. Ruff is a language server (lsp-config.lua)
         null_ls.builtins.formatting.isort,
         null_ls.builtins.formatting.black,
-				-- Qt 6's, as /usr/bin/qmlformat is Qt 5's and has no indent option
+        -- Qt 6's, as /usr/bin/qmlformat is Qt 5's and has no indent option
         null_ls.builtins.formatting.qmlformat.with({
           command = "/usr/lib/qt6/bin/qmlformat",
           extra_args = { "--indent-width", "2" },

@@ -3,10 +3,6 @@ return {
   lazy = false,
   build = ":TSUpdate",
   config = function()
-    -- vim.filetype.add({
-    -- extension = {
-    -- },
-    -- })
     vim.treesitter.language.register("qmljs", "qml")
     vim.api.nvim_create_autocmd("FileType", {
       pattern = {

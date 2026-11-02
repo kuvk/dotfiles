@@ -58,6 +58,7 @@ map("n", "<leader>Q", "<cmd>qa!<CR>", { desc = "Quit without saving" })
 map("n", "<leader>o", "o<ESC>", { desc = "Add line below" })
 map("n", "<leader>O", "O<ESC>", { desc = "Add line above" })
 map("n", "<leader>nh", "<cmd>nohlsearch<CR>", { desc = "Clear search highlight" })
+map("n", "<leader>ti", "<cmd>IBLToggle<CR>", { desc = "Toggle indent guides" })
 
 -- Files
 map("n", "<C-n>", "<cmd>Neotree toggle<CR>", { desc = "Toggle file tree" })
@@ -98,10 +99,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
     lsp({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "Code action")
   end,
 })
-
--- Tests
-map("n", "<leader>nt", "<cmd>TestNearest<CR>", { desc = "Run nearest test" })
-map("n", "<leader>T", "<cmd>TestFile<CR>", { desc = "Run test file" })
 
 -- Debugger
 local function dap(action)

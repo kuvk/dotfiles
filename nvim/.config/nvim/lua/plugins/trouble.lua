@@ -1,5 +1,14 @@
 return {
   "folke/trouble.nvim",
-  opts = {}, -- for default options, refer to the configuration section for custom setup.
   cmd = "Trouble",
+  opts = {
+    focus = true,
+    -- A small split under the file, leaving the file tree full height
+    win = {
+      type = "split",
+      relative = "win",
+      position = "bottom",
+      size = 10,
+    },
+  },
 }
