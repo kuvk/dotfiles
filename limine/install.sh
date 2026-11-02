@@ -8,6 +8,8 @@
 #   sudo limine/install.sh --theme     the current theme's colors (theme-set.py)
 #   limine/install.sh --print          print the config instead, without installing
 #   limine/install.sh --preview FILE   draw the wallpaper (the logo, no menu text) to FILE
+#   --resolution WxH                   the menu's resolution; by default the native mode of the
+#                                      boot display's screen (the logo is placed for it)
 #
 # Kernel options come from /etc/kernel/cmdline (made from the running system's on first run).
 # At boot, E on an entry edits its options for that boot only.
@@ -17,12 +19,14 @@ esp=/efi
 kernels=/efi/arch
 mode=install
 use_theme=false
+resolution=
 while (($#)); do
     case $1 in
         --theme) use_theme=true ;;
         --print) mode=print ;;
         --preview) mode=preview; preview=${2:?--preview needs a file}; shift ;;
-        *) echo "usage: $0 [--theme] [--print | --preview FILE]" >&2; exit 1 ;;
+        --resolution) resolution=${2:?--resolution needs WxH}; shift ;;
+        *) echo "usage: $0 [--theme] [--resolution WxH] [--print | --preview FILE]" >&2; exit 1 ;;
     esac
     shift
 done
@@ -71,9 +75,25 @@ found_kernels() {
 mapfile -t found < <(found_kernels)
 ((${#found[@]})) || { echo "No kernels with images in $kernels" >&2; exit 1; }
 
-# The menu is drawn at 2560x1600 with the font doubled: 18x32 pixel cells (16 plus the
-# letter gap), 142x50 of them. The logo goes above the tree, centered on it.
-res_w=2560 res_h=1600 cell_w=18 cell_h=32
+# The resolution: given, or the first connected screen's native mode on the boot display's
+# card (the one the firmware, and so Limine, draws on)
+if [[ -z $resolution ]]; then
+    for card in /sys/class/drm/card[0-9]; do
+        [[ $(cat "$card/device/boot_vga" 2>/dev/null) == 1 ]] || continue
+        for conn in "$card"-*; do
+            [[ $(cat "$conn/status" 2>/dev/null) == connected ]] || continue
+            resolution=$(head -1 "$conn/modes"); break 2
+        done
+    done
+fi
+[[ ${resolution:-} =~ ^([0-9]+)x([0-9]+)$ ]] || { echo "No resolution found; pass --resolution WxH" >&2; exit 1; }
+res_w=${BASH_REMATCH[1]} res_h=${BASH_REMATCH[2]}
+
+# Limine doubles its 8x16 font from 2560x1440 up; each cell also has a 1 pixel letter gap.
+# The logo goes above the tree, centered on it.
+scale=1
+((res_w >= 2560 && res_h >= 1440)) && scale=2
+cell_w=$((9 * scale)) cell_h=$((16 * scale))
 build=$(mktemp -d)
 trap 'rm -rf "$build"' EXIT
 
@@ -82,7 +102,7 @@ wallpaper() {
     font=$(fc-match -f '%{file}' "JetBrainsMono Nerd Font")
     logo_text="$home/.config/fastfetch/fastfetch-logo.txt"
     [[ -r $logo_text ]] || { echo "No fastfetch logo at $logo_text" >&2; exit 1; }
-    magick -background none -fill "$mauve" -font "$font" -pointsize 18 label:@"$logo_text" -trim +repage "$build/logo.png"
+    magick -background none -fill "$mauve" -font "$font" -pointsize $((9 * scale)) label:@"$logo_text" -trim +repage "$build/logo.png"
     lw=$(magick identify -format %w "$build/logo.png"); lh=$(magick identify -format %h "$build/logo.png")
     top=$(((res_h / cell_h - ${#found[@]} - 1) / 2 * cell_h))
     # Limine's centering (menu.c): each line is its tree marks plus " name ", the widest
@@ -92,7 +112,7 @@ wallpaper() {
     cols=$((res_w / cell_w)); prefix=$(((cols - max_len - 3) / 2))
     center=$(((res_w - cols * cell_w) / 2 + prefix * cell_w + (max_len - 1) * cell_w / 2))
     magick -size "${res_w}x$res_h" "xc:$base" \
-        "$build/logo.png" -geometry +$((center - lw / 2))+$((top - 64 - lh)) -composite "$1"
+        "$build/logo.png" -geometry +$((center - lw / 2))+$((top - 32 * scale - lh)) -composite "$1"
 }
 
 config() {
@@ -109,7 +129,7 @@ interface_help_colour_bright: $(hex "$accent2")
 wallpaper: boot():/EFI/limine/wallpaper.png
 wallpaper_style: centered
 backdrop: $(hex "$base")
-term_font_scale: 2x2
+term_font_scale: ${scale}x$scale
 term_background: ff$(hex "$base")
 term_foreground: $(hex "$accent2")
 term_background_bright: $(hex "$surface1")
