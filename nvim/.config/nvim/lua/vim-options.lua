@@ -45,6 +45,8 @@ opt.smartcase = true
 opt.termguicolors = true
 opt.background = "dark"
 opt.signcolumn = "yes"
+-- Rounded floating windows, LSP hover and signature help included
+opt.winborder = "rounded"
 opt.cursorline = true
 
 -- Turn off swap and enable mouse
@@ -109,9 +111,16 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter", "BufRead", "BufNewFile"
   end,
 })
 
+-- Comments use Neovim's built-in gc. Filetypes it has no format for:
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "conf" },
   callback = function(ev)
     vim.bo[ev.buf].commentstring = "# %s"
+  end,
+})
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "jinja", "jinja.html" },
+  callback = function(ev)
+    vim.bo[ev.buf].commentstring = "{# %s #}"
   end,
 })
