@@ -24,17 +24,18 @@ return {
       "rafamadriz/friendly-snippets",
     },
     config = function()
-      require("luasnip").filetype_extend("htmldjango", { "html", "jinja" })
-      require("luasnip").filetype_extend("html", { "htmldjango", "jinja" })
-      require("luasnip").filetype_extend("jinja", { "htmldjango", "html" })
+      require("luasnip.loaders.from_vscode").lazy_load()
+      require("luasnip").filetype_extend("jinja", { "htmldjango" })
     end,
   },
   {
     "hrsh7th/nvim-cmp",
+    dependencies = {
+      "hrsh7th/cmp-path",
+      "hrsh7th/cmp-buffer",
+    },
     config = function()
       local border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
-      -- local cmp = require("cmp")
-      -- require("luasnip.loaders.from_vscode").lazy_load()
       local luasnip = require("luasnip")
       local cmp = require("cmp")
 
@@ -100,9 +101,13 @@ return {
             return vim_item
           end,
         },
+        -- In this order. Buffer words only when nothing above matches.
         sources = cmp.config.sources({
-          { name = "nvim_lsp", priority = "9" },
-          { name = "luasnip", priority = "8" },
+          { name = "nvim_lsp" },
+          { name = "luasnip" },
+          { name = "path" },
+        }, {
+          { name = "buffer", keyword_length = 3 },
         }),
       })
     end,
