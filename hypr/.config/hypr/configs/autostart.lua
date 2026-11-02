@@ -1,7 +1,9 @@
 -- Autostart (exec-once)
 hl.on("hyprland.start", function()
   hl.exec_cmd("dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP")
-  -- Waits for late outputs (dock, dGPU port), applies the profile and focuses workspace 1
+  -- Start on workspace 1 right away; the monitor layout follows when late outputs show up
+  hl.exec_cmd([[hyprctl dispatch 'hl.dsp.focus({ workspace = 1 })']])
+  -- Waits for late outputs (dock, dGPU port) and applies the profile
   hl.exec_cmd("~/.config/scripts/hypr-monitors.py startup")
   -- Regenerate ~/.config/theme/current (no-op if nothing changed), then the shell
   hl.exec_cmd("~/.config/scripts/theme-set.py")
