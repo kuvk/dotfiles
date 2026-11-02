@@ -1,0 +1,10 @@
+# ASUS ROG laptop. linux-g14 and nvidia-laptop-power-cfg come from the g14 repo, which goes at
+# the bottom of /etc/pacman.conf:
+#   [g14]
+#   Server = https://arch.asus-linux.org
+linux-g14
+linux-g14-headers
+nvidia-laptop-power-cfg
+nvidia-prime
+asusctl
+rog-control-center

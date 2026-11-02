@@ -1,0 +1,123 @@
+# Everything the dotfiles need, on every machine. One package per line; "# AUR" marks AUR
+# packages (paru installs both). Arch's own install covers the rest: base, linux-firmware,
+# the CPU's microcode, cryptsetup, lvm2.
+
+# Kernels (both, with headers for the NVIDIA module)
+linux
+linux-headers
+linux-lts
+linux-lts-headers
+
+# Boot: Limine menu, Plymouth splash, SDDM login screen
+limine
+efibootmgr
+plymouth
+sddm-git                 # AUR
+
+# Hyprland
+hyprland
+hypridle
+hyprlock
+hyprpaper
+hyprsunset
+hyprshot
+hyprshutdown
+hyprpolkitagent
+xdg-desktop-portal-hyprland
+xdg-desktop-portal-gtk
+
+# Quickshell, and the services it talks to
+quickshell
+qt6-wayland
+qt5-wayland
+networkmanager
+nm-connection-editor     # the network dropdown's settings button
+bluez
+bluez-utils
+upower
+power-profiles-daemon
+pipewire
+pipewire-pulse
+pipewire-alsa
+pipewire-jack
+wireplumber
+
+# Commands the shell and scripts run
+brightnessctl
+playerctl
+wl-clipboard
+cliphist
+libnotify
+zenity
+udiskie
+ddcutil
+imagemagick
+jq
+socat
+curl
+wget
+speedtest-cli
+glib2
+gtk3
+python
+pacman-contrib           # paccache, pacdiff (sysmaintenance.sh, update.sh)
+reflector                # ranks mirrors; enable reflector.timer
+flatpak
+mpvpaper                 # AUR, video wallpapers
+unimatrix-git            # AUR, the lock screen's rain
+
+# Theme: GTK, Qt, icons, fonts
+adw-gtk-theme
+qt5ct
+qt6ct
+kvantum
+kvantum-qt5
+papirus-icon-theme
+ttf-jetbrains-mono-nerd
+ttf-nerd-fonts-symbols   # Quickshell's icons, kitty's symbol_map
+noto-fonts
+noto-fonts-emoji
+noto-fonts-cjk
+otf-apple-sf-pro-fixed   # AUR, login screen and Quickshell's display font
+
+# Terminal
+kitty
+zsh
+starship
+zoxide
+fzf
+eza
+bat
+direnv
+tmux
+btop
+htop                     # on battery: btop wakes the dGPU
+cava
+fastfetch
+lazygit
+git
+stow
+cliamp                   # AUR
+spicetify-cli            # AUR
+
+# Neovim, and what Mason needs to install its tools
+neovim
+ripgrep
+fd
+tree-sitter-cli
+nodejs
+npm
+unzip
+
+# Yazi, and its previews
+yazi
+poppler
+ffmpeg
+7zip
+swayimg
+zathura
+zathura-pdf-poppler
+
+# Browser (the default) and the AUR helper
+brave-bin                # AUR
+paru                     # AUR
