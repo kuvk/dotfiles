@@ -24,9 +24,9 @@ return {
       "rafamadriz/friendly-snippets",
     },
     config = function()
-      require("luasnip").filetype_extend("htmldjango", { "html", "jinja.html" })
-      require("luasnip").filetype_extend("html", { "htmldjango", "jinja.html" })
-      require("luasnip").filetype_extend("jinja.html", { "htmldjango", "html" })
+      require("luasnip").filetype_extend("htmldjango", { "html", "jinja" })
+      require("luasnip").filetype_extend("html", { "htmldjango", "jinja" })
+      require("luasnip").filetype_extend("jinja", { "htmldjango", "html" })
     end,
   },
   {
