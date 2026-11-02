@@ -14,6 +14,8 @@ return {
     "williamboman/mason-lspconfig.nvim",
     config = function()
       require("mason-lspconfig").setup({
+        -- stylua only formats, through none-ls with its indent settings
+        automatic_enable = { exclude = { "stylua" } },
         ensure_installed = {
           "lua_ls",
           "ts_ls",
@@ -67,14 +69,29 @@ return {
       vim.lsp.config("pyright", {
         capabilities = capabilities,
         settings = {
-          pyright = { autoImportCompletion = true },
+          -- Types and navigation here; style, imports and undefined names from Ruff
+          pyright = { autoImportCompletion = true, disableOrganizeImports = true },
           python = {
             analysis = {
               autoImportCompletion = true,
               autoSearchPaths = true,
               diagnosticMode = "openFilesOnly",
               useLibraryCodeForTypes = true,
-              typeCheckingMode = "off",
+              typeCheckingMode = "basic",
+              diagnosticSeverityOverrides = {
+                reportUndefinedVariable = "none",
+              },
+            },
+          },
+        },
+      })
+      vim.lsp.config("ruff", {
+        capabilities = capabilities,
+        init_options = {
+          settings = {
+            lint = {
+              -- Star imports and imports not at the top
+              ignore = { "F403", "F405", "E402" },
             },
           },
         },

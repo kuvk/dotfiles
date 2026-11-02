@@ -14,7 +14,6 @@ return {
         "isort",
         "black",
         "ruff",
-        "mypy",
         "beautysh",
         "debugpy",
       },
@@ -22,14 +21,6 @@ return {
     local null_ls = require("null-ls")
     null_ls.setup({
       sources = {
-        require("none-ls.diagnostics.ruff").with({
-          -- Ignore imports not at the top and already provided diagnostics by mypy
-          extra_args = {
-            "--ignore",
-            "F401,F403,F405,F841,E402",
-          },
-        }),
-        require("none-ls.formatting.ruff"),
         require("none-ls.formatting.beautysh"),
         -- Shellcheck diagnostics not neccessary if using bashls
         -- require("none-ls-shellcheck.diagnostics"),
@@ -77,22 +68,11 @@ return {
           },
         }),
 
-        -- Python formatting
+        -- Python formatting: isort, then Black. Ruff is a language server (lsp-config.lua)
         null_ls.builtins.formatting.isort,
         null_ls.builtins.formatting.black,
 				null_ls.builtins.formatting.qmlformat,
 
-        -- Mypy diagnostics setup
-        null_ls.builtins.diagnostics.mypy.with({
-          extra_args = function()
-            local virtual = os.getenv("VIRTUAL_ENV") or os.getenv("CONDA_PREFIX") or "/usr"
-            return {
-              "--python-executable",
-              virtual .. "/bin/python3",
-              "--disable-error-code=import-untyped",
-            }
-          end,
-        }),
       },
     })
 
