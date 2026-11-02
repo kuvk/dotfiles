@@ -1,5 +1,21 @@
 -- The greeter's compositor, /usr/share/sddm/hypr/hyprland.lua, installed by sddm/install.sh
-hl.env("AQ_DRM_DEVICES", "/dev/dri/card1:/dev/dri/card0")
+
+-- Only the GPU that drives the built-in screen (the kernel's boot display). Leaving the other
+-- (NVIDIA, with the HDMI port) untouched spares the session a 3 s "Flip event timeout" when it
+-- takes that screen over after login. Card numbers can swap between boots, so look it up.
+local boot_card
+for i = 0, 7 do
+  local f = io.open("/sys/class/drm/card" .. i .. "/device/boot_vga")
+  if f then
+    local value = f:read("l")
+    f:close()
+    if value == "1" then
+      boot_card = "/dev/dri/card" .. i
+      break
+    end
+  end
+end
+hl.env("AQ_DRM_DEVICES", boot_card or "/dev/dri/card1:/dev/dri/card0")
 
 -- The session's cursor from Settings (theme-set.py writes it), if the greeter can read that theme.
 -- Read as data, as below.
