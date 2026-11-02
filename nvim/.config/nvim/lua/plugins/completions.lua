@@ -41,6 +41,14 @@ return {
         menu = {
           border = "rounded",
           scrollbar = false,
+          -- Below noice's command window rather than over its bottom edge
+          cmdline_position = function()
+            local pos = vim.g.ui_cmdline_pos
+            if pos then
+              return { pos[1], pos[2] }
+            end
+            return { vim.o.lines - 1, 0 }
+          end,
           draw = {
             columns = { { "kind_icon" }, { "label", "label_description", gap = 1 }, { "kind" }, { "source" } },
             components = {
