@@ -5,8 +5,8 @@ standard_dialogs=default
 style=kvantum
 
 [Fonts]
-fixed="{{ nerd_font }},11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,Regular,0,0"
-general="{{ text_font }},11,-1,5,400,0,0,0,0,0,0,0,0,0,0,1,Regular,0,0"
+fixed="{{ nerd_font }},{{ gtk_font_pt }},-1,5,400,0,0,0,0,0,0,0,0,0,0,1,Regular,0,0"
+general="{{ text_font }},{{ gtk_font_pt }},-1,5,400,0,0,0,0,0,0,0,0,0,0,1,Regular,0,0"
 
 [Interface]
 activate_item_on_single_click=1

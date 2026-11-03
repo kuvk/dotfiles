@@ -46,7 +46,7 @@ local function fg(group)
   return hl.fg and { fg = string.format("#%06x", hl.fg) } or nil
 end
 
--- Mode colors from the system theme, the same in yazi and Claude Code's status line: normal
+-- Mode colors from the system theme, the same in yazi and starship's prompt: normal
 -- in accent, insert accent3, visual accent2, command green. The rest of the line keeps the
 -- colorscheme's look (surface0 blocks on mantle).
 local function mode_theme()

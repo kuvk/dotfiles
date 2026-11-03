@@ -80,7 +80,6 @@ EXTRA_DESTINATIONS = {
     "sddm-cursor.conf": Path("/var/lib/kuvk-shell/cursor.conf"),
     # the login screen; that folder only exists after sddm/install.sh
     "sddm-theme.conf": Path("/var/lib/kuvk-shell/theme.conf"),
-    "claude-theme.json": HOME / ".claude/themes/current.json",
 }
 # Written only when the app's folder exists (don't create a half plugin dir)
 ONLY_IF_PRESENT = {"tmux.conf", "cliamp.toml"}

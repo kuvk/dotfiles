@@ -62,7 +62,6 @@ theme folder and set `wallpaper` under `[apps]`.
 | Qt apps | Kvantum theme `current` (`templates/kvantum-current.*`), `qt5ct.conf` and `qt6ct.conf`: edit the templates, not the output | when an app next starts |
 | KDE apps | `~/.config/kdeglobals` | when an app next starts |
 | hyprshutdown, Hyprland's update and donation windows | `~/.config/hypr/hyprtoolkit.conf` | when a window next opens |
-| Claude Code | `~/.claude/themes/current.json`, with `"theme": "custom:current"` | live |
 | hyprlock | `current/hyprlock.conf` (`lockscreen.sh` fills in the monitor) | next lock |
 | Cursor | Settings > Appearance; `theme-set.py` writes it to Hyprland, GTK, XWayland and the login screen | now; open apps when restarted |
 | Icons | Settings > Appearance; `theme-set.py` writes it to GTK, Qt and hyprtoolkit | GTK now; Qt when restarted |
@@ -79,7 +78,7 @@ fastfetch uses `~/.config/fastfetch/config.jsonc`, generated from `base.jsonc` o
 
 `theme-set.py --shape rounded|square` sets the status line corners in tmux, nvim and yazi, the corners of Neovim's windows and LazyGit, and the starship prompt's. Quickshell calls it: square in Work-Game or with the corner radius at 0.
 
-Selected text uses the `selection_bg` (gray) and `selection_fg` (accent, or text where the accent is unreadable on it) roles in kitty, tmux, zsh, nvim, GTK and Qt. herdr and Claude Code only take the background.
+Selected text uses the `selection_bg` (gray) and `selection_fg` (accent, or text where the accent is unreadable on it) roles in kitty, tmux, zsh, nvim, GTK and Qt. herdr only takes the background.
 
 ## Power menu icons
 
