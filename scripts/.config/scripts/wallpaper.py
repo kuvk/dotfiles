@@ -12,6 +12,7 @@ last until logout.
   wallpaper.py stop [MONITOR]            stop live wallpapers
   wallpaper.py pause [on|off]            pause/resume live wallpapers (toggles without on|off)
   wallpaper.py export-greeter            copy the wallpaper for the login screen
+  wallpaper.py default                   first run: the bundled wallpaper, unless one is chosen
   wallpaper.py restore                   re-apply the saved static wallpapers (autostart)
 """
 
@@ -45,7 +46,9 @@ SKIP_DIRS = {"source"}
 STATE_DIR = Path(os.environ.get("XDG_STATE_HOME", HOME / ".local/state")) / "wallpaper"
 STATE_FILE = STATE_DIR / "state.json"
 GREETER_DIR = Path("/var/lib/kuvk-shell")  # only exists after sddm/install.sh
-CURRENT_LINK = STATE_DIR / "current"  # hyprpaper.conf points here
+CURRENT_LINK = STATE_DIR / "current"  # hyprpaper.conf and the lock screen point here
+# Shipped with the dotfiles (theme package); used until you pick another
+DEFAULT_WALLPAPER = HOME / ".config/theme/wallpapers/dori-base.png"
 CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME", HOME / ".cache")) / "wallpaper-thumbs"
 RUNTIME_DIR = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "wallpaper"
 
@@ -203,6 +206,24 @@ def export_greeter() -> None:
         print(f"wallpaper: could not copy for the login screen: {e}", file=sys.stderr)
 
 
+def use_default() -> None:
+    """With no wallpaper chosen yet (a fresh install), copy the bundled one into
+    ~/Pictures/Wallpapers, so the picker lists it, and choose it for every monitor:
+    desktop, lock screen and login screen. Works before Hyprland runs."""
+    if not CURRENT_LINK.exists() and DEFAULT_WALLPAPER.exists():
+        dest = DIRS["static"] / DEFAULT_WALLPAPER.name
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        if not dest.exists():
+            shutil.copyfile(DEFAULT_WALLPAPER, dest)
+        STATE_DIR.mkdir(parents=True, exist_ok=True)
+        CURRENT_LINK.unlink(missing_ok=True)
+        CURRENT_LINK.symlink_to(dest)
+        state = load_state()
+        state["static"] = {"*": str(dest)}
+        save_state(state)
+    export_greeter()
+
+
 # ---------------------------------------------------------------- live
 
 
@@ -297,6 +318,7 @@ def pause(state: str | None = None) -> None:
 
 def restore() -> None:
     """Static wallpapers survive a reboot; live ones don't, so forget them."""
+    use_default()
     state = load_state()
     static = state["static"]
     for mon in monitors():
@@ -361,6 +383,8 @@ def run_command(argv: list[str]) -> int:
         print(out, flush=True)
     elif cmd == "export-greeter":
         export_greeter()
+    elif cmd == "default":
+        use_default()
     elif cmd == "thumbs" and args and args[0] in DIRS:
         thumbs(args[0])
     elif cmd == "set" and len(args) >= 2 and args[0] in DIRS:
