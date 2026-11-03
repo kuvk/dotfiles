@@ -172,32 +172,6 @@ FloatingWindow {
             ]
         },
         {
-            section: "Claude Code",
-            binds: [
-                { keys: ["PgUp"], desc: "Scroll up (PgDn down)" },
-                { keys: ["Ctrl+Home"], desc: "Top (Ctrl+End latest)" },
-                { keys: ["Ctrl+O"], desc: "Open the transcript" },
-                { keys: ["Shift+Enter"], desc: "New line" },
-                { keys: ["Ctrl+G"], desc: "Write the prompt in nvim" },
-                { keys: ["Ctrl+V"], desc: "Paste an image" },
-                { keys: ["Shift+Tab"], desc: "Change permission mode" },
-                { keys: ["jk"], desc: "Leave insert mode" }
-            ]
-        },
-        {
-            section: "Claude Code transcript",
-            binds: [
-                { keys: ["j"], desc: "Line down (k up)" },
-                { keys: ["Ctrl+D"], desc: "Half page down (Ctrl+U up)" },
-                { keys: ["g"], desc: "Top (G bottom)" },
-                { keys: ["{"], desc: "Previous prompt (} next)" },
-                { keys: ["/"], desc: "Search (n, N)" },
-                { keys: ["v"], desc: "Open in nvim" },
-                { keys: ["["], desc: "Send to terminal scrollback" },
-                { keys: ["q"], desc: "Back to the prompt" }
-            ]
-        },
-        {
             section: "zsh",
             binds: [
                 { keys: ["jk"], desc: "Normal mode (also Esc)" },
