@@ -13,6 +13,19 @@ FloatingWindow {
 
     readonly property bool shown: Panels.displays
     readonly property var scalePresets: [1, 1.25, 1.333333, 1.5, 1.6, 1.666667, 1.75, 2, 2.5, 3, 4]
+    // Hyprland's per-monitor vrr values, and color modes (cm)
+    readonly property var vrrNames: ["Off", "Always", "Fullscreen", "Fullscreen games and video"]
+    readonly property var colorNames: ({
+            srgb: "Standard (sRGB)",
+            edid: "The panel's own (EDID)",
+            hdr: "HDR",
+            hdredid: "HDR, the panel's own colors"
+        })
+    readonly property bool currentHdr: root.current !== null && (root.current.cm === "hdr" || root.current.cm === "hdredid")
+
+    function colorModes(m: var): var {
+        return m.hdr_capable ? ["srgb", "edid", "hdr", "hdredid"] : ["srgb", "edid"];
+    }
 
     // Editable copy of Displays.info
     property var mons: []
@@ -197,7 +210,7 @@ FloatingWindow {
 
     function applyChanges(): void {
         Displays.apply({
-            monitors: mons.map(m => ({ id: m.id, enabled: m.enabled, mode: m.mode, x: m.x, y: m.y, scale: m.scale, transform: m.transform })),
+            monitors: mons.map(m => ({ id: m.id, enabled: m.enabled, mode: m.mode, x: m.x, y: m.y, scale: m.scale, transform: m.transform, vrr: m.vrr, cm: m.cm, sdrbrightness: m.sdrbrightness })),
             workspaces: workspaces,
             text_size: textSize,
             primary: primary
@@ -476,6 +489,50 @@ FloatingWindow {
                     enabled: root.current?.enabled ?? false
                     text: root.current ? `${Math.round(root.current.scale * 1000) / 10}%  (${Math.round(root.current.width)}×${Math.round(root.current.height)})` : ""
                     onStep: delta => root.update(root.selected, { scale: root.cycle(root.validScales(root.current.mode), root.current.scale, delta) })
+                }
+
+                StyledText {
+                    text: "Variable refresh"
+                    visible: vrrRow.visible
+                }
+
+                RowLayout {
+                    id: vrrRow
+
+                    visible: !!root.current?.enabled && !!root.current?.vrr_capable
+                    spacing: 10
+
+                    Stepper {
+                        text: root.vrrNames[root.current?.vrr ?? 0] ?? "Off"
+                        onStep: delta => root.update(root.selected, { vrr: ((root.current.vrr ?? 0) + delta + 4) % 4 })
+                    }
+
+                    StyledText {
+                        text: "For games. Turning on at fullscreen can blank some screens"
+                        color: Theme.overlay1
+                        font.pixelSize: Theme.fontSize - 2
+                    }
+                }
+
+                StyledText {
+                    text: "Colors"
+                }
+
+                Stepper {
+                    enabled: root.current?.enabled ?? false
+                    text: root.current ? (root.colorNames[root.current.cm] ?? root.current.cm) : ""
+                    onStep: delta => root.update(root.selected, { cm: root.cycle(root.colorModes(root.current), root.current.cm, delta) })
+                }
+
+                StyledText {
+                    text: "SDR brightness"
+                    visible: root.currentHdr
+                }
+
+                Stepper {
+                    visible: root.currentHdr
+                    text: root.current ? `${Math.round((root.current.sdrbrightness ?? 1) * 100)}%  (non-HDR content in HDR)` : ""
+                    onStep: delta => root.update(root.selected, { sdrbrightness: Math.max(0.5, Math.min(2, Math.round(((root.current.sdrbrightness ?? 1) + delta * 0.1) * 10) / 10)) })
                 }
 
                 StyledText {
