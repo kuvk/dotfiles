@@ -22,7 +22,8 @@ background {
     color = @COLOR@
 }
 
-# Clock and date, top right
+# Clock and date, top right (lockscreen.sh drops the lines between the @CLOCK markers when off)
+# @CLOCK{
 label {
     monitor = @MONITOR@
     text = $TIME
@@ -41,6 +42,7 @@ label {
     color = rgb(@DATE@)
     font_size = 28
     font_family = {{ text_font }}
+# @CLOCK}
     position = -30, -120
     halign = right
     valign = top
@@ -48,6 +50,7 @@ label {
 }
 
 # Card behind the avatar and password
+# @BOX{
 shape {
     monitor = @MONITOR@
     size = 380, 300
@@ -59,7 +62,10 @@ shape {
     halign = center
     valign = center
 }
+# @BOX}
 
+# Avatar
+# @AVATAR{
 image {
     monitor = @MONITOR@
     path = $HOME/.face
@@ -70,6 +76,7 @@ image {
     halign = center
     valign = center
 }
+# @AVATAR}
 
 input-field {
     monitor = @MONITOR@

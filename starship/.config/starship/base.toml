@@ -3,7 +3,7 @@ add_newline = false
 # scan_timeout = 100
 
 format = """
-[╭─](peach)\
+[╭─](accent3)\
 $os\
 $username\
 $hostname\
@@ -14,7 +14,7 @@ $git_status\
 $fill\
 $python\
 $cmd_duration\
-$line_break[╰─ ](peach)$character """
+$line_break[╰─ ](accent3)$character """
 
 palette = 'catppuccin_mocha'
 command_timeout = 500
@@ -27,6 +27,7 @@ mauve = "#cba6f7"
 red = "#f38ba8"
 maroon = "#eba0ac"
 peach = "#fab387"
+accent3 = "#fab387"
 yellow = "#f9e2af"
 green = "#a6e3a1"
 teal = "#94e2d5"
@@ -52,7 +53,7 @@ symbol = " "
 
 [os]
 disabled = false
-style = "blue"
+style = "accent"
 format = "[ $symbol ]($style)"
 
 [os.symbols]
@@ -87,8 +88,8 @@ ssh_only = true
 ssh_symbol = "🌐 "
 
 [directory]
-style = "blue"
-format = "[[  ](peach)]($style)[$path ]($style)"
+style = "accent"
+format = "[[  ](accent3)]($style)[$path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
 
@@ -102,19 +103,24 @@ truncation_symbol = "…/"
 
 [character]
 disabled = false
-success_symbol = '[󰶻](bold fg:teal)'
+# zsh's vi modes in the same colors as Neovim's lualine: typing (insert) accent3, normal
+# accent, visual accent2; red after a failed command
+success_symbol = '[󰶻](bold fg:green)'
 error_symbol = '[󰶻](bold fg:red)'
-vimcmd_symbol = '[󰶺](bold fg:teal)'
+vimcmd_symbol = '[󰶺](bold fg:accent)'
+vimcmd_visual_symbol = '[󰶺](bold fg:accent2)'
+vimcmd_replace_symbol = '[󰶺](bold fg:red)'
+vimcmd_replace_one_symbol = '[󰶺](bold fg:red)'
 
 [git_branch]
 symbol = ""
-format = '[[](peach)]($style)[[ $symbol $branch ](green)]($style)'
+format = '[[](accent3)]($style)[[ $symbol $branch ](green)]($style)'
 
 [git_status]
 format = '[[($all_status$ahead_behind )](green)]($style)'
 
 [cmd_duration]
-format = "[[](peach)]($style) [$duration]($style) "
+format = "[[](accent3)]($style) [$duration]($style) "
 style = "maroon"
 
 # [python]
@@ -125,9 +131,9 @@ style = "maroon"
 [python]
 symbol = " "
 style = "teal"
-format = "[[](peach)]($style)[[( $virtualenv)](fg:teal)]($style)[[ $symbol$version ](fg:teal)]($style)"
+format = "[[](accent3)]($style)[[( $virtualenv)](fg:teal)]($style)[[ $symbol$version ](fg:teal)]($style)"
 
 [time]
 disabled = false
 time_format = "%R"
-format = '[[](peach)]($style)[[  $time ](mauve)]($style)'
+format = '[[](accent3)]($style)[[  $time ](mauve)]($style)'

@@ -111,6 +111,7 @@ def convert(theme_dir: Path) -> str:
         "",
         f'{"accent".ljust(w)} = "{accent}"',
         f'{"accent2".ljust(w)} = "{accent2}"',
+        f'{"accent3".ljust(w)} = "peach"',
         "",
         "[terminal]",
         *(f'{k} = "{v}"' for k, v in terminal.items()),

@@ -198,7 +198,7 @@ PanelWindow {
 
             Icon {
                 text: Icons.rocket
-                color: System.mode === "game" ? Theme.peach : System.mode === "work" ? Theme.mauve : Theme.overlay1
+                color: System.mode === "game" ? Theme.accent3 : System.mode === "work" ? Theme.mauve : Theme.overlay1
             }
         }
 

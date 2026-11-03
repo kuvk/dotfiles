@@ -25,8 +25,8 @@ apps are told to reload.
   theme-set.py --window-buttons on|off
                           close button in GTK apps (Settings > Windows saves the choice)
   theme-set.py --shape rounded|square
-                          corners of the status lines in tmux, nvim, yazi and Claude
-                          Code, Neovim's windows, LazyGit and the starship prompt
+                          corners of the status lines in tmux, nvim and yazi, Neovim's
+                          windows, LazyGit and the starship prompt
                           (quickshell sets it: square in Work-Game or at radius 0)
 """
 
@@ -97,7 +97,7 @@ SLOTS = (
 ).split()
 # selection_*: selected text in every app. selection_fg defaults to the accent, or
 # to the text color in themes where the accent can't be read on selection_bg.
-ROLES = {"accent": "peach", "accent2": "blue", "selection_bg": "surface1"}
+ROLES = {"accent": "peach", "accent2": "blue", "accent3": "peach", "selection_bg": "surface1"}
 MIN_SELECTION_CONTRAST = 3.0
 CURSOR_DIRS = (HOME / ".icons", HOME / ".local/share/icons", Path("/usr/share/icons"))
 
@@ -177,6 +177,12 @@ def shell_settings() -> dict:
         "lockCapsColor": "yellow",
         "lockBoxOpacity": 85,
         "lockBox": True,
+        "lockClock": True,
+        "lockAvatar": True,
+        "lockPowerColor": "base",
+        "lockPowerOpacity": 85,
+        "lockPowerIconColor": "text",
+        "lockPowerOutlineColor": "accent",
         "accentOverrides": {},
         "lockInputOpacity": 25,
         "cursorTheme": "Adwaita",
@@ -231,7 +237,7 @@ def load_theme(name: str) -> dict:
     # Settings > Appearance > Accent: another slot of this theme's palette
     chosen = shell_settings().get("accentOverrides", {})
     chosen = chosen.get(name, {}) if isinstance(chosen, dict) else {}
-    for role in ("accent", "accent2"):
+    for role in ("accent", "accent2", "accent3"):
         if chosen.get(role) in SLOTS:
             raw[role] = chosen[role]
     colors: dict[str, str] = {}
@@ -289,6 +295,11 @@ def load_theme(name: str) -> dict:
         "font_hinting": hinting,
         "font_antialiasing": antialiasing,
         "gtk_font_pt": str(gtk_font_pt()),
+        # yazi's hover highlight ends: rounded caps, or full blocks. yazi draws these in the
+        # highlight's color (a space would come out in the background's), so either way the
+        # bar starts one character before the icon.
+        "yazi_pad_open": "\u2588" if current_shape() == "square" else "\ue0b6",
+        "yazi_pad_close": "\u2588" if current_shape() == "square" else "\ue0b4",
         "fc_antialias": "false" if antialiasing == "none" else "true",
         "fc_hinting": "false" if hinting == "none" else "true",
         "fc_hintstyle": f"hint{hinting}",
@@ -300,7 +311,7 @@ def load_theme(name: str) -> dict:
         "border_style": "single" if current_shape() == "square" else "rounded",
         # the login screen uses the lock screen's colors
         "login_clock": colors.get(shell["lockClockColor"], colors["text"]),
-        "login_date": colors.get(shell["lockDateColor"], colors["text"]),
+        "login_date": colors.get(shell["lockClockColor"], colors["text"]),  # one color for both
         "login_avatar": colors.get(shell["lockAvatarColor"], colors["text"]),
         "login_boxOutline": colors.get(shell["lockBoxOutlineColor"], colors["text"]),
         "login_box": colors.get(shell["lockBoxColor"], colors["text"]),
@@ -314,6 +325,12 @@ def load_theme(name: str) -> dict:
         "login_caps": colors.get(shell["lockCapsColor"], colors["text"]),
         "login_box_opacity": str(shell["lockBoxOpacity"] / 100),
         "login_show_box": "true" if shell["lockBox"] else "false",
+        "login_show_clock": "true" if shell["lockClock"] else "false",
+        "login_show_avatar": "true" if shell["lockAvatar"] else "false",
+        "login_power_bg": colors.get(shell["lockPowerColor"], colors["base"]),
+        "login_power_opacity": str(shell["lockPowerOpacity"] / 100),
+        "login_power_icon": colors.get(shell["lockPowerIconColor"], colors["text"]),
+        "login_power_outline": colors.get(shell["lockPowerOutlineColor"], colors["text"]),
         "login_input_opacity": str(shell["lockInputOpacity"] / 100),
         "icon_theme": icon_theme_for(shell["iconTheme"], mode),
         "prefer_dark": "0" if mode == "light" else "1",
@@ -651,7 +668,7 @@ def themes_json() -> str:
             # for the theme carousel's palette preview cards
             "colors": {k: c[k] for k in (
                 "base", "mantle", "crust", "surface0", "surface1", "overlay0", "overlay1", "text", "subtext0",
-                "accent", "accent2", "red", "peach", "yellow", "green", "teal", "blue", "mauve", "pink",
+                "accent", "accent2", "accent3", "red", "peach", "yellow", "green", "teal", "blue", "mauve", "pink",
             )},
         })
     return json.dumps(result)
@@ -662,7 +679,7 @@ def set_shape(shape: str) -> None:
         return
     # templates that draw corners (lazygit)
     generate(current_theme())
-    # nvim watches the file and Claude Code's status line reads it each time
+    # nvim watches the file
     if subprocess.run(["tmux", "info"], capture_output=True).returncode == 0:
         run_quiet(["tmux", "source-file", str(HOME / ".tmux.conf")])
     restart_yazi()

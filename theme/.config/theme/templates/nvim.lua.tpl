@@ -4,6 +4,7 @@ return {
   colorscheme = "{{ nvim_colorscheme }}",
   background = "{{ mode }}",
   accent2 = "{{ accent2 }}",
+  accent3 = "{{ accent3 }}",
   yank = { bg = "{{ accent }}", fg = "{{ surface1 }}" },
   selection = { bg = "{{ selection_bg }}", fg = "{{ selection_fg }}" },
   -- Palette for the aether colorscheme, used by themes without their own

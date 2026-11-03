@@ -57,13 +57,22 @@ local function custom_highlights()
   -- TODO in comments, as text without a background
   set(0, "@comment.todo", { fg = p.accent, bold = true })
   -- Command and search windows (noice.lua)
-  for _, group in ipairs({ "Border", "BorderSearch", "Title" }) do
-    set(0, "NoiceCmdlinePopup" .. group, { fg = p.accent })
+  -- Command line and search popups: borders green like lualine's command mode, which both
+  -- are; the icon in accent, what you type in accent2
+  for _, group in ipairs({ "Border", "BorderSearch", "Title", "TitleSearch" }) do
+    set(0, "NoiceCmdlinePopup" .. group, { fg = p.green })
   end
-  set(0, "AlphaHeader", { fg = p.blue })
-  set(0, "AlphaButtons", { fg = p.accent })
-  set(0, "AlphaShortcut", { fg = p.blue })
-  set(0, "AlphaFooter", { fg = p.magenta, italic = true })
+  for _, group in ipairs({ "NoiceCmdlineIcon", "NoiceCmdlineIconSearch" }) do
+    set(0, group, { fg = p.accent })
+  end
+  local popup = vim.api.nvim_get_hl(0, { name = "NoiceCmdlinePopup", link = false })
+  set(0, "NoiceCmdlinePopup", { fg = M.accent2, bg = popup.bg })
+  -- Dashboard: the NEOVIM lettering in accent, the logo in accent2, buttons in accent3
+  -- with their keys in accent
+  set(0, "AlphaHeader", { fg = p.accent })
+  set(0, "AlphaButtons", { fg = M.accent3 })
+  set(0, "AlphaShortcut", { fg = p.accent })
+  set(0, "AlphaFooter", { fg = M.accent2 })
   -- Diagnostic text at the end of a line, with no background
   for _, level in ipairs({ "Error", "Warn", "Info", "Hint" }) do
     local group = "DiagnosticVirtualText" .. level
@@ -90,6 +99,7 @@ function M.apply()
   M.current = theme.name
   M.palette = theme.aether or {}
   M.accent2 = theme.accent2 or M.palette.blue
+  M.accent3 = theme.accent3 or M.palette.orange
   vim.o.background = theme.background or "dark"
 
   -- aether builds its colors from the palette, so it needs setup per theme

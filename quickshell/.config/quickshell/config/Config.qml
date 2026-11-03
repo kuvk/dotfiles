@@ -34,6 +34,12 @@ Singleton {
     property alias lockCapsColor: adapter.lockCapsColor
     property alias lockBoxOpacity: adapter.lockBoxOpacity
     property alias lockBox: adapter.lockBox
+    property alias lockClock: adapter.lockClock
+    property alias lockAvatar: adapter.lockAvatar
+    property alias lockPowerColor: adapter.lockPowerColor
+    property alias lockPowerOpacity: adapter.lockPowerOpacity
+    property alias lockPowerIconColor: adapter.lockPowerIconColor
+    property alias lockPowerOutlineColor: adapter.lockPowerOutlineColor
     property alias accentOverrides: adapter.accentOverrides
     property alias lockInputOpacity: adapter.lockInputOpacity
     property alias lockDotsColor: adapter.lockDotsColor
@@ -162,6 +168,12 @@ Singleton {
         adapter.lockCapsColor = "yellow";
         adapter.lockBoxOpacity = 85;
         adapter.lockBox = true;
+        adapter.lockClock = true;
+        adapter.lockAvatar = true;
+        adapter.lockPowerColor = "base";
+        adapter.lockPowerOpacity = 85;
+        adapter.lockPowerIconColor = "text";
+        adapter.lockPowerOutlineColor = "accent";
         adapter.accentOverrides = {};
         adapter.lockInputOpacity = 25;
         adapter.lockDotsColor = "accent2";
@@ -260,6 +272,13 @@ Singleton {
             property int lockBoxOpacity: 85 // percent
             // per theme: { "catppuccin-mocha": { accent: "mauve", accent2: "blue" } }, read by theme-set.py
             property var accentOverrides: ({})
+            property bool lockClock: true // clock and date, one color (lockClockColor)
+            property bool lockAvatar: true
+            // the login screen's power buttons, apart from the box
+            property string lockPowerColor: "base"
+            property int lockPowerOpacity: 85 // percent
+            property string lockPowerIconColor: "text"
+            property string lockPowerOutlineColor: "accent"
             property bool lockBox: true // the card behind the avatar and password (lock and login screens)
             property int lockInputOpacity: 25 // percent
             property string lockDotsColor: "accent2"

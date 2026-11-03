@@ -68,12 +68,12 @@ Rectangle {
         cache: false
     }
 
-    // Clock, top right
+    // Clock, top right (Settings > Lock Screen > Clock and date)
     Column {
         anchors.top: parent.top
         anchors.right: parent.right
         anchors.margins: 30
-        visible: Window.active
+        visible: Window.active && String(root.c.showClock) !== "false"
         spacing: 0
 
         // layer.enabled: true
@@ -133,8 +133,10 @@ Rectangle {
             anchors.centerIn: parent
             spacing: 18
 
+            // Settings > Lock Screen > Avatar
             Item {
                 Layout.alignment: Qt.AlignHCenter
+                visible: String(root.c.showAvatar) !== "false"
                 implicitWidth: 139
                 implicitHeight: 139
 
@@ -302,17 +304,18 @@ Rectangle {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: modelData.action()
 
+                // Settings > Lock Screen > Power buttons (older theme.conf files: the box's colors)
                 Rectangle {
                     anchors.fill: parent
                     radius: 9
-                    color: Qt.alpha(root.c.box, power.containsMouse ? 0.95 : Number(root.c.boxOpacity))
-                    border.color: root.c.boxOutline
+                    color: Qt.alpha(root.c.powerBg || root.c.box, power.containsMouse ? 0.95 : Number(root.c.powerOpacity || root.c.boxOpacity))
+                    border.color: root.c.powerOutline || root.c.boxOutline
                 }
 
                 Text {
                     anchors.centerIn: parent
                     text: power.modelData.glyph
-                    color: power.containsMouse ? root.c.dots : root.c.text
+                    color: power.containsMouse ? root.c.dots : (root.c.powerIcon || root.c.text)
                     font.family: root.c.iconFont
                     font.pixelSize: 20
                 }
@@ -326,8 +329,8 @@ Rectangle {
                     width: tip.implicitWidth + 16
                     height: tip.implicitHeight + 8
                     radius: 6
-                    color: Qt.alpha(root.c.box, 0.95)
-                    border.color: root.c.boxOutline
+                    color: Qt.alpha(root.c.powerBg || root.c.box, 0.95)
+                    border.color: root.c.powerOutline || root.c.boxOutline
 
                     Text {
                         id: tip

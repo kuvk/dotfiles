@@ -7,7 +7,7 @@
 # Syntax highlighting in previews: the bat theme theme-set generates
 syntect_theme = "~/.config/bat/themes/Current.tmTheme"
 
-cwd = { fg = "{{ teal }}" }
+cwd = { fg = "{{ accent }}" }
 
 # Find
 find_keyword  = { fg = "{{ yellow }}", bold = true, italic = true, underline = true }
@@ -25,9 +25,9 @@ count_copied   = { fg = "{{ base }}", bg = "{{ green }}" }
 count_cut      = { fg = "{{ base }}", bg = "{{ red }}" }
 count_selected = { fg = "{{ base }}", bg = "{{ yellow }}" }
 
-# Border
+# Border: the dividers between columns, in accent2
 border_symbol = "│"
-border_style  = { fg = "{{ overlay1 }}" }
+border_style  = { fg = "{{ accent2 }}" }
 
 # : }}}
 
@@ -100,13 +100,15 @@ hovered = { fg = "{{ pink }}", bold = true }
 
 # : Which {{{
 
+# The popup after a first key (g, b, ...): keys in accent, where they lead in accent2.
+# Its corners are always rounded: yazi 26 draws this border itself.
 [which]
 # also the text color on the status line bubbles (init.lua)
 mask            = { bg = "{{ base }}" }
-border          = { fg = "{{ blue }}" }
-cand            = { fg = "{{ teal }}" }
+border          = { fg = "{{ accent }}" }
+cand            = { fg = "{{ accent }}" }
 rest            = { fg = "{{ overlay2 }}" }
-desc            = { fg = "{{ pink }}" }
+desc            = { fg = "{{ accent2 }}" }
 separator       = "  "
 separator_style = { fg = "{{ surface2 }}" }
 
@@ -150,18 +152,27 @@ title_error = { fg = "{{ red }}" }
 [app]
 overall = { bg = "{{ base }}" }
 
+# Modes, like Neovim's lualine: normal in accent, select and unset (yazi's visual modes) in accent2
 [mode]
 
-normal_main = { fg = "{{ base }}", bg = "{{ blue }}", bold = true }
-normal_alt  = { fg = "{{ blue }}", bg = "{{ surface0 }}" }
+normal_main = { fg = "{{ base }}", bg = "{{ accent }}", bold = true }
+normal_alt  = { fg = "{{ accent }}", bg = "{{ surface0 }}" }
 
 # Select mode
-select_main = { fg = "{{ base }}", bg = "{{ teal }}", bold = true }
-select_alt  = { fg = "{{ teal }}", bg = "{{ surface0 }}" }
+select_main = { fg = "{{ base }}", bg = "{{ accent2 }}", bold = true }
+select_alt  = { fg = "{{ accent2 }}", bg = "{{ surface0 }}" }
 
 # Unset mode
-unset_main = { fg = "{{ base }}", bg = "{{ flamingo }}", bold = true }
-unset_alt  = { fg = "{{ flamingo }}", bg = "{{ surface0 }}" }
+unset_main = { fg = "{{ base }}", bg = "{{ accent2 }}", bold = true }
+unset_alt  = { fg = "{{ accent2 }}", bg = "{{ surface0 }}" }
+
+# The hovered file: in its own color as the background, in the current and parent columns; a
+# quieter surface0 one in the preview column. The ends are rounded, or square in Work-Game.
+[indicator]
+parent  = { reversed = true }
+current = { reversed = true }
+preview = { bg = "{{ surface0 }}" }
+padding = { open = "{{ yazi_pad_open }}", close = "{{ yazi_pad_close }}" }
 
 [filetype]
 rules = [
@@ -186,6 +197,18 @@ rules = [
 	{ url = "*/", is = "orphan", fg = "{{ teal }}", bold = true },
 	{ url = "*", is = "link", fg = "{{ teal }}", bold = true },
 	{ url = "*/", is = "link", fg = "{{ teal }}", bold = true },
+	# By name too: the MIME rules above apply only once yazi has read a file's type, which it
+	# hasn't yet for files in the preview column
+	{ url = "*.{png,jpg,jpeg,gif,webp,bmp,svg,ico,tif,tiff,avif,heic}", fg = "{{ mauve }}", bold = true },
+	{ url = "*.{mp4,mkv,webm,mov,avi,m4v}", fg = "{{ mauve }}", bold = true },
+	{ url = "*.{mp3,flac,ogg,opus,wav,m4a,aac}", fg = "{{ teal }}" },
+	{ url = "*.{zip,rar,7z,tar,gz,tgz,xz,zst,bz2,lz,lzma,cab,iso}", fg = "{{ red }}", bold = true },
+	{ url = "*.{pdf,doc,docx,rtf,odt,ods,odp,xls,xlsx,ppt,pptx}", fg = "{{ green }}" },
+	# Executable: scripts and programs, and files without an extension. Other files that are
+	# only executable because of where they come from (exFAT and NTFS drives, Windows) keep
+	# their normal color.
+	{ url = "*.{sh,bash,zsh,fish,py,pl,rb,lua,AppImage,appimage,run,bin,x86_64}", is = "exec", fg = "{{ green }}", bold = true },
+	{ url = "*.*", fg = "{{ text }}" },
 	{ url = "*", is = "exec", fg = "{{ green }}", bold = true },
 	# Fallback
 	{ url = "*", fg = "{{ text }}" },
@@ -194,7 +217,7 @@ rules = [
 
 [icon]
 dirs = [
-	{ name = ".config", text = "", fg = "{{ peach }}" },
+	{ name = ".config", text = "", fg = "{{ accent3 }}" },
 	{ name = ".git", text = "", fg = "{{ blue }}" },
 	{ name = ".github", text = "", fg = "{{ blue }}" },
 	{ name = ".npm", text = "", fg = "{{ blue }}" },
