@@ -18,6 +18,8 @@ Options:
   --output-dir DIR     where the images go (default: ~/Pictures/Wallpapers, which the
                        wallpaper picker lists)
   --logo FILE          another text logo (default: ~/.config/theme/logo/ascii-dori)
+  --output FILE        one file at this path instead (one color and size only; theme-set.py
+                       uses it for the wallpaper that follows the theme)
 
 Files are named dori-FG-on-BG-SIZE.png (hex colors without the #); an existing file
 with the same name is replaced.
@@ -105,6 +107,7 @@ def main(argv: list[str]) -> int:
     parser.add_argument("--res")
     parser.add_argument("--output-dir", default=str(DEFAULT_DIR))
     parser.add_argument("--logo", default=str(DEFAULT_LOGO))
+    parser.add_argument("--output")
     parser.add_argument("-h", "--help", action="store_true")
     args, rest = parser.parse_known_args(argv)
     if args.help:
@@ -143,6 +146,16 @@ def main(argv: list[str]) -> int:
     colors = theme_colors()
     bgs = [resolve(c, colors) for c in split(args.bg)]
     fgs = [resolve(c, colors) for c in split(args.fg)]
+
+    if args.output:
+        if len(bgs) * len(fgs) * len(sizes) != 1:
+            print("--output takes one color and size; use --output-dir for a set", file=sys.stderr)
+            return 2
+        out = Path(args.output).expanduser()
+        out.parent.mkdir(parents=True, exist_ok=True)
+        render(logo, fgs[0][0], bgs[0][0], width, height, sizes[0] / 100, out)
+        print(out)
+        return 0
 
     out_dir = Path(args.output_dir).expanduser()
     out_dir.mkdir(parents=True, exist_ok=True)

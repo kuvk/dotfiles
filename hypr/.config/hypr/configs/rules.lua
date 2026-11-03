@@ -61,6 +61,15 @@ hl.window_rule({
   size = "800 600",
 })
 
+-- theme-boot.sh --window: updating the boot screens after a theme change
+hl.window_rule({
+  name = "theme-boot",
+  match = { class = "^(theme-boot)$" },
+  float = true,
+  center = true,
+  size = "900 600",
+})
+
 -- QT Settings
 hl.window_rule({
   name = "qt-settings",
