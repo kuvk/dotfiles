@@ -110,8 +110,11 @@ Rectangle {
         width: 380
         height: box.implicitHeight + 48
         radius: 6
-        color: Qt.alpha(root.c.box, Number(root.c.boxOpacity))
-        border.width: 2
+        // Settings > Lock Screen > Box off: only the avatar and password, no card
+        readonly property bool shown: String(root.c.showBox) !== "false"
+
+        color: shown ? Qt.alpha(root.c.box, Number(root.c.boxOpacity)) : "transparent"
+        border.width: shown ? 2 : 0
         border.color: root.c.boxOutline
 
         // Fades in
