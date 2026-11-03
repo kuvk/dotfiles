@@ -247,6 +247,27 @@ FloatingWindow {
                                 }
                             }
 
+                            SettingRow {
+                                label: "Wallpaper follows theme"
+                                hint: "The logo in the second accent on the base color, on the desktop, lock and login screens. Picking another wallpaper turns this off"
+
+                                Switch {
+                                    checked: Config.wallpaperFollowsTheme
+                                    onToggled: {
+                                        Config.wallpaperFollowsTheme = !Config.wallpaperFollowsTheme;
+                                        if (Config.wallpaperFollowsTheme)
+                                            followApply.restart();
+                                    }
+                                }
+                            }
+
+                            Timer {
+                                id: followApply
+
+                                interval: 800
+                                onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--follow-wallpaper"])
+                            }
+
                             // Long enough for Config to save the choice; then the whole theme again
                             Timer {
                                 id: accentApply

@@ -41,6 +41,7 @@ Singleton {
     property alias lockPowerIconColor: adapter.lockPowerIconColor
     property alias lockPowerOutlineColor: adapter.lockPowerOutlineColor
     property alias accentOverrides: adapter.accentOverrides
+    property alias wallpaperFollowsTheme: adapter.wallpaperFollowsTheme
     property alias lockInputOpacity: adapter.lockInputOpacity
     property alias lockDotsColor: adapter.lockDotsColor
     property alias lockTextColor: adapter.lockTextColor
@@ -175,6 +176,7 @@ Singleton {
         adapter.lockPowerIconColor = "text";
         adapter.lockPowerOutlineColor = "accent";
         adapter.accentOverrides = {};
+        adapter.wallpaperFollowsTheme = true;
         adapter.lockInputOpacity = 25;
         adapter.lockDotsColor = "accent2";
         adapter.lockTextColor = "text";
@@ -272,6 +274,8 @@ Singleton {
             property int lockBoxOpacity: 85 // percent
             // per theme: { "catppuccin-mocha": { accent: "mauve", accent2: "blue" } }, read by theme-set.py
             property var accentOverrides: ({})
+            // the logo wallpaper in the theme's colors, redrawn on theme change (theme-set.py)
+            property bool wallpaperFollowsTheme: true
             property bool lockClock: true // clock and date, one color (lockClockColor)
             property bool lockAvatar: true
             // the login screen's power buttons, apart from the box

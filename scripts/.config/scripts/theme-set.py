@@ -22,6 +22,9 @@ apps are told to reload.
                           ANTIALIASING: none|grayscale|rgba
   theme-set.py --login    rewrite the login screen's colors from Settings > Lock Screen
   theme-set.py --text-size  GTK's font size from Displays > Text size (hypr-monitors.py)
+  theme-set.py --follow-wallpaper
+                          the logo wallpaper in this theme's colors, when Settings >
+                          Appearance > Wallpaper follows theme is on
   theme-set.py --window-buttons on|off
                           close button in GTK apps (Settings > Windows saves the choice)
   theme-set.py --shape rounded|square
@@ -176,6 +179,7 @@ def shell_settings() -> dict:
         "lockCapsColor": "yellow",
         "lockBoxOpacity": 85,
         "lockBox": True,
+        "wallpaperFollowsTheme": True,
         "lockClock": True,
         "lockAvatar": True,
         "lockPowerColor": "base",
@@ -684,6 +688,47 @@ def set_shape(shape: str) -> None:
     restart_yazi()
 
 
+def follow_wallpaper(theme: dict) -> None:
+    """Settings > Appearance > Wallpaper follows theme: the logo in accent2 on base, drawn once
+    per theme and colors (logo-wallpaper.py) and set on every monitor, so the lock and login
+    screens follow too. Picking another wallpaper turns this off (WallpaperPicker.qml)."""
+    if not shell_settings().get("wallpaperFollowsTheme"):
+        return
+    colors, name = theme["colors"], theme["strings"]["theme"]
+    folder = HOME / "Pictures/Wallpapers"
+    path = folder / f"dori-theme-{name}-{colors['accent2'][1:]}-on-{colors['base'][1:]}.png"
+    scripts = HOME / ".config/scripts"
+    if not path.exists():
+        for old in folder.glob(f"dori-theme-{name}-*.png"):  # this theme in older colors
+            old.unlink(missing_ok=True)
+        run_quiet([str(scripts / "logo-wallpaper.py"), "--bg", colors["base"], "--fg", colors["accent2"],
+                   "--size", "30", "--output", str(path)])
+        if not path.exists():
+            return
+    current = HOME / ".local/state/wallpaper/current"
+    if current.resolve() != path.resolve():
+        run_quiet([str(scripts / "wallpaper.py"), "set", "static", str(path)])
+
+
+def offer_boot_update() -> None:
+    """A notification with an Update button when the boot splash and menu were built from
+    other colors (theme-boot.sh --check); the button opens a kitty window with theme-boot.sh,
+    its password prompt and output (theme-boot.sh --window)."""
+    script = HOME / ".config/scripts/theme-boot.sh"
+    if not script.exists() or not shutil.which("notify-send"):
+        return
+    if subprocess.run([str(script), "--check"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode != 0:
+        return
+    ask = (
+        'a=$(notify-send -a "Boot screens" -i preferences-desktop-theme -A update=Update '
+        '"Boot screens use the old theme" '
+        '"The boot menu and splash keep their colors until updated. Update asks for your password '
+        'and takes about a minute."); [ "$a" = update ] && exec "$0" --window'
+    )
+    subprocess.Popen(["bash", "-c", ask, str(script)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                     start_new_session=True)
+
+
 def main(argv: list[str]) -> int:
     if argv and argv[0] in ("-h", "--help"):
         print(__doc__.strip())
@@ -731,6 +776,9 @@ def main(argv: list[str]) -> int:
         # Displays > Text size changed (hypr-monitors.py): GTK's font size
         apply_fonts(generate(current_theme())["strings"])
         return 0
+    if argv == ["--follow-wallpaper"]:
+        follow_wallpaper(load_theme(current_theme()))
+        return 0
     if argv == ["--login"]:
         generate(current_theme())
         return 0
@@ -747,6 +795,8 @@ def main(argv: list[str]) -> int:
         print(f"Unknown theme '{name}'. Available: {', '.join(available_themes())}", file=sys.stderr)
         return 1
 
+    colors_file = CURRENT_DIR / "colors.sh"
+    before = colors_file.read_text() if colors_file.exists() else ""
     try:
         theme = generate(name)
     except (ValueError, KeyError, tomllib.TOMLDecodeError) as e:
@@ -755,6 +805,10 @@ def main(argv: list[str]) -> int:
         return 1
 
     reload_apps(theme)
+    follow_wallpaper(theme)
+    # The boot screens only change when their installers run: offer it after a real change
+    if colors_file.read_text() != before:
+        offer_boot_update()
     if argv:
         notify(f"Switched to {theme['strings']['theme_name']}")
     return 0

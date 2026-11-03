@@ -184,6 +184,10 @@ PanelWindow {
         const item = shownItems[selected];
         if (!item)
             return;
+        // Picking a wallpaper ends Settings > Appearance > Wallpaper follows theme, unless it's the
+        // theme's own logo wallpaper (dori-theme-*, drawn by theme-set.py)
+        if (!item.path.includes("/dori-theme-"))
+            Config.wallpaperFollowsTheme = false;
         const cmd = [script, "set", kind, item.path];
         if (thisMonitorOnly && screen)
             cmd.push(screen.name);
