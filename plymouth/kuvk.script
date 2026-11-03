@@ -349,6 +349,14 @@ fun hide_message_callback(text) {
 Plymouth.SetDisplayMessageFunction(display_message_callback);
 Plymouth.SetHideMessageFunction(hide_message_callback);
 
+#----------------------------------------- No password --------------------------------
+
+# Drives that aren't encrypted (install.sh fills this in from the initramfs hooks): nothing
+# asks for a password, so the boot shows the progress bar from the start
+if (@ENCRYPTED@ == 0) {
+  start_boot_progress();
+}
+
 #----------------------------------------- Shutdown --------------------------------
 
 # Shutdown and reboot: the logo with the progress bar from the start, filling in a few seconds

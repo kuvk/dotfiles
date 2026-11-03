@@ -1,6 +1,24 @@
 # Dotfiles
 
 Arch Linux with Hyprland (Lua config), a Quickshell desktop shell and one theme for everything.
+
+## Install
+
+On a fresh Arch install, after the first boot, as yourself with the network up:
+
+```sh
+git clone https://github.com/kuvk/dotfiles ~/dotfiles && ~/dotfiles/install.sh
+```
+
+It expects the ESP at `/efi` and, for encrypted drives, the systemd initramfs (`systemd` and
+`sd-encrypt` hooks, `rd.luks.name=` in the kernel options). It sets up pacman (multilib, the g14 repo
+on ASUS laptops), mirrors with a weekly reflector timer, links the dotfiles (files in the way go to
+`~/.dotfiles-backup`), installs the package lists for the detected hardware, enables the services,
+switches to zsh, applies the theme and installs the login screen, boot splash and boot menu. Run it
+again any time: it skips what's done.
+
+## Pick and choose
+
 Each top-level folder is a [GNU Stow](https://www.gnu.org/software/stow/) package:
 
 ```sh
@@ -18,7 +36,7 @@ stow hypr quickshell theme scripts fontconfig kitty tmux zsh nvim yazi   # or an
 | `sddm` | Login screen: your wallpaper, fonts, cursor and monitor scales. Not stowed; install with `sudo sddm/install.sh` |
 | `plymouth` | Boot splash: the fastfetch logo, a password field for the encrypted drives and a progress bar. Not stowed; install with `sudo plymouth/install.sh` (`--theme` for the current theme's colors, `--preview FILE` to see it first) |
 | `limine` | Boot menu: the fastfetch logo above an Omarchy-style tree of kernels, in the theme's colors. Not stowed; install with `sudo limine/install.sh` (`--theme` for the current theme's colors, `--resolution WxH`, `--print` for the config, `--preview FILE` for the wallpaper) |
-| `packages` | Package lists for these dotfiles: `core.txt` (needed), `apps.txt` (apps with window rules), `flatpak.txt`, `nvidia.txt`, `laptop.txt` (ASUS ROG, g14 repo), `desktop.txt`. Not stowed |
+| `packages` | Package lists for `install.sh`: `core.txt` (needed), `apps.txt` (apps with window rules), `flatpak.txt`, `nvidia.txt`, `intel.txt`, `laptop.txt` (ASUS ROG, g14 repo), `desktop.txt`. Not stowed |
 | `fontconfig` | Font folders; rendering comes from Settings > Fonts |
 | `kitty`, `tmux`, `zsh` | Terminal, multiplexer and shell (below) |
 | `nvim`, `lazygit`, `yazi`, `bat`, `btop`, `cava`, `fastfetch`, `starship`, `swayimg`, `spotify`, `cliamp`, `paru` | App configs; those with colors follow the theme |

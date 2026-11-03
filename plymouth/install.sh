@@ -72,7 +72,11 @@ magick -background none -fill "$mauve" -font "$font" -pointsize 28 label:"Go bac
 magick -size 14x14 xc:none -fill "$accent2" -draw "circle 7,7 7,1" "$build/bullet.png"
 magick -size "${ew}x10" xc:none -fill "$surface0" -draw "roundrectangle 0,0 $((ew - 1)),9 5,5" "$build/progress_box.png"
 magick -size "${ew}x10" xc:none -fill "$accent2" -draw "roundrectangle 0,0 $((ew - 1)),9 5,5" "$build/progress_bar.png"
-sed -e "s/@BG_RGB@/$(rgb "$base")/" -e "s/@TEXT_RGB@/$(rgb "$subtext0")/" "$here/kuvk.script" >"$build/kuvk.script"
+# Encrypted drives get the password field first; without them the progress bar shows from the start
+encrypted=0
+grep -qE '^HOOKS=.*\b(sd-)?encrypt\b' /etc/mkinitcpio.conf && encrypted=1
+sed -e "s/@BG_RGB@/$(rgb "$base")/" -e "s/@TEXT_RGB@/$(rgb "$subtext0")/" -e "s/@ENCRYPTED@/$encrypted/" \
+    "$here/kuvk.script" >"$build/kuvk.script"
 sed -e "s/@BG@/${base#\#}/" "$here/kuvk.plymouth" >"$build/kuvk.plymouth"
 
 if [[ $mode == preview* ]]; then
