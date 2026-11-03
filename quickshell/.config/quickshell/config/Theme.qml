@@ -47,6 +47,7 @@ Singleton {
     readonly property color crust: colors.crust ?? "#11111b"
     readonly property color accent: colors.accent ?? peach
     readonly property color accent2: colors.accent2 ?? blue
+    readonly property color accent3: colors.accent3 ?? peach
     // Highlights inside dropdowns, launchers and tooltips; their borders use accent
     readonly property color highlight: accent2
 

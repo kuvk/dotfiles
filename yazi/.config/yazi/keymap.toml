@@ -1,4 +1,29 @@
-# ~/.config/yazi/keymap.toml: additions to yazi's own keys
+# ~/.config/yazi/keymap.toml: Hyprdori's keys, on top of yazi's own.
+#
+# yazi's own keys are listed in keymap-default.toml next to this file (reference only).
+# Restart yazi after a change.
+#
+# Add or change a key: a [[mgr.prepend_keymap]] block. Prepended keys win over yazi's own,
+# so the same `on` replaces what that key did.
+#
+#   [[mgr.prepend_keymap]]
+#   on = "<C-n>"                       # one key; "<C-x>" Ctrl, "<A-x>" Alt, "<S-x>" or "X" Shift
+#   run = "create"                     # a command from keymap-default.toml (or "plugin NAME")
+#   desc = "New file or folder"        # shown in the popup and in help (~)
+#
+#   [[mgr.prepend_keymap]]
+#   on = ["g", "w"]                    # a sequence: g, then w (shows in the g popup)
+#   run = "cd ~/Pictures/Wallpapers"
+#   desc = "Go to Wallpapers"
+#
+#   [[mgr.prepend_keymap]]
+#   on = "e"
+#   run = 'shell "$EDITOR %s" --block'  # run a program; %s is the hovered or selected files
+#   desc = "Edit in $EDITOR"
+#
+# Turn a key off: run = "noop".  Other places have their own tables: [[tasks.prepend_keymap]],
+# [[spot...]], [[pick...]], [[input...]], [[confirm...]], [[cmp...]], [[help...]] (the
+# section names in keymap-default.toml).
 
 [[mgr.prepend_keymap]]
 on = "<Enter>"

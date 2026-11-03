@@ -46,6 +46,37 @@ local function fg(group)
   return hl.fg and { fg = string.format("#%06x", hl.fg) } or nil
 end
 
+-- Mode colors from the system theme, the same in yazi and Claude Code's status line: normal
+-- in accent, insert accent3, visual accent2, command green. The rest of the line keeps the
+-- colorscheme's look (surface0 blocks on mantle).
+local function mode_theme()
+  local theme = require("theme")
+  local p = theme.palette
+  if not p.bg then
+    return "auto"
+  end
+  local function mode(color)
+    return {
+      a = { fg = p.bg, bg = color, gui = "bold" },
+      b = { fg = color, bg = p.lighter_bg },
+      c = { fg = p.fg, bg = p.dark_bg },
+    }
+  end
+  return {
+    normal = mode(p.accent),
+    insert = mode(theme.accent3 or p.orange),
+    visual = mode(theme.accent2 or p.blue),
+    command = mode(p.green),
+    replace = mode(p.red),
+    terminal = mode(theme.accent3 or p.orange),
+    inactive = {
+      a = { fg = p.dark_fg, bg = p.dark_bg },
+      b = { fg = p.dark_fg, bg = p.dark_bg },
+      c = { fg = p.dark_fg, bg = p.dark_bg },
+    },
+  }
+end
+
 local function setup()
   local square = require("theme").square()
   local left = square and "" or "\u{e0b6}"
@@ -53,7 +84,7 @@ local function setup()
   require("lualine").setup({
     options = {
       icons_enabled = true,
-      theme = "auto",
+      theme = mode_theme(),
       component_separators = "",
       section_separators = { left = right, right = left },
     },

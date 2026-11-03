@@ -33,11 +33,12 @@ mantle    = "#181825"
 crust     = "#11111b"
 
 # Semantic roles: a slot name or a hex value
-accent    = "peach"
-accent2   = "blue"
+accent    = "sapphire"
+accent2   = "mauve"
+accent3   = "peach"
 
 [terminal]
-cursor = "#8bd5ca"
+cursor = "accent"
 
 [apps]
 nvim_colorscheme = "catppuccin-mocha"

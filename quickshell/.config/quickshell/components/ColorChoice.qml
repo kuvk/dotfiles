@@ -8,7 +8,7 @@ Flow {
     property string value
     signal picked(string name)
 
-    readonly property var defaultNames: ["text", "subtext1", "subtext0", "base", "accent", "accent2", "red", "maroon", "peach", "yellow", "green", "teal", "sky", "blue", "lavender", "mauve", "pink"]
+    readonly property var defaultNames: ["text", "subtext1", "subtext0", "base", "accent", "accent2", "accent3", "red", "maroon", "peach", "yellow", "green", "teal", "sky", "blue", "lavender", "mauve", "pink"]
     property var names: defaultNames
 
     spacing: 4

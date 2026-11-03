@@ -23,7 +23,7 @@
     "separator": " ",
     "color": {
       "keys": "{{ overlay1.ansi }}",
-      "output": "{{ accent2.ansi }}",
+      "output": "{{ accent3.ansi }}",
     },
   },
   "modules": [

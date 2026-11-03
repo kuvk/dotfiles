@@ -32,6 +32,7 @@ crust     = "#161616"
 
 accent    = "#7daea3"
 accent2   = "#d3869b"
+accent3   = "peach"
 
 [terminal]
 color0 = "#282828"

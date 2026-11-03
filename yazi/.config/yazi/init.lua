@@ -11,12 +11,14 @@ local sep = {
   right = "\u{e0b4}", -- rounded, closing to the right
 }
 -- Square in Work-Game or with the corner radius at 0 (theme-set --shape)
+local square = false
 local shape_file = io.open(os.getenv("HOME") .. "/.config/theme/current/shape")
 if shape_file then
-  if shape_file:read("*l") == "square" then
-    sep = { left = "", right = "" }
-  end
+  square = shape_file:read("*l") == "square"
   shape_file:close()
+end
+if square then
+  sep = { left = "", right = "" }
 end
 local select_symbol = "\u{f4a7}"
 local yank_symbol = "\u{f0190}"
@@ -35,7 +37,7 @@ end
 
 -- Section C text: readable but quieter than the blocks (overlay1)
 local function muted()
-  return th.mgr.border_style:fg() or "gray"
+  return th.status.perm_sep:fg() or "gray"
 end
 
 local function utf8_sub(str, i, j)
@@ -136,7 +138,8 @@ end
 Status:children_add(Status.files, 4000, Status.LEFT)
 Status:children_add(Status.modified, 0, Status.RIGHT)
 
--- Link targets like eza's: blue (theme's symlink_target), red when broken
+-- Link targets like eza's: blue (theme's symlink_target), red when broken. On the hovered
+-- file in the row's own highlight, so the whole row is one bar.
 function Entity:symlink()
   if not rt.mgr.show_symlink then
     return ""
@@ -146,7 +149,9 @@ function Entity:symlink()
     return ""
   end
   local span = ui.Span(string.format(" -> %s", to))
-  if self._file.cha.is_orphan then
+  if self._file.is_hovered then
+    return span
+  elseif self._file.cha.is_orphan then
     return span:fg(th.notify.title_error:fg() or "red")
   end
   return span:style(th.mgr.symlink_target)

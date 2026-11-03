@@ -11,6 +11,7 @@ import qs.services
 FloatingWindow {
     id: root
 
+
     readonly property bool shown: Panels.settings
     readonly property var clockFormats: ["dddd HH:mm", "ddd HH:mm", "HH:mm", "ddd d MMM  HH:mm", "dddd h:mm AP"]
     readonly property var sections: [
@@ -198,7 +199,8 @@ FloatingWindow {
                             Repeater {
                                 model: [
                                     { role: "accent", label: "Accent" },
-                                    { role: "accent2", label: "Second accent" }
+                                    { role: "accent2", label: "Second accent" },
+                                    { role: "accent3", label: "Third accent" }
                                 ]
 
                                 ColumnLayout {
@@ -687,28 +689,78 @@ FloatingWindow {
                                 }
                             }
 
-                            SettingRow {
-                                label: "Box"
-                                hint: "Card behind the avatar and password, here and on the login screen"
+                            // Sections: each part of the lock screen, and the login screen's power
+                            // buttons. Colors also go to the login screen (theme-set.py --login).
+                            LockSection {
+                                text: "Clock and date"
+                            }
 
-                                Switch {
-                                    checked: Config.lockBox
-                                    onToggled: {
-                                        Config.lockBox = !Config.lockBox;
-                                        loginApply.restart();
-                                    }
-                                }
+                            LockToggle {
+                                label: "Show"
+                                hint: "Top right, on the lock and login screens"
+                                key: "lockClock"
+                                onEdited: loginApply.restart()
+                            }
+
+                            LockColor {
+                                visible: Config.lockClock
+                                label: "Color"
+                                key: "lockClockColor"
+                                onEdited: loginApply.restart()
+                            }
+
+                            LockSection {
+                                text: "Avatar"
+                            }
+
+                            LockToggle {
+                                label: "Show"
+                                hint: "Your picture (~/.face)"
+                                key: "lockAvatar"
+                                onEdited: loginApply.restart()
+                            }
+
+                            LockColor {
+                                visible: Config.lockAvatar
+                                label: "Outline"
+                                key: "lockAvatarColor"
+                                onEdited: loginApply.restart()
+                            }
+
+                            LockSection {
+                                text: "Box"
+                            }
+
+                            LockToggle {
+                                label: "Show"
+                                hint: "A card behind the avatar and password"
+                                key: "lockBox"
+                                onEdited: loginApply.restart()
+                            }
+
+                            LockColor {
+                                visible: Config.lockBox
+                                label: "Outline"
+                                key: "lockBoxOutlineColor"
+                                onEdited: loginApply.restart()
+                            }
+
+                            LockColor {
+                                visible: Config.lockBox
+                                label: "Background"
+                                key: "lockBoxColor"
+                                opacityKey: "lockBoxOpacity"
+                                onEdited: loginApply.restart()
+                            }
+
+                            LockSection {
+                                text: "Password field"
                             }
 
                             Repeater {
                                 model: [
-                                    { label: "Clock", key: "lockClockColor" },
-                                    { label: "Date", key: "lockDateColor" },
-                                    { label: "Avatar outline", key: "lockAvatarColor" },
-                                    { label: "Box outline", key: "lockBoxOutlineColor", box: true },
-                                    { label: "Box background", key: "lockBoxColor", opacity: "lockBoxOpacity", box: true },
-                                    { label: "Input outline", key: "lockInputOutlineColor" },
-                                    { label: "Input background", key: "lockInputColor", opacity: "lockInputOpacity" },
+                                    { label: "Outline", key: "lockInputOutlineColor" },
+                                    { label: "Background", key: "lockInputColor", opacity: "lockInputOpacity" },
                                     { label: "Typing dots", key: "lockDotsColor" },
                                     { label: "User name", key: "lockUserColor" },
                                     { label: "Text", key: "lockTextColor" },
@@ -717,41 +769,37 @@ FloatingWindow {
                                     { label: "Caps Lock on", key: "lockCapsColor" }
                                 ]
 
-                                ColumnLayout {
-                                    id: lockColor
-
+                                LockColor {
                                     required property var modelData
 
-                                    Layout.fillWidth: true
-                                    spacing: 4
-
-                                    // Without the box these colors are left for the login screen's power buttons
-                                    StyledText {
-                                        text: lockColor.modelData.box && !Config.lockBox ? lockColor.modelData.label.replace("Box", "Power buttons:") + " (login screen)" : lockColor.modelData.label
-                                    }
-
-                                    ColorChoice {
-                                        Layout.fillWidth: true
-                                        value: Config[lockColor.modelData.key]
-                                        onPicked: name => {
-                                            Config[lockColor.modelData.key] = name;
-                                            loginApply.restart();
-                                        }
-                                    }
-
-                                    SettingRow {
-                                        visible: lockColor.modelData.opacity !== undefined
-                                        label: "Opacity"
-
-                                        Stepper {
-                                            text: `${Config[lockColor.modelData.opacity]}%`
-                                            onStep: d => {
-                                                Config[lockColor.modelData.opacity] = root.clamp(Config[lockColor.modelData.opacity] + d * 5, 0, 100);
-                                                loginApply.restart();
-                                            }
-                                        }
-                                    }
+                                    label: modelData.label
+                                    key: modelData.key
+                                    opacityKey: modelData.opacity ?? ""
+                                    onEdited: loginApply.restart()
                                 }
+                            }
+
+                            LockSection {
+                                text: "Power buttons (login screen)"
+                            }
+
+                            LockColor {
+                                label: "Background"
+                                key: "lockPowerColor"
+                                opacityKey: "lockPowerOpacity"
+                                onEdited: loginApply.restart()
+                            }
+
+                            LockColor {
+                                label: "Icons"
+                                key: "lockPowerIconColor"
+                                onEdited: loginApply.restart()
+                            }
+
+                            LockColor {
+                                label: "Outline"
+                                key: "lockPowerOutlineColor"
+                                onEdited: loginApply.restart()
                             }
 
                             // The login screen shares these colors. Long enough for Config to save them.
