@@ -1,0 +1,5 @@
+# Intel GPU (the laptop's built-in one). mesa comes with Hyprland; these add Vulkan, which
+# Steam and games need, and video decoding.
+vulkan-intel
+lib32-vulkan-intel
+intel-media-driver

@@ -2,7 +2,7 @@
 # without them. "# AUR" marks AUR packages. Installed by hand: DaVinci Resolve (its PKGBUILD
 # needs editing) and Frame Checker (github.com/kuvk/frame-checker). Dolphin's rule has no
 # package here.
-chromium                 # web apps (webapp.py)
+chromium
 blueman
 brasero
 gimp
