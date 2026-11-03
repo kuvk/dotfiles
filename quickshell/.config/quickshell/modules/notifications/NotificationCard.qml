@@ -71,15 +71,19 @@ Item {
         clip: true
 
         layer.enabled: root.popup && !Theme.gamemode
+        // Close to Hyprland's window shadow (decoration.lua): black at 0x66, soft, slightly down
         layer.effect: MultiEffect {
             shadowEnabled: true
             shadowColor: "black"
-            shadowOpacity: 0.45
+            shadowOpacity: 0.4
+            blurMax: 30
             shadowBlur: 0.5
+            shadowHorizontalOffset: 1
             shadowVerticalOffset: 3
         }
 
-        // Time left before the popup hides
+        // Time left before the popup hides. Along the straight part of the top edge, between
+        // the rounded corners, with rounded ends; edge to edge when corners are square.
         Rectangle {
             id: progress
 
@@ -88,8 +92,10 @@ Item {
             visible: root.timeout > 0
             anchors.top: parent.top
             anchors.left: parent.left
+            anchors.leftMargin: card.radius
             height: 2
-            width: parent.width * remaining
+            radius: card.radius > 0 ? height / 2 : 0
+            width: (parent.width - 2 * card.radius) * remaining
             color: Theme.highlight
             opacity: 0.8
 
