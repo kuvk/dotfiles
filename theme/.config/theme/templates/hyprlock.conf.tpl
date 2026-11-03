@@ -54,7 +54,7 @@ shape {
     color = rgba(@BOX_BG@)
     rounding = 6
     border_size = 2
-    border_color = rgb(@BOX_OUTLINE@)
+    border_color = rgba(@BOX_OUTLINE@)
     position = 0, 0
     halign = center
     valign = center

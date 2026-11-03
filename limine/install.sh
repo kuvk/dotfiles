@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Installs Limine on the ESP and writes its menu: one entry per kernel in /efi/arch
 # (mkinitcpio's presets put kernels and images there), styled like the boot splash:
-# the fastfetch logo above an "Arch Linux" tree of kernels, in accent2.
+# the fastfetch logo in accent2 above an "Arch Linux" tree of kernels in accent.
 # Run it again after a Limine update, a new kernel, or to change colors.
 #
-#   sudo limine/install.sh             Catppuccin Mocha colors
-#   sudo limine/install.sh --theme     the current theme's colors (theme-set.py)
+#   sudo limine/install.sh             the current theme's colors, accents included
+#                                      (theme-set.py; Catppuccin Mocha before it has run)
+#   sudo limine/install.sh --theme     the same, but stop if there's no theme yet
 #   limine/install.sh --print          print the config instead, without installing
 #   limine/install.sh --preview FILE   draw the wallpaper (the logo, no menu text) to FILE
 #   --resolution WxH                   the menu's resolution; by default the native mode of the
@@ -43,15 +44,17 @@ else
     home=$HOME
 fi
 
-# Catppuccin Mocha, or the current theme's slots
+# The current theme's slots, or Catppuccin Mocha before theme-set.py has run
 base="#1e1e2e" surface1="#45475a" surface2="#585b70" text="#cdd6f4" subtext1="#bac2de"
 subtext0="#a6adc8" overlay1="#7f849c" red="#f38ba8" green="#a6e3a1" yellow="#f9e2af"
 blue="#89b4fa" pink="#f5c2e7" teal="#94e2d5" mauve="#cba6f7" accent="#fab387" accent2="#89b4fa"
-if $use_theme; then
-    colors="$home/.config/theme/current/colors.sh"
-    [[ -r $colors ]] || { echo "No $colors; run theme-set.py first" >&2; exit 1; }
+colors="$home/.config/theme/current/colors.sh"
+if [[ -r $colors ]]; then
     # shellcheck source=/dev/null
     . "$colors"
+elif $use_theme; then
+    echo "No $colors; run theme-set.py first" >&2
+    exit 1
 fi
 hex() { local c; for c; do printf '%s;' "${c#\#}"; done | sed 's/;$//'; }
 
@@ -103,7 +106,7 @@ wallpaper() {
     font=$(fc-match -f '%{file}' "JetBrainsMono Nerd Font")
     logo_text="$home/.config/fastfetch/fastfetch-logo.txt"
     [[ -r $logo_text ]] || { echo "No fastfetch logo at $logo_text" >&2; exit 1; }
-    magick -background none -fill "$mauve" -font "$font" -pointsize $((9 * scale)) label:@"$logo_text" -trim +repage "$build/logo.png"
+    magick -background none -fill "$accent2" -font "$font" -pointsize $((9 * scale)) label:@"$logo_text" -trim +repage "$build/logo.png"
     lw=$(magick identify -format %w "$build/logo.png"); lh=$(magick identify -format %h "$build/logo.png")
     top=$(((res_h / cell_h - ${#found[@]} - 1) / 2 * cell_h))
     # Limine's centering (menu.c): each line is its tree marks plus " name ", the widest
@@ -127,15 +130,15 @@ interface_resolution: ${res_w}x$res_h
 interface_branding:
 interface_help_hidden: yes
 interface_help_colour: $(hex "$overlay1")
-interface_help_colour_bright: $(hex "$accent2")
+interface_help_colour_bright: $(hex "$accent")
 wallpaper: boot():/EFI/limine/wallpaper.png
 wallpaper_style: centered
 backdrop: $(hex "$base")
 term_font_scale: ${scale}x$scale
 term_background: ff$(hex "$base")
-term_foreground: $(hex "$accent2")
+term_foreground: $(hex "$accent")
 term_background_bright: $(hex "$surface1")
-term_foreground_bright: $(hex "$accent2")
+term_foreground_bright: $(hex "$accent")
 term_palette: $(hex "$surface1" "$red" "$green" "$yellow" "$blue" "$pink" "$teal" "$subtext1")
 term_palette_bright: $(hex "$surface2" "$red" "$green" "$yellow" "$blue" "$pink" "$teal" "$subtext0")
 term_margin: 0

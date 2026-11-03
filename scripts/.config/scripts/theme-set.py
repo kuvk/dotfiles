@@ -21,6 +21,7 @@ apps are told to reload.
                           Nerd Fonts only. HINTING: none|slight|medium|full,
                           ANTIALIASING: none|grayscale|rgba
   theme-set.py --login    rewrite the login screen's colors from Settings > Lock Screen
+  theme-set.py --text-size  GTK's font size from Displays > Text size (hypr-monitors.py)
   theme-set.py --window-buttons on|off
                           close button in GTK apps (Settings > Windows saves the choice)
   theme-set.py --shape rounded|square
@@ -175,6 +176,8 @@ def shell_settings() -> dict:
         "lockFailColor": "red",
         "lockCapsColor": "yellow",
         "lockBoxOpacity": 85,
+        "lockBox": True,
+        "accentOverrides": {},
         "lockInputOpacity": 25,
         "cursorTheme": "Adwaita",
         "cursorSize": 24,
@@ -224,7 +227,13 @@ def load_theme(name: str) -> dict:
     with path.open("rb") as f:
         data = tomllib.load(f)
 
-    raw = data.get("colors", {})
+    raw = dict(data.get("colors", {}))
+    # Settings > Appearance > Accent: another slot of this theme's palette
+    chosen = shell_settings().get("accentOverrides", {})
+    chosen = chosen.get(name, {}) if isinstance(chosen, dict) else {}
+    for role in ("accent", "accent2"):
+        if chosen.get(role) in SLOTS:
+            raw[role] = chosen[role]
     colors: dict[str, str] = {}
     for slot in SLOTS:
         value = raw.get(slot)
@@ -279,6 +288,7 @@ def load_theme(name: str) -> dict:
         "text_font": shell["nerdFont"] if shell["nerdFontOnly"] else shell["displayFont"],
         "font_hinting": hinting,
         "font_antialiasing": antialiasing,
+        "gtk_font_pt": str(gtk_font_pt()),
         "fc_antialias": "false" if antialiasing == "none" else "true",
         "fc_hinting": "false" if hinting == "none" else "true",
         "fc_hintstyle": f"hint{hinting}",
@@ -303,6 +313,7 @@ def load_theme(name: str) -> dict:
         "login_fail": colors.get(shell["lockFailColor"], colors["text"]),
         "login_caps": colors.get(shell["lockCapsColor"], colors["text"]),
         "login_box_opacity": str(shell["lockBoxOpacity"] / 100),
+        "login_show_box": "true" if shell["lockBox"] else "false",
         "login_input_opacity": str(shell["lockInputOpacity"] / 100),
         "icon_theme": icon_theme_for(shell["iconTheme"], mode),
         "prefer_dark": "0" if mode == "light" else "1",
@@ -464,11 +475,25 @@ def apply_cursor(strings: dict) -> None:
         run_quiet(["hyprctl", "setcursor", strings["cursor_theme"], strings["cursor_size"]])
 
 
+def gtk_font_pt() -> int:
+    """GTK's font size in points for Displays > Text size (px, kept by hypr-monitors.py):
+    13 px is 10 pt. Set as the font size rather than GTK's text-scaling-factor, which
+    Electron apps on Wayland (Obsidian, Mullvad) apply to their content without resizing
+    the window, leaving an empty strip."""
+    try:
+        size = int(json.loads((HOME / ".config/hypr/monitors.json").read_text()).get("text_size", 12))
+    except (OSError, ValueError, TypeError, AttributeError):
+        size = 12
+    return max(6, round(10 * size / 13))
+
+
 def apply_fonts(strings: dict) -> None:
     interface = "org.gnome.desktop.interface"
-    run_quiet(["gsettings", "set", interface, "font-name", f"{strings['text_font']} 10"])
-    run_quiet(["gsettings", "set", interface, "document-font-name", f"{strings['text_font']} 10"])
-    run_quiet(["gsettings", "set", interface, "monospace-font-name", f"{strings['nerd_font']} 10"])
+    pt = strings["gtk_font_pt"]
+    run_quiet(["gsettings", "set", interface, "font-name", f"{strings['text_font']} {pt}"])
+    run_quiet(["gsettings", "set", interface, "document-font-name", f"{strings['text_font']} {pt}"])
+    run_quiet(["gsettings", "set", interface, "monospace-font-name", f"{strings['nerd_font']} {pt}"])
+    run_quiet(["gsettings", "set", interface, "text-scaling-factor", "1.0"])
     run_quiet(["gsettings", "set", interface, "font-hinting", strings["font_hinting"]])
     run_quiet(["gsettings", "set", interface, "font-antialiasing", strings["font_antialiasing"]])
     run_quiet(["gsettings", "set", interface, "font-rgba-order", "rgb"])
@@ -684,6 +709,10 @@ def main(argv: list[str]) -> int:
             return 1
         SETTINGS_OVERRIDE.update(nerdFont=nerd, displayFont=display, nerdFontOnly=only == "on",
                                  fontHinting=hinting, fontAntialiasing=antialiasing)
+        apply_fonts(generate(current_theme())["strings"])
+        return 0
+    if argv == ["--text-size"]:
+        # Displays > Text size changed (hypr-monitors.py): GTK's font size
         apply_fonts(generate(current_theme())["strings"])
         return 0
     if argv == ["--login"]:

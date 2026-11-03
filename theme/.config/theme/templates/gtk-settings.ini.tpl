@@ -1,7 +1,7 @@
 [Settings]
 gtk-theme-name={{ gtk_theme }}
 gtk-icon-theme-name={{ icon_theme }}
-gtk-font-name={{ text_font }} 10
+gtk-font-name={{ text_font }} {{ gtk_font_pt }}
 gtk-cursor-theme-name={{ cursor_theme }}
 gtk-cursor-theme-size={{ cursor_size }}
 gtk-application-prefer-dark-theme={{ prefer_dark }}

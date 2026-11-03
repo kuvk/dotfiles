@@ -20,12 +20,13 @@ TEMPLATE="$HOME/.config/theme/current/hyprlock.conf"
 config="$XDG_RUNTIME_DIR/hyprlock.conf"
 settings=("$HOME"/.local/state/quickshell/by-shell/*/settings.json)
 IFS=$'\x1f' read -r saved image matrix clock date avatar box_outline box_bg box_opacity \
-    input_outline input_bg input_opacity dots user_color text_name check fail caps solid < <(jq -r '[
+    input_outline input_bg input_opacity dots user_color text_name check fail caps solid show_box < <(jq -r '[
     .lockStyle // "picture", .lockImage // "", .lockMatrixColor // "magenta", .lockClockColor // "accent2", .lockDateColor // "accent2",
     .lockAvatarColor // "accent2", .lockBoxOutlineColor // "accent", .lockBoxColor // "base", .lockBoxOpacity // 85,
     .lockInputOutlineColor // "accent2", .lockInputColor // "subtext0", .lockInputOpacity // 25,
     .lockDotsColor // "accent2", .lockUserColor // "accent", .lockTextColor // "text",
-    .lockCheckColor // "green", .lockFailColor // "red", .lockCapsColor // "yellow", .lockSolidColor // "base"
+    .lockCheckColor // "green", .lockFailColor // "red", .lockCapsColor // "yellow", .lockSolidColor // "base",
+    (if .lockBox == false then "off" else "on" end)
 ] | join("\u001f")' "${settings[0]}" 2>/dev/null)
 style=${1:-${saved:-picture}}
 
@@ -92,12 +93,20 @@ else
     hyprlock_args+=(--no-fade-in --immediate-render)
 fi
 
+# Settings > Lock Screen > Box off: the card is drawn fully transparent
+box_fill=$(hex_alpha "${box_bg:-base}" "${box_opacity:-85}")
+box_border="$(hex "${box_outline:-accent}")ff"
+if [[ $show_box == off ]]; then
+    box_fill=00000000
+    box_border=00000000
+fi
+
 escape() { sed 's/[&|\\]/\\&/g' <<<"$1"; }
 
 install -m 600 /dev/null "$config"
 sed -e "s|@MONITOR@|$focused|g" -e "s|@PICTURE@|$(escape "$picture")|" -e "s|@COLOR@|$color|" \
     -e "s|@CLOCK@|$(hex "${clock:-accent2}")|g" -e "s|@DATE@|$(hex "${date:-accent2}")|g" -e "s|@AVATAR@|$(hex "${avatar:-accent2}")|g" \
-    -e "s|@BOX_OUTLINE@|$(hex "${box_outline:-accent}")|g" -e "s|@BOX_BG@|$(hex_alpha "${box_bg:-base}" "${box_opacity:-85}")|g" \
+    -e "s|@BOX_OUTLINE@|$box_border|g" -e "s|@BOX_BG@|$box_fill|g" \
     -e "s|@INPUT_OUTLINE@|$(hex "${input_outline:-accent2}")|g" -e "s|@INPUT_BG@|$(hex_alpha "${input_bg:-subtext0}" "${input_opacity:-25}")|g" \
     -e "s|@DOTS@|$(hex "${dots:-accent2}")|g" -e "s|@USER@|$(hex "${user_color:-accent}")|g" -e "s|@TEXT@|$(hex "${text_name:-text}")|g" \
     -e "s|@CHECK@|$(hex "${check:-green}")|g" -e "s|@FAIL@|$(hex "${fail:-red}")|g" -e "s|@CAPS@|$(hex "${caps:-yellow}")|g" "$TEMPLATE" >"$config"

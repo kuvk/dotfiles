@@ -33,6 +33,8 @@ Singleton {
     property alias lockFailColor: adapter.lockFailColor
     property alias lockCapsColor: adapter.lockCapsColor
     property alias lockBoxOpacity: adapter.lockBoxOpacity
+    property alias lockBox: adapter.lockBox
+    property alias accentOverrides: adapter.accentOverrides
     property alias lockInputOpacity: adapter.lockInputOpacity
     property alias lockDotsColor: adapter.lockDotsColor
     property alias lockTextColor: adapter.lockTextColor
@@ -159,6 +161,8 @@ Singleton {
         adapter.lockFailColor = "red";
         adapter.lockCapsColor = "yellow";
         adapter.lockBoxOpacity = 85;
+        adapter.lockBox = true;
+        adapter.accentOverrides = {};
         adapter.lockInputOpacity = 25;
         adapter.lockDotsColor = "accent2";
         adapter.lockTextColor = "text";
@@ -254,6 +258,9 @@ Singleton {
             property string lockFailColor: "red"
             property string lockCapsColor: "yellow"
             property int lockBoxOpacity: 85 // percent
+            // per theme: { "catppuccin-mocha": { accent: "mauve", accent2: "blue" } }, read by theme-set.py
+            property var accentOverrides: ({})
+            property bool lockBox: true // the card behind the avatar and password (lock and login screens)
             property int lockInputOpacity: 25 // percent
             property string lockDotsColor: "accent2"
             property string lockTextColor: "text"

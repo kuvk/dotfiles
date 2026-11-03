@@ -194,6 +194,65 @@ FloatingWindow {
                             visible: root.section === "appearance"
                             spacing: 12
 
+                            // Accent and accent2 for the running theme, from its own palette
+                            Repeater {
+                                model: [
+                                    { role: "accent", label: "Accent" },
+                                    { role: "accent2", label: "Second accent" }
+                                ]
+
+                                ColumnLayout {
+                                    id: accentRow
+
+                                    required property var modelData
+                                    readonly property string chosen: (Config.accentOverrides[Theme.theme] ?? {})[modelData.role] ?? ""
+
+                                    function choose(name: string): void {
+                                        const all = Object.assign({}, Config.accentOverrides);
+                                        const mine = Object.assign({}, all[Theme.theme] ?? {});
+                                        if (name)
+                                            mine[accentRow.modelData.role] = name;
+                                        else
+                                            delete mine[accentRow.modelData.role];
+                                        if (Object.keys(mine).length)
+                                            all[Theme.theme] = mine;
+                                        else
+                                            delete all[Theme.theme];
+                                        Config.accentOverrides = all;
+                                        accentApply.restart();
+                                    }
+
+                                    Layout.fillWidth: true
+                                    spacing: 4
+
+                                    SettingRow {
+                                        label: accentRow.modelData.label
+                                        hint: `${accentRow.chosen ? accentRow.chosen[0].toUpperCase() + accentRow.chosen.slice(1) : "The theme's own"} in ${Theme.themeName}`
+
+                                        TextButton {
+                                            text: "Theme default"
+                                            enabled: accentRow.chosen !== ""
+                                            onClicked: accentRow.choose("")
+                                        }
+                                    }
+
+                                    ColorChoice {
+                                        Layout.fillWidth: true
+                                        names: ["rosewater", "flamingo", "pink", "mauve", "red", "maroon", "peach", "yellow", "green", "teal", "sky", "sapphire", "blue", "lavender"]
+                                        value: accentRow.chosen
+                                        onPicked: name => accentRow.choose(name)
+                                    }
+                                }
+                            }
+
+                            // Long enough for Config to save the choice; then the whole theme again
+                            Timer {
+                                id: accentApply
+
+                                interval: 800
+                                onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py"])
+                            }
+
                             SettingRow {
                                 label: "Corner radius"
                                 hint: "Hyprland windows use 6"
@@ -628,13 +687,26 @@ FloatingWindow {
                                 }
                             }
 
+                            SettingRow {
+                                label: "Box"
+                                hint: "Card behind the avatar and password, here and on the login screen"
+
+                                Switch {
+                                    checked: Config.lockBox
+                                    onToggled: {
+                                        Config.lockBox = !Config.lockBox;
+                                        loginApply.restart();
+                                    }
+                                }
+                            }
+
                             Repeater {
                                 model: [
                                     { label: "Clock", key: "lockClockColor" },
                                     { label: "Date", key: "lockDateColor" },
                                     { label: "Avatar outline", key: "lockAvatarColor" },
-                                    { label: "Box outline", key: "lockBoxOutlineColor" },
-                                    { label: "Box background", key: "lockBoxColor", opacity: "lockBoxOpacity" },
+                                    { label: "Box outline", key: "lockBoxOutlineColor", box: true },
+                                    { label: "Box background", key: "lockBoxColor", opacity: "lockBoxOpacity", box: true },
                                     { label: "Input outline", key: "lockInputOutlineColor" },
                                     { label: "Input background", key: "lockInputColor", opacity: "lockInputOpacity" },
                                     { label: "Typing dots", key: "lockDotsColor" },
@@ -653,8 +725,9 @@ FloatingWindow {
                                     Layout.fillWidth: true
                                     spacing: 4
 
+                                    // Without the box these colors are left for the login screen's power buttons
                                     StyledText {
-                                        text: lockColor.modelData.label
+                                        text: lockColor.modelData.box && !Config.lockBox ? lockColor.modelData.label.replace("Box", "Power buttons:") + " (login screen)" : lockColor.modelData.label
                                     }
 
                                     ColorChoice {

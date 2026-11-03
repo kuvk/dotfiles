@@ -34,8 +34,8 @@ stow hypr quickshell theme scripts fontconfig kitty tmux zsh nvim yazi   # or an
 | `theme` | One palette rendered into every app, with live reloads. See [its README](theme/.config/theme/README.md) |
 | `scripts` | `theme-set.py`, `wallpaper.py`, `hypr-monitors.py`, `lockscreen.sh`, `webapp.py`, `network.py`, `update.sh` (updates everything), `sysmaintenance.sh` (cleans up) and others |
 | `sddm` | Login screen: your wallpaper, fonts, cursor and monitor scales. Not stowed; install with `sudo sddm/install.sh` |
-| `plymouth` | Boot splash: the fastfetch logo, a password field for the encrypted drives and a progress bar. Not stowed; install with `sudo plymouth/install.sh` (`--theme` for the current theme's colors, `--preview FILE` to see it first) |
-| `limine` | Boot menu: the fastfetch logo above an Omarchy-style tree of kernels, in the theme's colors. Not stowed; install with `sudo limine/install.sh` (`--theme` for the current theme's colors, `--resolution WxH`, `--print` for the config, `--preview FILE` for the wallpaper) |
+| `plymouth` | Boot splash: the fastfetch logo, a password field for the encrypted drives and a progress bar. Not stowed; install with `sudo plymouth/install.sh`, which uses the current theme's colors; run it again after changing them (`--preview FILE` to see it first) |
+| `limine` | Boot menu: the fastfetch logo above an Omarchy-style tree of kernels, in the theme's colors. Not stowed; install with `sudo limine/install.sh`, which uses the current theme's colors; run it again after changing them (`--resolution WxH`, `--print` for the config, `--preview FILE` for the wallpaper) |
 | `packages` | Package lists for `install.sh`: `core.txt` (needed), `apps.txt` (apps with window rules), `flatpak.txt`, `nvidia.txt`, `intel.txt`, `laptop.txt` (ASUS ROG, g14 repo), `desktop.txt`. Not stowed |
 | `fontconfig` | Font folders; rendering comes from Settings > Fonts |
 | `kitty`, `tmux`, `zsh` | Terminal, multiplexer and shell (below) |

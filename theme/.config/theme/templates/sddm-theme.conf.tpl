@@ -12,6 +12,7 @@ avatar={{ login_avatar }}
 boxOutline={{ login_boxOutline }}
 box={{ login_box }}
 boxOpacity={{ login_box_opacity }}
+showBox={{ login_show_box }}
 inputOutline={{ login_inputOutline }}
 input={{ login_input }}
 inputOpacity={{ login_input_opacity }}

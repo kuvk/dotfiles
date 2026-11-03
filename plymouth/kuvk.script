@@ -308,14 +308,13 @@ layout();
 message_sprite = Sprite();
 message_sprite.SetPosition(10, 10, 10000);
 
-# Farewell screen before luks-poweroff turns the machine off: only the line, on the background
-# Farewell before luks-poweroff turns the machine off: the logo stays, and the field and
-# its message give way to one larger line, drawn with the hint's sprite in the field's place.
+# Farewell before luks-poweroff turns the machine off: everything else goes, and one large
+# line stays in the middle of the plain background, drawn with the hint's sprite.
 farewell_line.image = Image("farewell.png");
 
 fun position_farewell() {
   hint.sprite.SetX(Window.GetWidth() / 2 - farewell_line.image.GetWidth() / 2);
-  hint.sprite.SetY(entry.y + entry.image.GetHeight() / 2 - farewell_line.image.GetHeight() / 2);
+  hint.sprite.SetY(Window.GetHeight() / 2 - farewell_line.image.GetHeight() / 2);
 }
 
 fun show_farewell() {
@@ -325,6 +324,7 @@ fun show_farewell() {
   hide_progress_bar();
   hide_password_dialog();
   message_sprite.SetOpacity(0);
+  logo.sprite.SetOpacity(0);
   hint.sprite.SetImage(farewell_line.image);
   position_farewell();
   hint.sprite.SetOpacity(1);

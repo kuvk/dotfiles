@@ -25,8 +25,8 @@ fullscreen blanks some screens for a moment) and the color mode: sRGB, the panel
 own colors from its EDID (wide-gamut screens), or HDR where the screen supports it.
 
 Text size is in px (9-20, default 13), like Omarchy's display text size: it
-sets the shell font, GTK's text-scaling-factor (rounded so the interface font
-lands on a whole point size) and kitty's font size.
+sets the shell font, GTK's font size (theme-set.py --text-size) and kitty's
+font size.
 """
 
 from __future__ import annotations
@@ -51,6 +51,7 @@ LOCK_FILE = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "hypr-monitors.loc
 LAST_RUN_FILE = LOCK_FILE.with_name("hypr-monitors.last")
 LAST_RUN_WINDOW = 10.0  # s; the same monitors again this soon need nothing done
 GAMEMODE_SCRIPT = HOME / ".config/scripts/hypr-gamemode.sh"
+THEME_SET = HOME / ".config/scripts/theme-set.py"
 
 INTERNAL_PREFIXES = ("eDP", "LVDS", "DSI")
 WORKSPACES = 10
@@ -302,16 +303,10 @@ def render_lua(profile: dict, live: list[dict]) -> str:
 
 
 def apply_text_size(size: int) -> None:
-    """GTK factor and kitty font size for a text size in px (13 = default)."""
-    if shutil.which("gsettings"):
-        # Quantize so the GTK interface font lands on a whole point size
-        name = run(["gsettings", "get", "org.gnome.desktop.interface", "font-name"]).strip().strip("'")
-        try:
-            pt = float(name.rsplit(" ", 1)[-1])
-        except ValueError:
-            pt = 11.0
-        factor = round(pt * size / TEXT_SIZE_BASE) / pt
-        run(["gsettings", "set", "org.gnome.desktop.interface", "text-scaling-factor", f"{factor:.4f}"])
+    """GTK and kitty font sizes for a text size in px (13 = default). theme-set.py reads
+    the size from monitors.json and sets GTK's font in points."""
+    if THEME_SET.exists():
+        run([str(THEME_SET), "--text-size"])
 
     kitty_pt = round(size * KITTY_FONT_DEFAULT / TEXT_SIZE_BASE)
     content = f"# Written by hypr-monitors.py (Displays > Text size)\nfont_size {kitty_pt}.0\n"
