@@ -12,7 +12,7 @@ last until logout.
   wallpaper.py stop [MONITOR]            stop live wallpapers
   wallpaper.py pause [on|off]            pause/resume live wallpapers (toggles without on|off)
   wallpaper.py export-greeter            copy the wallpaper for the login screen
-  wallpaper.py default                   first run: the bundled wallpaper, unless one is chosen
+  wallpaper.py default [PATH]            first run: PATH (or the bundled wallpaper), unless one is chosen
   wallpaper.py restore                   re-apply the saved static wallpapers (autostart)
 """
 
@@ -206,15 +206,17 @@ def export_greeter() -> None:
         print(f"wallpaper: could not copy for the login screen: {e}", file=sys.stderr)
 
 
-def use_default() -> None:
-    """With no wallpaper chosen yet (a fresh install), copy the bundled one into
-    ~/Pictures/Wallpapers, so the picker lists it, and choose it for every monitor:
-    desktop, lock screen and login screen. Works before Hyprland runs."""
-    if not CURRENT_LINK.exists() and DEFAULT_WALLPAPER.exists():
-        dest = DIRS["static"] / DEFAULT_WALLPAPER.name
+def use_default(path: Path | None = None) -> None:
+    """With no wallpaper chosen yet (a fresh install), choose PATH, or else the bundled one,
+    for every monitor: desktop, lock screen and login screen. It's copied into
+    ~/Pictures/Wallpapers first if it isn't there, so the picker lists it. Works before
+    Hyprland runs."""
+    source = path if path and path.is_file() else DEFAULT_WALLPAPER
+    if not CURRENT_LINK.exists() and source.exists():
+        dest = source if source.parent == DIRS["static"] else DIRS["static"] / source.name
         dest.parent.mkdir(parents=True, exist_ok=True)
         if not dest.exists():
-            shutil.copyfile(DEFAULT_WALLPAPER, dest)
+            shutil.copyfile(source, dest)
         STATE_DIR.mkdir(parents=True, exist_ok=True)
         CURRENT_LINK.unlink(missing_ok=True)
         CURRENT_LINK.symlink_to(dest)
@@ -384,7 +386,7 @@ def run_command(argv: list[str]) -> int:
     elif cmd == "export-greeter":
         export_greeter()
     elif cmd == "default":
-        use_default()
+        use_default(Path(args[0]).expanduser() if args else None)
     elif cmd == "thumbs" and args and args[0] in DIRS:
         thumbs(args[0])
     elif cmd == "set" and len(args) >= 2 and args[0] in DIRS:

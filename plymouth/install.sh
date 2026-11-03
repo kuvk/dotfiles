@@ -54,9 +54,9 @@ elif $use_theme; then
     exit 1
 fi
 
-logo_text="$home/.config/fastfetch/fastfetch-logo.txt"
+logo_text="$home/.config/theme/logo/ascii-dori"
 font=$(fc-match -f '%{file}' "JetBrainsMono Nerd Font")
-[[ -r $logo_text ]] || { echo "No fastfetch logo at $logo_text" >&2; exit 1; }
+[[ -r $logo_text ]] || { echo "No logo at $logo_text" >&2; exit 1; }
 
 # "#rrggbb" as Plymouth's "r, g, b" from 0 to 1
 rgb() { awk -v r=$((16#${1:1:2})) -v g=$((16#${1:3:2})) -v b=$((16#${1:5:2})) 'BEGIN { printf "%.3f, %.3f, %.3f", r/255, g/255, b/255 }'; }
@@ -67,7 +67,8 @@ trap 'rm -rf "$build"' EXIT
 # Images: the logo in accent2; the password field in surface0 with an accent outline, dots in
 # accent2, the progress bar in accent; the hint under the field in subtext0 (accent2, then accent after wrong
 # passwords); the farewell line in accent2, large, alone on the screen
-magick -background none -fill "$accent2" -font "$font" -pointsize 18 label:@"$logo_text" "$build/logo.png"
+# The logo drawn like kitty draws it, in 24px rows (scripts/.config/scripts/logo-render.py)
+"$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$accent2" --cell-height 24 --out "$build/logo.png"
 # The password field and progress bar are as wide as the logo
 ew=$(magick identify -format %w "$build/logo.png")
 magick -size "${ew}x48" xc:none -fill "$surface0" -stroke "$accent" -strokewidth 2 \
