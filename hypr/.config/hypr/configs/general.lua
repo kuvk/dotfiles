@@ -35,7 +35,7 @@ hl.config({
     disable_splash_rendering = true,
     initial_workspace_tracking = 1,
     allow_session_lock_restore = true,
-    -- Variable refresh rate for fullscreen windows, where the monitor supports it
-    vrr = 2,
+    -- Variable refresh rate is set per monitor in Displays (hypr-monitors.py); off elsewhere
+    vrr = 0,
   },
 })

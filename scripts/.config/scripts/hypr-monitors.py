@@ -20,6 +20,10 @@ Workspaces by default: the primary monitor gets 1-5, a second monitor 6-10,
 with three monitors 3 each (1-3 on the primary). Any workspace can be
 assigned or left unassigned in the Displays panel.
 
+Per monitor also: variable refresh rate (off by default: turning it on and off at
+fullscreen blanks some screens for a moment) and the color mode: sRGB, the panel's
+own colors from its EDID (wide-gamut screens), or HDR where the screen supports it.
+
 Text size is in px (9-20, default 13), like Omarchy's display text size: it
 sets the shell font, GTK's text-scaling-factor (rounded so the interface font
 lands on a whole point size) and kitty's font size.
@@ -52,6 +56,10 @@ INTERNAL_PREFIXES = ("eDP", "LVDS", "DSI")
 WORKSPACES = 10
 MAX_PER_MONITOR = 5
 PROFILE_VERSION = 2
+
+VRR_MODES = (0, 1, 2, 3)  # off, on, fullscreen, fullscreen games and video
+COLOR_MODES = ("srgb", "edid", "hdr", "hdredid")
+HDR_MODES = ("hdr", "hdredid")
 
 TEXT_SIZE_DEFAULT = 12  # px, for a setup with no saved size
 TEXT_SIZE_BASE = 13  # px that GTK's scaling factor 1 and kitty.conf's font size correspond to
@@ -271,10 +279,16 @@ def render_lua(profile: dict, live: list[dict]) -> str:
         if not mon["enabled"]:
             lines.append(f"hl.monitor({{ output = {sel}, disabled = true }})")
             continue
+        extra = f", vrr = {int(mon.get('vrr', 0))}"
+        cm = mon.get("cm", "srgb")
+        if cm != "srgb":
+            extra += f", cm = {lua_str(cm)}"
+        if cm in HDR_MODES:
+            extra += f", bitdepth = 10, sdrbrightness = {float(mon.get('sdrbrightness', 1.0)):g}"
         lines.append(
             f"hl.monitor({{ output = {sel}, mode = {lua_str(mon['mode'])}, "
             f"position = \"{round(mon['x'])}x{round(mon['y'])}\", scale = \"{scale_str(mon['scale'])}\", "
-            f"transform = {int(mon.get('transform', 0))} }})"
+            f"transform = {int(mon.get('transform', 0))}{extra} }})"
         )
     # Anything not in the profile (e.g. a projector plugged in later) still works
     lines.append('hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" })')
@@ -468,6 +482,7 @@ def state(data: dict, live: list[dict]) -> dict:
         mid = ident(m)
         mon = profile["monitors"][mid]
         w, h = logical_size(mon)
+        hw = m.get("hardwareDetails") or {}
         monitors.append({
             "id": mid,
             "name": m["name"],
@@ -484,6 +499,11 @@ def state(data: dict, live: list[dict]) -> dict:
             "height": h,
             "scale": mon["scale"],
             "transform": mon.get("transform", 0),
+            "vrr": mon.get("vrr", 0),
+            "cm": mon.get("cm", "srgb"),
+            "sdrbrightness": mon.get("sdrbrightness", 1.0),
+            "vrr_capable": bool(hw.get("vrrCapable")),
+            "hdr_capable": bool(hw.get("hdr")),
         })
     return {
         "key": key,
@@ -500,9 +520,14 @@ def set_state(data: dict, live: list[dict], new: dict) -> None:
         mon = profile["monitors"].get(m["id"])
         if mon is None:
             continue
-        for field in ("enabled", "mode", "x", "y", "scale", "transform"):
+        for field in ("enabled", "mode", "x", "y", "scale", "transform", "vrr", "cm", "sdrbrightness"):
             if field in m:
                 mon[field] = m[field]
+        if mon.get("vrr") not in VRR_MODES:
+            mon["vrr"] = 0
+        if mon.get("cm") not in COLOR_MODES:
+            mon["cm"] = "srgb"
+        mon["sdrbrightness"] = max(0.5, min(2.0, float(mon.get("sdrbrightness", 1.0))))
         w, h = parse_mode(mon["mode"])
         mon["scale"] = clean_scale(float(mon["scale"]), w, h)
     if not any(mon["enabled"] for mon in profile["monitors"].values()):
