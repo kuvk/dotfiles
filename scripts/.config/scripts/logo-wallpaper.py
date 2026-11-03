@@ -1,0 +1,157 @@
+#!/usr/bin/env python3
+"""Wallpapers with the logo (~/.config/theme/logo/ascii-dori) centered on a plain color.
+
+Colors are theme color names from the current theme (base, accent, accent2, mauve, ...)
+or hex values (#1e1e2e). --bg, --fg and --size take comma-separated lists, and every
+combination is drawn, so one run can make a set to pick from.
+
+  logo-wallpaper.py                                   accent2 on base, 30% high
+  logo-wallpaper.py --fg accent,accent2,mauve --size 20,30,45
+  logo-wallpaper.py --bg '#000000' --fg red --res 3840x2160 --output-dir ~/tmp
+
+Options:
+  --bg COLORS          background (default: base)
+  --fg COLORS          logo color (default: accent2)
+  --size PERCENTS      logo height as a share of the screen height (default: 30)
+  --res WxH            image size (default: the highest resolution any connected monitor
+                       has, else 2560x1440; works from a console too)
+  --output-dir DIR     where the images go (default: ~/Pictures/Wallpapers, which the
+                       wallpaper picker lists)
+  --logo FILE          another text logo (default: ~/.config/theme/logo/ascii-dori)
+
+Files are named dori-FG-on-BG-SIZE.png (hex colors without the #); an existing file
+with the same name is replaced.
+"""
+
+from __future__ import annotations
+
+import argparse
+import itertools
+import json
+import re
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+HOME = Path.home()
+THEME_COLORS = HOME / ".config/theme/current/quickshell.json"
+DEFAULT_LOGO = HOME / ".config/theme/logo/ascii-dori"
+DEFAULT_DIR = HOME / "Pictures/Wallpapers"
+RENDER = Path(__file__).resolve().with_name("logo-render.py")
+HEX_RE = re.compile(r"^#?[0-9a-fA-F]{6}$")
+
+
+def theme_colors() -> dict[str, str]:
+    try:
+        return json.loads(THEME_COLORS.read_text()).get("colors", {})
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def resolve(color: str, colors: dict[str, str]) -> tuple[str, str]:
+    """(#rrggbb, name for the file) for a theme color name or a hex value."""
+    if color in colors:
+        return colors[color], color
+    if HEX_RE.match(color):
+        value = "#" + color.lstrip("#").lower()
+        return value, value[1:]
+    names = ", ".join(sorted(k for k in colors if not k.startswith("term_")))
+    raise SystemExit(f"Unknown color '{color}'. Use #rrggbb or a theme color: {names}")
+
+
+def largest_monitor() -> tuple[int, int]:
+    """The highest resolution of any connected monitor, from the kernel's list of modes,
+    so it works without Hyprland (install.sh runs from a console)."""
+    sizes = []
+    for conn in Path("/sys/class/drm").glob("card*-*"):
+        try:
+            if (conn / "status").read_text().strip() != "connected":
+                continue
+            for mode in (conn / "modes").read_text().split():
+                m = re.match(r"^(\d+)x(\d+)", mode)
+                if m:
+                    sizes.append((int(m.group(1)), int(m.group(2))))
+        except OSError:
+            continue
+    return max(sizes, key=lambda s: s[0] * s[1]) if sizes else (2560, 1440)
+
+
+def render(logo: Path, fg: str, bg: str, width: int, height: int, share: float, out: Path) -> None:
+    # The logo drawn like kitty draws it (logo-render.py), then centered on the color
+    with tempfile.TemporaryDirectory() as tmp:
+        mark = Path(tmp) / "logo.png"
+        subprocess.run(
+            [str(RENDER), "--logo", str(logo), "--color", fg, "--height", str(round(height * share)), "--out", str(mark)],
+            check=True,
+        )
+        subprocess.run(
+            ["magick", "-size", f"{width}x{height}", f"xc:{bg}", str(mark), "-gravity", "center",
+             "-composite", str(out)],
+            check=True,
+        )
+
+
+def split(value: str) -> list[str]:
+    return [v.strip() for v in value.split(",") if v.strip()]
+
+
+def main(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--bg", default="base")
+    parser.add_argument("--fg", default="accent2")
+    parser.add_argument("--size", default="30")
+    parser.add_argument("--res")
+    parser.add_argument("--output-dir", default=str(DEFAULT_DIR))
+    parser.add_argument("--logo", default=str(DEFAULT_LOGO))
+    parser.add_argument("-h", "--help", action="store_true")
+    args, rest = parser.parse_known_args(argv)
+    if args.help:
+        print(__doc__.strip())
+        return 0
+    if rest:
+        print(f"Unknown arguments: {' '.join(rest)}\n\n{__doc__.strip()}", file=sys.stderr)
+        return 2
+    if not shutil.which("magick"):
+        print("ImageMagick (magick) is needed", file=sys.stderr)
+        return 1
+
+    logo = Path(args.logo).expanduser()
+    if not logo.is_file():
+        print(f"No logo at {logo}", file=sys.stderr)
+        return 1
+    if args.res:
+        m = re.match(r"^(\d+)x(\d+)$", args.res)
+        if not m:
+            print("--res takes WxH, e.g. 2560x1440", file=sys.stderr)
+            return 2
+        width, height = int(m.group(1)), int(m.group(2))
+    else:
+        width, height = largest_monitor()
+    sizes = []
+    for s in split(args.size):
+        try:
+            value = float(s.rstrip("%"))
+        except ValueError:
+            value = 0
+        if not 1 <= value <= 100:
+            print(f"--size takes percents from 1 to 100, not '{s}'", file=sys.stderr)
+            return 2
+        sizes.append(value)
+
+    colors = theme_colors()
+    bgs = [resolve(c, colors) for c in split(args.bg)]
+    fgs = [resolve(c, colors) for c in split(args.fg)]
+
+    out_dir = Path(args.output_dir).expanduser()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    for (bg, bg_name), (fg, fg_name), size in itertools.product(bgs, fgs, sizes):
+        out = out_dir / f"dori-{fg_name}-on-{bg_name}-{size:g}.png"
+        render(logo, fg, bg, width, height, size / 100, out)
+        print(out)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

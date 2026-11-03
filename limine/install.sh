@@ -16,6 +16,7 @@
 # At boot, E on an entry edits its options for that boot only.
 set -euo pipefail
 
+here=$(dirname "$(readlink -f "$0")")
 esp=/efi
 kernels=/efi/arch
 mode=install
@@ -102,11 +103,11 @@ build=$(mktemp -d)
 trap 'rm -rf "$build"' EXIT
 
 wallpaper() {
-    local font logo_text lw lh top k line max_len=0 cols prefix center
-    font=$(fc-match -f '%{file}' "JetBrainsMono Nerd Font")
-    logo_text="$home/.config/fastfetch/fastfetch-logo.txt"
-    [[ -r $logo_text ]] || { echo "No fastfetch logo at $logo_text" >&2; exit 1; }
-    magick -background none -fill "$accent2" -font "$font" -pointsize $((9 * scale)) label:@"$logo_text" -trim +repage "$build/logo.png"
+    local logo_text lw lh top k line max_len=0 cols prefix center
+    logo_text="$home/.config/theme/logo/ascii-dori"
+    [[ -r $logo_text ]] || { echo "No logo at $logo_text" >&2; exit 1; }
+    # drawn like kitty draws it, in 12px rows (24 on large screens), by the dotfiles' logo-render.py
+    "$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$accent2" --cell-height $((12 * scale)) --out "$build/logo.png"
     lw=$(magick identify -format %w "$build/logo.png"); lh=$(magick identify -format %h "$build/logo.png")
     top=$(((res_h / cell_h - ${#found[@]} - 1) / 2 * cell_h))
     # Limine's centering (menu.c): each line is its tree marks plus " name ", the widest

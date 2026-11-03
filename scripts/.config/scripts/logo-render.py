@@ -1,0 +1,117 @@
+#!/usr/bin/env python3
+"""Draws the text logo (~/.config/theme/logo/ascii-dori) to a transparent PNG the way kitty
+draws it in a terminal: every character on a grid of cells twice as tall as wide, braille as
+2x4 dots and block characters (▄ ▌ ▙ ...) as exact rectangles filling their cell. Font glyphs
+for these don't fit the cell exactly, so text renderers leave seams and overlap rows; drawn
+as shapes the logo is sharp at any size and the same everywhere: the wallpaper
+(logo-wallpaper.py), the boot splash (plymouth/install.sh) and the boot menu
+(limine/install.sh), like fastfetch in kitty and the System Information window.
+
+  logo-render.py --color '#cba6f7' --cell-height 24 --out logo.png
+  logo-render.py --color '#cba6f7' --height 480 --out logo.png    the whole logo 480px high
+
+Options:
+  --color HEX          the logo's color (#rrggbb)
+  --cell-height PX     height of a character cell (its width is half), or
+  --height PX          the whole logo's height, rounded to whole cells
+  --out FILE           the PNG to write, trimmed to the logo
+  --logo FILE          another text logo (default: ~/.config/theme/logo/ascii-dori)
+
+Characters other than braille, blocks and spaces are skipped (the logo uses only those).
+Needs ImageMagick (magick).
+"""
+
+from __future__ import annotations
+
+import argparse
+import re
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+DEFAULT_LOGO = Path.home() / ".config/theme/logo/ascii-dori"
+
+# Block characters by the quarters they fill: upper left, upper right, lower left, lower right
+QUADRANTS = {
+    0x2580: (1, 1, 0, 0), 0x2584: (0, 0, 1, 1), 0x2588: (1, 1, 1, 1), 0x258C: (1, 0, 1, 0), 0x2590: (0, 1, 0, 1),
+    0x2596: (0, 0, 1, 0), 0x2597: (0, 0, 0, 1), 0x2598: (1, 0, 0, 0), 0x2599: (1, 0, 1, 1), 0x259A: (1, 0, 0, 1),
+    0x259B: (1, 1, 1, 0), 0x259C: (1, 1, 0, 1), 0x259D: (0, 1, 0, 0), 0x259E: (0, 1, 1, 0), 0x259F: (0, 1, 1, 1),
+}
+# Braille bit order: dots 1-3 down the left, 4-6 down the right, then 7 and 8 at the bottom
+BRAILLE = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (0, 3), (1, 3)]
+
+
+def rectangles(lines: list[str], w: int, h: int) -> list[tuple[int, int, int, int]]:
+    """(x, y, width, height) of every filled rectangle, cell by cell."""
+    out = []
+    dot = max(1, round(min(w / 2, h / 4) * 0.55))
+    for row, line in enumerate(lines):
+        for col, ch in enumerate(line):
+            x, y, code = col * w, row * h, ord(ch)
+            if 0x2801 <= code <= 0x28FF:
+                bits = code - 0x2800
+                for b, (cx, cy) in enumerate(BRAILLE):
+                    if bits & (1 << b):
+                        out.append((round(x + (cx + 0.5) * w / 2 - dot / 2), round(y + (cy + 0.5) * h / 4 - dot / 2), dot, dot))
+            elif code in QUADRANTS:
+                # the halves split at whole pixels, so neighbouring blocks meet without a seam
+                xs, ys = (x, x + w // 2, x + w), (y, y + h // 2, y + h)
+                for k, filled in enumerate(QUADRANTS[code]):
+                    if filled:
+                        i, j = k % 2, k // 2
+                        out.append((xs[i], ys[j], xs[i + 1] - xs[i], ys[j + 1] - ys[j]))
+    return out
+
+
+def render(logo: Path, color: str, cell_h: int, out: Path) -> None:
+    lines = logo.read_text(encoding="utf-8").rstrip("\n").split("\n")
+    w, h = max(1, round(cell_h / 2)), max(2, cell_h)
+    rects = rectangles(lines, w, h)
+    if not rects:
+        raise SystemExit(f"Nothing to draw in {logo}")
+    width = max(len(line) for line in lines) * w
+    height = len(lines) * h
+    with tempfile.TemporaryDirectory() as tmp:
+        mvg = Path(tmp) / "logo.mvg"
+        # MVG rectangles include both corners, hence the -1
+        mvg.write_text(f"fill '{color}'\n" + "".join(f"rectangle {x},{y} {x + rw - 1},{y + rh - 1}\n" for x, y, rw, rh in rects))
+        subprocess.run(
+            ["magick", "-size", f"{width}x{height}", "xc:none", "+antialias", "-draw", f"@{mvg}", "-trim", "+repage", str(out)],
+            check=True,
+        )
+
+
+def rows(logo: Path) -> int:
+    return len(logo.read_text(encoding="utf-8").rstrip("\n").split("\n"))
+
+
+def main(argv: list[str]) -> int:
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument("--color")
+    parser.add_argument("--cell-height", type=int)
+    parser.add_argument("--height", type=int)
+    parser.add_argument("--out")
+    parser.add_argument("--logo", default=str(DEFAULT_LOGO))
+    parser.add_argument("-h", "--help", action="store_true")
+    args, rest = parser.parse_known_args(argv)
+    if args.help:
+        print(__doc__.strip())
+        return 0
+    if rest or not args.color or not args.out or not (args.cell_height or args.height):
+        print(__doc__.strip(), file=sys.stderr)
+        return 2
+    if not re.match(r"^#[0-9a-fA-F]{6}$", args.color):
+        print(f"--color takes #rrggbb, not '{args.color}'", file=sys.stderr)
+        return 2
+    logo = Path(args.logo).expanduser()
+    if not logo.is_file():
+        print(f"No logo at {logo}", file=sys.stderr)
+        return 1
+    cell_h = args.cell_height or max(2, round(args.height / rows(logo)))
+    render(logo, args.color, cell_h, Path(args.out).expanduser())
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

@@ -65,7 +65,17 @@ Scope {
                 opacity: root.reveal
                 focus: root.shown && win.main
 
-                onFocusChanged: if (focus && !activeFocus) forceActiveFocus()
+                // Take keyboard focus when shown. One try per change: forceActiveFocus() changes
+                // focus itself, and while the window can't take it (not yet mapped, another
+                // monitor) this handler would call itself until the stack ran out.
+                property bool forcing: false
+                onFocusChanged: {
+                    if (focus && !activeFocus && !forcing) {
+                        forcing = true;
+                        forceActiveFocus();
+                        forcing = false;
+                    }
+                }
 
                 Keys.onPressed: event => {
                     const n = root.actions.length;

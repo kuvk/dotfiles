@@ -174,8 +174,11 @@ step "Theme"
 # The login screen first: theme-set.py writes its colors to the folder this makes
 sudo "$dotfiles/sddm/install.sh" >/dev/null
 "$HOME/.config/scripts/theme-set.py"
-# The bundled wallpaper on the desktop, lock screen and login screen, unless one is chosen
-"$HOME/.config/scripts/wallpaper.py" default
+# The logo in accent2 on base, at the highest resolution any monitor has: the desktop, lock
+# screen and login screen then match the boot splash and menu. Unless a wallpaper is chosen
+# already; the bundled one if drawing it fails.
+wall=$("$HOME/.config/scripts/logo-wallpaper.py" --bg base --fg accent2 --size 30 | tail -1) || wall=
+"$HOME/.config/scripts/wallpaper.py" default ${wall:+"$wall"}
 sudo "$HOME/.config/scripts/browser-theme-setup.sh"
 
 # --- Boot: initramfs, kernel options, splash, menu -------------------------------------------------------------
