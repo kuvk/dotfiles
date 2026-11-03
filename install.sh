@@ -174,6 +174,8 @@ step "Theme"
 # The login screen first: theme-set.py writes its colors to the folder this makes
 sudo "$dotfiles/sddm/install.sh" >/dev/null
 "$HOME/.config/scripts/theme-set.py"
+# The bundled wallpaper on the desktop, lock screen and login screen, unless one is chosen
+"$HOME/.config/scripts/wallpaper.py" default
 sudo "$HOME/.config/scripts/browser-theme-setup.sh"
 
 # --- Boot: initramfs, kernel options, splash, menu -------------------------------------------------------------
@@ -246,8 +248,7 @@ step "Done"
 cat <<MSG
 Reboot. After the first login, from the desktop:
 
-  ~/.config/scripts/wallpaper.py export-greeter      the login screen's wallpaper
-  ~/.config/scripts/hypr-monitors.py export-greeter  its monitor layout
+  ~/.config/scripts/hypr-monitors.py export-greeter   the login screen's monitor layout
 
 Backups of what this changed: /etc/pacman.conf.bak, /etc/mkinitcpio.conf.bak, the presets'
 .bak files and /etc/pacman.d/mirrorlist.bak.
