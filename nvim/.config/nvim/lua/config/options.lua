@@ -33,6 +33,14 @@ opt.fillchars = {
   horizup = "▀",
   horizdown = "▀",
 }
+
+-- Folds from treesitter, two levels deep at most, all open when a file opens; a folded line
+-- keeps its syntax colors. <leader>zo opens and <leader>zc closes (keymaps.lua)
+opt.foldmethod = "expr"
+opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+opt.foldnestmax = 2
+opt.foldlevelstart = 99
+opt.foldtext = ""
 opt.cursorline = true
 
 -- Turn off swap and enable mouse

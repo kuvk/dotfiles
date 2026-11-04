@@ -10,5 +10,15 @@ return {
       position = "bottom",
       size = 10,
     },
+    modes = {
+      -- Only problems in buffers you have open, not every file the language server checked
+      diagnostics = {
+        filter = function(items)
+          return vim.tbl_filter(function(item)
+            return item.buf and vim.api.nvim_buf_is_loaded(item.buf) and vim.bo[item.buf].buflisted
+          end, items)
+        end,
+      },
+    },
   },
 }

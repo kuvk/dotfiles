@@ -9,8 +9,10 @@ return {
     indent = {
       char = "▏",
     },
+    -- Only the guide of the block the cursor is in is colored (IblScope, theme.lua), in the
+    -- same thin character; no underline where it starts or ends
     scope = {
-      enabled = false,
+      enabled = true,
       show_start = false,
       show_end = false,
     },

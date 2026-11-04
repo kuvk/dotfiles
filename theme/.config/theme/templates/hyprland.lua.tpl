@@ -5,5 +5,5 @@ return {
   cursor_size = "{{ cursor_size }}",
   -- The same in every mode: the active window's border in full color, the others see-through
   active_border = "rgb({{ accent.hex }})",
-  inactive_border = "rgba({{ accent2.hex }}aa)",
+  inactive_border = "rgba({{ accent2.hex }}e6)",
 }

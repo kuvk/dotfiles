@@ -64,7 +64,7 @@ hl.config({
         border_size = 2,
         col = {
             active_border = 'rgb($accent)',
-            inactive_border = 'rgba(${accent2}aa)',
+            inactive_border = 'rgba(${accent2}e6)',
         },
     },
 })
@@ -90,7 +90,7 @@ hl.config({
         border_size = 2,
         col = {
             active_border = 'rgb($accent)',
-            inactive_border = 'rgba(${accent2}aa)',
+            inactive_border = 'rgba(${accent2}e6)',
         },
     },
 })
