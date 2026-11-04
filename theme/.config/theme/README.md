@@ -3,9 +3,11 @@
 One palette per theme, rendered into every app's format, with running apps reloaded.
 
 Besides the 26 color slots, a theme has three roles: `accent`, `accent2` and `accent3` (peach unless
-set). Settings > Appearance can pick another slot for each, per theme. Folders, the normal mode and
-active borders use `accent`; `accent2` the second color (selected items, visual mode, logos);
-`accent3` the third (insert mode, options and quotes while typing, symlinks, the prompt's frame).
+set). Settings > Appearance can pick another slot for each, per theme. Folders, the normal mode, TODO
+comments and the active window's border (full color) use `accent`; `accent2` the second color
+(selected items, visual mode, logos, NOTE comments, the current indent guide, the tmux command
+prompt, inactive borders, slightly see-through); `accent3` the third (insert mode, options while
+typing, symlinks, WARNING comments, the prompt's frame). FIXME comments are red.
 
 ```
 themes/<name>/colors.toml   the palette, the only file a theme needs
@@ -50,7 +52,7 @@ theme folder and set `wallpaper` under `[apps]`.
 | App | Reads | Reload |
 |---|---|---|
 | Quickshell | `current/quickshell.json` | live (file watch + IPC) |
-| Hyprland borders | `~/.config/hypr/configs/generated/theme.lua` | live (`hyprctl eval`) |
+| Hyprland borders | `~/.config/hypr/configs/generated/theme.lua`, the same in normal, Work and Game modes | live (`hyprctl eval`) |
 | kitty | `current/kitty.conf` | live (SIGUSR1) |
 | Neovim | `current/nvim.lua` | live (`lua/theme.lua` watches it) |
 | btop | `~/.config/btop/themes/current.theme` | live (SIGUSR2) |
@@ -64,7 +66,7 @@ theme folder and set `wallpaper` under `[apps]`.
 | cliamp | `~/.config/cliamp/themes/system.toml` | live (`cliamp theme system`) |
 | ls, eza, zsh completion | `current/ls_colors.zsh` (`dircolors` output of `current/dir_colors`): names in text, folders accent, links accent3, executables green | live in open shells (SIGUSR1) |
 | zsh while typing, eza | `current/zsh-colors.zsh`: zsh-syntax-highlighting styles and `EZA_COLORS` (names, links, permissions, size, user, date) | live in open shells (SIGUSR1) |
-| Icons (yazi, eza, Neovim) | `icons.toml`: folders by name (accent), the two link icons (accent3), file and extension overrides; everything else is each program's own. eza's `theme.yml` comes from yazi's icons plus this file (run `eza-icons.py` after changing it) | yazi on restart, eza next run, Neovim live |
+| Icons (yazi, eza, Neovim) | `icons.toml`: folders by name (accent), the link icons (accent3: a linked folder, a working link without an icon of its own, a broken link; eza can't tell a broken link and uses the name's icon), file and extension overrides; everything else is each program's own. eza's `theme.yml` comes from yazi's icons plus this file (run `eza-icons.py` after changing it) | yazi on restart, eza next run, Neovim live |
 | herdr | `~/.config/herdr/config.toml`, the whole file: edit `templates/herdr-config.toml.tpl`, not the output | live (`herdr server reload-config`) |
 | Qt apps | Kvantum theme `current` (`templates/kvantum-current.*`), `qt5ct.conf` and `qt6ct.conf`: edit the templates, not the output | when an app next starts |
 | KDE apps | `~/.config/kdeglobals` | when an app next starts |

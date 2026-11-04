@@ -17,7 +17,6 @@ qbittorrent
 remmina
 spotify-launcher
 timeshift
-virt-manager
 vlc
 libreoffice-fresh        # also yazi's office previews
 localsend-bin            # AUR
