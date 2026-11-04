@@ -32,7 +32,7 @@ can own the D-Bus name.
 | Battery, power mode (Quiet / Balanced / Performance) | `modules/dropdowns/BatteryDropdown.qml` | click the battery |
 | Night light | `scripts/nightlight-toggle.sh` + `services/System.qml` | the Control Center tile, or `SUPER+CTRL+N`; temperature and schedule in Settings |
 | Stay awake | `services/System.qml` | the coffee icon (holds an idle inhibitor); while media plays an inhibitor is held automatically |
-| Work-Game: **Work** mode (no blur, animations or rounding, own gaps, live wallpapers paused) and **Game** mode (the same, plus a plain US keyboard and Stay Awake) | `scripts/hypr-gamemode.sh` + `services/System.qml` | `SUPER+G` Work, `SUPER+CTRL+G` Game (each again for off); the rocket icon or Control Center tile goes normal, Work, Game. The icon is mauve in Work, peach in Game |
+| Work-Game: **Work** mode (no blur, animations or rounding, own gaps, live wallpapers paused) and **Game** mode (the same, plus a plain US keyboard and Stay Awake) | `scripts/hypr-gamemode.sh` + `services/System.qml` | `SUPER+G` Work, `SUPER+CTRL+G` Game (each again for off); the rocket icon or Control Center tile goes normal, Work, Game. The icon is mauve in Work, accent3 in Game |
 | Displays | `modules/displays/DisplaysPanel.qml` | the monitor icon, or `SUPER+CTRL+M` |
 | Notification popups, with actions and inline replies; web apps show their own name and icon | `modules/notifications/NotificationPopups.qml` | |
 | Clipboard history in RAM (a reboot wipes it): text and images, type to filter | `modules/launcher/Clipboard.qml` | `SUPER+SHIFT+V` |
@@ -40,10 +40,10 @@ can own the D-Bus name.
 | Search launcher (just the field; apps appear as you type) | `modules/launcher/Launcher.qml` | `SUPER+Space` |
 | App menu: categories on the left, apps on the right | `modules/launcher/AppMenu.qml` + `services/Apps.qml` | the Arch icon, or `SUPER+CTRL+Space` |
 | Theme carousel (each card the theme's palette as bars, type to search; other monitors are blurred) | `modules/themes/ThemePicker.qml` | `SUPER+CTRL+T`, or the Theme tile |
-| Power menu | `modules/powermenu/PowerMenu.qml` | `SUPER+CTRL+Q`, or the power icon |
+| Power menu (log out, reboot and shut down go through hyprshutdown, which closes apps first) | `modules/powermenu/PowerMenu.qml` | `SUPER+CTRL+Q`, or the power icon |
 | Lock screen | hyprlock with `scripts/lockscreen.sh` | `` SUPER+` ``, hypridle |
 | Wallpaper carousel (type to search; other monitors are blurred) | `modules/wallpaper/WallpaperPicker.qml` | `SUPER+W`, Tab for live wallpapers |
-| System information (fastfetch's output in a window sized to it) | `modules/sysinfo/SysinfoWindow.qml` | the ⓘ button in the app menu and Control Center |
+| System information (fastfetch's output drawn cell by cell like kitty, in a window sized to it; it opens once the output is ready, Ctrl+C copies it) | `modules/sysinfo/SysinfoWindow.qml` | the ⓘ button in the app menu and Control Center |
 | Keybindings (built from `bindings.lua`, type to filter) | `modules/keybinds/KeybindsWindow.qml` + `scripts/hypr-keybinds.py` | `SUPER+/` |
 | Settings | `modules/settings/SettingsWindow.qml` | `SUPER+CTRL+S`, or the gear in the Control Center |
 
@@ -72,12 +72,14 @@ Work-Game.
 Dropdowns slide out of the bar; one click anywhere outside closes them.
 Hovering a bar item shows a dot under it, an open dropdown an accent line.
 
-Preferences are set in Settings, one sidebar section each: Appearance (corner
-radius, cursor and size, icon theme, border width, opacity, animations), Fonts (a Nerd Font and a
+Preferences are set in Settings, one sidebar section each: Appearance (the three accents per theme,
+whether the wallpaper follows the theme, corner radius, cursor and size, icon theme, border width,
+opacity, animations), Fonts (a Nerd Font and a
 display font, "Nerd Fonts only" and "Use Nerd Symbols font" switches, hinting and antialiasing), Bar (full width or floating with
 margins and rounded corners, clock format, weather location and unit, and which modules show on the primary monitor's bar and on
 the others; the clock always shows), Windows (window buttons, gaps for regular
-and Work-Game), Notifications, Lock Screen (style and colors),
+and Work-Game), Notifications, Lock Screen (style; sections for the clock and date, avatar, box,
+password field and the login screen's power buttons),
 and Tray & Player (tray icon style, apps that keep their own colors, the
 visualizer and its bar count). They are saved to Quickshell's state folder
 (`~/.local/state/quickshell/by-shell/<id>/settings.json`). **Save as defaults** writes them to
@@ -100,6 +102,7 @@ icon, add its `notify-send -a` name to `appGlyphs` in `services/Notifs.qml`.
 |---|---|---|
 | Work-Game | `hypr-gamemode.sh` | Work or Game mode on, or off |
 | Theme | `theme-set.py` | a theme is applied by name, or applying fails |
+| Boot screens | `theme-set.py`, `theme-boot.sh` | the boot splash and menu use an older theme (with an Update button), or updating them finished or failed |
 | Wallpapers | `wallpaper.py` | live wallpapers pause or resume, none is running, or mpvpaper is missing |
 
 Screenshots (`hyprshot`) send their own notification. Neovim and yazi show theirs inside the app.
@@ -107,9 +110,11 @@ Screenshots (`hyprshot`) send their own notification. Neovim and yazi show their
 ## Lock screen
 
 Locking uses hyprlock (`~/.config/scripts/lockscreen.sh`), with the clock and password on the
-monitor focused when locking. Settings > Lock Screen sets its style and a color for the clock, date,
-avatar outline, box and input outline and background (with opacity), typing dots, user name, text,
-and the checking, wrong password and Caps Lock states:
+monitor focused when locking. Settings > Lock Screen sets its style, then in sections: the clock
+and date (on or off, one color), the avatar (on or off, outline), the box behind them (on or off,
+outline, background with opacity), the password field (outline, background with opacity, typing
+dots, user name, text, and the checking, wrong password and Caps Lock states) and the login
+screen's power buttons (background with opacity, icons, outline). The styles:
 
 - **Matrix**: a fullscreen kitty running unimatrix on every monitor, showing through hyprlock's
   transparent background (`misc:session_lock_xray`). It locks about a second later, once the
@@ -118,8 +123,8 @@ and the checking, wrong password and Caps Lock states:
 - **Image**: an image you choose, opaque; the wallpaper if none is chosen.
 - **Solid color**: a theme color you choose, opaque.
 
-The look is in `theme/.config/theme/templates/hyprlock.conf.tpl`. The login screen (`sddm/kuvk`) shares
-the colors and opacity and always uses the wallpaper as its background. hypridle runs the script on
+The look is in `theme/.config/theme/templates/hyprlock.conf.tpl`. The login screen (`sddm/kuvk`) uses
+the same settings and the same sizes and positions, and always the wallpaper as its background. hypridle runs the script on
 `loginctl lock-session` and before sleep.
 
 ## Web apps
@@ -138,7 +143,9 @@ Appearance > "Use system title bar and borders".
 `~/Pictures/Wallpapers` (hyprpaper), live ones in `~/Pictures/WallpapersLive`
 (mpvpaper, one process per monitor, paused while covered by windows). Enter
 applies to every monitor, Shift+Enter to the focused one only. The choice is
-saved and restored at login. `SUPER+CTRL+W` stops live wallpapers and
+saved and restored at login. With Settings > Appearance > Wallpaper follows theme on, each theme
+or accent change draws the logo in accent2 on base and sets it; picking another wallpaper turns it
+off. `SUPER+CTRL+W` stops live wallpapers and
 `SUPER+SHIFT+W` pauses them. Put source videos in `~/Pictures/WallpapersLive/source`
 and run `convert-live-wallpapers.py` to make lighter 1440p/30fps copies.
 
@@ -158,8 +165,10 @@ assign it to the selected monitor, click again to unassign it.
 In the panel you can drag monitors (they snap edge to edge), turn them on or
 off, pick the primary, change resolution and scale (only scales Hyprland
 accepts for that mode), set brightness (laptop backlight, or DDC/CI with
-`ddcutil`), assign workspaces, and set the text size in px. Text size sets the shell font, GTK's `text-scaling-factor` (rounded
-to whole points) and kitty's font size. Apply writes
+`ddcutil`), set variable refresh rate (off, always, fullscreen, fullscreen games and video; only
+where the screen supports it) and the color mode (sRGB, the panel's own colors from its EDID, and HDR
+where supported), assign workspaces, and set the text size in px. Text size sets the shell font, the
+GTK and Qt font size in points (13 px is 10 pt) and kitty's font size. Apply writes
 `~/.config/hypr/configs/generated/monitors.lua` and reloads Hyprland.
 Brightness changes right away.
 

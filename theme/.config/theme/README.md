@@ -2,6 +2,11 @@
 
 One palette per theme, rendered into every app's format, with running apps reloaded.
 
+Besides the 26 color slots, a theme has three roles: `accent`, `accent2` and `accent3` (peach unless
+set). Settings > Appearance can pick another slot for each, per theme. Folders, the normal mode and
+active borders use `accent`; `accent2` the second color (selected items, visual mode, logos);
+`accent3` the third (insert mode, quotes and pipes while typing, symlinks, the prompt's frame).
+
 ```
 themes/<name>/colors.toml   the palette, the only file a theme needs
 themes/<name>/<file>        optional: replaces the rendered file of the same name
@@ -57,7 +62,8 @@ theme folder and set `wallpaper` under `[apps]`.
 | cava | `~/.config/cava/themes/current` | live (SIGUSR2) |
 | Chromium, Brave | managed policy `BrowserThemeColor` (one-time `browser-theme-setup.sh`) | live |
 | cliamp | `~/.config/cliamp/themes/system.toml` | live (`cliamp theme system`) |
-| ls, eza, zsh completion | `current/ls_colors.zsh` (`dircolors` output of `current/dir_colors`) | live in open shells (SIGUSR1) |
+| ls, eza, zsh completion | `current/ls_colors.zsh` (`dircolors` output of `current/dir_colors`): folders accent, symlinks accent3, media accent2, archives yellow, spreadsheets green, documents blue, PDF and presentations maroon, executables green | live in open shells (SIGUSR1) |
+| zsh while typing, eza's long listing | `current/zsh-colors.zsh`: zsh-syntax-highlighting styles and `EZA_COLORS` (permissions, size, user, date) | live in open shells (SIGUSR1) |
 | herdr | `~/.config/herdr/config.toml`, the whole file: edit `templates/herdr-config.toml.tpl`, not the output | live (`herdr server reload-config`) |
 | Qt apps | Kvantum theme `current` (`templates/kvantum-current.*`), `qt5ct.conf` and `qt6ct.conf`: edit the templates, not the output | when an app next starts |
 | KDE apps | `~/.config/kdeglobals` | when an app next starts |
@@ -71,7 +77,9 @@ theme folder and set `wallpaper` under `[apps]`.
 | Window buttons | Settings > Windows; `theme-set.py` writes `gtk-decoration-layout` and `gsettings` (close only); `gtk.css` styles the button | GTK apps with a title bar, when reopened |
 | Login screen (SDDM) | `/var/lib/kuvk-shell/theme.conf`, once `sddm/install.sh` has run; colors come from Settings > Lock Screen | next logout |
 | swayimg | `current/swayimg.lua` (loaded by `~/.config/swayimg/init.lua`) | live (SIGUSR1) |
-| scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |
+| scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh`, `lockscreen.sh`, `theme-boot.sh` |
+| Boot splash (Plymouth), boot menu (Limine) | `current/colors.sh` and the logo, read when their installers run | after a theme change: the **Update** notification, or `theme-boot.sh` |
+| Wallpaper | Settings > Appearance > Wallpaper follows theme: the logo in accent2 on base, drawn per theme (`logo-wallpaper.py`) | on switch, with the lock and login screens |
 | GTK apps | adw-gtk3 if installed, otherwise Adwaita, in the theme's mode; icons and `color-scheme` through `gsettings` and `settings.ini`; colors in `~/.config/gtk-{3,4}.0/gtk.css` | mode live; colors when an app next starts |
 
 fastfetch uses `~/.config/fastfetch/config.jsonc`, generated from `base.jsonc` on each theme switch.
@@ -96,7 +104,7 @@ folder, or name the themes). A theme without icons uses Catppuccin Mocha's.
    are backgrounds from lightest to darkest,
    `surface*` are raised surfaces, `overlay*` are muted text, and `text`/`subtext*`
    are foregrounds.
-3. Set `accent` (borders, highlights) and `accent2` to a slot name or a hex value.
+3. Set `accent`, `accent2` and `accent3` to a slot name or a hex value (`accent3` is peach if left out).
 4. In `[apps]`, set `nvim_colorscheme`, and add its plugin to
    `nvim/lua/plugins/themes.lua` if it isn't there.
 5. Optional: `[terminal]` overrides for the 16 ANSI colors, `cursor`, and
