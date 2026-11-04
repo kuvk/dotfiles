@@ -3,8 +3,7 @@ return {
   name = "{{ theme }}",
   cursor_theme = "{{ cursor_theme }}",
   cursor_size = "{{ cursor_size }}",
-  active_border = "rgba({{ accent.hex }}ee)",
+  -- The same in every mode: the active window's border in full color, the others see-through
+  active_border = "rgb({{ accent.hex }})",
   inactive_border = "rgba({{ accent2.hex }}aa)",
-  active_border_opaque = "rgb({{ accent.hex }})",
-  inactive_border_opaque = "rgb({{ accent2.hex }})",
 }
