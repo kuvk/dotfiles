@@ -138,8 +138,7 @@ end
 Status:children_add(Status.files, 4000, Status.LEFT)
 Status:children_add(Status.modified, 0, Status.RIGHT)
 
--- Link targets like eza's: blue (theme's symlink_target), red when broken. On the hovered
--- file in the row's own highlight, so the whole row is one bar.
+-- Link targets like eza's: accent (theme's symlink_target), red when broken.
 function Entity:symlink()
   if not rt.mgr.show_symlink then
     return ""
@@ -149,10 +148,18 @@ function Entity:symlink()
     return ""
   end
   local span = ui.Span(string.format(" -> %s", to))
-  if self._file.is_hovered then
-    return span
-  elseif self._file.cha.is_orphan then
+  if self._file.cha.is_orphan then
     return span:fg(th.notify.title_error:fg() or "red")
   end
   return span:style(th.mgr.symlink_target)
+end
+
+-- The hovered file keeps its icon's own color (yazi drops it there, so the icon took the
+-- row's text color); the highlight is only the bar behind the row
+function Entity:icon()
+  local icon = th.icon:match(self._file, { hovered = self._file.is_hovered })
+  if not icon then
+    return ""
+  end
+  return ui.Line(icon.text .. " "):style(icon.style)
 end

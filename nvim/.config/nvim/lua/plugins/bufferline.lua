@@ -35,8 +35,8 @@ local options = {
   offsets = {
     {
       filetype = "neo-tree",
-      text = "File Explorer",
-      highlight = "StatusLine",
+      text = "Neo Tree",
+      highlight = "NeoTreeExplorerLabel", -- accent (lua/theme.lua)
       text_align = "left",
       -- covers the divider's column too, so the line beside the tree reaches the top
       padding = 1,

@@ -7,28 +7,39 @@ zle_highlight=(region:bg={{ selection_bg }},fg={{ selection_fg }} paste:none)
 HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg={{ selection_bg }},fg={{ selection_fg }}'
 HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='fg={{ red }},bold'
 # Command line while typing (zsh-syntax-highlighting; open shells pick up a theme change):
-# sudo and the like accent2, commands green, arguments and options accent, quoted text and
-# | > accent3, paths accent, unknown commands red
+# sudo and the like accent2, commands green, options accent3, other arguments text, paths
+# accent, quoted text blue, redirections (> >> <) subtext0, | && ; yellow, unknown commands red
 typeset -gA ZSH_HIGHLIGHT_STYLES
 ZSH_HIGHLIGHT_STYLES[precommand]='fg={{ accent2 }}'
 for _style in command builtin alias suffix-alias global-alias function hashed-command; do
     ZSH_HIGHLIGHT_STYLES[$_style]='fg={{ green }}'
 done
-for _style in default single-hyphen-option double-hyphen-option path path_prefix autodirectory; do
+ZSH_HIGHLIGHT_STYLES[default]='fg={{ text }}'
+for _style in path path_prefix autodirectory; do
     ZSH_HIGHLIGHT_STYLES[$_style]='fg={{ accent }}'
+done
+for _style in single-hyphen-option double-hyphen-option; do
+    ZSH_HIGHLIGHT_STYLES[$_style]='fg={{ accent3 }}'
 done
 for _style in single-quoted-argument double-quoted-argument dollar-quoted-argument back-quoted-argument \
     single-quoted-argument-unclosed double-quoted-argument-unclosed dollar-quoted-argument-unclosed \
-    back-quoted-argument-unclosed commandseparator redirection; do
-    ZSH_HIGHLIGHT_STYLES[$_style]='fg={{ accent3 }}'
+    back-quoted-argument-unclosed; do
+    ZSH_HIGHLIGHT_STYLES[$_style]='fg={{ blue }}'
 done
 unset _style
+ZSH_HIGHLIGHT_STYLES[redirection]='fg={{ subtext0 }}'
+ZSH_HIGHLIGHT_STYLES[commandseparator]='fg={{ yellow }}'
 ZSH_HIGHLIGHT_STYLES[unknown-token]='fg={{ red }}'
 # eza's long listing (file names use LS_COLORS): read accent2, write accent3, execute green;
 # size accent; user and group accent2, root red; date accent3; broken link targets red without the
-# underline (bO=0)
+# underline (bO=0); link names accent3, targets that exist accent. With a theme.yml (the
+# icons) eza reads file kinds from here only: folders accent, executables green, every other
+# name text (its own colors by file type off: im vi mu lo cr do co tm cm bu sc). Bold comes
+# after the color (…;1): with theme.yml eza drops a 24-bit color that has bold in front
 _r='{{ accent2.ansi }}' _w='{{ accent3.ansi }}' _x='{{ green.ansi }}'
 export EZA_COLORS="bO=0:ur=${_r}:gr=${_r}:tr=${_r}:uw=${_w}:gw=${_w}:tw=${_w}:ux=${_x}:ue=${_x}:gx=${_x}:tx=${_x}\
 :sn={{ accent.ansi }}:sb={{ accent.ansi }}:uu={{ accent2.ansi }}:uR={{ red.ansi }}:un={{ accent2.ansi }}\
-:gu={{ accent2.ansi }}:gR={{ red.ansi }}:gn={{ accent2.ansi }}:da={{ accent3.ansi }}"
+:gu={{ accent2.ansi }}:gR={{ red.ansi }}:gn={{ accent2.ansi }}:da={{ accent3.ansi }}\
+:ln={{ accent3.ansi }};1:lp={{ accent.ansi }}\
+:di={{ accent.ansi }};1:ex={{ green.ansi }};1:fi=0:im=0:vi=0:mu=0:lo=0:cr=0:do=0:co=0:tm=0:cm=0:bu=0:sc=0"
 unset _r _w _x

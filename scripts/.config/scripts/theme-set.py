@@ -68,6 +68,8 @@ EXTRA_DESTINATIONS = {
     ],
     "cliamp.toml": HOME / ".config/cliamp/themes/system.toml",
     "herdr-config.toml": HOME / ".config/herdr/config.toml",
+    # eza's icons, the same as yazi's (theme/eza-icons.py writes the template)
+    "eza-theme.yml": HOME / ".config/eza/theme.yml",
     # GTK adds these to whatever theme is set
     "gtk.css": HOME / ".config/gtk-3.0/gtk.css",
     "gtk4.css": HOME / ".config/gtk-4.0/gtk.css",
@@ -153,6 +155,47 @@ def current_shape() -> str:
         return (CURRENT_DIR / "shape").read_text().strip()
     except FileNotFoundError:
         return "rounded"
+
+
+ICONS_FILE = THEME_DIR / "icons.toml"
+
+
+def icon_strings(colors: dict) -> dict:
+    """icons.toml as yazi [icon] lines and a Lua table for Neovim, in this theme's colors:
+    folders accent, links accent3, files and extensions in their own color (a theme color
+    name or #hex)."""
+    try:
+        icons = tomllib.loads(ICONS_FILE.read_text())
+    except (OSError, tomllib.TOMLDecodeError) as e:
+        print(f"theme-set: {ICONS_FILE}: {e}", file=sys.stderr)
+        icons = {}
+    color = lambda c: colors.get(c, c if HEX_RE.match(c or "") else colors["text"])
+    toml = lambda v: json.dumps(v, ensure_ascii=False)
+    dirs = [(n, d["icon"]) for d in icons.get("dir", []) for n in d.get("names", [])]
+    files = [(n, f["icon"], color(f.get("color", "text"))) for f in icons.get("file", []) for n in f.get("names", [])]
+    exts = [(n, e["icon"], color(e.get("color", "text"))) for e in icons.get("ext", []) for n in e.get("names", [])]
+    link = icons.get("link", {})
+    lua = lambda v: json.dumps(v, ensure_ascii=False)  # a JSON string is a Lua string literal
+    lua_entries = lambda rows: "{ " + ", ".join(f"[{lua(n)}] = {{ {lua(i)}, {lua(c)} }}" for n, i, c in rows) + " }"
+    return {
+        "yazi_icon_dirs": "\n".join(f'\t{{ name = {toml(n)}, text = {toml(i)}, fg = {toml(colors["accent"])} }},' for n, i in dirs),
+        "yazi_icon_files": "\n".join(f'\t{{ name = {toml(n)}, text = {toml(i)}, fg = {toml(c)} }},' for n, i, c in files),
+        "yazi_icon_exts": "\n".join(f'\t{{ name = {toml(n)}, text = {toml(i)}, fg = {toml(c)} }},' for n, i, c in exts),
+        "icon_link_dir": toml(link.get("dir", "\ue5ff"))[1:-1],
+        "icon_link_file": toml(link.get("file", "\uf15b"))[1:-1],
+        "icon_link_broken": toml(link.get("broken", "\U000f086f"))[1:-1],
+        "nvim_icons": "{ dirs = { " + ", ".join(f"[{lua(n)}] = {lua(i)}" for n, i in dirs) + " }, files = "
+        + lua_entries(files) + ", exts = " + lua_entries(exts)
+        + f", link_dir = {lua(link.get('dir', chr(0xe5ff)))}, link_file = {lua(link.get('file', chr(0xf15b)))}"
+        + f", link_broken = {lua(link.get('broken', chr(0xf086f)))} }}",
+    }
+
+
+def blend(a: str, b: str, amount: float) -> str:
+    """b mixed into a by amount (0..1), as #rrggbb."""
+    ca = [int(a[i:i + 2], 16) for i in (1, 3, 5)]
+    cb = [int(b[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#" + "".join(f"{round(x + (y - x) * amount):02x}" for x, y in zip(ca, cb))
 
 
 def shell_settings() -> dict:
@@ -298,6 +341,9 @@ def load_theme(name: str) -> dict:
         "font_hinting": hinting,
         "font_antialiasing": antialiasing,
         "gtk_font_pt": str(gtk_font_pt()),
+        # the cursor line in Neovim's neo-tree (Catppuccin's: surface0 64% over base); yazi's
+        # hover highlight uses it too
+        "cursorline": blend(colors["base"], colors["surface0"], 0.64),
         # yazi's hover highlight ends: rounded caps, or full blocks. yazi draws these in the
         # highlight's color (a space would come out in the background's), so either way the
         # bar starts one character before the icon.
@@ -344,6 +390,7 @@ def load_theme(name: str) -> dict:
     }
     for key, value in data.get("apps", {}).items():
         strings[key] = str(value)
+    strings.update(icon_strings(colors))  # icons.toml: folder, file and link icons
 
     return {"colors": colors, "strings": strings, "dir": path.parent}
 

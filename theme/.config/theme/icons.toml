@@ -1,0 +1,105 @@
+# Icons for yazi, eza and Neovim (neo-tree, nvim-web-devicons). theme-set.py applies this file on
+# every theme change; eza also needs `~/.config/theme/eza-icons.py` after a change here.
+#
+# Anything not listed keeps each program's own icons (yazi's and Neovim's both come from
+# nvim-web-devicons; eza's theme.yml is made from yazi's). Glyphs are Nerd Font characters:
+# paste one, or write "\uf115", or "\U000f086f" for those above U+FFFF.
+
+# Folders by name, in the theme's accent. Names match exactly, so list every spelling.
+
+[[dir]]
+names = [".config"]
+icon = ""
+
+[[dir]]
+names = [".git"]
+icon = ""
+
+[[dir]]
+names = [".github"]
+icon = ""
+
+[[dir]]
+names = [".npm"]
+icon = ""
+
+[[dir]]
+names = ["PROJECTS", "Projects", "projects"]
+icon = "󰲋"
+
+[[dir]]
+names = ["DESKTOP", "Desktop", "desktop"]
+icon = ""
+
+[[dir]]
+names = ["DEVELOPMENT", "Development", "development"]
+icon = "󰵮"
+
+[[dir]]
+names = ["DOCUMENTS", "Documents", "documents"]
+icon = "󰲂"
+
+[[dir]]
+names = ["DOWNLOADS", "Downloads", "downloads"]
+icon = "󰉍"
+
+[[dir]]
+names = ["LIBRARY", "Library", "library"]
+icon = ""
+
+[[dir]]
+names = ["MOVIES", "Movies", "movies"]
+icon = ""
+
+[[dir]]
+names = ["MUSIC", "Music", "music"]
+icon = "󱍙"
+
+[[dir]]
+names = ["PICTURES", "Pictures", "pictures"]
+icon = "󰉏"
+
+[[dir]]
+names = ["PUBLIC", "Public", "public"]
+icon = ""
+
+[[dir]]
+names = ["VIDEOS", "Videos", "videos"]
+icon = ""
+
+[[dir]]
+names = ["FILMS", "Films", "films"]
+icon = "󰨜"
+
+[[dir]]
+names = ["SERIES", "Series", "series", "SHOWS", "Shows", "shows"]
+icon = "󰟴"
+# Links, in accent3 (eza draws its own, these match it): a linked folder; a working link to a
+# file without an icon of its own (one with an icon shows that icon in its color); a broken link.
+[link]
+dir = "\ue5ff"
+file = "\uf15b"
+broken = "\U000f086f"
+
+# .tmux is a plain folder (eza gives it tmux's icon); the icon goes to tmux's config file below
+[[dir]]
+names = [".tmux"]
+icon = "\ue5ff"
+
+[[file]]
+names = [".tmux.conf", "tmux.conf"]
+icon = "\uebc8"
+color = "#14ba19"
+
+# Files by exact name or by extension, on top of the programs' own icons. color: a theme color
+# (accent, accent2, accent3, red, green, ...) or "#rrggbb". For example:
+#
+# [[file]]
+# names = ["Makefile", "makefile"]
+# icon = "\ue779"
+# color = "accent2"
+#
+# [[ext]]
+# names = ["kdbx"]
+# icon = "\uf084"
+# color = "yellow"
