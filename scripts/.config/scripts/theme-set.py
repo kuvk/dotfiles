@@ -591,7 +591,7 @@ def reload_apps(theme: dict) -> None:
     if hypr_running():
         # Same in every mode (hyprland.lua.tpl): active in full color, inactive see-through
         active = f"rgb({colors['accent'][1:]})"
-        inactive = f"rgba({colors['accent2'][1:]}aa)"
+        inactive = f"rgba({colors['accent2'][1:]}e6)"
         run_quiet([
             "hyprctl", "eval",
             f"hl.config({{ general = {{ col = {{ active_border = '{active}', inactive_border = '{inactive}' }} }} }})",

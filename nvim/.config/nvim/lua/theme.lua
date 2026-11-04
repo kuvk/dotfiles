@@ -54,8 +54,18 @@ local function custom_highlights()
   local divider = tree and string.format("#%06x", tree) or p.dark_bg
   set(0, "WinSeparator", { fg = divider })
   set(0, "NeoTreeWinSeparator", { fg = divider })
-  -- TODO in comments, as text without a background
+  -- Trouble in the editor's background, like a file; its cursor line is CursorLine
+  local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
+  set(0, "TroubleNormal", { bg = normal })
+  set(0, "TroubleNormalNC", { bg = normal })
+  -- Indent guides: the current block's in accent2, the rest as the colorscheme draws them
+  set(0, "IblScope", { fg = M.accent2 })
+  -- Keywords in comments (treesitter's comment parser), as bold text without a background:
+  -- TODO WIP accent; NOTE INFO XXX accent2; WARNING HACK FIX accent3; FIXME BUG ERROR red
   set(0, "@comment.todo", { fg = p.accent, bold = true })
+  set(0, "@comment.note", { fg = M.accent2, bold = true })
+  set(0, "@comment.warning", { fg = M.accent3, bold = true })
+  set(0, "@comment.error", { fg = p.red, bold = true })
   -- Command and search windows (noice.lua)
   -- Command line and search popups: borders green like lualine's command mode, which both
   -- are; the icon in accent, the typed text in accent2
