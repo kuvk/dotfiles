@@ -5,7 +5,7 @@ One palette per theme, rendered into every app's format, with running apps reloa
 Besides the 26 color slots, a theme has three roles: `accent`, `accent2` and `accent3` (peach unless
 set). Settings > Appearance can pick another slot for each, per theme. Folders, the normal mode and
 active borders use `accent`; `accent2` the second color (selected items, visual mode, logos);
-`accent3` the third (insert mode, quotes and pipes while typing, symlinks, the prompt's frame).
+`accent3` the third (insert mode, options and quotes while typing, symlinks, the prompt's frame).
 
 ```
 themes/<name>/colors.toml   the palette, the only file a theme needs
@@ -62,8 +62,9 @@ theme folder and set `wallpaper` under `[apps]`.
 | cava | `~/.config/cava/themes/current` | live (SIGUSR2) |
 | Chromium, Brave | managed policy `BrowserThemeColor` (one-time `browser-theme-setup.sh`) | live |
 | cliamp | `~/.config/cliamp/themes/system.toml` | live (`cliamp theme system`) |
-| ls, eza, zsh completion | `current/ls_colors.zsh` (`dircolors` output of `current/dir_colors`): folders accent, symlinks accent3, media accent2, archives yellow, spreadsheets green, documents blue, PDF and presentations maroon, executables green | live in open shells (SIGUSR1) |
-| zsh while typing, eza's long listing | `current/zsh-colors.zsh`: zsh-syntax-highlighting styles and `EZA_COLORS` (permissions, size, user, date) | live in open shells (SIGUSR1) |
+| ls, eza, zsh completion | `current/ls_colors.zsh` (`dircolors` output of `current/dir_colors`): names in text, folders accent, links accent3, executables green | live in open shells (SIGUSR1) |
+| zsh while typing, eza | `current/zsh-colors.zsh`: zsh-syntax-highlighting styles and `EZA_COLORS` (names, links, permissions, size, user, date) | live in open shells (SIGUSR1) |
+| Icons (yazi, eza, Neovim) | `icons.toml`: folders by name (accent), the two link icons (accent3), file and extension overrides; everything else is each program's own. eza's `theme.yml` comes from yazi's icons plus this file (run `eza-icons.py` after changing it) | yazi on restart, eza next run, Neovim live |
 | herdr | `~/.config/herdr/config.toml`, the whole file: edit `templates/herdr-config.toml.tpl`, not the output | live (`herdr server reload-config`) |
 | Qt apps | Kvantum theme `current` (`templates/kvantum-current.*`), `qt5ct.conf` and `qt6ct.conf`: edit the templates, not the output | when an app next starts |
 | KDE apps | `~/.config/kdeglobals` | when an app next starts |

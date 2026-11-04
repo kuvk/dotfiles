@@ -5,6 +5,10 @@ return {
   background = "{{ mode }}",
   accent2 = "{{ accent2 }}",
   accent3 = "{{ accent3 }}",
+  -- the cursor line in every window and neo-tree, and yazi's hover highlight
+  cursorline = "{{ cursorline }}",
+  -- icons.toml: folders by name, files and extensions, links (neo-tree, nvim-web-devicons)
+  icons = {{ nvim_icons }},
   yank = { bg = "{{ accent }}", fg = "{{ surface1 }}" },
   selection = { bg = "{{ selection_bg }}", fg = "{{ selection_fg }}" },
   -- Palette for the aether colorscheme, used by themes without their own

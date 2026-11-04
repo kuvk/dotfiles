@@ -1,5 +1,21 @@
 {
-  "accentOverrides": {},
+  "accentOverrides": {
+    "catppuccin-mocha": {
+      "accent": "blue",
+      "accent2": "mauve",
+      "accent3": "peach"
+    },
+    "gruvbox": {
+      "accent": "blue",
+      "accent2": "peach",
+      "accent3": "mauve"
+    },
+    "tokyo-night": {
+      "accent": "teal",
+      "accent2": "peach",
+      "accent3": "mauve"
+    }
+  },
   "animations": true,
   "barFloating": false,
   "barHiddenOthers": [
@@ -15,7 +31,7 @@
   ],
   "barMargin": 6,
   "barOpacity": 0.85,
-  "borderWidth": 1,
+  "borderWidth": 2,
   "cava": true,
   "cavaBars": 40,
   "clockFormat": "dddd HH:mm",
@@ -44,7 +60,7 @@
   "lockFailColor": "red",
   "lockImage": "/home/kuvk/Pictures/Wallpapers/dori-accent2-on-base-30.png",
   "lockInputColor": "subtext0",
-  "lockInputOpacity": 25,
+  "lockInputOpacity": 30,
   "lockInputOutlineColor": "accent",
   "lockMatrixColor": "magenta",
   "lockPowerColor": "base",
@@ -52,7 +68,7 @@
   "lockPowerOpacity": 85,
   "lockPowerOutlineColor": "accent",
   "lockSolidColor": "base",
-  "lockStyle": "image",
+  "lockStyle": "picture",
   "lockTextColor": "text",
   "lockUserColor": "accent",
   "nerdFont": "JetBrainsMono Nerd Font",
@@ -61,13 +77,14 @@
   "nightlightEnd": "07:00",
   "nightlightSchedule": false,
   "nightlightStart": "20:00",
-  "nightlightTemperature": 4200,
+  "nightlightTemperature": 4400,
   "notificationTimeout": 5,
   "panelOpacity": 0.85,
   "radius": 8,
   "trayKeepColors": "",
   "trayMonochrome": false,
   "trayTint": false,
+  "wallpaperFollowsTheme": true,
   "weatherFahrenheit": false,
   "weatherLocation": "",
   "windowButtons": false

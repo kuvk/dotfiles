@@ -20,14 +20,14 @@ marker_marked   = { fg = "{{ teal }}", bg = "{{ teal }}" }
 marker_selected = { fg = "{{ yellow }}", bg = "{{ yellow }}" }
 
 # Count
-symlink_target = { fg = "{{ blue }}" }
+symlink_target = { fg = "{{ accent }}" }
 count_copied   = { fg = "{{ base }}", bg = "{{ green }}" }
 count_cut      = { fg = "{{ base }}", bg = "{{ red }}" }
 count_selected = { fg = "{{ base }}", bg = "{{ yellow }}" }
 
-# Border: the dividers between columns, in accent2
+# Border: the dividers between columns
 border_symbol = "│"
-border_style  = { fg = "{{ accent2 }}" }
+border_style  = { fg = "{{ overlay1 }}" }
 
 # : }}}
 
@@ -46,9 +46,9 @@ inactive = { fg = "{{ blue }}", bg = "{{ surface0 }}" }
 [status]
 # Permissions
 perm_sep   = { fg = "{{ overlay1 }}" }
-perm_type  = { fg = "{{ blue }}" }
-perm_read  = { fg = "{{ yellow }}" }
-perm_write = { fg = "{{ red }}" }
+perm_type  = { fg = "{{ accent }}" }
+perm_read  = { fg = "{{ accent2 }}" }
+perm_write = { fg = "{{ accent3 }}" }
 perm_exec  = { fg = "{{ green }}" }
 
 # Progress
@@ -62,7 +62,7 @@ progress_error  = { fg = "{{ yellow }}", bg = "{{ red }}" }
 # : Pick {{{
 
 [pick]
-border   = { fg = "{{ blue }}" }
+border   = { fg = "{{ accent }}" }
 active   = { fg = "{{ pink }}", bold = true }
 inactive = {}
 
@@ -72,7 +72,7 @@ inactive = {}
 # : Input {{{
 
 [input]
-border   = { fg = "{{ blue }}" }
+border   = { fg = "{{ accent }}" }
 title    = {}
 value    = {}
 selected = { reversed = true }
@@ -83,7 +83,7 @@ selected = { reversed = true }
 # : Completion {{{
 
 [cmp]
-border = { fg = "{{ blue }}" }
+border = { fg = "{{ accent }}" }
 
 # : }}}
 
@@ -91,7 +91,7 @@ border = { fg = "{{ blue }}" }
 # : Tasks {{{
 
 [tasks]
-border  = { fg = "{{ blue }}" }
+border  = { fg = "{{ accent }}" }
 title   = {}
 hovered = { fg = "{{ pink }}", bold = true }
 
@@ -129,8 +129,8 @@ footer  = { fg = "{{ surface0 }}", bg = "{{ text }}" }
 # : Spotter {{{
 
 [spot]
-border   = { fg = "{{ blue }}" }
-title    = { fg = "{{ blue }}" }
+border   = { fg = "{{ accent }}" }
+title    = { fg = "{{ accent }}" }
 tbl_col  = { fg = "{{ teal }}" }
 tbl_cell = { fg = "{{ pink }}", bg = "{{ surface1 }}" }
 
@@ -166,121 +166,60 @@ select_alt  = { fg = "{{ accent2 }}", bg = "{{ surface0 }}" }
 unset_main = { fg = "{{ base }}", bg = "{{ accent2 }}", bold = true }
 unset_alt  = { fg = "{{ accent2 }}", bg = "{{ surface0 }}" }
 
-# The hovered file: in its own color as the background, in the current and parent columns; a
-# quieter surface0 one in the preview column. The ends are rounded, or square in Work-Game.
+# The hovered file: a bar in neo-tree's cursor line color behind it (the text keeps its own
+# color), in every column. Rounded ends, or square ones in Work-Game.
 [indicator]
-parent  = { reversed = true }
-current = { reversed = true }
-preview = { bg = "{{ surface0 }}" }
+parent  = { bg = "{{ cursorline }}" }
+current = { bg = "{{ cursorline }}" }
+preview = { bg = "{{ cursorline }}" }
 padding = { open = "{{ yazi_pad_open }}", close = "{{ yazi_pad_close }}" }
 
 [filetype]
 rules = [
-	# Links (broken ones too) and executables first: an executable file shows green whatever
-	# its type, so stray executable bits stand out
+	# Names in text; a file's type shows in its icon ([icon] below). Links (broken ones too)
+	# accent3, executable files green, folders accent.
 	{ url = "*", is = "orphan", fg = "{{ accent3 }}", bold = true },
 	{ url = "*/", is = "orphan", fg = "{{ accent3 }}", bold = true },
 	{ url = "*", is = "link", fg = "{{ accent3 }}", bold = true },
 	{ url = "*/", is = "link", fg = "{{ accent3 }}", bold = true },
 	{ url = "*", is = "exec", fg = "{{ green }}", bold = true },
-	# Image and media
-	{ mime = "**/image/*", fg = "{{ accent2 }}", bold = true },
-	{ mime = "**/video/*", fg = "{{ accent2 }}", bold = true },
-	{ mime = "**/audio/*", fg = "{{ teal }}" },
-	# Archives yellow
-	{ mime = "**/application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*,x-iso9660-image}", fg = "{{ yellow }}", bold = true },
-	# Documents: spreadsheets green, text documents blue, PDF and presentations maroon
-	{ mime = "**/application/{vnd.,}openxmlformats-officedocument.spreadsheetml*", fg = "{{ green }}" },
-	{ mime = "**/application/{vnd.,}oasis.opendocument.spreadsheet*", fg = "{{ green }}" },
-	{ mime = "**/application/{vnd.,}ms-excel*", fg = "{{ green }}" },
-	{ mime = "**/text/csv", fg = "{{ green }}" },
-	{ mime = "**/application/{vnd.,}openxmlformats-officedocument.wordprocessingml*", fg = "{{ blue }}" },
-	{ mime = "**/application/{vnd.,}oasis.opendocument.text*", fg = "{{ blue }}" },
-	{ mime = "**/application/{msword,rtf}", fg = "{{ blue }}" },
-	{ mime = "**/text/rtf", fg = "{{ blue }}" },
-	{ mime = "**/application/pdf", fg = "{{ maroon }}" },
-	{ mime = "**/application/{vnd.,}openxmlformats-officedocument.presentationml*", fg = "{{ maroon }}" },
-	{ mime = "**/application/{vnd.,}oasis.opendocument.presentation*", fg = "{{ maroon }}" },
-	{ mime = "**/application/{vnd.,}ms-powerpoint*", fg = "{{ maroon }}" },
-	# Virtual file system
 	{ mime = "vfs/{absent,stale}", fg = "{{ overlay2 }}" },
-	# By name too: the MIME rules above apply only once yazi has read a file's type, which it
-	# hasn't yet for files in the preview column
-	{ url = "*.{png,jpg,jpeg,gif,webp,bmp,svg,ico,tif,tiff,avif,heic}", fg = "{{ accent2 }}", bold = true },
-	{ url = "*.{mp4,mkv,webm,mov,avi,m4v}", fg = "{{ accent2 }}", bold = true },
-	{ url = "*.{mp3,flac,ogg,opus,wav,wma,m4a,aac,alac,aiff,ape}", fg = "{{ teal }}" },
-	{ url = "*.{zip,rar,7z,tar,gz,tgz,xz,zst,bz2,lz,lzma,cab,iso}", fg = "{{ yellow }}", bold = true },
-	{ url = "*.{xls,xlsx,ods,csv}", fg = "{{ green }}" },
-	{ url = "*.{doc,docx,odt,rtf}", fg = "{{ blue }}" },
-	{ url = "*.{pdf,ppt,pptx,odp}", fg = "{{ maroon }}" },
-	# Fallback
 	{ url = "*", fg = "{{ text }}" },
 	{ url = "*/", fg = "{{ accent }}", bold = true },
 ]
 
 [icon]
+# Folders in accent and links in accent3; every file keeps yazi's own icon and color (its
+# defaults come from nvim-web-devicons, like Neovim's). eza shows the same ones
+# (templates/eza-theme.yml.tpl, written by eza-icons.py).
+# From icons.toml (theme-set.py fills these in): folders by name in accent, and any file
+# names and extensions listed there
 dirs = [
-	{ name = ".config", text = "", fg = "{{ accent3 }}" },
-	{ name = ".git", text = "", fg = "{{ accent }}" },
-	{ name = ".github", text = "", fg = "{{ accent }}" },
-	{ name = ".npm", text = "", fg = "{{ accent }}" },
-	{ name = "Projects", text = "", fg = "{{ accent }}" },
-	{ name = "projects", text = "", fg = "{{ accent }}" },
-	{ name = "Desktop", text = "", fg = "{{ accent }}" },
-	{ name = "Development", text = "", fg = "{{ accent }}" },
-	{ name = "Documents", text = "󰲂", fg = "{{ accent }}" },
-	{ name = "Downloads", text = "󰉍", fg = "{{ accent }}" },
-	{ name = "Library", text = "", fg = "{{ accent }}" },
-	{ name = "Movies", text = "", fg = "{{ accent }}" },
-	{ name = "Music", text = "󱍙", fg = "{{ accent }}" },
-	{ name = "Pictures", text = "󰉏", fg = "{{ accent }}" },
-	{ name = "Public", text = "", fg = "{{ accent }}" },
-	{ name = "Videos", text = "", fg = "{{ accent }}" },
+{{ yazi_icon_dirs }}
+]
+prepend_files = [
+{{ yazi_icon_files }}
+]
+prepend_exts = [
+{{ yazi_icon_exts }}
 ]
 conds = [
+	# Links, like eza (icons.toml [link], accent3): a linked folder; a broken link; a working
+	# link to a file without an icon of its own (one with an icon matched it above, by name)
+	{ if = "link & dir", text = "{{ icon_link_dir }}", fg = "{{ accent3 }}" },
+	{ if = "orphan", text = "{{ icon_link_broken }}", fg = "{{ accent3 }}" },
+	{ if = "link", text = "{{ icon_link_file }}", fg = "{{ accent3 }}" },
 	# Special files
-	{ if = "orphan", text = "󰡯", fg = "{{ accent3 }}" },
-	{ if = "link", text = "󰡯", fg = "{{ accent3 }}" },
-	{ if = "block", text = "", fg = "{{ flamingo }}" },
-	{ if = "char", text = "", fg = "{{ flamingo }}" },
-	{ if = "fifo", text = "", fg = "{{ flamingo }}" },
-	{ if = "sock", text = "", fg = "{{ flamingo }}" },
-	{ if = "sticky", text = "", fg = "{{ flamingo }}" },
-	{ if = "dummy", text = "", fg = "{{ red }}" },
+	{ if = "block", text = "", fg = "#cddc39" },
+	{ if = "char", text = "", fg = "#cddc39" },
+	{ if = "fifo", text = "", fg = "#cddc39" },
+	{ if = "sock", text = "", fg = "#cddc39" },
+	{ if = "sticky", text = "", fg = "#cddc39" },
+	{ if = "dummy", text = "", fg = "#f44336" },
 
-	# Fallback
+	# Fallback (an open folder on the hovered one, as yazi does)
+	{ if = "dir & hovered", text = "\ue5fe", fg = "{{ accent }}" },
 	{ if = "dir", text = "", fg = "{{ accent }}" },
-	{ if = "exec", text = "", fg = "{{ green }}" },
-	{ if = "!dir", text = "", fg = "{{ subtext1 }}" },
-]
-# Same glyphs and colors as eza
-prepend_exts = [
-	{ name = "png", text = "", fg = "{{ accent2 }}" },
-	{ name = "jpg", text = "", fg = "{{ accent2 }}" },
-	{ name = "jpeg", text = "", fg = "{{ accent2 }}" },
-	{ name = "webp", text = "", fg = "{{ accent2 }}" },
-	{ name = "mp4", text = "", fg = "{{ accent2 }}" },
-	{ name = "mkv", text = "", fg = "{{ accent2 }}" },
-	{ name = "webm", text = "", fg = "{{ accent2 }}" },
-	{ name = "mp3", text = "", fg = "{{ teal }}" },
-	{ name = "flac", text = "", fg = "{{ teal }}" },
-	{ name = "wav", text = "", fg = "{{ teal }}" },
-	{ name = "wma", text = "", fg = "{{ teal }}" },
-	{ name = "ogg", text = "", fg = "{{ teal }}" },
-	{ name = "opus", text = "", fg = "{{ teal }}" },
-	{ name = "m4a", text = "", fg = "{{ teal }}" },
-	{ name = "aac", text = "", fg = "{{ teal }}" },
-	{ name = "alac", text = "", fg = "{{ teal }}" },
-	{ name = "aiff", text = "", fg = "{{ teal }}" },
-	{ name = "ape", text = "", fg = "{{ teal }}" },
-	{ name = "pdf", text = "", fg = "{{ maroon }}" },
-	{ name = "zip", text = "", fg = "{{ yellow }}" },
-	{ name = "gz", text = "", fg = "{{ yellow }}" },
-	{ name = "tar", text = "", fg = "{{ yellow }}" },
-	{ name = "txt", text = "", fg = "{{ text }}" },
-	{ name = "md", text = "", fg = "{{ text }}" },
-	{ name = "sh", text = "", fg = "{{ text }}" },
-	{ name = "py", text = "", fg = "{{ accent3 }}" },
-	{ name = "lua", text = "", fg = "{{ accent3 }}" },
-	{ name = "json", text = "", fg = "{{ text }}" },
+	{ if = "exec", text = "", fg = "#8bc34a" },
+	{ if = "!dir", text = "", fg = "{{ text }}" },
 ]

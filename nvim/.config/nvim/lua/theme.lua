@@ -67,6 +67,29 @@ local function custom_highlights()
   end
   local popup = vim.api.nvim_get_hl(0, { name = "NoiceCmdlinePopup", link = false })
   set(0, "NoiceCmdlinePopup", { fg = M.accent2, bg = popup.bg })
+  -- Folders in accent, like yazi, eza and ls: neo-tree, the completion menu's folder kind and
+  -- everything that uses Directory (file pickers, :e completion, netrw)
+  for _, group in ipairs({ "Directory", "NeoTreeDirectoryIcon", "NeoTreeDirectoryName", "BlinkCmpKindFolder", "CmpItemKindFolder" }) do
+    set(0, group, { fg = p.accent })
+  end
+  set(0, "NeoTreeRootName", { fg = p.accent, bold = true })
+  -- Files without an icon of their own in text, as in yazi and eza
+  set(0, "NeoTreeFileIcon", { fg = p.fg })
+  -- One cursor line everywhere: the editor, neo-tree, and yazi's hover highlight (theme-set.py)
+  if M.cursorline then
+    local line = vim.api.nvim_get_hl(0, { name = "CursorLine", link = false })
+    line.bg = M.cursorline
+    set(0, "CursorLine", line)
+    set(0, "NeoTreeCursorLine", { bg = M.cursorline })
+  end
+  -- Links like yazi's: icon and name in accent3, the target accent (red when broken)
+  set(0, "NeoTreeLinkIcon", { fg = M.accent3 })
+  set(0, "NeoTreeLinkName", { fg = M.accent3, bold = true })
+  set(0, "NeoTreeSymbolicLinkTarget", { fg = p.accent })
+  set(0, "NeoTreeBrokenLinkTarget", { fg = p.red })
+  -- The "File Explorer" label above neo-tree (bufferline's offset), in accent on the status line
+  local status = vim.api.nvim_get_hl(0, { name = "StatusLine", link = false })
+  set(0, "NeoTreeExplorerLabel", { fg = p.accent, bg = status.bg, bold = true })
   -- Dashboard: the NEOVIM lettering in accent, the logo in accent2, buttons in accent3
   -- with their keys in accent
   set(0, "AlphaHeader", { fg = p.accent })
@@ -79,6 +102,24 @@ local function custom_highlights()
     local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
     hl.bg = nil
     set(0, group, hl)
+  end
+end
+
+-- icons.toml's files and extensions on top of nvim-web-devicons' own (folders and links are
+-- neo-tree's, see plugins/neo-tree.lua)
+local function apply_devicons()
+  local ok, devicons = pcall(require, "nvim-web-devicons")
+  if not ok or not M.icons then
+    return
+  end
+  local overrides = {}
+  for _, kind in ipairs({ "files", "exts" }) do
+    for name, icon in pairs(M.icons[kind] or {}) do
+      overrides[name] = { icon = icon[1], color = icon[2], name = "Kuvk" .. name:gsub("%W", "_") }
+    end
+  end
+  if next(overrides) then
+    devicons.set_icon(overrides)
   end
 end
 
@@ -100,6 +141,9 @@ function M.apply()
   M.palette = theme.aether or {}
   M.accent2 = theme.accent2 or M.palette.blue
   M.accent3 = theme.accent3 or M.palette.orange
+  M.cursorline = theme.cursorline
+  M.icons = theme.icons or { dirs = {}, files = {}, exts = {} }
+  apply_devicons()
   vim.o.background = theme.background or "dark"
 
   -- aether builds its colors from the palette, so it needs setup per theme
