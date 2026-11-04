@@ -11,7 +11,7 @@
 #
 # Steps: pacman.conf (multilib, the g14 repo on ASUS laptops), mirrors (reflector), dotfiles
 # (stow; files in the way go to ~/.dotfiles-backup), packages (packages/*.txt by detected
-# hardware), Flatpak, services, zsh, the theme, then boot: initramfs and kernel options,
+# hardware), Flatpak, services, zsh and its plugins, the theme, then boot: initramfs and kernel options,
 # Plymouth, Limine. The login screen (SDDM) comes with the theme.
 set -euo pipefail
 
@@ -64,6 +64,7 @@ if ! $laptop && ask "Desktop PC: fan and RGB control (packages/desktop.txt)?" y;
     groups+=(desktop)
 fi
 ask "Apps with window rules (packages/apps.txt)?" y && groups+=(apps)
+ask "Virtual machines and Docker (packages/vm.txt)?" y && groups+=(vm)
 flatpak=false
 ask "Flatpak apps (packages/flatpak.txt)?" y && flatpak=true
 
@@ -159,9 +160,18 @@ if [[ " ${groups[*]} " == *" nvidia "* ]]; then
     $laptop && services+=(nvidia-powerd)
 fi
 [[ " ${groups[*]} " == *" desktop "* ]] && services+=(coolercontrold)
+vm=false
+[[ " ${groups[*]} " == *" vm "* ]] && vm=true && services+=(libvirtd docker.socket)
 for unit in "${services[@]}"; do
     if sudo systemctl enable "$unit" &>/dev/null; then echo "Enabled $unit"; else note "Couldn't enable $unit"; fi
 done
+if $vm; then
+    # VMs without a password prompt, and libvirt's NAT network up on every boot
+    sudo usermod -aG libvirt "$USER"
+    sudo systemctl start libvirtd
+    sudo virsh net-autostart default >/dev/null && echo "libvirt's default network starts on boot" \
+        || note "Couldn't set libvirt's default network to start on boot"
+fi
 
 step "Shell"
 if [[ $(getent passwd "$USER" | cut -d: -f7) != /usr/bin/zsh ]]; then
@@ -169,10 +179,16 @@ if [[ $(getent passwd "$USER" | cut -d: -f7) != /usr/bin/zsh ]]; then
 else
     echo "Already zsh."
 fi
+# zsh's plugins (vi mode, highlighting, suggestions, completions, history search)
+"$HOME/.config/scripts/install-zsh-plugins.py"
 
 step "Theme"
 # The login screen first: theme-set.py writes its colors to the folder this makes
 sudo "$dotfiles/sddm/install.sh" >/dev/null
+# tmux's theme plugin (.tmux.conf would clone it on first start), so theme-set.py can write
+# the theme's colors into it now
+tmux_theme="$HOME/.tmux/plugins/catppuccin/tmux"
+[[ -d $tmux_theme ]] || git clone -q -b v2.3.2 https://github.com/catppuccin/tmux.git "$tmux_theme"
 "$HOME/.config/scripts/theme-set.py"
 # The logo in accent2 on base, at the highest resolution any monitor has: the desktop, lock
 # screen and login screen then match the boot splash and menu. Unless a wallpaper is chosen

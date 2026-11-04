@@ -1,0 +1,15 @@
+# Virtual machines (QEMU/KVM through libvirt and virt-manager) and Docker. Optional; install.sh
+# enables libvirtd and Docker's socket, starts libvirt's default NAT network on boot, and adds
+# the user to the libvirt group (VMs without a password prompt). Not to the docker group: that is
+# root without a password, so Docker is used through sudo (or rootless, see docker's notes).
+qemu-full                # every guest architecture; qemu-desktop is enough for x86 guests
+libvirt
+virt-manager
+virt-install
+edk2-ovmf                # UEFI firmware for guests
+swtpm                    # a virtual TPM, which Windows 11 guests need
+dnsmasq                  # DHCP and DNS for libvirt's default network
+spice-gtk                # virt-manager's console: clipboard, USB redirection
+docker
+docker-compose
+docker-buildx
