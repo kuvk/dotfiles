@@ -232,7 +232,8 @@ EOF
         sed -E 's/(^| )(BOOT_IMAGE|initrd)=[^ ]*//g; s/^ +//' /proc/cmdline | sudo tee /etc/kernel/cmdline >/dev/null
     fi
     cmdline=$(cat /etc/kernel/cmdline)
-    extra=(quiet loglevel=3 splash)
+    # quiet boot and shutdown: no kernel or systemd status text, no console cursor
+    extra=(quiet loglevel=3 splash systemd.show_status=false vt.global_cursor_default=0)
     if [[ $cmdline == *rd.luks.name=* ]]; then
         extra+=(rd.luks.options=timeout=90s,tries=3 systemd.default_device_timeout_sec=infinity)
     fi
