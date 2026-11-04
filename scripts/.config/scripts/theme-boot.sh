@@ -6,8 +6,8 @@
 #   theme-boot.sh            update, unless they're already built from the current theme
 #   theme-boot.sh --force    update anyway
 #   theme-boot.sh --check    say whether an update is needed (exit 0 yes, 1 no); no root
-#   theme-boot.sh --window   in a kitty window that shows the output and stays open until
-#                            q or Esc (the notification's Update button)
+#   theme-boot.sh --window   in a kitty window: the logo, what this does, a Y/n question, the
+#                            output, then any key closes it (the notification's Update button)
 #
 # Asks for the password in a terminal (sudo) or, started from the desktop, in the polkit
 # dialog (pkexec). Plymouth rebuilds every initramfs, which takes a while.
@@ -50,17 +50,36 @@ if [[ ${1:-} == --as-root ]]; then
     exit 0
 fi
 
-# --- In a window: the output stays readable until q or Esc ----------------------------------------
+# --- In a window: the logo, what this does, a Y/n question, then the output ----------------------
 if [[ ${1:-} == --window ]]; then
     exec kitty --class theme-boot --title "Boot screens" "$self" --in-window
 fi
 if [[ ${1:-} == --in-window ]]; then
+    # The logo in accent2, from the current theme
+    accent2="#cba6f7"
+    # shellcheck source=/dev/null
+    . "$HOME/.config/theme/current/colors.sh" 2>/dev/null
+    color=$(printf '38;2;%d;%d;%d' "0x${accent2:1:2}" "0x${accent2:3:2}" "0x${accent2:5:2}")
+    printf '\n\e[%sm' "$color"
+    sed 's/^/  /' "$HOME/.config/theme/logo/ascii-dori" 2>/dev/null
+    printf '\e[0m\n'
+    cat <<'MSG'
+  The boot menu (Limine) and boot splash (Plymouth) keep the colors they were installed
+  with. This runs both installers again with the current theme, accents and logo, so the
+  boot matches the desktop from the next start. It needs your password (sudo) and takes
+  about a minute, as the splash is rebuilt into every initramfs.
+
+MSG
     status=0
-    "$self" || status=$?
-    printf '\n\e[2mPress q or Esc to close\e[0m'
-    while IFS= read -rsn1 key; do
-        [[ $key == q || $key == $'\e' ]] && break
-    done
+    read -rp "  Update the boot screens now? [Y/n] " answer
+    if [[ ${answer:-y} =~ ^[yY] ]]; then
+        echo
+        "$self" || status=$?
+    else
+        echo "  Left as they are."
+    fi
+    printf '\n\e[2m  Press any key to close\e[0m'
+    read -rsn1 _
     exit "$status"
 fi
 
