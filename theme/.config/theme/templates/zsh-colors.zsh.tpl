@@ -6,3 +6,29 @@ zle_highlight=(region:bg={{ selection_bg }},fg={{ selection_fg }} paste:none)
 # Up/down history search: the matching text, or the line when nothing matches
 HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_FOUND='bg={{ selection_bg }},fg={{ selection_fg }}'
 HISTORY_SUBSTRING_SEARCH_HIGHLIGHT_NOT_FOUND='fg={{ red }},bold'
+# Command line while typing (zsh-syntax-highlighting; open shells pick up a theme change):
+# sudo and the like accent2, commands green, arguments and options accent, quoted text and
+# | > accent3, paths accent, unknown commands red
+typeset -gA ZSH_HIGHLIGHT_STYLES
+ZSH_HIGHLIGHT_STYLES[precommand]='fg={{ accent2 }}'
+for _style in command builtin alias suffix-alias global-alias function hashed-command; do
+    ZSH_HIGHLIGHT_STYLES[$_style]='fg={{ green }}'
+done
+for _style in default single-hyphen-option double-hyphen-option path path_prefix autodirectory; do
+    ZSH_HIGHLIGHT_STYLES[$_style]='fg={{ accent }}'
+done
+for _style in single-quoted-argument double-quoted-argument dollar-quoted-argument back-quoted-argument \
+    single-quoted-argument-unclosed double-quoted-argument-unclosed dollar-quoted-argument-unclosed \
+    back-quoted-argument-unclosed commandseparator redirection; do
+    ZSH_HIGHLIGHT_STYLES[$_style]='fg={{ accent3 }}'
+done
+unset _style
+ZSH_HIGHLIGHT_STYLES[unknown-token]='fg={{ red }}'
+# eza's long listing (file names use LS_COLORS): read accent2, write accent3, execute green;
+# size accent; user and group accent2, root red; date accent3; broken link targets red without the
+# underline (bO=0)
+_r='{{ accent2.ansi }}' _w='{{ accent3.ansi }}' _x='{{ green.ansi }}'
+export EZA_COLORS="bO=0:ur=${_r}:gr=${_r}:tr=${_r}:uw=${_w}:gw=${_w}:tw=${_w}:ux=${_x}:ue=${_x}:gx=${_x}:tx=${_x}\
+:sn={{ accent.ansi }}:sb={{ accent.ansi }}:uu={{ accent2.ansi }}:uR={{ red.ansi }}:un={{ accent2.ansi }}\
+:gu={{ accent2.ansi }}:gR={{ red.ansi }}:gn={{ accent2.ansi }}:da={{ accent3.ansi }}"
+unset _r _w _x

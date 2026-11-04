@@ -79,7 +79,7 @@ RedHatEnterprise = "󱄛"
 
 [username]
 show_always = true
-style_user = "mauve"
+style_user = "accent2"
 style_root = "red"
 format = '[ $user]($style)'
 
@@ -105,7 +105,7 @@ truncation_symbol = "…/"
 disabled = false
 # zsh's vi modes in the same colors as Neovim's lualine: typing (insert) accent3, normal
 # accent, visual accent2; red after a failed command
-success_symbol = '[󰶻](bold fg:green)'
+success_symbol = '[󰶻](bold fg:accent)'
 error_symbol = '[󰶻](bold fg:red)'
 vimcmd_symbol = '[󰶺](bold fg:accent)'
 vimcmd_visual_symbol = '[󰶺](bold fg:accent2)'
