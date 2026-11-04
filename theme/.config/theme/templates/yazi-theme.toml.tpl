@@ -176,68 +176,71 @@ padding = { open = "{{ yazi_pad_open }}", close = "{{ yazi_pad_close }}" }
 
 [filetype]
 rules = [
-	# Image
-	{ mime = "**/image/*", fg = "{{ mauve }}", bold = true },
-	# Media
-	{ mime = "**/video/*", fg = "{{ mauve }}", bold = true },
+	# Links (broken ones too) and executables first: an executable file shows green whatever
+	# its type, so stray executable bits stand out
+	{ url = "*", is = "orphan", fg = "{{ accent3 }}", bold = true },
+	{ url = "*/", is = "orphan", fg = "{{ accent3 }}", bold = true },
+	{ url = "*", is = "link", fg = "{{ accent3 }}", bold = true },
+	{ url = "*/", is = "link", fg = "{{ accent3 }}", bold = true },
+	{ url = "*", is = "exec", fg = "{{ green }}", bold = true },
+	# Image and media
+	{ mime = "**/image/*", fg = "{{ accent2 }}", bold = true },
+	{ mime = "**/video/*", fg = "{{ accent2 }}", bold = true },
 	{ mime = "**/audio/*", fg = "{{ teal }}" },
-	# Archive
-	{ mime = "**/application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*}", fg = "{{ red }}", bold = true },
-	# Document
-	{ mime = "**/application/{pdf,doc,rtf}", fg = "{{ green }}" },
+	# Archives yellow
+	{ mime = "**/application/{zip,rar,7z*,tar,gzip,xz,zstd,bzip*,lzma,compress,archive,cpio,arj,xar,ms-cab*,x-iso9660-image}", fg = "{{ yellow }}", bold = true },
+	# Documents: spreadsheets green, text documents blue, PDF and presentations maroon
+	{ mime = "**/application/{vnd.,}openxmlformats-officedocument.spreadsheetml*", fg = "{{ green }}" },
+	{ mime = "**/application/{vnd.,}oasis.opendocument.spreadsheet*", fg = "{{ green }}" },
+	{ mime = "**/application/{vnd.,}ms-excel*", fg = "{{ green }}" },
+	{ mime = "**/text/csv", fg = "{{ green }}" },
+	{ mime = "**/application/{vnd.,}openxmlformats-officedocument.wordprocessingml*", fg = "{{ blue }}" },
+	{ mime = "**/application/{vnd.,}oasis.opendocument.text*", fg = "{{ blue }}" },
+	{ mime = "**/application/{msword,rtf}", fg = "{{ blue }}" },
+	{ mime = "**/text/rtf", fg = "{{ blue }}" },
+	{ mime = "**/application/pdf", fg = "{{ maroon }}" },
+	{ mime = "**/application/{vnd.,}openxmlformats-officedocument.presentationml*", fg = "{{ maroon }}" },
+	{ mime = "**/application/{vnd.,}oasis.opendocument.presentation*", fg = "{{ maroon }}" },
+	{ mime = "**/application/{vnd.,}ms-powerpoint*", fg = "{{ maroon }}" },
 	# Virtual file system
 	{ mime = "vfs/{absent,stale}", fg = "{{ overlay2 }}" },
-	# Office Documents
-    { mime = "**/application/openxmlformats-officedocument.*", fg = "{{ green }}" },
-    { mime = "**/application/oasis.opendocument.*", fg = "{{ green }}" },
-    { mime = "**/application/ms-*", fg = "{{ green }}" },
-    { mime = "**/application/msword", fg = "{{ green }}" },
-
-	{ url = "*", is = "orphan", fg = "{{ teal }}", bold = true },
-	{ url = "*/", is = "orphan", fg = "{{ teal }}", bold = true },
-	{ url = "*", is = "link", fg = "{{ teal }}", bold = true },
-	{ url = "*/", is = "link", fg = "{{ teal }}", bold = true },
 	# By name too: the MIME rules above apply only once yazi has read a file's type, which it
 	# hasn't yet for files in the preview column
-	{ url = "*.{png,jpg,jpeg,gif,webp,bmp,svg,ico,tif,tiff,avif,heic}", fg = "{{ mauve }}", bold = true },
-	{ url = "*.{mp4,mkv,webm,mov,avi,m4v}", fg = "{{ mauve }}", bold = true },
-	{ url = "*.{mp3,flac,ogg,opus,wav,m4a,aac}", fg = "{{ teal }}" },
-	{ url = "*.{zip,rar,7z,tar,gz,tgz,xz,zst,bz2,lz,lzma,cab,iso}", fg = "{{ red }}", bold = true },
-	{ url = "*.{pdf,doc,docx,rtf,odt,ods,odp,xls,xlsx,ppt,pptx}", fg = "{{ green }}" },
-	# Executable: scripts and programs, and files without an extension. Other files that are
-	# only executable because of where they come from (exFAT and NTFS drives, Windows) keep
-	# their normal color.
-	{ url = "*.{sh,bash,zsh,fish,py,pl,rb,lua,AppImage,appimage,run,bin,x86_64}", is = "exec", fg = "{{ green }}", bold = true },
-	{ url = "*.*", fg = "{{ text }}" },
-	{ url = "*", is = "exec", fg = "{{ green }}", bold = true },
+	{ url = "*.{png,jpg,jpeg,gif,webp,bmp,svg,ico,tif,tiff,avif,heic}", fg = "{{ accent2 }}", bold = true },
+	{ url = "*.{mp4,mkv,webm,mov,avi,m4v}", fg = "{{ accent2 }}", bold = true },
+	{ url = "*.{mp3,flac,ogg,opus,wav,wma,m4a,aac,alac,aiff,ape}", fg = "{{ teal }}" },
+	{ url = "*.{zip,rar,7z,tar,gz,tgz,xz,zst,bz2,lz,lzma,cab,iso}", fg = "{{ yellow }}", bold = true },
+	{ url = "*.{xls,xlsx,ods,csv}", fg = "{{ green }}" },
+	{ url = "*.{doc,docx,odt,rtf}", fg = "{{ blue }}" },
+	{ url = "*.{pdf,ppt,pptx,odp}", fg = "{{ maroon }}" },
 	# Fallback
 	{ url = "*", fg = "{{ text }}" },
-	{ url = "*/", fg = "{{ blue }}", bold = true },
+	{ url = "*/", fg = "{{ accent }}", bold = true },
 ]
 
 [icon]
 dirs = [
 	{ name = ".config", text = "", fg = "{{ accent3 }}" },
-	{ name = ".git", text = "", fg = "{{ blue }}" },
-	{ name = ".github", text = "", fg = "{{ blue }}" },
-	{ name = ".npm", text = "", fg = "{{ blue }}" },
-	{ name = "Projects", text = "", fg = "{{ blue }}" },
-	{ name = "projects", text = "", fg = "{{ blue }}" },
-	{ name = "Desktop", text = "", fg = "{{ blue }}" },
-	{ name = "Development", text = "", fg = "{{ blue }}" },
-	{ name = "Documents", text = "󰲂", fg = "{{ blue }}" },
-	{ name = "Downloads", text = "󰉍", fg = "{{ blue }}" },
-	{ name = "Library", text = "", fg = "{{ blue }}" },
-	{ name = "Movies", text = "", fg = "{{ blue }}" },
-	{ name = "Music", text = "󱍙", fg = "{{ blue }}" },
-	{ name = "Pictures", text = "󰉏", fg = "{{ blue }}" },
-	{ name = "Public", text = "", fg = "{{ blue }}" },
-	{ name = "Videos", text = "", fg = "{{ blue }}" },
+	{ name = ".git", text = "", fg = "{{ accent }}" },
+	{ name = ".github", text = "", fg = "{{ accent }}" },
+	{ name = ".npm", text = "", fg = "{{ accent }}" },
+	{ name = "Projects", text = "", fg = "{{ accent }}" },
+	{ name = "projects", text = "", fg = "{{ accent }}" },
+	{ name = "Desktop", text = "", fg = "{{ accent }}" },
+	{ name = "Development", text = "", fg = "{{ accent }}" },
+	{ name = "Documents", text = "󰲂", fg = "{{ accent }}" },
+	{ name = "Downloads", text = "󰉍", fg = "{{ accent }}" },
+	{ name = "Library", text = "", fg = "{{ accent }}" },
+	{ name = "Movies", text = "", fg = "{{ accent }}" },
+	{ name = "Music", text = "󱍙", fg = "{{ accent }}" },
+	{ name = "Pictures", text = "󰉏", fg = "{{ accent }}" },
+	{ name = "Public", text = "", fg = "{{ accent }}" },
+	{ name = "Videos", text = "", fg = "{{ accent }}" },
 ]
 conds = [
 	# Special files
-	{ if = "orphan", text = "󰡯", fg = "{{ teal }}" },
-	{ if = "link", text = "󰡯", fg = "{{ teal }}" },
+	{ if = "orphan", text = "󰡯", fg = "{{ accent3 }}" },
+	{ if = "link", text = "󰡯", fg = "{{ accent3 }}" },
 	{ if = "block", text = "", fg = "{{ flamingo }}" },
 	{ if = "char", text = "", fg = "{{ flamingo }}" },
 	{ if = "fifo", text = "", fg = "{{ flamingo }}" },
@@ -246,29 +249,38 @@ conds = [
 	{ if = "dummy", text = "", fg = "{{ red }}" },
 
 	# Fallback
-	{ if = "dir", text = "", fg = "{{ blue }}" },
+	{ if = "dir", text = "", fg = "{{ accent }}" },
 	{ if = "exec", text = "", fg = "{{ green }}" },
 	{ if = "!dir", text = "", fg = "{{ subtext1 }}" },
 ]
 # Same glyphs and colors as eza
 prepend_exts = [
-	{ name = "png", text = "", fg = "{{ mauve }}" },
-	{ name = "jpg", text = "", fg = "{{ mauve }}" },
-	{ name = "jpeg", text = "", fg = "{{ mauve }}" },
-	{ name = "webp", text = "", fg = "{{ mauve }}" },
-	{ name = "mp4", text = "", fg = "{{ mauve }}" },
-	{ name = "mkv", text = "", fg = "{{ mauve }}" },
-	{ name = "webm", text = "", fg = "{{ mauve }}" },
+	{ name = "png", text = "", fg = "{{ accent2 }}" },
+	{ name = "jpg", text = "", fg = "{{ accent2 }}" },
+	{ name = "jpeg", text = "", fg = "{{ accent2 }}" },
+	{ name = "webp", text = "", fg = "{{ accent2 }}" },
+	{ name = "mp4", text = "", fg = "{{ accent2 }}" },
+	{ name = "mkv", text = "", fg = "{{ accent2 }}" },
+	{ name = "webm", text = "", fg = "{{ accent2 }}" },
 	{ name = "mp3", text = "", fg = "{{ teal }}" },
 	{ name = "flac", text = "", fg = "{{ teal }}" },
-	{ name = "pdf", text = "", fg = "{{ green }}" },
-	{ name = "zip", text = "", fg = "{{ red }}" },
-	{ name = "gz", text = "", fg = "{{ red }}" },
-	{ name = "tar", text = "", fg = "{{ red }}" },
+	{ name = "wav", text = "", fg = "{{ teal }}" },
+	{ name = "wma", text = "", fg = "{{ teal }}" },
+	{ name = "ogg", text = "", fg = "{{ teal }}" },
+	{ name = "opus", text = "", fg = "{{ teal }}" },
+	{ name = "m4a", text = "", fg = "{{ teal }}" },
+	{ name = "aac", text = "", fg = "{{ teal }}" },
+	{ name = "alac", text = "", fg = "{{ teal }}" },
+	{ name = "aiff", text = "", fg = "{{ teal }}" },
+	{ name = "ape", text = "", fg = "{{ teal }}" },
+	{ name = "pdf", text = "", fg = "{{ maroon }}" },
+	{ name = "zip", text = "", fg = "{{ yellow }}" },
+	{ name = "gz", text = "", fg = "{{ yellow }}" },
+	{ name = "tar", text = "", fg = "{{ yellow }}" },
 	{ name = "txt", text = "", fg = "{{ text }}" },
 	{ name = "md", text = "", fg = "{{ text }}" },
 	{ name = "sh", text = "", fg = "{{ text }}" },
-	{ name = "py", text = "", fg = "{{ yellow }}" },
-	{ name = "lua", text = "", fg = "{{ yellow }}" },
+	{ name = "py", text = "", fg = "{{ accent3 }}" },
+	{ name = "lua", text = "", fg = "{{ accent3 }}" },
 	{ name = "json", text = "", fg = "{{ text }}" },
 ]

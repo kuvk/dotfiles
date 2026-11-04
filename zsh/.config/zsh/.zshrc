@@ -46,8 +46,7 @@ _compiled $ZDOTDIR/.zshrc nosource
 
 ## File colors from the theme (theme-set.py writes them; see TRAPUSR1 below)
 _ls_colors=$HOME/.config/theme/current/ls_colors.zsh
-# Broken link targets in eza: red, without the underline
-export EZA_COLORS="bO=0"
+# eza's colors (permissions, size, user, date) come from the theme: current/zsh-colors.zsh
 _load_ls_colors() {
     [[ -r $_ls_colors ]] && source $_ls_colors
     [[ -r $_ls_colors:h/zsh-colors.zsh ]] && source $_ls_colors:h/zsh-colors.zsh
@@ -237,17 +236,7 @@ fi
 
 # Syntax highlighting
 _compiled $HOME/.local/share/zsh-plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-(( ${+ZSH_HIGHLIGHT_STYLES} )) || typeset -A ZSH_HIGHLIGHT_STYLES
-ZSH_HIGHLIGHT_STYLES[path]=fg=blue
-ZSH_HIGHLIGHT_STYLES[path_prefix]=fg=blue
-ZSH_HIGHLIGHT_STYLES[autodirectory]=fg=blue
-ZSH_HIGHLIGHT_STYLES[precommand]=fg=magenta
-ZSH_HIGHLIGHT_STYLES[alias]=fg=green
-ZSH_HIGHLIGHT_STYLES[single-hyphen-option]=fg=cyan
-ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=cyan
-ZSH_HIGHLIGHT_STYLES[redirection]=fg=yellow
-ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=yellow
-ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red
+# Its colors come from the theme: current/zsh-colors.zsh (templates/zsh-colors.zsh.tpl)
 
 # if [[ -o interactive ]]; then
 #     fastfetch
