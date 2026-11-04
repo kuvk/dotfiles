@@ -68,47 +68,46 @@ Rectangle {
         cache: false
     }
 
-    // Clock, top right (Settings > Lock Screen > Clock and date)
-    Column {
-        anchors.top: parent.top
-        anchors.right: parent.right
-        anchors.margins: 30
+    // Clock and date, top right, where the lock screen puts them (templates/hyprlock.conf.tpl:
+    // 72 pt and 28 pt, which Pango draws at 96 and 37 px; tops 10 and 120 px down, 30 in)
+    // (Settings > Lock Screen > Clock and date)
+    Item {
+        anchors.fill: parent
         visible: Window.active && String(root.c.showClock) !== "false"
-        spacing: 0
-
-        // layer.enabled: true
-        // layer.effect: MultiEffect {
-        //     shadowEnabled: true
-        //     shadowColor: "black"
-        //     shadowBlur: 0.8
-        // }
 
         Text {
+            anchors.top: parent.top
             anchors.right: parent.right
+            anchors.topMargin: 10
+            anchors.rightMargin: 30
             text: Qt.formatDateTime(root.now, "HH:mm")
             color: root.c.clock
             font.family: root.c.font
-            font.pixelSize: 120
+            font.pixelSize: 96
             font.weight: Font.Medium
         }
 
         Text {
+            anchors.top: parent.top
             anchors.right: parent.right
+            anchors.topMargin: 120
+            anchors.rightMargin: 30
             text: Qt.formatDateTime(root.now, "dddd, d MMMM yyyy")
             color: root.c.date
             font.family: root.c.font
-            font.pixelSize: 33
+            font.pixelSize: 37
         }
     }
 
-    // Avatar and password
+    // Avatar and password, at the lock screen's positions: a 380x300 box in the middle, the
+    // avatar's center 45 px above the screen's center, the field's 85 px below
     Rectangle {
         id: card
 
         anchors.centerIn: parent
         visible: Window.active
         width: 380
-        height: box.implicitHeight + 48
+        height: 300
         radius: 6
         // Settings > Lock Screen > Box off: only the avatar and password, no card
         readonly property bool shown: String(root.c.showBox) !== "false"
@@ -127,143 +126,148 @@ Rectangle {
             }
         }
 
-        ColumnLayout {
-            id: box
+        // Settings > Lock Screen > Avatar
+        Item {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: -45
+            visible: String(root.c.showAvatar) !== "false"
+            implicitWidth: 139
+            implicitHeight: 139
 
-            anchors.centerIn: parent
-            spacing: 18
-
-            // Settings > Lock Screen > Avatar
-            Item {
-                Layout.alignment: Qt.AlignHCenter
-                visible: String(root.c.showAvatar) !== "false"
-                implicitWidth: 139
-                implicitHeight: 139
-
-                Rectangle {
-                    anchors.fill: parent
-                    radius: width / 2
-                    color: root.c.avatar
-                }
-
-                Image {
-                    id: avatar
-
-                    anchors.centerIn: parent
-                    width: 135
-                    height: 135
-                    source: root.userIcon
-                    fillMode: Image.PreserveAspectCrop
-                    sourceSize.width: 270
-                    sourceSize.height: 270
-                    visible: false
-                }
-
-                Rectangle {
-                    id: avatarMask
-
-                    anchors.fill: avatar
-                    radius: width / 2
-                    visible: false
-                    layer.enabled: true
-                }
-
-                MultiEffect {
-                    anchors.fill: avatar
-                    source: avatar
-                    maskEnabled: true
-                    maskSource: ShaderEffectSource {
-                        sourceItem: avatarMask
-                    }
-                    maskThresholdMin: 0.5
-                    maskSpreadAtMin: 1
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    visible: avatar.status !== Image.Ready
-                    text: ""
-                    color: root.c.box
-                    font.family: root.c.iconFont
-                    font.pixelSize: 56
-                }
+            Rectangle {
+                anchors.fill: parent
+                radius: width / 2
+                color: root.c.avatar
             }
 
-            // Only with several users
-            Controls {
-                Layout.alignment: Qt.AlignHCenter
-                visible: userModel.count > 1
-                label: root.userName
-                onStepped: d => root.userIndex = root.step(root.userIndex, d, userModel.count)
+            Image {
+                id: avatar
+
+                anchors.centerIn: parent
+                width: 135
+                height: 135
+                source: root.userIcon
+                fillMode: Image.PreserveAspectCrop
+                sourceSize.width: 270
+                sourceSize.height: 270
+                visible: false
             }
 
             Rectangle {
-                id: field
+                id: avatarMask
 
-                Layout.alignment: Qt.AlignHCenter
-                implicitWidth: 260
-                implicitHeight: 36
-                radius: height / 2
-                color: Qt.alpha(root.c.input, Number(root.c.inputOpacity))
-                border.width: 1
-                border.color: root.failed ? root.c.fail : (root.busy ? root.c.check : root.c.inputOutline)
+                anchors.fill: avatar
+                radius: width / 2
+                visible: false
+                layer.enabled: true
+            }
 
-                transform: Translate {
-                    id: offset
+            MultiEffect {
+                anchors.fill: avatar
+                source: avatar
+                maskEnabled: true
+                maskSource: ShaderEffectSource {
+                    sourceItem: avatarMask
                 }
-
-                SequentialAnimation {
-                    id: shake
-
-                    NumberAnimation { target: offset; property: "x"; to: -10; duration: 50 }
-                    NumberAnimation { target: offset; property: "x"; to: 10; duration: 80 }
-                    NumberAnimation { target: offset; property: "x"; to: -6; duration: 60 }
-                    NumberAnimation { target: offset; property: "x"; to: 0; duration: 50 }
-                }
-
-                TextInput {
-                    id: password
-
-                    anchors.fill: parent
-                    anchors.leftMargin: 16
-                    anchors.rightMargin: 16
-                    verticalAlignment: TextInput.AlignVCenter
-                    horizontalAlignment: TextInput.AlignHCenter
-                    echoMode: TextInput.Password
-                    passwordCharacter: "●"
-                    color: root.c.dots
-                    selectByMouse: false
-                    font.family: root.c.font
-                    font.pixelSize: 11
-                    font.letterSpacing: 3
-                    clip: true
-                    focus: true
-                    onTextEdited: root.failed = false
-                    onAccepted: root.login()
-                    Keys.onEscapePressed: text = ""
-                }
-
-                Text {
-                    anchors.centerIn: parent
-                    width: parent.width - 24
-                    horizontalAlignment: Text.AlignHCenter
-                    visible: password.text === ""
-                    elide: Text.ElideRight
-                    textFormat: Text.StyledText
-                    text: root.failed ? "<i>ACCESS DENIED</i>" : `<i>\u{f033e}  Log in as </i><b><font color="${root.c.user}">${root.userName}</font></b>`
-                    color: root.failed ? root.c.fail : root.c.text
-                    font.family: root.c.font
-                    font.pixelSize: 14
-                }
+                maskThresholdMin: 0.5
+                maskSpreadAtMin: 1
             }
 
             Text {
-                Layout.alignment: Qt.AlignHCenter
-                text: keyboard.capsLock ? "Caps Lock is on" : " "
-                color: root.c.caps
-                font.family: root.c.font
-                font.pixelSize: 12
+                anchors.centerIn: parent
+                visible: avatar.status !== Image.Ready
+                text: ""
+                color: root.c.box
+                font.family: root.c.iconFont
+                font.pixelSize: 56
             }
+        }
+
+        // Only with several users: under the field
+        Controls {
+            id: users
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: field.bottom
+            anchors.topMargin: 10
+            visible: userModel.count > 1
+            label: root.userName
+            onStepped: d => root.userIndex = root.step(root.userIndex, d, userModel.count)
+        }
+
+        Rectangle {
+            id: field
+
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.verticalCenterOffset: 85
+            implicitWidth: 260
+            implicitHeight: 36
+            radius: height / 2
+            color: Qt.alpha(root.c.input, Number(root.c.inputOpacity))
+            border.width: 1
+            border.color: root.failed ? root.c.fail : (root.busy ? root.c.check : root.c.inputOutline)
+
+            transform: Translate {
+                id: offset
+            }
+
+            SequentialAnimation {
+                id: shake
+
+                NumberAnimation { target: offset; property: "x"; to: -10; duration: 50 }
+                NumberAnimation { target: offset; property: "x"; to: 10; duration: 80 }
+                NumberAnimation { target: offset; property: "x"; to: -6; duration: 60 }
+                NumberAnimation { target: offset; property: "x"; to: 0; duration: 50 }
+            }
+
+            TextInput {
+                id: password
+
+                anchors.fill: parent
+                anchors.leftMargin: 16
+                anchors.rightMargin: 16
+                verticalAlignment: TextInput.AlignVCenter
+                horizontalAlignment: TextInput.AlignHCenter
+                echoMode: TextInput.Password
+                passwordCharacter: "●"
+                color: root.c.dots
+                selectByMouse: false
+                font.family: root.c.font
+                font.pixelSize: 11
+                font.letterSpacing: 3
+                clip: true
+                focus: true
+                onTextEdited: root.failed = false
+                onAccepted: root.login()
+                Keys.onEscapePressed: text = ""
+            }
+
+            Text {
+                anchors.centerIn: parent
+                width: parent.width - 24
+                horizontalAlignment: Text.AlignHCenter
+                visible: password.text === ""
+                elide: Text.ElideRight
+                textFormat: Text.StyledText
+                text: root.failed ? "<i>ACCESS DENIED</i>" : `<i>\u{f033e}  Log in as </i><b><font color="${root.c.user}">${root.userName}</font></b>`
+                color: root.failed ? root.c.fail : root.c.text
+                font.family: root.c.font
+                font.pixelSize: 14
+            }
+        }
+
+        // Under the field (and the user switch); it takes no room when off
+        Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.top: users.visible ? users.bottom : field.bottom
+            anchors.topMargin: 8
+            visible: keyboard.capsLock
+            text: "Caps Lock is on"
+            color: root.c.caps
+            font.family: root.c.font
+            font.pixelSize: 12
         }
     }
 

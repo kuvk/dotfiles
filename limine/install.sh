@@ -130,7 +130,7 @@ terse: yes
 interface_resolution: ${res_w}x$res_h
 interface_branding:
 interface_help_hidden: yes
-interface_help_colour: $(hex "$overlay1")
+interface_help_colour: $(hex "$accent2")
 interface_help_colour_bright: $(hex "$accent")
 wallpaper: boot():/EFI/limine/wallpaper.png
 wallpaper_style: centered
