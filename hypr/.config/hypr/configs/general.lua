@@ -1,7 +1,7 @@
 -- Border colors follow the theme (written by ~/.config/scripts/theme-set.py)
 local ok, theme = pcall(require, "configs.generated.theme")
 if not ok then
-  theme = { active_border = "rgba(fab387ee)", inactive_border = "rgba(89b4faaa)" }
+  theme = { active_border = "rgb(fab387)", inactive_border = "rgba(89b4faaa)" }
 end
 
 hl.config({

@@ -589,11 +589,9 @@ def reload_apps(theme: dict) -> None:
     run_quiet(["qs", "ipc", "call", "theme", "reload"])
 
     if hypr_running():
-        gamemode = Path("/tmp/hypr-gamemode").exists()
-        alpha = ("", "") if gamemode else ("ee", "aa")
-        fn = "rgb" if gamemode else "rgba"
-        active = f"{fn}({colors['accent'][1:]}{alpha[0]})"
-        inactive = f"{fn}({colors['accent2'][1:]}{alpha[1]})"
+        # Same in every mode (hyprland.lua.tpl): active in full color, inactive see-through
+        active = f"rgb({colors['accent'][1:]})"
+        inactive = f"rgba({colors['accent2'][1:]}aa)"
         run_quiet([
             "hyprctl", "eval",
             f"hl.config({{ general = {{ col = {{ active_border = '{active}', inactive_border = '{inactive}' }} }} }})",

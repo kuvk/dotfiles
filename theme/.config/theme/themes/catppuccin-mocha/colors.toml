@@ -33,7 +33,7 @@ mantle    = "#181825"
 crust     = "#11111b"
 
 # Semantic roles: a slot name or a hex value
-accent    = "sapphire"
+accent    = "blue"
 accent2   = "mauve"
 accent3   = "peach"
 
