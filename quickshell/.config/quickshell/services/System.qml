@@ -153,14 +153,17 @@ Singleton {
             // hypridle locks before sleeping (before_sleep_cmd)
             Quickshell.execDetached(["systemctl", "suspend"]);
             break;
+        // hyprshutdown asks every app to close (an app with unsaved work can ask first), exits
+        // Hyprland, then runs the post command: reboot and power off happen after a clean exit.
+        // --no-wall: no "The system will power off now!" on the console before Plymouth shows
         case "logout":
             Quickshell.execDetached(["hyprshutdown", "-t", "Logging out ..."]);
             break;
         case "reboot":
-            Quickshell.execDetached(["systemctl", "reboot"]);
+            Quickshell.execDetached(["hyprshutdown", "-t", "Rebooting ...", "-p", "systemctl --no-wall reboot"]);
             break;
         case "shutdown":
-            Quickshell.execDetached(["systemctl", "poweroff"]);
+            Quickshell.execDetached(["hyprshutdown", "-t", "Shutting down ...", "-p", "systemctl --no-wall poweroff"]);
             break;
         }
     }
