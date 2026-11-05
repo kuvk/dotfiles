@@ -76,12 +76,11 @@ Card {
             }
         }
 
+        // fixed height and full width, so the card never changes size
         CavaBars {
-            Layout.alignment: Qt.AlignHCenter
-            visible: Cava.values.length > 0
-            barWidth: 8
-            maxHeight: 36
-            spacing: 4
+            Layout.fillWidth: true
+            visible: Config.cava
+            implicitHeight: 36
             color: Theme.highlight
         }
 

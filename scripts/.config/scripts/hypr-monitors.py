@@ -482,6 +482,8 @@ def hotplug() -> int:
             time.sleep(1)
             if profile_key(hypr_json("monitors") or live) == key:
                 break
+        # start from the first workspace on the new layout
+        run(["hyprctl", "dispatch", "hl.dsp.focus({ workspace = 1 })"])
     return 0
 
 

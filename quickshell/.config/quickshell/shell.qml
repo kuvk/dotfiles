@@ -98,6 +98,7 @@ ShellRoot {
 
         function gamemode(enabled: bool): void {
             Theme.gamemode = enabled;
+            System.setGamemode(enabled);
         }
     }
 

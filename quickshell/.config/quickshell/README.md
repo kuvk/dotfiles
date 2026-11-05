@@ -30,16 +30,17 @@ katakana in the lock screen's digital rain.
 | Now playing | `modules/popouts/MediaPopout.qml` | click the track; middle-click play/pause, right-click next player |
 | System tray, themed right-click menus | `modules/bar/Tray.qml`, `modules/popouts/TrayMenu.qml` | hover the arrow; right-click an icon |
 | Battery, power mode (Quiet / Balanced / Performance) | `modules/popouts/BatteryPopout.qml` | click the battery |
-| Stay awake | `services/System.qml` | the coffee icon (holds an idle inhibitor) |
-| Displays | `modules/displays/Displays.qml` | the monitor icon, or `ALT+M` |
+| Stay awake | `services/System.qml` | the coffee icon (holds an idle inhibitor); while media plays an inhibitor is held automatically |
+| Work-Game Mode (no blur/animations/rounding, game gaps, turns Stay Awake on) | `scripts/hypr-gamemode.sh` + `services/System.qml` | the rocket icon, or the Control Center tile |
+| Displays | `modules/displays/Displays.qml` | the monitor icon, or `ALT+CTRL+M` |
 | Notification popups | `modules/notifications/NotificationPopups.qml` | |
 | Control Center: toggles, sliders, media (with visualizer), notifications grouped by app, session buttons | `modules/controlcenter/ControlCenter.qml` | `ALT+N`, or the sliders icon (right-click toggles DND) |
 | App launcher | `modules/launcher/Launcher.qml` | `ALT+Space` |
 | Theme picker | same file, `themes` mode | `ALT+SHIFT+T`, or the Theme tile |
 | Power menu (the old wlogout layout) | `modules/powermenu/PowerMenu.qml` | `ALT+SHIFT+E`, or the power icon |
 | Lock screen | `modules/lock/LockScreen.qml` | `` ALT+` ``, hypridle, before sleep |
-| Wallpaper carousel | `modules/wallpaper/WallpaperPicker.qml` | `ALT+P` (static), `ALT+W` (live) |
-| Panel Settings | `modules/settings/SettingsWindow.qml` | gear in the Control Center |
+| Wallpaper carousel (type to search) | `modules/wallpaper/WallpaperPicker.qml` | `ALT+P` (static), `ALT+W` (live) |
+| Settings | `modules/settings/SettingsWindow.qml` | `ALT+CTRL+P`, or the gear in the Control Center |
 
 The launcher takes arrows, Tab, Ctrl+J/K and Ctrl+N/P to move, Enter to launch,
 and Esc to close. The power menu takes `l` lock, `u` sleep, `e` log out,
@@ -48,9 +49,12 @@ and Esc to close. The power menu takes `l` lock, `u` sleep, `e` log out,
 Dropdowns slide out of the bar; one click anywhere outside closes them.
 Hovering a bar item shows a dot under it, an open dropdown an accent line.
 
-Preferences (corner radius, border width, opacity, animations, clock format,
-weather location and units, notification timeout, lock screen effects) are
-set in Panel Settings and saved to Quickshell's state folder
+Preferences are set in Settings, one sidebar section each: Appearance (corner
+radius, border width, opacity, animations), Bar (clock format, weather),
+Windows (gaps for regular and Work-Game Mode), Notifications, Lock Screen
+(effects and the colors of the clock, rain, outlines, password dots and text),
+and Tray & Player (tray icon style, apps that keep their own colors, the
+visualizer and its bar count). They are saved to Quickshell's state folder
 (`~/.local/state/quickshell/by-shell/<id>/settings.json`). Defaults are in
 `config/Config.qml`.
 

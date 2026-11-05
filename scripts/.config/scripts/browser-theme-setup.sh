@@ -7,7 +7,10 @@
 # without a password. Nothing else gets root.
 #
 #   sudo ~/.config/scripts/browser-theme-setup.sh            install
-#   sudo ~/.config/scripts/browser-theme-setup.sh --remove   undo
+#   sudo ~/.config/scripts/browser-theme-setup.sh --unlock   drop the color policy for
+#        now, e.g. to switch Appearance > Theme to Classic; the next theme
+#        switch (or theme-set.py) puts it back
+#   sudo ~/.config/scripts/browser-theme-setup.sh --remove   undo everything
 set -euo pipefail
 
 HELPER=/usr/local/bin/browser-theme-policy
@@ -23,6 +26,17 @@ user="${SUDO_USER:-}"
 if [[ -z $user || $user == root ]]; then
     echo "Run through sudo from your own account, so the rule is for your user." >&2
     exit 1
+fi
+
+if [[ ${1:-} == --unlock ]]; then
+    for dir in "${POLICY_DIRS[@]}"; do rm -f "$dir/color.json"; done
+    cat <<'MSG'
+Theme policy removed. Now:
+  1. Restart the browser (close every window).
+  2. Settings > Appearance > Theme: choose "Classic" (not GTK or QT).
+  3. Close the browser, then run ~/.config/scripts/theme-set.py to color it again.
+MSG
+    exit 0
 fi
 
 if [[ ${1:-} == --remove ]]; then

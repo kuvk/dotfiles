@@ -486,8 +486,8 @@ Popout {
             Repeater {
                 model: [
                     { label: "Ping", value: Network.speed.ping !== undefined ? `${Network.speed.ping} ms` : "…", active: Network.speed.phase === "ping" },
-                    { label: "Download", value: Network.speed.download !== undefined ? `${Network.speed.download}` : (Network.speed.phase === "download" ? `${Network.speed.mbps ?? 0}` : "…"), unit: "Mb/s", active: Network.speed.phase === "download" },
-                    { label: "Upload", value: Network.speed.upload !== undefined ? `${Network.speed.upload}` : (Network.speed.phase === "upload" ? `${Network.speed.mbps ?? 0}` : "…"), unit: "Mb/s", active: Network.speed.phase === "upload" }
+                    { label: "Download", value: Network.speed.download !== undefined ? `${Network.speed.download}` : "…", unit: "Mb/s", active: Network.speed.phase === "download" },
+                    { label: "Upload", value: Network.speed.upload !== undefined ? `${Network.speed.upload}` : "…", unit: "Mb/s", active: Network.speed.phase === "upload" }
                 ]
 
                 Card {

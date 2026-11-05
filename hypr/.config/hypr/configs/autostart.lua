@@ -8,7 +8,6 @@ hl.on("hyprland.start", function()
   -- Saved wallpapers per monitor, once hyprpaper is up
   hl.exec_cmd("sleep 1; ~/.config/scripts/wallpaper.py restore")
   hl.exec_cmd("~/.config/scripts/autostart.sh")
-  hl.exec_cmd("~/.config/scripts/media-inhibit.sh &")
   hl.exec_cmd("systemctl --user start hyprpolkitagent")
   hl.exec_cmd("hyprctl setcursor Colloid-dark-cursors 24")
   hl.exec_cmd("hyprctl dispatch 'hl.dsp.focus({ workspace = 1 })'")

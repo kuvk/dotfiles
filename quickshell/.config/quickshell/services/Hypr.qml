@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
+import qs.config
 
 // Hyprland helpers. With a Lua config (hl.*), dispatches are Lua expressions,
 // same as `hyprctl dispatch 'hl.dsp.focus({ workspace = 1 })'`.
@@ -21,6 +22,24 @@ Singleton {
         dispatch(Hyprland.usingLua ? `hl.dsp.focus({ workspace = ${id} })` : `workspace ${id}`);
     }
 
+    // Window gaps from Settings; Work-Game Mode has its own
+    function applyGaps(): void {
+        const inner = Theme.gamemode ? Config.gameGapsIn : Config.gapsIn;
+        const outer = Theme.gamemode ? Config.gameGapsOut : Config.gapsOut;
+        Quickshell.execDetached(["hyprctl", "eval", `hl.config({ general = { gaps_in = ${inner}, gaps_out = ${outer} } })`]);
+    }
+
+    readonly property string gapsKey: [Theme.gamemode, Config.gapsIn, Config.gapsOut, Config.gameGapsIn, Config.gameGapsOut].join(",")
+    onGapsKeyChanged: gapsDelay.restart()
+    Component.onCompleted: gapsDelay.restart()
+
+    Timer {
+        id: gapsDelay
+
+        interval: 300
+        onTriggered: root.applyGaps()
+    }
+
     function nextLayout(): void {
         Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/switch-layout.sh"]);
     }
@@ -31,6 +50,9 @@ Singleton {
         function onRawEvent(event: HyprlandEvent): void {
             if (event.name === "activelayout")
                 devices.running = true;
+            // a reload resets the gaps to hyprland's config
+            else if (event.name === "configreloaded")
+                gapsDelay.restart();
         }
     }
 
