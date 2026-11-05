@@ -41,7 +41,7 @@ katakana in the lock screen's digital rain.
 | Power menu (the old wlogout layout) | `modules/powermenu/PowerMenu.qml` | `ALT+SHIFT+E`, or the power icon |
 | Lock screen | `modules/lock/LockScreen.qml` | `` ALT+` ``, hypridle, before sleep |
 | Wallpaper carousel (type to search; other monitors are blurred) | `modules/wallpaper/WallpaperPicker.qml` | `ALT+W`, Tab for live wallpapers |
-| System information (fastfetch in a floating kitty window) | `services/System.qml` `showSysinfo()` | the ⓘ button in the app menu and Control Center |
+| System information (fastfetch's output in a window sized to it) | `modules/sysinfo/SysinfoWindow.qml` | the ⓘ button in the app menu and Control Center |
 | Keybindings (built from `bindings.lua`, type to filter) | `modules/keybinds/KeybindsWindow.qml` + `scripts/hypr-keybinds.py` | `ALT+SHIFT+/` |
 | Settings | `modules/settings/SettingsWindow.qml` | `ALT+CTRL+P`, or the gear in the Control Center |
 
@@ -56,7 +56,7 @@ of buttons for Settings, Displays, Keybindings and System information.
 Dropdowns close when you switch workspaces, and clicking another bar icon
 switches straight to its dropdown.
 
-Settings, Displays and Keybindings are regular windows: a Hyprland rule (`rules.lua`) makes
+Settings, Displays, Keybindings and System Information are regular windows: a Hyprland rule (`rules.lua`) makes
 them float centered; they always stay floating (tiling one reopens it), open at
 their default size and can grow but not shrink below it. They have no close
 button unless Settings > Windows > Window buttons is on; close them with Esc
@@ -162,6 +162,7 @@ qs ipc call displays toggle
 qs ipc call theme reload | gamemode true
 qs ipc call wallpaper toggle | static | live
 qs ipc call keybinds toggle
+qs ipc call sysinfo toggle
 qs ipc call settings toggle
 qs ipc call panels close
 ```
