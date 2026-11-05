@@ -14,6 +14,7 @@ FloatingWindow {
     readonly property var clockFormats: ["dddd HH:mm", "ddd HH:mm", "HH:mm", "ddd d MMM  HH:mm", "dddd h:mm AP"]
     readonly property var sections: [
         { id: "appearance", label: "Appearance", icon: Icons.palette },
+        { id: "fonts", label: "Fonts", icon: Icons.font },
         { id: "bar", label: "Bar", icon: Icons.sliders },
         { id: "windows", label: "Windows", icon: Icons.display },
         { id: "notifications", label: "Notifications", icon: Icons.bell },
@@ -423,6 +424,195 @@ FloatingWindow {
                                     text: `${Config.notificationTimeout} s`
                                     onStep: d => Config.notificationTimeout = root.clamp(Config.notificationTimeout + d, 2, 60)
                                 }
+                            }
+                        }
+
+                        // ------------------------------------------------ Fonts
+                        ColumnLayout {
+                            id: fontsPage
+
+                            // the Nerd Font to use for "Nerd Font" presets: the
+                            // current text or icon font if it is one, else
+                            // JetBrainsMono Nerd Font, else the first installed
+                            readonly property var nerdFonts: Qt.fontFamilies().filter(f => /Nerd Font/.test(f) && !f.startsWith("Symbols Nerd Font"))
+                            readonly property string nerdFont: {
+                                for (const f of [Config.uiFont, Config.iconFont, "JetBrainsMono Nerd Font"]) {
+                                    if (nerdFonts.includes(f))
+                                        return f;
+                                }
+                                return nerdFonts[0] ?? "JetBrainsMono Nerd Font";
+                            }
+                            readonly property bool textIsNerd: /Nerd Font/.test(Config.uiFont) && !Config.uiFont.startsWith("Symbols")
+
+                            Layout.fillWidth: true
+                            visible: root.section === "fonts"
+                            spacing: 12
+
+                            StyledText {
+                                Layout.fillWidth: true
+                                text: "Terminals keep their own fonts (kitty.conf). These are for the bar, panels and the shell's windows."
+                                color: Theme.overlay1
+                                wrapMode: Text.Wrap
+                            }
+
+                            // Presets
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: 8
+
+                                TextButton {
+                                    Layout.fillWidth: true
+                                    text: "SF Pro + Symbols"
+                                    onClicked: {
+                                        Config.uiFont = "SF Pro Display";
+                                        Config.iconFont = "Symbols Nerd Font";
+                                    }
+                                }
+
+                                TextButton {
+                                    Layout.fillWidth: true
+                                    text: "Nerd Font only"
+                                    onClicked: {
+                                        const f = fontsPage.nerdFont;
+                                        Config.uiFont = f;
+                                        Config.iconFont = f;
+                                    }
+                                }
+
+                                TextButton {
+                                    Layout.fillWidth: true
+                                    text: "Nerd Font + Symbols"
+                                    onClicked: {
+                                        Config.uiFont = fontsPage.nerdFont;
+                                        Config.iconFont = "Symbols Nerd Font";
+                                    }
+                                }
+                            }
+
+                            // Preview in the chosen fonts
+                            Rectangle {
+                                Layout.fillWidth: true
+                                implicitHeight: preview.implicitHeight + 20
+                                radius: Theme.smallRadius
+                                color: Theme.cardBg
+
+                                Row {
+                                    id: preview
+
+                                    anchors.centerIn: parent
+                                    spacing: 10
+
+                                    Icon {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: Icons.arch
+                                        color: Theme.accent2
+                                    }
+
+                                    StyledText {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: Qt.formatDateTime(Time.date, Config.clockFormat)
+                                        font.weight: Font.DemiBold
+                                    }
+
+                                    Repeater {
+                                        model: [Icons.music, Icons.coffee, Icons.bluetooth, Icons.font, Icons.power]
+
+                                        Icon {
+                                            required property string modelData
+
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            text: modelData
+                                            color: Theme.subtext1
+                                        }
+                                    }
+
+                                    StyledText {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: "Mono 0O1lI"
+                                        font.family: Theme.monoFont
+                                        color: Theme.subtext0
+                                    }
+                                }
+                            }
+
+                            StyledText {
+                                Layout.topMargin: 6
+                                text: "Text"
+                                color: Theme.highlight
+                                font.weight: Font.Bold
+                            }
+
+                            StyledText {
+                                Layout.fillWidth: true
+                                text: "Bar, panels and windows. Any installed font, or a Nerd Font."
+                                color: Theme.overlay1
+                                font.pixelSize: Theme.fontSize - 1
+                                wrapMode: Text.Wrap
+                            }
+
+                            FontPicker {
+                                value: Config.uiFont
+                                onPicked: family => Config.uiFont = family
+                            }
+
+                            StyledText {
+                                Layout.topMargin: 6
+                                text: "Icons"
+                                color: Theme.highlight
+                                font.weight: Font.Bold
+                            }
+
+                            StyledText {
+                                Layout.fillWidth: true
+                                text: "A Nerd Font. Symbols Nerd Font has only the icons, next to the text font; a full Nerd Font (e.g. JetBrainsMono Nerd Font) has its own letters too."
+                                color: Theme.overlay1
+                                font.pixelSize: Theme.fontSize - 1
+                                wrapMode: Text.Wrap
+                            }
+
+                            RowLayout {
+                                Layout.fillWidth: true
+                                spacing: 8
+
+                                TextButton {
+                                    text: "Symbols Nerd Font"
+                                    onClicked: Config.iconFont = "Symbols Nerd Font"
+                                }
+
+                                TextButton {
+                                    visible: fontsPage.textIsNerd
+                                    text: "Same as text"
+                                    onClicked: Config.iconFont = Config.uiFont
+                                }
+                            }
+
+                            FontPicker {
+                                value: Config.iconFont
+                                nerdOnly: true
+                                allowAll: false
+                                sample: [Icons.arch, Icons.music, Icons.coffee, Icons.bluetooth, Icons.power].join("  ")
+                                onPicked: family => Config.iconFont = family
+                            }
+
+                            StyledText {
+                                Layout.topMargin: 6
+                                text: "Monospace"
+                                color: Theme.highlight
+                                font.weight: Font.Bold
+                            }
+
+                            StyledText {
+                                Layout.fillWidth: true
+                                text: "The lock screen's digital rain."
+                                color: Theme.overlay1
+                                font.pixelSize: Theme.fontSize - 1
+                            }
+
+                            FontPicker {
+                                value: Config.monoFont
+                                nerdOnly: true
+                                sample: "0O1lI {} => 0123"
+                                onPicked: family => Config.monoFont = family
                             }
                         }
 

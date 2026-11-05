@@ -55,7 +55,7 @@ Canvas {
             ctx.clearRect(0, 0, width, height);
             reset = false;
         }
-        ctx.font = `${s - 3}px "JetBrainsMono Nerd Font", monospace`;
+        ctx.font = `${s - 3}px "${Theme.monoFont}", monospace`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
