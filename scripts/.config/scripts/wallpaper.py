@@ -297,8 +297,14 @@ def notify(body: str) -> None:
 DEBUG_LOG = Path(os.environ.get("XDG_CACHE_HOME", HOME / ".cache")) / "wallpaper-debug.log"
 
 
-def debug(message: str) -> None:
-    """Append a line to ~/.cache/wallpaper-debug.log (last 2000 lines kept)."""
+VERBOSE = bool(os.environ.get("WALLPAPER_DEBUG"))
+
+
+def debug(message: str, *, always: bool = False) -> None:
+    """Append a line to ~/.cache/wallpaper-debug.log (last 2000 lines kept).
+    Errors are always logged; every call only with WALLPAPER_DEBUG=1."""
+    if not (always or VERBOSE):
+        return
     try:
         DEBUG_LOG.parent.mkdir(parents=True, exist_ok=True)
         line = f"{time.strftime('%H:%M:%S')}.{int(time.time() * 1000) % 1000:03d} [{os.getpid()}<{os.getppid()}] {message}\n"
@@ -317,7 +323,7 @@ def main(argv: list[str]) -> int:
     try:
         code = run_command(argv)
     except BaseException as e:  # noqa: BLE001 - log everything, then re-raise
-        debug(f"EXCEPTION after {time.monotonic() - start:.3f}s: {e!r}\n{traceback.format_exc()}")
+        debug(f"EXCEPTION argv={argv!r} after {time.monotonic() - start:.3f}s: {e!r}\n{traceback.format_exc()}", always=True)
         raise
     debug(f"exit {code} after {time.monotonic() - start:.3f}s")
     return code
@@ -348,7 +354,7 @@ def run_command(argv: list[str]) -> int:
     elif cmd == "restore":
         restore()
     else:
-        debug(f"unknown command {argv!r}: printing usage, exit 1")
+        debug(f"unknown command {argv!r}: printing usage, exit 1", always=True)
         print(__doc__.strip(), file=sys.stderr)
         return 1
     return 0
