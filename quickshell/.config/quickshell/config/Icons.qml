@@ -17,6 +17,8 @@ Singleton {
     readonly property string check: g(0xf00c)
     readonly property string chevronRight: g(0xf054)
     readonly property string chevronLeft: g(0xf053)
+    readonly property string chevronUp: g(0xf077)
+    readonly property string chevronDown: g(0xf078)
     readonly property string cog: g(0xf013)
     readonly property string refresh: g(0xf021)
     readonly property string lock: g(0xf023)

@@ -59,10 +59,19 @@ Singleton {
     readonly property int borderWidth: Config.borderWidth
 
     // Metrics
-    // Settings > Fonts
-    readonly property string font: Config.uiFont || "SF Pro Display"
-    readonly property string iconFont: Config.iconFont || "Symbols Nerd Font"
-    readonly property string monoFont: Config.monoFont || "JetBrainsMono Nerd Font"
+    // Settings > Fonts. Text: the display font, or the Nerd Font with
+    // "Nerd Fonts only". Icons: Symbols Nerd Font, or the Nerd Font's
+    // proportional ("Propo") variant: in the monospaced variants wide icons
+    // spill out of their cell and sit off-center in buttons.
+    readonly property string nerdFamily: (Config.nerdFont || "JetBrainsMono Nerd Font").replace(/ (Mono|Propo)$/, "")
+    readonly property string font: Config.nerdFontOnly ? (Config.nerdFont || nerdFamily) : (Config.displayFont || "SF Pro Display")
+    readonly property string iconFont: {
+        if (Config.nerdSymbols)
+            return "Symbols Nerd Font";
+        const propo = nerdFamily + " Propo";
+        return Qt.fontFamilies().includes(propo) ? propo : nerdFamily;
+    }
+    readonly property string monoFont: Config.nerdFont || "JetBrainsMono Nerd Font"
     // Text size in px from the Displays panel (~/.config/hypr/monitors.json)
     property int textSize: 13
     readonly property int fontSize: textSize

@@ -114,9 +114,9 @@ FloatingWindow {
             } else if (event.key === Qt.Key_Backspace) {
                 root.query = root.query.slice(0, -1);
             } else if (event.key === Qt.Key_Down) {
-                flick.contentY = Math.min(Math.max(0, flick.contentHeight - flick.height), flick.contentY + 60);
+                bindsFlick.contentY = Math.min(Math.max(0, bindsFlick.contentHeight - bindsFlick.height), bindsFlick.contentY + 60);
             } else if (event.key === Qt.Key_Up) {
-                flick.contentY = Math.max(0, flick.contentY - 60);
+                bindsFlick.contentY = Math.max(0, bindsFlick.contentY - 60);
             } else if (event.text.length === 1 && event.text >= " " && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier))) {
                 root.query += event.text;
             } else {
@@ -168,7 +168,7 @@ FloatingWindow {
             }
 
             Flickable {
-                id: flick
+                id: bindsFlick
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -176,13 +176,19 @@ FloatingWindow {
                 clip: true
                 boundsBehavior: Flickable.StopAtBounds
 
+                ScrollBar {
+                    parent: bindsFlick
+                    flick: bindsFlick
+                }
+
                 // Sections flow into two columns, each section kept whole
                 Row {
                     id: columns
 
-                    readonly property real columnWidth: (flick.width - spacing) / 2
+                    readonly property real columnWidth: (width - spacing) / 2
 
-                    width: flick.width
+                    // room for the scroll bar
+                    width: bindsFlick.width - 14
                     spacing: 16
 
                     Repeater {
