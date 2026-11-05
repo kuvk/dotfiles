@@ -51,11 +51,11 @@ PanelWindow {
             visible: barWindow.shows("launcher")
             indicator: false
             tooltip: "Applications"
-            onClicked: Panels.toggleLauncher("apps")
+            onClicked: Panels.toggleAppMenu()
 
             Icon {
                 text: Icons.arch
-                color: launcherButton.containsMouse || (Panels.launcher && Panels.launcherMode === "apps" && Panels.overlayScreen === barWindow.screen) ? Theme.accent : Theme.accent2
+                color: launcherButton.containsMouse || (Panels.appMenu && Panels.overlayScreen === barWindow.screen) ? Theme.accent : Theme.accent2
                 font.pixelSize: 17
             }
         }

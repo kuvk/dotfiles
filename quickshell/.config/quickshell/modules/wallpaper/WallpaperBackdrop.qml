@@ -5,13 +5,13 @@ import qs.config
 import qs.components
 import qs.services
 
-// While the wallpaper picker is open, every other monitor gets the same
-// blurred, dimmed overlay as the power menu; the carousel stays on the
-// monitor it opened on. A click on one of them closes the picker.
+// While the wallpaper or theme carousel is open, every other monitor gets the
+// same blurred, dimmed overlay as the power menu; the carousel stays on the
+// monitor it opened on. A click on one of them closes it.
 Scope {
     id: root
 
-    readonly property bool shown: Panels.wallpapers !== ""
+    readonly property bool shown: Panels.wallpapers !== "" || Panels.themes
 
     Reveal {
         id: revealer
@@ -49,7 +49,10 @@ Scope {
 
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: Panels.wallpapers = ""
+                    onClicked: {
+                        Panels.wallpapers = "";
+                        Panels.themes = false;
+                    }
                 }
             }
         }

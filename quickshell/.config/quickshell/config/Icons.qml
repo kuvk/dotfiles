@@ -79,6 +79,14 @@ Singleton {
     readonly property string vlc: g(0xf057c)
     readonly property string firefox: g(0xf269)
     readonly property string globe: g(0xf0ac)
+    readonly property string image: g(0xf03e)
+    readonly property string document: g(0xf15c)
+    readonly property string code: g(0xf121)
+    readonly property string school: g(0xf19d)
+    readonly property string tools: g(0xf0ad)
+    readonly property string chip: g(0xf2db)
+    readonly property string grid: g(0xf00a)
+    readonly property string box: g(0xf1b2)
     readonly property string chrome: g(0xf268)
 
     // Network
