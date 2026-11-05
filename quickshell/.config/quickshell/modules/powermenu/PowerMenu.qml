@@ -148,11 +148,10 @@ Scope {
                                 }
                             }
 
-                            Icon {
+                            SessionIcon {
                                 anchors.centerIn: parent
-                                text: button.modelData.icon
-                                color: Theme[button.modelData.color]
-                                font.pixelSize: 44
+                                entry: button.modelData
+                                size: 44
                                 scale: button.selected ? 1.1 : 1
 
                                 Behavior on scale {

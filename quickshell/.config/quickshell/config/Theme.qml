@@ -14,6 +14,8 @@ Singleton {
     property string theme: "catppuccin-mocha"
     property string themeName: "Catppuccin Mocha"
     property string mode: "dark"
+    // power menu icons for this theme (theme-icons.py), "" = use glyphs
+    property string iconsDir: ""
     // Set by hypr-gamemode.sh over IPC: opaque surfaces, square corners, no animations
     property bool gamemode: false
 
@@ -91,6 +93,7 @@ Singleton {
                 root.theme = data.theme ?? root.theme;
                 root.themeName = data.name ?? root.themeName;
                 root.mode = data.mode ?? "dark";
+                root.iconsDir = data.icons ?? "";
             } catch (e) {
                 console.warn("Theme: could not parse", path, e);
             }

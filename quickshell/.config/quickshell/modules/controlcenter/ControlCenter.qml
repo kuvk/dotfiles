@@ -339,11 +339,10 @@ PanelWindow {
                             color: action.containsMouse ? Theme.hoverBg : Theme.cardBg
                         }
 
-                        Icon {
+                        SessionIcon {
                             anchors.centerIn: parent
-                            text: action.modelData.icon
-                            color: Theme[action.modelData.color]
-                            font.pixelSize: 18
+                            entry: action.modelData
+                            size: 18
                         }
                     }
                 }
