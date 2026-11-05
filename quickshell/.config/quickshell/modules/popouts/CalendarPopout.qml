@@ -54,7 +54,7 @@ Popout {
 
     StyledText {
         Layout.fillWidth: true
-        text: Qt.formatDateTime(Time.date, "dddd, d MMMM yyyy  ·  HH:mm:ss")
+        text: Qt.formatDateTime(Time.date, "dddd, d MMMM yyyy  ·  HH:mm")
         color: Theme.subtext0
         font.pixelSize: Theme.fontSize + 1
         horizontalAlignment: Text.AlignHCenter
