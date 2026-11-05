@@ -12,18 +12,19 @@ tab_size = 4
 show_symlink = true
 
 [opener]
-# Default app (xdg-open) in its own session: setsid -f returns at once, so
-# yazi forgets it, and closing yazi leaves the app running. (`orphan = true`
-# stopped files from opening at all.) Text and the like still open in
-# $EDITOR in the terminal (yazi's `edit` rule).
+# Files are passed as %s1 (the first) and %s (all), quoted by yazi: current
+# yazi no longer sets the shell's "$1"/"$@", which left xdg-open without a
+# file. Default app (xdg-open) in its own session: setsid -f returns at once,
+# so yazi forgets it and the app outlives yazi. Text and the like still open
+# in $EDITOR in the terminal (yazi's `edit` rule).
 open = [
-	{ run = 'setsid -f xdg-open "$1" >/dev/null 2>&1', desc = "Open", for = "linux" },
+	{ run = "setsid -f xdg-open %s1 >/dev/null 2>&1", desc = "Open", for = "linux" },
 ]
 play = [
-	{ run = 'vlc "$@"', orphan = true, for = "linux" },
+	{ run = "vlc %s", orphan = true, desc = "VLC", for = "linux" },
 ]
 pinta_image = [
-	{ run = 'pinta "$@"', orphan = true, desc = "Pinta" },
+	{ run = "pinta %s", orphan = true, desc = "Pinta" },
 ]
 
 # prepend_rules keeps yazi's own rules after these (Enter opens anything
