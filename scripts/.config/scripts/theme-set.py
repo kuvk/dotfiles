@@ -17,6 +17,7 @@ import json
 import os
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import tomllib
@@ -273,6 +274,7 @@ def reload_apps(theme: dict) -> None:
         run_quiet(["bat", "cache", "--build"])
     if "yazi-theme.toml" in theme.get("changed", ()):
         restart_yazi()
+    redraw_prompts()
     if shutil.which("tmux") and subprocess.run(["tmux", "info"], capture_output=True).returncode == 0:
         run_quiet(["tmux", "source-file", str(HOME / ".tmux.conf")])
     # a running cliamp re-reads the theme file when told to switch to it
@@ -297,6 +299,24 @@ def reload_apps(theme: dict) -> None:
                 monitors = []
             for monitor in monitors:
                 run_quiet(["hyprctl", "hyprpaper", "wallpaper", f"{monitor},{path},cover"])
+
+
+def redraw_prompts() -> None:
+    """Open zsh shells redraw their starship prompt in the new colors. Only
+    shells that registered themselves (.zshrc, they trap USR1) are signalled:
+    USR1 would end any other process."""
+    runtime = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "zsh-prompt"
+    if not runtime.is_dir():
+        return
+    for entry in runtime.iterdir():
+        try:
+            pid = int(entry.name)
+            with open(f"/proc/{pid}/comm") as f:
+                if f.read().strip() != "zsh":
+                    raise ProcessLookupError
+            os.kill(pid, signal.SIGUSR1)
+        except (ValueError, OSError):
+            entry.unlink(missing_ok=True)  # gone, or the pid was reused
 
 
 def restart_yazi() -> None:
