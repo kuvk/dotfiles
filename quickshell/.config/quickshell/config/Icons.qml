@@ -79,6 +79,7 @@ Singleton {
     readonly property string vlc: g(0xf057c)
     readonly property string firefox: g(0xf269)
     readonly property string globe: g(0xf0ac)
+    readonly property string reply: g(0xf112)
     readonly property string image: g(0xf03e)
     readonly property string document: g(0xf15c)
     readonly property string code: g(0xf121)
