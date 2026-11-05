@@ -12,6 +12,8 @@ Singleton {
 
     property bool dnd: false
     property var popups: []
+    // a popup's reply box has the keyboard (the popups window takes focus)
+    property bool replying: false
     property var arrivals: ({}) // notification id -> Date
 
     readonly property var list: server.trackedNotifications.values
@@ -97,6 +99,8 @@ Singleton {
 
         keepOnReload: true
         actionsSupported: true
+        // a reply box for apps that ask for one (Notification.hasInlineReply)
+        inlineReplySupported: true
         actionIconsSupported: true
         bodySupported: true
         bodyMarkupSupported: true

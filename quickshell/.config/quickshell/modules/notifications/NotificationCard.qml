@@ -21,6 +21,13 @@ Item {
     // opaque background (the card color blended onto the panel), for cards
     // stacked over each other in the Control Center
     property bool solid: false
+    // the reply box is open (apps that support inline replies)
+    property bool replying: false
+
+    onReplyingChanged: if (popup)
+        Notifs.replying = replying
+    Component.onDestruction: if (popup && replying)
+        Notifs.replying = false
 
     readonly property bool critical: notification.urgency === NotificationUrgency.Critical
     readonly property int timeout: popup ? Notifs.timeoutFor(notification) : 0
@@ -90,7 +97,7 @@ Item {
                 id: countdown
 
                 running: root.timeout > 0
-                paused: running && hover.containsMouse
+                paused: running && (hover.containsMouse || root.replying)
                 from: 1
                 to: 0
                 duration: root.timeout * 1000
@@ -187,11 +194,78 @@ Item {
                 }
             }
 
+            // Reply box: Enter sends, Escape closes it
+            Rectangle {
+                Layout.fillWidth: true
+                visible: root.replying
+                implicitHeight: 34
+                radius: Theme.smallRadius
+                color: Theme.surface0
+                border.color: replyInput.activeFocus ? Theme.highlight : "transparent"
+
+                TextInput {
+                    id: replyInput
+
+                    anchors.fill: parent
+                    anchors.leftMargin: 10
+                    anchors.rightMargin: 10
+                    verticalAlignment: TextInput.AlignVCenter
+                    color: Theme.text
+                    font.family: Theme.font
+                    font.pixelSize: Theme.fontSize
+                    clip: true
+                    onAccepted: {
+                        if (text.trim() === "")
+                            return;
+                        root.notification.sendInlineReply(text);
+                        root.replying = false;
+                        if (!root.notification.resident)
+                            root.close();
+                    }
+                    Keys.onEscapePressed: root.replying = false
+
+                    StyledText {
+                        anchors.fill: parent
+                        visible: replyInput.text === ""
+                        text: root.notification.inlineReplyPlaceholder || "Reply"
+                        color: Theme.overlay1
+                    }
+                }
+            }
+
             // Action buttons (these don't close the card on their own click area)
             RowLayout {
                 Layout.fillWidth: true
-                visible: actionsRepeater.count > 0
+                visible: actionsRepeater.count > 0 || root.notification.hasInlineReply
                 spacing: 6
+
+                // Reply: opens the reply box
+                MouseArea {
+                    id: replyButton
+
+                    Layout.fillWidth: true
+                    visible: root.notification.hasInlineReply
+                    implicitHeight: 30
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: {
+                        root.replying = !root.replying;
+                        replyInput.text = "";
+                        if (root.replying)
+                            replyInput.forceActiveFocus();
+                    }
+
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: Theme.smallRadius
+                        color: replyButton.containsMouse || root.replying ? Theme.surface1 : Theme.surface0
+                    }
+
+                    StyledText {
+                        anchors.centerIn: parent
+                        text: `${Icons.reply}  Reply`
+                    }
+                }
 
                 Repeater {
                     id: actionsRepeater
