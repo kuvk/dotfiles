@@ -23,7 +23,7 @@ open = [
 play = [
 	{ run = "vlc %s", orphan = true, desc = "VLC", for = "linux" },
 ]
-# swayimg lists the image's whole folder (imagelist.adjacent), so H/L browse it
+# swayimg lists the image's whole folder (imagelist.adjacent), so h/l browse it
 swayimg = [
 	{ run = "setsid -f swayimg %s >/dev/null 2>&1", desc = "swayimg", for = "linux" },
 ]

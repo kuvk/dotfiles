@@ -38,6 +38,11 @@ Item {
         return Quickshell.iconPath(icon, true);
     }
 
+    // Chromium-based browsers (and so web apps) put the site ("web.whatsapp.com",
+    // sometimes as a link) on the body's first line; the app name already says it
+    readonly property bool fromBrowser: /chrom|brave|vivaldi|edge|opera/i.test(notification.appName + " " + notification.desktopEntry)
+    readonly property string body: fromBrowser ? notification.body.replace(/^\s*(<a\b[^>]*>)?(https?:\/\/)?([\w-]+\.)+[a-z]{2,}(:\d+)?(\/\S*)?(<\/a>)?((\s*(\n|<br\s*\/?>))+|\s*$)/i, "").trim() : notification.body
+
     function close(): void {
         if (popup)
             Notifs.dismissPopup(notification);
@@ -130,9 +135,11 @@ Item {
                     Layout.fillWidth: true
                     spacing: 2
 
+                    // app name and time; without the app name (Control Center
+                    // groups) the time sits to the right of the text instead
                     RowLayout {
                         Layout.fillWidth: true
-                        visible: root.showAppName || timeLabel.text !== ""
+                        visible: root.showAppName
 
                         StyledText {
                             Layout.fillWidth: true
@@ -143,14 +150,7 @@ Item {
                             font.weight: Font.DemiBold
                         }
 
-                        Item {
-                            Layout.fillWidth: true
-                            visible: !root.showAppName
-                        }
-
                         StyledText {
-                            id: timeLabel
-
                             text: Notifs.relativeTime(root.notification, Time.date)
                             color: Theme.overlay1
                             font.pixelSize: Theme.fontSize - 2
@@ -170,13 +170,21 @@ Item {
                     StyledText {
                         Layout.fillWidth: true
                         visible: text !== ""
-                        text: root.notification.body
+                        text: root.body
                         textFormat: Text.StyledText
                         color: Theme.subtext1
                         wrapMode: Text.Wrap
                         maximumLineCount: root.popup ? 4 : 8
                         onLinkActivated: link => Qt.openUrlExternally(link)
                     }
+                }
+
+                StyledText {
+                    Layout.alignment: Qt.AlignTop
+                    visible: !root.showAppName
+                    text: Notifs.relativeTime(root.notification, Time.date)
+                    color: Theme.overlay1
+                    font.pixelSize: Theme.fontSize - 2
                 }
             }
 
