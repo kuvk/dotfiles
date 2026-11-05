@@ -12,6 +12,8 @@ local bar = "qs ipc call bar toggle"
 local displays = "qs ipc call displays toggle"
 local lock = "qs ipc call lock lock"
 local powermenu = "qs ipc call power toggle"
+local settings = "qs ipc call settings toggle"
+local music = "kitty --class cliamp -e cliamp"
 local email = "thunderbird"
 local gamemode = "~/.config/scripts/hypr-gamemode.sh"
 
@@ -22,14 +24,16 @@ local mainMod = "ALT"
 
 -- General Binds
 hl.bind(mainMod .. " + return", hl.dsp.exec_cmd(terminal))
-hl.bind(mainMod .. " + B", hl.dsp.exec_cmd(browser))
+hl.bind(mainMod .. " + CONTROL + return", hl.dsp.exec_cmd(browser))
 hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(email))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(notifications))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(menu))
 hl.bind(mainMod .. " + SHIFT + space", hl.dsp.exec_cmd(bar))
 hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd(themes))
-hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(displays))
+hl.bind(mainMod .. " + CONTROL + M", hl.dsp.exec_cmd(displays))
+hl.bind(mainMod .. " + CONTROL + P", hl.dsp.exec_cmd(settings))
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(music))
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd(lock))
 hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(powermenu))

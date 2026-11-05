@@ -15,12 +15,16 @@ local function read()
   return fallback
 end
 
+-- Palette of the current theme (aether keys: bg, dark_bg, fg, blue, ...)
+M.palette = {}
+
 function M.apply()
   local theme = read()
   if M.current == theme.name and vim.g.colors_name == theme.colorscheme then
     return
   end
   M.current = theme.name
+  M.palette = theme.aether or {}
   vim.o.background = theme.background or "dark"
 
   -- aether builds its colors from the palette, so it needs setup per theme
@@ -38,6 +42,10 @@ function M.apply()
 end
 
 function M.setup()
+  if M.started then
+    return
+  end
+  M.started = true
   M.apply()
 
   if vim.fn.isdirectory(dir) == 0 then

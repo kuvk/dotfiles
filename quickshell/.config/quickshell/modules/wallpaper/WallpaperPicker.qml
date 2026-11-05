@@ -14,8 +14,8 @@ import qs.services
 // right. Same picker for static (~/Pictures/Wallpapers) and live
 // (~/Pictures/WallpapersLive) wallpapers; Tab switches between them.
 //
-// ←/→ h/l or scroll: move   Enter: all monitors   Shift+Enter: this monitor
-// Tab: static/live   Delete: stop live wallpapers   Esc: close
+// ←/→ or scroll: move   type: search   Enter: all monitors
+// Shift+Enter: this monitor   Tab: static/live   Delete: stop live   Esc: close
 PanelWindow {
     id: root
 
@@ -24,28 +24,54 @@ PanelWindow {
     readonly property string script: Quickshell.env("HOME") + "/.config/scripts/wallpaper.py"
 
     property var items: []
+    property string query: ""
     property int selected: 0
     property bool loading: false
+    property string loadedKind: ""
+    property bool retried: false
 
-    // Card geometry, scaled to the screen
-    readonly property real cardHeight: Math.min(475, height * 0.45)
+    readonly property var shownItems: {
+        const q = query.toLowerCase();
+        return q ? items.filter(i => i.name.toLowerCase().includes(q)) : items;
+    }
+
+    // Animated selection: every card's size and place derive from it, so the
+    // middle card shrinks exactly as fast as its neighbour grows (no gaps)
+    property real position: selected
+    // skip the animation when jumping to the current wallpaper on open
+    property bool jump: false
+
+    Behavior on position {
+        enabled: root.shown && !root.jump
+
+        NumberAnimation {
+            duration: Theme.animDuration * 2
+            easing.type: Easing.OutCubic
+        }
+    }
+
+    // Card geometry from the monitor size (the window may not be mapped yet)
+    readonly property real screenWidth: screen?.width ?? 1920
+    readonly property real cardHeight: Math.min(475, (screen?.height ?? 1080) * 0.45)
     readonly property real cardWidth: cardHeight * 768 / 475
     readonly property real sliceWidth: cardHeight * 0.23
     readonly property real sliceHeight: cardHeight * 0.91
     readonly property real skew: cardHeight * 0.06
     readonly property real overlap: -cardHeight * 0.06
-    readonly property int radius: Math.ceil((width - cardWidth) / (2 * (sliceWidth + overlap))) + 1
+    readonly property int radius: Math.max(3, Math.ceil((screenWidth - cardWidth) / (2 * (sliceWidth + overlap))) + 2)
 
     // Thumbnails generated during this opening, per kind
     property var thumbsTried: ({})
 
     function load(): void {
         loading = true;
-        // A list for the previous tab may still be running; restart it
         listProc.running = false;
-        listProc.kind = kind;
-        listProc.command = [script, "list", kind];
-        listProc.running = true;
+        // start on the next tick so a list for the previous tab is really stopped
+        Qt.callLater(() => {
+            listProc.kind = kind;
+            listProc.command = [script, "list", kind];
+            listProc.running = true;
+        });
     }
 
     function makeThumbs(): void {
@@ -61,12 +87,12 @@ PanelWindow {
     }
 
     function move(delta: int): void {
-        if (items.length > 0)
-            selected = Math.max(0, Math.min(items.length - 1, selected + delta));
+        if (shownItems.length > 0)
+            selected = Math.max(0, Math.min(shownItems.length - 1, selected + delta));
     }
 
     function apply(thisMonitorOnly: bool): void {
-        const item = items[selected];
+        const item = shownItems[selected];
         if (!item)
             return;
         const cmd = [script, "set", kind, item.path];
@@ -76,12 +102,15 @@ PanelWindow {
         Panels.wallpapers = "";
     }
 
-    // Horizontal center of the card at `offset` from the selected one
-    function centerFor(offset: int): real {
-        if (offset === 0)
-            return width / 2;
-        const side = Math.sign(offset);
-        return width / 2 + side * (cardWidth / 2 + overlap + sliceWidth / 2 + (Math.abs(offset) - 1) * (sliceWidth + overlap));
+    // Size of the visible slice at fractional distance `d` from the selection
+    function lerp(a: real, b: real, t: real): real {
+        return a + (b - a) * Math.min(1, Math.abs(t));
+    }
+
+    function centerOffset(d: real): real {
+        const a = Math.abs(d);
+        const first = cardWidth / 2 + overlap + sliceWidth / 2;
+        return Math.sign(d) * (a <= 1 ? a * first : first + (a - 1) * (sliceWidth + overlap));
     }
 
     screen: Panels.focusedScreen
@@ -101,13 +130,18 @@ PanelWindow {
     onKindChanged: {
         if (shown) {
             items = [];
+            query = "";
             selected = 0;
+            retried = false;
+            loadedKind = "";
             load();
             focusTimer.restart();
         } else {
             thumbsTried = {};
         }
     }
+
+    onQueryChanged: selected = 0
 
     // The window may not be mapped yet when the kind changes; focus once it is
     Timer {
@@ -139,16 +173,33 @@ PanelWindow {
                 } catch (e) {
                     console.warn("Wallpapers: bad list", e);
                 }
-                const first = root.items.length === 0;
+                // an empty first answer is retried once before believing it
+                if (list.length === 0 && !root.retried) {
+                    root.retried = true;
+                    retry.restart();
+                    return;
+                }
+                const first = root.loadedKind !== root.kind;
                 root.items = list;
-                if (first)
+                root.loadedKind = root.kind;
+                if (first) {
+                    root.jump = true;
                     root.selected = Math.max(0, list.findIndex(i => i.current));
+                    Qt.callLater(() => root.jump = false);
+                }
                 root.loading = false;
                 // Fill in missing thumbnails, then reload once
                 if (list.some(i => !i.thumb))
                     root.makeThumbs();
             }
         }
+    }
+
+    Timer {
+        id: retry
+
+        interval: 400
+        onTriggered: root.load()
     }
 
     Process {
@@ -169,16 +220,19 @@ PanelWindow {
 
         Keys.onPressed: event => {
             const shift = event.modifiers & Qt.ShiftModifier;
-            if (event.key === Qt.Key_Escape)
-                Panels.wallpapers = "";
-            else if (event.key === Qt.Key_Left || event.key === Qt.Key_H)
+            if (event.key === Qt.Key_Escape) {
+                if (root.query !== "")
+                    root.query = "";
+                else
+                    Panels.wallpapers = "";
+            } else if (event.key === Qt.Key_Left)
                 root.move(-1);
-            else if (event.key === Qt.Key_Right || event.key === Qt.Key_L)
+            else if (event.key === Qt.Key_Right)
                 root.move(1);
             else if (event.key === Qt.Key_Home)
                 root.selected = 0;
             else if (event.key === Qt.Key_End)
-                root.selected = Math.max(0, root.items.length - 1);
+                root.selected = Math.max(0, root.shownItems.length - 1);
             else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
                 root.apply(shift);
             else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab)
@@ -186,7 +240,11 @@ PanelWindow {
             else if (event.key === Qt.Key_Delete && root.kind === "live") {
                 Quickshell.execDetached([root.script, "stop"]);
                 Panels.wallpapers = "";
-            } else
+            } else if (event.key === Qt.Key_Backspace)
+                root.query = root.query.slice(0, -1);
+            else if (event.text.length === 1 && event.text >= " " && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier)))
+                root.query += event.text;
+            else
                 return;
             event.accepted = true;
         }
@@ -197,45 +255,76 @@ PanelWindow {
             onWheel: wheel => root.move(wheel.angleDelta.y > 0 || wheel.angleDelta.x > 0 ? -1 : 1)
         }
 
-        // Tabs
-        Row {
+        // Tabs and search
+        ColumnLayout {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: carousel.top
-            anchors.bottomMargin: 36
-            spacing: 8
+            anchors.bottomMargin: 30
+            spacing: 12
+            opacity: reveal.value
 
-            Repeater {
-                model: [
-                    { kind: "static", label: "Wallpapers" },
-                    { kind: "live", label: "Live wallpapers" }
-                ]
+            Row {
+                Layout.alignment: Qt.AlignHCenter
+                spacing: 8
 
-                MouseArea {
-                    id: tab
+                Repeater {
+                    model: [
+                        { kind: "static", label: "Wallpapers" },
+                        { kind: "live", label: "Live wallpapers" }
+                    ]
 
-                    required property var modelData
-                    readonly property bool current: root.kind === modelData.kind
+                    MouseArea {
+                        id: tab
 
-                    width: tabLabel.implicitWidth + 28
-                    height: 32
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: Panels.wallpapers = modelData.kind
+                        required property var modelData
+                        readonly property bool current: root.kind === modelData.kind
 
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: Theme.radius
-                        color: tab.current ? Theme.alpha(Theme.highlight, 0.25) : Theme.alpha(Theme.base, 0.6)
-                        border.color: tab.current ? Theme.highlight : "transparent"
-                        border.width: Theme.borderWidth
+                        width: tabLabel.implicitWidth + 28
+                        height: 32
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: Panels.wallpapers = modelData.kind
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: Theme.radius
+                            color: tab.current ? Theme.alpha(Theme.highlight, 0.25) : Theme.alpha(Theme.base, 0.6)
+                            border.color: tab.current ? Theme.highlight : "transparent"
+                            border.width: Theme.borderWidth
+                        }
+
+                        StyledText {
+                            id: tabLabel
+
+                            anchors.centerIn: parent
+                            text: tab.modelData.label
+                            color: tab.current ? Theme.highlight : Theme.subtext0
+                            font.weight: Font.DemiBold
+                        }
+                    }
+                }
+            }
+
+            Rectangle {
+                Layout.alignment: Qt.AlignHCenter
+                implicitWidth: 320
+                implicitHeight: 34
+                radius: height / 2
+                color: Theme.alpha(Theme.base, 0.75)
+                border.color: root.query !== "" ? Theme.highlight : "transparent"
+                border.width: Theme.borderWidth
+
+                Row {
+                    anchors.centerIn: parent
+                    spacing: 8
+
+                    Icon {
+                        text: Icons.search
+                        color: root.query !== "" ? Theme.highlight : Theme.overlay1
                     }
 
                     StyledText {
-                        id: tabLabel
-
-                        anchors.centerIn: parent
-                        text: tab.modelData.label
-                        color: tab.current ? Theme.highlight : Theme.subtext0
-                        font.weight: Font.DemiBold
+                        text: root.query !== "" ? root.query : "Type to search"
+                        color: root.query !== "" ? Theme.text : Theme.overlay1
                     }
                 }
             }
@@ -251,49 +340,34 @@ PanelWindow {
             scale: 0.95 + 0.05 * reveal.value
 
             Repeater {
-                model: root.items
+                model: root.shownItems
 
                 Loader {
                     id: slot
 
                     required property var modelData
                     required property int index
-                    readonly property int offset: index - root.selected
-                    readonly property bool isSelected: offset === 0
+                    // fractional distance from the (animated) selection
+                    readonly property real d: index - root.position
+                    readonly property bool isSelected: index === root.selected
+                    // visible slice inside the fixed-size card
+                    readonly property real visibleWidth: root.lerp(root.cardWidth, root.sliceWidth, d)
+                    readonly property real visibleHeight: root.lerp(root.cardHeight, root.sliceHeight, d)
+                    readonly property real left: (root.cardWidth - visibleWidth) / 2
+                    readonly property real top: (root.cardHeight - visibleHeight) / 2
 
-                    active: Math.abs(offset) <= root.radius
+                    active: Math.abs(index - root.selected) <= root.radius
                     visible: active
-                    z: 100 - Math.abs(offset)
-                    width: isSelected ? root.cardWidth : root.sliceWidth
-                    height: isSelected ? root.cardHeight : root.sliceHeight
-                    x: root.centerFor(offset) - width / 2
-                    y: (carousel.height - height) / 2
-
-                    Behavior on x {
-                        NumberAnimation {
-                            duration: Theme.animDuration * 1.5
-                            easing.type: Easing.OutCubic
-                        }
-                    }
-
-                    Behavior on width {
-                        NumberAnimation {
-                            duration: Theme.animDuration * 1.5
-                            easing.type: Easing.OutCubic
-                        }
-                    }
-
-                    Behavior on height {
-                        NumberAnimation {
-                            duration: Theme.animDuration * 1.5
-                            easing.type: Easing.OutCubic
-                        }
-                    }
+                    z: 1000 - Math.round(Math.abs(d) * 10)
+                    width: root.cardWidth
+                    height: root.cardHeight
+                    x: carousel.width / 2 + root.centerOffset(d) - width / 2
 
                     sourceComponent: Item {
                         id: card
 
-                        // Image, dimmed when not selected, cut to a parallelogram
+                        // Fixed-size picture, so its layer never reallocates
+                        // while animating; only the mask path moves
                         Item {
                             id: picture
 
@@ -327,13 +401,7 @@ PanelWindow {
                             Rectangle {
                                 anchors.fill: parent
                                 color: Theme.crust
-                                opacity: slot.isSelected ? 0 : 0.45
-
-                                Behavior on opacity {
-                                    NumberAnimation {
-                                        duration: Theme.animDuration
-                                    }
-                                }
+                                opacity: Math.min(1, Math.abs(slot.d)) * 0.45
                             }
                         }
 
@@ -347,12 +415,12 @@ PanelWindow {
                             ShapePath {
                                 fillColor: "white"
                                 strokeColor: "transparent"
-                                startX: root.skew
-                                startY: 0
-                                PathLine { x: card.width; y: 0 }
-                                PathLine { x: card.width - root.skew; y: card.height }
-                                PathLine { x: 0; y: card.height }
-                                PathLine { x: root.skew; y: 0 }
+                                startX: slot.left + root.skew
+                                startY: slot.top
+                                PathLine { x: slot.left + slot.visibleWidth; y: slot.top }
+                                PathLine { x: slot.left + slot.visibleWidth - root.skew; y: slot.top + slot.visibleHeight }
+                                PathLine { x: slot.left; y: slot.top + slot.visibleHeight }
+                                PathLine { x: slot.left + root.skew; y: slot.top }
                             }
                         }
 
@@ -374,29 +442,32 @@ PanelWindow {
                                 fillColor: "transparent"
                                 strokeColor: slot.isSelected ? Theme.accent : Theme.alpha(Theme.text, 0.15)
                                 strokeWidth: slot.isSelected ? Math.max(2, Theme.borderWidth) : 1
-                                startX: root.skew
-                                startY: 0
-                                PathLine { x: card.width; y: 0 }
-                                PathLine { x: card.width - root.skew; y: card.height }
-                                PathLine { x: 0; y: card.height }
-                                PathLine { x: root.skew; y: 0 }
+                                startX: slot.left + root.skew
+                                startY: slot.top
+                                PathLine { x: slot.left + slot.visibleWidth; y: slot.top }
+                                PathLine { x: slot.left + slot.visibleWidth - root.skew; y: slot.top + slot.visibleHeight }
+                                PathLine { x: slot.left; y: slot.top + slot.visibleHeight }
+                                PathLine { x: slot.left + root.skew; y: slot.top }
                             }
                         }
 
                         // Current wallpaper marker
                         Rectangle {
                             visible: slot.modelData.current && slot.isSelected
-                            anchors.top: parent.top
-                            anchors.right: parent.right
-                            anchors.margins: 12
+                            x: slot.left + slot.visibleWidth - 22
+                            y: slot.top + 12
                             width: 10
                             height: 10
                             radius: 5
                             color: Theme.accent
                         }
 
+                        // Clicks only on the visible slice
                         MouseArea {
-                            anchors.fill: parent
+                            x: slot.left
+                            y: slot.top
+                            width: slot.visibleWidth
+                            height: slot.visibleHeight
                             cursorShape: Qt.PointingHandCursor
                             onClicked: slot.isSelected ? root.apply(false) : (root.selected = slot.index)
                         }
@@ -414,7 +485,15 @@ PanelWindow {
 
             StyledText {
                 Layout.alignment: Qt.AlignHCenter
-                text: root.items.length === 0 ? (root.loading ? "Loading…" : `Nothing in ~/Pictures/${root.kind === "live" ? "WallpapersLive" : "Wallpapers"}`) : (root.items[root.selected]?.name ?? "")
+                text: {
+                    if (root.loading && root.loadedKind !== root.kind)
+                        return "Loading…";
+                    if (root.items.length === 0)
+                        return `Nothing in ~/Pictures/${root.kind === "live" ? "WallpapersLive" : "Wallpapers"}`;
+                    if (root.shownItems.length === 0)
+                        return `No match for "${root.query}"`;
+                    return root.shownItems[root.selected]?.name ?? "";
+                }
                 font.pixelSize: Theme.fontSize + 3
                 font.weight: Font.DemiBold
                 style: Text.Outline
@@ -423,7 +502,7 @@ PanelWindow {
 
             StyledText {
                 Layout.alignment: Qt.AlignHCenter
-                text: `${root.items.length ? root.selected + 1 : 0} / ${root.items.length}   ·   Enter: all monitors   ·   Shift+Enter: this monitor   ·   Tab: ${root.kind === "static" ? "live" : "static"}${root.kind === "live" ? "   ·   Del: stop live" : ""}`
+                text: `${root.shownItems.length ? root.selected + 1 : 0} / ${root.shownItems.length}   ·   Enter: all monitors   ·   Shift+Enter: this monitor   ·   Tab: ${root.kind === "static" ? "live" : "static"}${root.kind === "live" ? "   ·   Del: stop live" : ""}`
                 color: Theme.subtext0
                 font.pixelSize: Theme.fontSize - 1
             }

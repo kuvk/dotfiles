@@ -17,10 +17,11 @@ fi
 
 notify() {
     command -v notify-send >/dev/null 2>&1 || return 0
-    notify-send -a "Hyprland Gamemode" -t 1500 "󰊴" "$1"
+    notify-send -a "Work-Game Mode" -t 1500 "󰊴" "$1"
 }
 
-# Opaque, square quickshell surfaces while gaming
+# Work-Game Mode: no animations, blur or rounding. Quickshell goes opaque,
+# applies the Work-Game gaps from its Settings and keeps the screen awake.
 set_shell_gamemode() {
     qs ipc call theme gamemode "$1" >/dev/null 2>&1 || true
 }
@@ -134,8 +135,6 @@ hl.config({
         rounding_power = 0,
     },
     general = {
-        gaps_in = 0,
-        gaps_out = 0,
         border_size = 2,
         col = {
             active_border = 'rgb($accent)',
@@ -148,7 +147,7 @@ hl.window_rule({ name = 'spotify', match = { class = 'spotify' }, opaque = true,
 hl.window_rule({ name = 'thunderbird', match = { class = 'org.mozilla.Thunderbird' }, opaque = true, no_blur = true })
 "
 
-    notify "Gamemode is ON."
+    notify "Work-Game Mode is on."
 }
 
 disable() {
@@ -168,8 +167,6 @@ hl.config({
         rounding_power = 2,
     },
     general = {
-        gaps_in = 2,
-        gaps_out = 4,
         border_size = 2,
         col = {
             active_border = 'rgba(${accent}ee)',
@@ -181,7 +178,7 @@ hl.window_rule({ name = 'kitty', match = { class = 'kitty' }, opaque = false, no
 hl.window_rule({ name = 'spotify', match = { class = 'spotify' }, opaque = false, no_blur = false })
 hl.window_rule({ name = 'thunderbird', match = { class = 'org.mozilla.Thunderbird' }, opaque = false, no_blur = false  })
 "
-    notify "Gamemode is OFF."
+    notify "Work-Game Mode is off."
 }
 
 if [[ -e "$FLAG" ]]; then

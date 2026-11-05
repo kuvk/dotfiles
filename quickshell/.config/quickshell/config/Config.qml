@@ -34,7 +34,23 @@ Singleton {
 
     // Tray and player
     property alias trayMonochrome: adapter.trayMonochrome
+    property alias trayTint: adapter.trayTint
+    property alias trayKeepColors: adapter.trayKeepColors
     property alias cava: adapter.cava
+    property alias cavaBars: adapter.cavaBars
+
+    // Window gaps (Hyprland), normal and in Work-Game Mode
+    property alias gapsIn: adapter.gapsIn
+    property alias gapsOut: adapter.gapsOut
+    property alias gameGapsIn: adapter.gameGapsIn
+    property alias gameGapsOut: adapter.gameGapsOut
+
+    // Lock screen colors, as theme color names (green, blue, accent, ...)
+    property alias lockClockColor: adapter.lockClockColor
+    property alias lockRainColor: adapter.lockRainColor
+    property alias lockOutlineColor: adapter.lockOutlineColor
+    property alias lockDotsColor: adapter.lockDotsColor
+    property alias lockTextColor: adapter.lockTextColor
 
     function reset(): void {
         adapter.radius = 8;
@@ -50,7 +66,19 @@ Singleton {
         adapter.lockMatrix = true;
         adapter.lockBlur = false;
         adapter.trayMonochrome = false;
+        adapter.trayTint = false;
+        adapter.trayKeepColors = "rog-control-center";
         adapter.cava = true;
+        adapter.cavaBars = 24;
+        adapter.gapsIn = 2;
+        adapter.gapsOut = 4;
+        adapter.gameGapsIn = 0;
+        adapter.gameGapsOut = 0;
+        adapter.lockClockColor = "green";
+        adapter.lockRainColor = "green";
+        adapter.lockOutlineColor = "green";
+        adapter.lockDotsColor = "blue";
+        adapter.lockTextColor = "text";
         adapter.version = root.version;
     }
 
@@ -90,7 +118,21 @@ Singleton {
             property bool lockMatrix: true
             property bool lockBlur: false
             property bool trayMonochrome: false
+            property bool trayTint: false
+            // tray apps whose icon colors carry meaning (e.g. the ROG dGPU
+            // state) and stay original in monochrome/tinted mode; comma separated
+            property string trayKeepColors: "rog-control-center"
             property bool cava: true
+            property int cavaBars: 24
+            property int gapsIn: 2
+            property int gapsOut: 4
+            property int gameGapsIn: 0
+            property int gameGapsOut: 0
+            property string lockClockColor: "green"
+            property string lockRainColor: "green"
+            property string lockOutlineColor: "green"
+            property string lockDotsColor: "blue"
+            property string lockTextColor: "text"
         }
     }
 }

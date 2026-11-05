@@ -139,7 +139,17 @@ PanelWindow {
         Tray {}
 
         BarButton {
-            tooltip: System.stayAwake ? "Allow idle and lock" : "Stay Awake"
+            tooltip: System.gamemode ? "Leave Work-Game Mode" : "Work-Game Mode"
+            onClicked: System.toggleGamemode()
+
+            Icon {
+                text: Icons.rocket
+                color: System.gamemode ? Theme.accent : Theme.overlay1
+            }
+        }
+
+        BarButton {
+            tooltip: System.stayAwake ? "Allow Idle Lock & Screensaver" : "Stay Awake"
             onClicked: System.stayAwake = !System.stayAwake
 
             Icon {
@@ -158,7 +168,7 @@ PanelWindow {
 
             Icon {
                 text: Audio.icon
-                color: Audio.muted ? Theme.red : Theme.mauve
+                color: Audio.color
             }
         }
 
