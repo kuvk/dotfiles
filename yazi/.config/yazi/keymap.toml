@@ -1,0 +1,21 @@
+# ~/.config/yazi/keymap.toml: additions to yazi's own keys
+
+[[mgr.prepend_keymap]]
+on = "<Enter>"
+run = "plugin smart-enter"
+desc = "Enter the folder, or open the file with its default app"
+
+[[mgr.prepend_keymap]]
+on = ["g", "p"]
+run = "plugin places"
+desc = "Places: home, bookmarks, drives, network"
+
+[[mgr.prepend_keymap]]
+on = ["b", "a"]
+run = "plugin places add"
+desc = "Bookmark this folder"
+
+[[mgr.prepend_keymap]]
+on = ["b", "d"]
+run = "plugin places remove"
+desc = "Remove a bookmark"
