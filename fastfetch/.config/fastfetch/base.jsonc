@@ -22,7 +22,7 @@
     "separator": " ",
     "color": {
       "keys": "{{ overlay1.ansi }}",
-      "output": "{{ accent.ansi }}",
+      "output": "{{ accent2.ansi }}",
     },
   },
   "modules": [
@@ -31,22 +31,22 @@
       "type": "custom",
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}  user    {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}  user    {#keys}│",
       "type": "title",
       "format": "{user-name}",
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}󰇅  hname   {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}󰇅  hname   {#keys}│",
       "type": "title",
       "format": "{host-name}",
     },
     {
       "type": "command",
-      "key": "│ {#{{ accent2.ansi }}}󱦟  os age  {#keys}│",
-      "text": "printf \"\\e[0m%s days\\e[0m\" \"$(( ($(date +%s) - $(stat -c %W /)) / 86400 ))\"",
+      "key": "│ {#{{ accent.ansi }}}󱦟  os age  {#keys}│",
+      "text": "printf \"%s days\" \"$(( ($(date +%s) - $(stat -c %W /)) / 86400 ))\"",
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}󰅐  uptime  {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}󰅐  uptime  {#keys}│",
       "type": "uptime",
     },
     {
@@ -54,32 +54,32 @@
       "type": "custom",
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}󰇅  pc      {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}󰇅  pc      {#keys}│",
       "type": "host",
       "format": "{1}",
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}󰍛  cpu     {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}󰍛  cpu     {#keys}│",
       "type": "cpu",
       "showPeCoreCount": true,
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}󰍛  gpu     {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}󰍛  gpu     {#keys}│",
       "type": "gpu",
       "format": "{2} ({6})",
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}  memory  {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}  memory  {#keys}│",
       "type": "memory",
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}  root    {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}  root    {#keys}│",
       "type": "disk",
       "folders": "/",
 			"format": "{size-used} / {size-total} ({size-percentage})"
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}󱂶  home    {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}󱂶  home    {#keys}│",
       "type": "disk",
       "folders": "/home",
 			"format": "{size-used} / {size-total} ({size-percentage})"
@@ -89,36 +89,36 @@
       "type": "custom",
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}{icon}  distro  {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}{icon}  distro  {#keys}│",
       "type": "os",
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}  kernel  {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}  kernel  {#keys}│",
       "type": "kernel",
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}  wm      {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}  wm      {#keys}│",
       "type": "wm",
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}󰇄  desktop {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}󰇄  desktop {#keys}│",
       "type": "de",
 			"format": "{pretty-name}"
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}  pkgs    {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}  pkgs    {#keys}│",
       "type": "packages",
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}  term    {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}  term    {#keys}│",
       "type": "terminal",
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}  shell   {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}  shell   {#keys}│",
       "type": "shell",
     },
     {
-      "key": "│ {#{{ accent2.ansi }}}  colors  {#keys}│",
+      "key": "│ {#{{ accent.ansi }}}  colors  {#keys}│",
       "type": "colors",
       "symbol": "circle",
     },
