@@ -5,7 +5,7 @@ import Quickshell.Wayland
 import qs.config
 import qs.components
 import qs.services
-import qs.modules.popouts
+import qs.modules.dropdowns
 
 PanelWindow {
     id: barWindow
@@ -18,15 +18,15 @@ PanelWindow {
         return Config.barShows(primary, id);
     }
 
-    // Open a popout centered under `item`
+    // Open a dropdown centered under `item`
     function toggle(name: string, item: Item): void {
         const pos = item.mapToItem(null, item.width / 2, 0);
         // window coordinates, plus the floating bar's margin
-        Panels.togglePopout(name, screen, pos.x + Theme.barMargin);
+        Panels.toggleDropdown(name, screen, pos.x + Theme.barMargin);
     }
 
     function isOpen(name: string): bool {
-        return Panels.popout === name && Panels.popoutScreen === screen;
+        return Panels.dropdown === name && Panels.dropdownScreen === screen;
     }
 
     screen: modelData
@@ -57,7 +57,7 @@ PanelWindow {
         MouseArea {
             anchors.fill: parent
             onClicked: {
-                Panels.popout = "";
+                Panels.dropdown = "";
                 Panels.appMenu = false;
                 Panels.controlCenter = false;
             }
@@ -312,32 +312,32 @@ PanelWindow {
         bar: barWindow
     }
 
-    // Popouts belong to the bar of their screen
-    NetworkPopout {
+    // Dropdowns belong to the bar of their screen
+    NetworkDropdown {
         bar: barWindow
     }
 
-    BluetoothPopout {
+    BluetoothDropdown {
         bar: barWindow
     }
 
-    AudioPopout {
+    AudioDropdown {
         bar: barWindow
     }
 
-    MediaPopout {
+    MediaDropdown {
         bar: barWindow
     }
 
-    CalendarPopout {
+    CalendarDropdown {
         bar: barWindow
     }
 
-    WeatherPopout {
+    WeatherDropdown {
         bar: barWindow
     }
 
-    BatteryPopout {
+    BatteryDropdown {
         bar: barWindow
     }
 

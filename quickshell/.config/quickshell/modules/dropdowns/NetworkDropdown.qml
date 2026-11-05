@@ -6,7 +6,7 @@ import qs.services
 
 // Network: Wi-Fi, wired, VPN (WireGuard and NetworkManager VPNs) and tools
 // (details, live throughput, DNS, speed test).
-Popout {
+Dropdown {
     id: root
 
     name: "network"
@@ -541,7 +541,7 @@ Popout {
             anchors.fill: parent
             cursorShape: Qt.PointingHandCursor
             onClicked: {
-                Panels.popout = "";
+                Panels.dropdown = "";
                 System.run(["nm-connection-editor"]);
             }
         }

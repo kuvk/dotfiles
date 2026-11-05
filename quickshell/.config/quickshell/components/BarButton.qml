@@ -36,7 +36,7 @@ MouseArea {
     onTooltipChanged: if (containsMouse && Panels.tooltip !== "") showTooltip()
 
     function showTooltip(): void {
-        if (tooltip === "" || Panels.popout !== "")
+        if (tooltip === "" || Panels.dropdown !== "")
             return;
         const pos = mapToItem(null, width / 2, 0);
         Panels.showTooltip(tooltip, QsWindow.window?.screen ?? null, pos.x + Theme.barMargin);

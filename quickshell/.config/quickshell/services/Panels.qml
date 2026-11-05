@@ -4,17 +4,17 @@ import QtQuick
 import Quickshell
 import Quickshell.Hyprland
 
-// Which overlay is open, and on which screen. Only one popout at a time.
+// Which overlay is open, and on which screen. Only one dropdown at a time.
 Singleton {
     id: root
 
     property bool barVisible: true
 
-    // Bar popouts: "network" | "bluetooth" | "audio" | "media" | "calendar" | ""
-    property string popout: ""
-    property var popoutScreen: null
-    // Horizontal center of the bar item that opened the popout, in screen coordinates
-    property real popoutX: 0
+    // Bar dropdowns: "network" | "bluetooth" | "audio" | "media" | "calendar" | ""
+    property string dropdown: ""
+    property var dropdownScreen: null
+    // Horizontal center of the bar item that opened the dropdown, in screen coordinates
+    property real dropdownX: 0
 
     property bool controlCenter: false
     property bool displays: false
@@ -27,8 +27,8 @@ Singleton {
     property bool appMenu: false // app menu dropdown with categories
     property var trayItem: null // SystemTrayItem whose menu is open
 
-    // The click that dismisses a popout can also land on the button that
-    // opened it; ignore that click instead of reopening the popout.
+    // The click that dismisses a dropdown can also land on the button that
+    // opened it; ignore that click instead of reopening the dropdown.
     property string lastClosed: ""
     property double lastClosedAt: 0
 
@@ -47,12 +47,12 @@ Singleton {
         tooltip = "";
     }
 
-    function closePopout(name: string): void {
-        if (popout !== name)
+    function closeDropdown(name: string): void {
+        if (dropdown !== name)
             return;
         lastClosed = name;
         lastClosedAt = Date.now();
-        popout = "";
+        dropdown = "";
     }
     property bool launcher: false
     property string launcherMode: "apps" // "apps" | "themes"
@@ -86,7 +86,7 @@ Singleton {
         target: Hyprland
 
         function onFocusedWorkspaceChanged(): void {
-            root.popout = "";
+            root.dropdown = "";
             root.appMenu = false;
             root.controlCenter = false;
             root.tooltip = "";
@@ -104,10 +104,10 @@ Singleton {
             overlayScreen = focusedScreen;
     }
 
-    function togglePopout(name: string, screen: var, x: real): void {
+    function toggleDropdown(name: string, screen: var, x: real): void {
         hideTooltip();
-        if (popout === name && popoutScreen === screen) {
-            closePopout(name);
+        if (dropdown === name && dropdownScreen === screen) {
+            closeDropdown(name);
             return;
         }
         if (lastClosed === name && Date.now() - lastClosedAt < 300)
@@ -118,9 +118,9 @@ Singleton {
         powerMenu = false;
         wallpapers = "";
         themes = false;
-        popoutScreen = screen;
-        popoutX = x;
-        popout = name;
+        dropdownScreen = screen;
+        dropdownX = x;
+        dropdown = name;
     }
 
     function toggleControlCenter(): void {
@@ -193,7 +193,7 @@ Singleton {
     }
 
     function closeAll(): void {
-        popout = "";
+        dropdown = "";
         controlCenter = false;
         launcher = false;
         appMenu = false;

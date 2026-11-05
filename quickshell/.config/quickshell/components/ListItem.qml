@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.config
 
-// Row used in popout lists (networks, devices, sinks)
+// Row used in dropdown lists (networks, devices, sinks)
 MouseArea {
     id: root
 
