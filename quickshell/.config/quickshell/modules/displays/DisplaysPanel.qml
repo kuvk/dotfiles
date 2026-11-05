@@ -486,7 +486,7 @@ FloatingWindow {
                     readonly property var value: root.current ? Displays.brightness[root.current.name] : undefined
 
                     Layout.fillWidth: true
-                    visible: root.current?.enabled && value !== undefined && value !== null
+                    visible: !!root.current?.enabled && value !== undefined && value !== null
                     spacing: 10
 
                     StyledSlider {
