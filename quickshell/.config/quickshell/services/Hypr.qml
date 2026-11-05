@@ -11,6 +11,7 @@ Singleton {
     id: root
 
     property string layout: ""
+    property string layoutName: ""
 
     function dispatch(lua: string): void {
         Hyprland.dispatch(lua);
@@ -45,6 +46,7 @@ Singleton {
                     const kb = keyboards.find(k => k.main) ?? keyboards[0];
                     if (!kb)
                         return;
+                    root.layoutName = kb.active_keymap ?? "";
                     const layouts = (kb.layout ?? "").split(",");
                     const idx = kb.active_layout_index ?? -1;
                     root.layout = idx >= 0 && idx < layouts.length ? layouts[idx] : (kb.active_keymap ?? "").slice(0, 2).toLowerCase();

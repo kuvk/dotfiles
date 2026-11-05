@@ -7,7 +7,7 @@ Item {
 
     property real value: 0
     property real to: 1
-    property color color: Theme.accent
+    property color color: Theme.highlight
     signal moved(real value)
 
     implicitHeight: 18

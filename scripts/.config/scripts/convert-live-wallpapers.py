@@ -5,8 +5,9 @@ from pathlib import Path
 
 HOME = Path(os.path.expanduser("~"))
 
-SRC_DIR = Path(os.environ.get("LIVE_WALLPAPER_SRC", str(HOME / "wallpapers" / "live"))).expanduser()
-OUT_DIR = Path(os.environ.get("LIVE_WALLPAPER_OUT", str(HOME / "wallpapers" / "live_1440p"))).expanduser()
+# Originals go in ~/Pictures/WallpapersLive/source (the picker skips that folder)
+SRC_DIR = Path(os.environ.get("LIVE_WALLPAPER_SRC", str(HOME / "Pictures" / "WallpapersLive" / "source"))).expanduser()
+OUT_DIR = Path(os.environ.get("LIVE_WALLPAPER_OUT", str(HOME / "Pictures" / "WallpapersLive"))).expanduser()
 
 TARGET_W = int(os.environ.get("TARGET_W", "2560"))
 TARGET_FPS = int(os.environ.get("TARGET_FPS", "30"))

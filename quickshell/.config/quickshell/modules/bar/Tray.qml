@@ -4,20 +4,51 @@ import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import qs.config
 import qs.components
+import qs.services
 
-// System tray collapsed behind an arrow; click the arrow to slide the icons out
-Row {
+// System tray behind a left arrow. Hovering slides the icons out to the
+// right of the arrow; they stay while the pointer is over them or a menu is open.
+Item {
     id: root
 
-    property bool expanded: false
+    property int menusOpen: 0
+    readonly property bool expanded: hover.hovered || menusOpen > 0 || collapseDelay.running
 
     visible: SystemTray.items.values.length > 0
-    spacing: 0
+    implicitWidth: arrow.implicitWidth + drawer.width
+    implicitHeight: Theme.barHeight
+
+    HoverHandler {
+        id: hover
+
+        onHoveredChanged: if (!hovered) collapseDelay.restart()
+    }
+
+    Timer {
+        id: collapseDelay
+
+        interval: 500
+    }
+
+    BarButton {
+        id: arrow
+
+        implicitWidth: 26
+        indicator: false
+        tooltip: root.expanded ? "" : "System tray"
+
+        Icon {
+            text: Icons.chevronLeft
+            color: root.expanded ? Theme.accent : Theme.overlay2
+            font.pixelSize: 11
+        }
+    }
 
     Item {
         id: drawer
 
-        height: Theme.barHeight - 6
+        anchors.left: arrow.right
+        height: parent.height
         width: root.expanded ? icons.implicitWidth : 0
         clip: true
 
@@ -31,8 +62,6 @@ Row {
         Row {
             id: icons
 
-            anchors.right: parent.right
-
             Repeater {
                 model: SystemTray.items
 
@@ -42,6 +71,7 @@ Row {
                     required property SystemTrayItem modelData
 
                     implicitWidth: 30
+                    tooltip: modelData.tooltipTitle || modelData.title || modelData.id
                     onClicked: mouse => {
                         if (mouse.button === Qt.LeftButton && !modelData.onlyMenu)
                             modelData.activate();
@@ -71,20 +101,11 @@ Row {
                         anchor.item: item
                         anchor.edges: Edges.Bottom
                         anchor.gravity: Edges.Bottom
+                        onOpened: root.menusOpen++
+                        onClosed: root.menusOpen = Math.max(0, root.menusOpen - 1)
                     }
                 }
             }
-        }
-    }
-
-    BarButton {
-        implicitWidth: 26
-        onClicked: root.expanded = !root.expanded
-
-        Icon {
-            text: root.expanded ? Icons.chevronRight : Icons.chevronLeft
-            color: Theme.overlay2
-            font.pixelSize: 11
         }
     }
 }

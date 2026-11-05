@@ -15,3 +15,6 @@ yazi/.config/yazi/plugins/
 yazi/.config/yazi/flavors/
 .qmlls.ini
 theme/.config/theme/current/
+kitty/.config/kitty/text-size.conf
+bat/.config/bat/themes/Current.tmTheme
+btop/.config/btop/themes/current.theme

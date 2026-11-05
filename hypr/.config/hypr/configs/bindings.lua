@@ -45,10 +45,10 @@ hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd("hyprshot -m region -o ~/Pictures/Scree
 hl.bind("CONTROL + SHIFT + PRINT", hl.dsp.exec_cmd("hyprshot -m output -o ~/Pictures/Screenshots"))
 
 -- Wallpapers
-hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("~/.config/scripts/wallpaper-picker.py"))
-hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("~/.config/scripts/live-wallpaper-picker.py"))
-hl.bind(mainMod .. " + CONTROL + W", hl.dsp.exec_cmd("~/.config/scripts/mpvpaper-stop.sh"))
-hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("~/.config/scripts/mpvpaper-toggle.sh"))
+hl.bind(mainMod .. " + P", hl.dsp.exec_cmd("qs ipc call wallpaper static"))
+hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc call wallpaper live"))
+hl.bind(mainMod .. " + CONTROL + W", hl.dsp.exec_cmd("~/.config/scripts/wallpaper.py stop"))
+hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("~/.config/scripts/wallpaper.py pause"))
 
 -- Focus and Movement
 local dirs = { h = "left", j = "down", k = "up", l = "right" }
