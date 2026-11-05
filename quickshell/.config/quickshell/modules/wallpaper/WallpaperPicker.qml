@@ -35,18 +35,31 @@ PanelWindow {
     }
 
     // Animated selection: every card's size and place derive from it, so the
-    // middle card shrinks exactly as fast as its neighbour grows (no gaps)
-    property real position: selected
+    // middle card shrinks exactly as fast as its neighbour grows (no gaps).
+    // Driven by hand: a Behavior kept running after a jump and left the
+    // carousel parked at 0 with the cards off-screen on every open.
+    property real position: 0
     // skip the animation when jumping to the current wallpaper on open
     property bool jump: false
 
-    Behavior on position {
-        enabled: root.shown && !root.jump
-
-        NumberAnimation {
-            duration: Theme.animDuration * 2
-            easing.type: Easing.OutCubic
+    onSelectedChanged: {
+        positionAnim.stop();
+        if (jump || !shown || Theme.animDuration === 0) {
+            position = selected;
+        } else {
+            positionAnim.from = position;
+            positionAnim.to = selected;
+            positionAnim.start();
         }
+    }
+
+    NumberAnimation {
+        id: positionAnim
+
+        target: root
+        property: "position"
+        duration: Theme.animDuration * 2
+        easing.type: Easing.OutCubic
     }
 
     // Card geometry from the monitor size (the window may not be mapped yet)
@@ -130,8 +143,12 @@ PanelWindow {
     onKindChanged: {
         if (shown) {
             items = [];
+            jump = true;
             query = "";
             selected = 0;
+            positionAnim.stop();
+            position = 0;
+            jump = false;
             retried = false;
             loadedKind = "";
             load();
@@ -141,7 +158,11 @@ PanelWindow {
         }
     }
 
-    onQueryChanged: selected = 0
+    onQueryChanged: {
+        jump = true;
+        selected = 0;
+        jump = false;
+    }
 
     // The window may not be mapped yet when the kind changes; focus once it is
     Timer {
