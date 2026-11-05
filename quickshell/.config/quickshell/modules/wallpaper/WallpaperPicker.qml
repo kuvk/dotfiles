@@ -353,8 +353,8 @@ PanelWindow {
                     // visible slice inside the fixed-size card
                     readonly property real visibleWidth: root.lerp(root.cardWidth, root.sliceWidth, d)
                     readonly property real visibleHeight: root.lerp(root.cardHeight, root.sliceHeight, d)
-                    readonly property real left: (root.cardWidth - visibleWidth) / 2
-                    readonly property real top: (root.cardHeight - visibleHeight) / 2
+                    readonly property real sliceLeft: (root.cardWidth - visibleWidth) / 2
+                    readonly property real sliceTop: (root.cardHeight - visibleHeight) / 2
 
                     active: Math.abs(index - root.selected) <= root.radius
                     visible: active
@@ -415,12 +415,12 @@ PanelWindow {
                             ShapePath {
                                 fillColor: "white"
                                 strokeColor: "transparent"
-                                startX: slot.left + root.skew
-                                startY: slot.top
-                                PathLine { x: slot.left + slot.visibleWidth; y: slot.top }
-                                PathLine { x: slot.left + slot.visibleWidth - root.skew; y: slot.top + slot.visibleHeight }
-                                PathLine { x: slot.left; y: slot.top + slot.visibleHeight }
-                                PathLine { x: slot.left + root.skew; y: slot.top }
+                                startX: slot.sliceLeft + root.skew
+                                startY: slot.sliceTop
+                                PathLine { x: slot.sliceLeft + slot.visibleWidth; y: slot.sliceTop }
+                                PathLine { x: slot.sliceLeft + slot.visibleWidth - root.skew; y: slot.sliceTop + slot.visibleHeight }
+                                PathLine { x: slot.sliceLeft; y: slot.sliceTop + slot.visibleHeight }
+                                PathLine { x: slot.sliceLeft + root.skew; y: slot.sliceTop }
                             }
                         }
 
@@ -442,20 +442,20 @@ PanelWindow {
                                 fillColor: "transparent"
                                 strokeColor: slot.isSelected ? Theme.accent : Theme.alpha(Theme.text, 0.15)
                                 strokeWidth: slot.isSelected ? Math.max(2, Theme.borderWidth) : 1
-                                startX: slot.left + root.skew
-                                startY: slot.top
-                                PathLine { x: slot.left + slot.visibleWidth; y: slot.top }
-                                PathLine { x: slot.left + slot.visibleWidth - root.skew; y: slot.top + slot.visibleHeight }
-                                PathLine { x: slot.left; y: slot.top + slot.visibleHeight }
-                                PathLine { x: slot.left + root.skew; y: slot.top }
+                                startX: slot.sliceLeft + root.skew
+                                startY: slot.sliceTop
+                                PathLine { x: slot.sliceLeft + slot.visibleWidth; y: slot.sliceTop }
+                                PathLine { x: slot.sliceLeft + slot.visibleWidth - root.skew; y: slot.sliceTop + slot.visibleHeight }
+                                PathLine { x: slot.sliceLeft; y: slot.sliceTop + slot.visibleHeight }
+                                PathLine { x: slot.sliceLeft + root.skew; y: slot.sliceTop }
                             }
                         }
 
                         // Current wallpaper marker
                         Rectangle {
                             visible: slot.modelData.current && slot.isSelected
-                            x: slot.left + slot.visibleWidth - 22
-                            y: slot.top + 12
+                            x: slot.sliceLeft + slot.visibleWidth - 22
+                            y: slot.sliceTop + 12
                             width: 10
                             height: 10
                             radius: 5
@@ -464,8 +464,8 @@ PanelWindow {
 
                         // Clicks only on the visible slice
                         MouseArea {
-                            x: slot.left
-                            y: slot.top
+                            x: slot.sliceLeft
+                            y: slot.sliceTop
                             width: slot.visibleWidth
                             height: slot.visibleHeight
                             cursorShape: Qt.PointingHandCursor
