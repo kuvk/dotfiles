@@ -147,6 +147,8 @@ PanelWindow {
     property var thumbsTried: ({})
 
     function load(): void {
+        // nothing to list while closed (a late retry or re-run used to run
+        // `wallpaper.py list ""`, which fails, and kept retrying)
         if (!shown)
             return;
         loading = true;
@@ -235,6 +237,9 @@ PanelWindow {
         } else {
             thumbsTried = {};
             contentRevealed = false;
+            retry.stop();
+            retries = 0;
+            listProc.again = false;
         }
     }
 
@@ -304,14 +309,13 @@ PanelWindow {
         }
 
         onExited: (code, status) => {
-            if (again) {
+            // A load came in during this run, or the tab changed: read again
+            // for what is shown now (load() does nothing once closed)
+            if (again || kind !== root.kind) {
                 again = false;
                 Qt.callLater(root.load);
                 return;
             }
-            // Ignore a list for a tab that is no longer shown
-            if (kind !== root.kind)
-                return;
             let list = null;
             if (code === 0 && status === 0) {
                 try {
@@ -635,7 +639,7 @@ PanelWindow {
             StyledText {
                 Layout.alignment: Qt.AlignHCenter
                 text: {
-                    if (root.loading && root.loadedKind !== root.kind)
+                    if (root.loading && root.items.length === 0)
                         return "Loading…";
                     if (root.items.length === 0)
                         return `Nothing in ~/Pictures/${root.kind === "live" ? "WallpapersLive" : "Wallpapers"}`;
