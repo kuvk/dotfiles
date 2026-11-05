@@ -1,13 +1,17 @@
 #!/bin/bash
 # Script to recolor wlogout icons using ImageMagick and save to $HOME/.config/wlogout/icons
 
-# Catppuccin colors
+# Theme colors (Catppuccin Mocha if theme-set.py hasn't run yet)
 green="#a6e3a1"
 mauve="#cba6f7"
 peach="#fab387"
 red="#f38ba8"
 blue="#89b4fa"
 teal="#94e2d5"
+if [[ -f "$HOME/.config/theme/current/colors.sh" ]]; then
+    # shellcheck source=/dev/null
+    . "$HOME/.config/theme/current/colors.sh"
+fi
 
 SRC_DIR="/usr/share/wlogout/icons"
 DEST_DIR="$HOME/.config/wlogout/icons"

@@ -4,9 +4,10 @@
 local terminal = "kitty"
 local fileManager = terminal .. " -e yazi"
 -- local fileManager = "dolphin"
-local menu = "~/.config/scripts/app-launcher.sh || pkill rofi"
+local menu = "qs ipc call launcher toggle"
+local themes = "qs ipc call launcher themes"
 local browser = "brave"
-local notifications = "swaync-client -t"
+local notifications = "qs ipc call notifications toggle"
 local email = "thunderbird"
 local gamemode = "~/.config/scripts/hypr-gamemode.sh"
 
@@ -22,6 +23,7 @@ hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(email))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(notifications))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(menu))
+hl.bind(mainMod .. " + SHIFT + space", hl.dsp.exec_cmd(themes))
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
 hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd("~/.config/scripts/lockscreen.sh"))
 hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd("~/.config/scripts/wlogout-dynamic.sh"))

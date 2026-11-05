@@ -27,3 +27,5 @@ require("lazy").setup({
   },
   install = { colorscheme = { "catppuccin" } },
 })
+
+require("theme").setup()
