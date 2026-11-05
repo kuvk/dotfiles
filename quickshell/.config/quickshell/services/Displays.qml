@@ -55,7 +55,7 @@ Singleton {
         target: Hyprland
 
         function onRawEvent(event: HyprlandEvent): void {
-            if (event.name !== "monitoraddedv2" && event.name !== "monitorremovedv2")
+            if (!["monitoradded", "monitoraddedv2", "monitorremoved", "monitorremovedv2"].includes(event.name))
                 return;
             if (Date.now() < root.ignoreEventsUntil)
                 return;

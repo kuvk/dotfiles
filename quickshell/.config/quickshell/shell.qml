@@ -13,6 +13,8 @@ import qs.modules.launcher
 import qs.modules.lock
 import qs.modules.notifications
 import qs.modules.powermenu
+import qs.modules.settings
+import qs.modules.wallpaper
 
 ShellRoot {
     Variants {
@@ -32,6 +34,10 @@ ShellRoot {
     DisplaysPanel {}
 
     LockScreen {}
+
+    SettingsWindow {}
+
+    WallpaperPicker {}
 
     // qs ipc call <target> <function> [args]
     IpcHandler {
@@ -121,6 +127,26 @@ ShellRoot {
 
         function toggle(): void {
             Panels.toggleDisplays();
+        }
+    }
+
+    IpcHandler {
+        target: "wallpaper"
+
+        function static(): void {
+            Panels.toggleWallpapers("static");
+        }
+
+        function live(): void {
+            Panels.toggleWallpapers("live");
+        }
+    }
+
+    IpcHandler {
+        target: "settings"
+
+        function toggle(): void {
+            Panels.toggleSettings();
         }
     }
 

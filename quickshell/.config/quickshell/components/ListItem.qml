@@ -31,7 +31,7 @@ MouseArea {
 
         Icon {
             text: root.icon
-            color: root.highlighted ? Theme.accent : Theme.subtext0
+            color: root.highlighted ? Theme.highlight : Theme.subtext0
             Layout.preferredWidth: 18
         }
 
@@ -42,7 +42,7 @@ MouseArea {
             StyledText {
                 Layout.fillWidth: true
                 text: root.label
-                color: root.highlighted ? Theme.accent : Theme.text
+                color: root.highlighted ? Theme.highlight : Theme.text
             }
 
             StyledText {

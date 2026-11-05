@@ -20,12 +20,50 @@ WlSessionLock {
         id: surface
 
         readonly property bool isMain: screen?.name === Lock.mainScreen || Lock.mainScreen === ""
+        // Blur a still capture of the desktop (Hyprland can't blur lock surfaces)
+        readonly property bool blur: Config.lockBlur && !Theme.gamemode && !Lock.instant
         property bool dropped: Lock.instant
+
+        function drop(): void {
+            fallback.stop();
+            dropped = true;
+        }
 
         // session_lock_xray shows the desktop until the curtain covers it
         color: "transparent"
 
-        Component.onCompleted: dropped = true
+        // The drop starts once the surface is on screen and the capture is
+        // ready (or after a short timeout), otherwise it would finish before
+        // the compositor shows the lock.
+        function start(): void {
+            if (!visible || dropped)
+                return;
+            if (!blur || capture.hasContent)
+                Qt.callLater(drop);
+            else
+                fallback.start();
+        }
+
+        onVisibleChanged: start()
+        Component.onCompleted: start()
+
+        Timer {
+            id: fallback
+
+            interval: 400
+            onTriggered: surface.drop()
+        }
+
+        ScreencopyView {
+            id: capture
+
+            width: surface.width
+            height: surface.height
+            visible: false
+            live: false
+            captureSource: surface.blur ? surface.screen : null
+            onHasContentChanged: if (hasContent && surface.visible && !surface.dropped) Qt.callLater(surface.drop)
+        }
 
         Item {
             id: curtain
@@ -33,22 +71,40 @@ WlSessionLock {
             width: surface.width
             height: surface.height
             y: surface.dropped && !Lock.unlocking ? 0 : -height
+            clip: true
 
             Behavior on y {
+                enabled: !Lock.instant
+
                 NumberAnimation {
-                    duration: Lock.unlocking ? 350 : 500
+                    duration: Lock.unlocking ? 350 : 550
                     easing.type: Lock.unlocking ? Easing.InCubic : Easing.OutQuart
                 }
             }
 
+            // Frosted desktop, held still while the curtain slides over it
+            MultiEffect {
+                visible: surface.blur && capture.hasContent
+                y: -curtain.y
+                width: surface.width
+                height: surface.height
+                source: capture
+                autoPaddingEnabled: false
+                blurEnabled: true
+                blur: 1
+                blurMax: 64
+                brightness: -0.15
+            }
+
             Rectangle {
                 anchors.fill: parent
-                color: Theme.alpha(Theme.crust, 0.94)
+                color: Theme.alpha(Theme.crust, Theme.gamemode ? 1 : (surface.blur && capture.hasContent ? 0.55 : 0.94))
             }
 
             MatrixRain {
                 anchors.fill: parent
-                running: Lock.locked
+                visible: Config.lockMatrix
+                running: Lock.locked && Config.lockMatrix
             }
 
             // Glowing bottom edge while the curtain moves

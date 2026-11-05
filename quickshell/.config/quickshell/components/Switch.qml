@@ -15,7 +15,7 @@ MouseArea {
     Rectangle {
         anchors.fill: parent
         radius: height / 2
-        color: root.checked ? Theme.accent : Theme.surface1
+        color: root.checked ? Theme.highlight : Theme.surface1
 
         Rectangle {
             x: root.checked ? parent.width - width - 3 : 3

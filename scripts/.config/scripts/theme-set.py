@@ -33,6 +33,9 @@ DEFAULT_THEME = "catppuccin-mocha"
 # Rendered files that also need a copy somewhere an app can find them
 EXTRA_DESTINATIONS = {
     "hyprland.lua": HOME / ".config/hypr/configs/generated/theme.lua",
+    # btop and bat find themes by name in their own themes folders
+    "btop.theme": HOME / ".config/btop/themes/current.theme",
+    "bat.tmTheme": HOME / ".config/bat/themes/Current.tmTheme",
 }
 
 STARSHIP_SOURCE = HOME / ".config/starship.toml"
@@ -148,16 +151,17 @@ def render(text: str, theme: dict, source: str) -> str:
     return PLACEHOLDER_RE.sub(substitute, text)
 
 
-def write_if_changed(path: Path, content: str) -> None:
+def write_if_changed(path: Path, content: str) -> bool:
     path.parent.mkdir(parents=True, exist_ok=True)
     try:
         if path.read_text() == content:
-            return
+            return False
     except FileNotFoundError:
         pass
     tmp = path.with_name(path.name + ".tmp")
     tmp.write_text(content)
     tmp.replace(path)  # atomic, so file watchers never see a half-written file
+    return True
 
 
 def render_starship(theme: dict) -> None:
@@ -183,12 +187,17 @@ def render_quickshell(theme: dict) -> None:
 
 def generate(name: str) -> dict:
     theme = load_theme(name)
+    theme["changed"] = set()
     for tpl in sorted(TEMPLATES_DIR.glob("*.tpl")):
         out_name = tpl.name.removesuffix(".tpl")
         content = render(tpl.read_text(), theme, tpl.name)
         write_if_changed(CURRENT_DIR / out_name, content)
         if out_name in EXTRA_DESTINATIONS:
-            write_if_changed(EXTRA_DESTINATIONS[out_name], content)
+            try:
+                if write_if_changed(EXTRA_DESTINATIONS[out_name], content):
+                    theme["changed"].add(out_name)
+            except OSError as e:
+                print(f"theme-set: could not write {EXTRA_DESTINATIONS[out_name]}: {e}", file=sys.stderr)
 
     render_quickshell(theme)
     render_starship(theme)
@@ -227,6 +236,9 @@ def reload_apps(theme: dict) -> None:
 
     run_quiet(["pkill", "-USR1", "-x", "kitty"])
     run_quiet(["pkill", "-USR2", "-x", "btop"])
+    # bat reads themes from a cache that must be rebuilt
+    if "bat.tmTheme" in theme.get("changed", ()) and shutil.which("bat"):
+        run_quiet(["bat", "cache", "--build"])
     run_quiet(["pkill", "-USR2", "-x", "waybar"])
     if subprocess.run(["pgrep", "-x", "swaync"], capture_output=True).returncode == 0:
         run_quiet(["swaync-client", "-rs"])

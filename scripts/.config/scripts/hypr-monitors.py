@@ -12,6 +12,14 @@ current live layout, and workspaces are split across the monitors.
   hypr-monitors.py set '<json>'         save and apply changes from Quickshell
   hypr-monitors.py brightness           print brightness per monitor as JSON
   hypr-monitors.py brightness NAME PCT  set brightness (backlight or DDC/CI)
+
+Workspaces by default: the primary monitor gets 1-5, a second monitor 6-10,
+with three monitors 3 each (1-3 on the primary). Any workspace can be
+assigned or left unassigned in the Displays panel.
+
+Text size is in px (9-20, default 13), like Omarchy's display text size: it
+sets the shell font, GTK's text-scaling-factor (rounded so the interface font
+lands on a whole point size) and kitty's font size.
 """
 
 from __future__ import annotations
@@ -31,6 +39,12 @@ GAMEMODE_SCRIPT = HOME / ".config/scripts/hypr-gamemode.sh"
 
 INTERNAL_PREFIXES = ("eDP", "LVDS", "DSI")
 WORKSPACES = 10
+MAX_PER_MONITOR = 5
+PROFILE_VERSION = 2
+
+TEXT_SIZE_DEFAULT = 13  # px, the shell's base font size
+KITTY_FONT_DEFAULT = 11  # pt in kitty.conf, matching 13 px
+KITTY_TEXT_SIZE_FILE = HOME / ".config/kitty/text-size.conf"
 
 # Descriptions shared by several connected monitors (same model, no serial);
 # those are told apart by port instead
@@ -94,6 +108,18 @@ def available_modes(m: dict) -> list[str]:
     return modes
 
 
+def clean_scale(scale: float, width: int, height: int) -> float:
+    """Hyprland only accepts scales that divide the mode into whole logical
+    pixels, in 1/120 steps. Round up to the nearest such scale (as Omarchy does)."""
+    from math import gcd
+
+    g = gcd(width * 120, height * 120)
+    k = max(1, min(g, int(scale * 120 + 0.5)))
+    while g % k:
+        k += 1
+    return round(k / 120, 6)
+
+
 def best_mode(m: dict) -> str:
     modes = available_modes(m)
     if not modes:
@@ -114,7 +140,8 @@ def load_profiles() -> dict:
         data = json.loads(PROFILES_FILE.read_text())
     except (FileNotFoundError, json.JSONDecodeError):
         data = {}
-    data.setdefault("text_scale", 1.0)
+    if "text_size" not in data:
+        data["text_size"] = round(TEXT_SIZE_DEFAULT * float(data.pop("text_scale", 1.0)))
     data.setdefault("profiles", {})
     return data
 
@@ -144,21 +171,34 @@ def default_profile(live: list[dict]) -> dict:
             "transform": m.get("transform", 0),
         }
 
-    # Externals first (left to right), internal last, like the old fixed layouts
-    order = sorted(
-        (m for m in live if monitors[ident(m)]["enabled"]),
-        key=lambda m: (is_internal(m["name"]), m.get("x", 0)),
-    )
-    workspaces = {}
-    if order:
-        per = WORKSPACES // len(order)
-        extra = WORKSPACES % len(order)
-        ws = 1
-        for i, m in enumerate(order):
-            for _ in range(per + (1 if i < extra else 0)):
-                workspaces[str(ws)] = ident(m)
-                ws += 1
-    return {"monitors": monitors, "workspaces": workspaces}
+    profile = {"version": PROFILE_VERSION, "monitors": monitors, "primary": default_primary(live, monitors)}
+    profile["workspaces"] = default_workspaces(profile, live)
+    return profile
+
+
+def default_primary(live: list[dict], monitors: dict) -> str:
+    """The leftmost external monitor, or the internal one when alone."""
+    enabled = [m for m in live if monitors[ident(m)]["enabled"]] or live
+    order = sorted(enabled, key=lambda m: (is_internal(m["name"]), monitors[ident(m)]["x"]))
+    return ident(order[0]) if order else ""
+
+
+def default_workspaces(profile: dict, live: list[dict]) -> dict[str, str]:
+    """Primary first, then left to right; at most 5 each (1 monitor: 1-5,
+    2: 1-5 / 6-10, 3: 1-3 / 4-6 / 7-9)."""
+    mons = profile["monitors"]
+    enabled = [ident(m) for m in live if mons.get(ident(m), {}).get("enabled")]
+    if not enabled:
+        return {}
+    primary = profile.get("primary")
+    order = sorted(enabled, key=lambda mid: (mid != primary, mons[mid]["x"], mons[mid]["y"]))
+    per = min(MAX_PER_MONITOR, WORKSPACES // len(order))
+    workspaces, ws = {}, 1
+    for mid in order:
+        for _ in range(per):
+            workspaces[str(ws)] = mid
+            ws += 1
+    return workspaces
 
 
 def current_profile(data: dict, live: list[dict]) -> tuple[str, dict]:
@@ -172,20 +212,29 @@ def current_profile(data: dict, live: list[dict]) -> tuple[str, dict]:
     # (the key would differ), but keep the profile complete anyway
     for m in live:
         profile["monitors"].setdefault(ident(m), default_profile([m])["monitors"][ident(m)])
+    # Profiles from the first version gave a lone monitor all 10 workspaces;
+    # redo their workspaces with the current defaults, keep the layout
+    if profile.get("version") != PROFILE_VERSION:
+        profile["version"] = PROFILE_VERSION
+        profile["primary"] = default_primary(live, profile["monitors"])
+        profile["workspaces"] = default_workspaces(profile, live)
+        save_profiles(data)
     return key, profile
 
 
 def effective_workspaces(profile: dict, live: list[dict]) -> dict[str, str]:
-    """Workspaces of a disabled monitor go to the first enabled one, without
-    changing the saved assignment, so they come back when it's re-enabled."""
+    """Rules only for enabled monitors. A disabled monitor's workspaces get no
+    rule (Hyprland opens them where you are) and come back when it's re-enabled."""
     connected = {ident(m) for m in live}
-    enabled = [mid for mid, mon in profile["monitors"].items() if mon["enabled"] and mid in connected]
-    if not enabled:
-        return {}
-    return {ws: (mid if mid in enabled else enabled[0]) for ws, mid in profile["workspaces"].items()}
+    enabled = {mid for mid, mon in profile["monitors"].items() if mon["enabled"] and mid in connected}
+    return {ws: mid for ws, mid in profile["workspaces"].items() if mid in enabled}
 
 
 # ---------------------------------------------------------------- applying
+
+
+def scale_str(scale: float) -> str:
+    return f"{float(scale):.6f}".rstrip("0").rstrip(".")
 
 
 def lua_str(s: str) -> str:
@@ -204,7 +253,7 @@ def render_lua(profile: dict, live: list[dict]) -> str:
             continue
         lines.append(
             f"hl.monitor({{ output = {sel}, mode = {lua_str(mon['mode'])}, "
-            f"position = \"{round(mon['x'])}x{round(mon['y'])}\", scale = \"{mon['scale']:g}\", "
+            f"position = \"{round(mon['x'])}x{round(mon['y'])}\", scale = \"{scale_str(mon['scale'])}\", "
             f"transform = {int(mon.get('transform', 0))} }})"
         )
     # Anything not in the profile (e.g. a projector plugged in later) still works
@@ -218,9 +267,27 @@ def render_lua(profile: dict, live: list[dict]) -> str:
     return "\n".join(lines) + "\n"
 
 
-def apply_text_scale(scale: float) -> None:
+def apply_text_size(size: int) -> None:
+    """GTK factor and kitty font size for a text size in px (13 = default)."""
     if shutil.which("gsettings"):
-        run(["gsettings", "set", "org.gnome.desktop.interface", "text-scaling-factor", f"{scale:g}"])
+        # Quantize so the GTK interface font lands on a whole point size
+        name = run(["gsettings", "get", "org.gnome.desktop.interface", "font-name"]).strip().strip("'")
+        try:
+            pt = float(name.rsplit(" ", 1)[-1])
+        except ValueError:
+            pt = 11.0
+        factor = round(pt * size / TEXT_SIZE_DEFAULT) / pt
+        run(["gsettings", "set", "org.gnome.desktop.interface", "text-scaling-factor", f"{factor:.4f}"])
+
+    kitty_pt = round(size * KITTY_FONT_DEFAULT / TEXT_SIZE_DEFAULT)
+    content = f"# Written by hypr-monitors.py (Displays > Text size)\nfont_size {kitty_pt}.0\n"
+    try:
+        current = KITTY_TEXT_SIZE_FILE.read_text()
+    except FileNotFoundError:
+        current = ""
+    if current != content and KITTY_TEXT_SIZE_FILE.parent.exists():
+        KITTY_TEXT_SIZE_FILE.write_text(content)
+        run(["pkill", "-USR1", "-x", "kitty"])
 
 
 def apply(data: dict, live: list[dict], *, force_reload: bool = False) -> None:
@@ -243,13 +310,17 @@ def apply(data: dict, live: list[dict], *, force_reload: bool = False) -> None:
 
     # Workspace rules only apply to new workspaces; move the existing ones
     by_id = {ident(m): m for m in live}
-    current = {str(w["id"]): w.get("monitor") for w in hypr_json("workspaces") if w.get("id", 0) > 0}
+    try:
+        listed = json.loads(run(["hyprctl", "-j", "workspaces"]) or "[]")
+    except json.JSONDecodeError:
+        listed = []
+    current = {str(w["id"]): w.get("monitor") for w in listed if w.get("id", 0) > 0}
     for ws, mid in effective_workspaces(profile, live).items():
         target = by_id.get(mid)
         if target and ws in current and current[ws] != target["name"]:
             run(["hyprctl", "dispatch", f"hl.dsp.workspace.move({{ workspace = \"{ws}\", monitor = {lua_str(target['name'])} }})"])
 
-    apply_text_scale(float(data.get("text_scale", 1.0)))
+    apply_text_size(int(data.get("text_size", TEXT_SIZE_DEFAULT)))
 
 
 # ---------------------------------------------------------------- brightness
@@ -340,7 +411,8 @@ def state(data: dict, live: list[dict]) -> dict:
         })
     return {
         "key": key,
-        "text_scale": data.get("text_scale", 1.0),
+        "text_size": data.get("text_size", TEXT_SIZE_DEFAULT),
+        "primary": profile.get("primary", ""),
         "monitors": monitors,
         "workspaces": profile["workspaces"],
     }
@@ -355,13 +427,17 @@ def set_state(data: dict, live: list[dict], new: dict) -> None:
         for field in ("enabled", "mode", "x", "y", "scale", "transform"):
             if field in m:
                 mon[field] = m[field]
+        w, h = parse_mode(mon["mode"])
+        mon["scale"] = clean_scale(float(mon["scale"]), w, h)
     if not any(mon["enabled"] for mon in profile["monitors"].values()):
         print("refusing to disable every monitor", file=sys.stderr)
         return
+    if "primary" in new:
+        profile["primary"] = new["primary"]
     if "workspaces" in new:
-        profile["workspaces"] = {str(k): v for k, v in new["workspaces"].items()}
-    if "text_scale" in new:
-        data["text_scale"] = round(float(new["text_scale"]), 2)
+        profile["workspaces"] = {str(k): v for k, v in new["workspaces"].items() if v}
+    if "text_size" in new:
+        data["text_size"] = max(9, min(20, int(new["text_size"])))
     save_profiles(data)
     apply(data, live)
 

@@ -14,12 +14,13 @@ PanelWindow {
     id: root
 
     readonly property bool shown: Panels.displays
-    readonly property var scales: [1, 1.25, 1.333333, 1.5, 1.6, 1.666667, 1.75, 2, 2.5, 3]
+    readonly property var scalePresets: [1, 1.25, 1.333333, 1.5, 1.6, 1.666667, 1.75, 2, 2.5, 3, 4]
 
     // Editable copy of Displays.info
     property var mons: []
     property var workspaces: ({})
-    property real textScale: 1
+    property int textSize: 13
+    property string primary: ""
     property int selected: 0
     property bool dirty: false
 
@@ -30,7 +31,8 @@ PanelWindow {
         const s = Displays.info;
         mons = (s.monitors ?? []).map(m => Object.assign({}, m));
         workspaces = Object.assign({}, s.workspaces ?? {});
-        textScale = s.text_scale ?? 1;
+        textSize = s.text_size ?? 13;
+        primary = s.primary ?? "";
         selected = Math.min(selected, Math.max(0, mons.length - 1));
         dirty = false;
     }
@@ -132,6 +134,47 @@ PanelWindow {
         }
     }
 
+    // Hyprland accepts only scales that divide the mode into whole logical
+    // pixels, in 1/120 steps (same rule Omarchy uses); round up to the next one
+    function cleanScale(scale: real, mode: string): real {
+        const r = /(\d+)x(\d+)/.exec(mode);
+        if (!r)
+            return scale;
+        const gcd = (a, b) => b ? gcd(b, a % b) : a;
+        const g = gcd(parseInt(r[1]) * 120, parseInt(r[2]) * 120);
+        let k = Math.max(1, Math.min(g, Math.round(scale * 120)));
+        while (g % k !== 0)
+            k++;
+        return Math.round(k / 120 * 1e6) / 1e6;
+    }
+
+    function validScales(mode: string): var {
+        const out = [];
+        for (const p of scalePresets) {
+            const c = cleanScale(p, mode);
+            if (!out.some(v => Math.abs(v - c) < 1e-4))
+                out.push(c);
+        }
+        return out;
+    }
+
+    function setMode(index: int, mode: string): void {
+        update(index, { mode: mode, scale: cleanScale(mons[index].scale, mode) });
+    }
+
+    // Primary first, then left to right; at most 5 each (1-5 / 6-10, or 3 each with three)
+    function defaultWorkspaces(): void {
+        const on = enabledMons.slice().sort((a, b) => (b.id === primary) - (a.id === primary) || a.x - b.x || a.y - b.y);
+        const per = on.length ? Math.min(5, Math.floor(10 / on.length)) : 0;
+        const w = {};
+        let ws = 1;
+        for (const m of on)
+            for (let i = 0; i < per; i++)
+                w[String(ws++)] = m.id;
+        workspaces = w;
+        dirty = true;
+    }
+
     function cycle(list: var, value: var, step: int): var {
         let i = list.findIndex(v => Math.abs(Number(v) - Number(value)) < 0.001 || v === value);
         if (i < 0)
@@ -139,18 +182,27 @@ PanelWindow {
         return list[(i + step + list.length) % list.length];
     }
 
-    function assign(ws: int): void {
+    // Click: assign to the selected monitor, or unassign if it already is
+    function toggleWorkspace(ws: int): void {
         const w = Object.assign({}, workspaces);
-        w[String(ws)] = current.id;
+        if (w[String(ws)] === current.id)
+            delete w[String(ws)];
+        else
+            w[String(ws)] = current.id;
         workspaces = w;
         dirty = true;
+    }
+
+    function monitorName(id: string): string {
+        return mons.find(m => m.id === id)?.name ?? "";
     }
 
     function applyChanges(): void {
         Displays.apply({
             monitors: mons.map(m => ({ id: m.id, enabled: m.enabled, mode: m.mode, x: m.x, y: m.y, scale: m.scale, transform: m.transform })),
             workspaces: workspaces,
-            text_scale: textScale
+            text_size: textSize,
+            primary: primary
         });
         dirty = false;
     }
@@ -195,7 +247,7 @@ PanelWindow {
         color: Theme.panelBg
         radius: Theme.radius
         border.color: Theme.border
-        border.width: 2
+        border.width: Theme.borderWidth
         focus: root.shown
         Keys.onEscapePressed: Panels.displays = false
 
@@ -214,6 +266,10 @@ PanelWindow {
                     visible: Displays.busy
                     text: "Applying…"
                     color: Theme.subtext0
+                }
+
+                CloseButton {
+                    onClicked: Panels.displays = false
                 }
             }
 
@@ -264,8 +320,8 @@ PanelWindow {
                             anchors.fill: parent
                             anchors.margins: 2
                             radius: 6
-                            color: tile.index === root.selected ? Theme.alpha(Theme.accent, 0.3) : Theme.surface0
-                            border.color: tile.index === root.selected ? Theme.accent : Theme.surface2
+                            color: tile.index === root.selected ? Theme.alpha(Theme.highlight, 0.3) : Theme.surface0
+                            border.color: tile.index === root.selected ? Theme.highlight : Theme.surface2
                             border.width: 2
 
                             ColumnLayout {
@@ -276,7 +332,7 @@ PanelWindow {
                                     Layout.alignment: Qt.AlignHCenter
                                     text: tile.modelData.name
                                     font.weight: Font.Bold
-                                    color: tile.index === root.selected ? Theme.accent : Theme.text
+                                    color: tile.index === root.selected ? Theme.highlight : Theme.text
                                 }
 
                                 StyledText {
@@ -350,7 +406,7 @@ PanelWindow {
                         Rectangle {
                             anchors.fill: parent
                             radius: height / 2
-                            color: chip.index === root.selected ? Theme.accent : Theme.cardBg
+                            color: chip.index === root.selected ? Theme.highlight : Theme.cardBg
                         }
 
                         StyledText {
@@ -389,13 +445,35 @@ PanelWindow {
                 }
 
                 StyledText {
+                    text: "Primary"
+                }
+
+                RowLayout {
+                    spacing: 10
+
+                    Switch {
+                        checked: root.current !== null && root.current.id === root.primary
+                        onToggled: {
+                            root.primary = root.current.id;
+                            root.dirty = true;
+                        }
+                    }
+
+                    StyledText {
+                        text: "Gets the first workspaces with Default"
+                        color: Theme.overlay1
+                        font.pixelSize: Theme.fontSize - 2
+                    }
+                }
+
+                StyledText {
                     text: "Resolution"
                 }
 
                 Stepper {
                     enabled: root.current?.enabled ?? false
                     text: root.current ? root.current.mode.replace("@", " @ ") + " Hz" : ""
-                    onStep: delta => root.update(root.selected, { mode: root.cycle(root.current.modes, root.current.mode, delta) })
+                    onStep: delta => root.setMode(root.selected, root.cycle(root.current.modes, root.current.mode, delta))
                 }
 
                 StyledText {
@@ -404,8 +482,8 @@ PanelWindow {
 
                 Stepper {
                     enabled: root.current?.enabled ?? false
-                    text: root.current ? `${Math.round(root.current.scale * 100)}%` : ""
-                    onStep: delta => root.update(root.selected, { scale: root.cycle(root.scales, root.current.scale, delta) })
+                    text: root.current ? `${Math.round(root.current.scale * 1000) / 10}%  (${Math.round(root.current.width)}×${Math.round(root.current.height)})` : ""
+                    onStep: delta => root.update(root.selected, { scale: root.cycle(root.validScales(root.current.mode), root.current.scale, delta) })
                 }
 
                 StyledText {
@@ -440,37 +518,57 @@ PanelWindow {
                     text: "Workspaces"
                 }
 
-                Row {
+                ColumnLayout {
                     spacing: 4
 
-                    Repeater {
-                        model: 10
+                    RowLayout {
+                        spacing: 4
 
-                        MouseArea {
-                            id: wsChip
+                        Repeater {
+                            model: 10
 
-                            required property int index
-                            readonly property int ws: index + 1
-                            readonly property bool mine: root.current && root.workspaces[String(ws)] === root.current.id
+                            MouseArea {
+                                id: wsChip
 
-                            width: 30
-                            height: 30
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: root.assign(ws)
+                                required property int index
+                                readonly property int ws: index + 1
+                                readonly property string owner: root.workspaces[String(ws)] ?? ""
+                                readonly property bool mine: root.current !== null && owner === root.current.id
 
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: Theme.smallRadius
-                                color: wsChip.mine ? Theme.accent : Theme.cardBg
-                            }
+                                implicitWidth: 30
+                                implicitHeight: 30
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: root.toggleWorkspace(ws)
 
-                            StyledText {
-                                anchors.centerIn: parent
-                                text: wsChip.ws
-                                color: wsChip.mine ? Theme.base : Theme.subtext0
-                                font.weight: wsChip.mine ? Font.Bold : Font.Normal
+                                Rectangle {
+                                    anchors.fill: parent
+                                    radius: Theme.smallRadius
+                                    color: wsChip.mine ? Theme.highlight : (wsChip.containsMouse ? Theme.hoverBg : Theme.cardBg)
+                                    // assigned to another monitor
+                                    border.color: !wsChip.mine && wsChip.owner !== "" ? Theme.surface2 : "transparent"
+                                    border.width: Theme.borderWidth
+                                }
+
+                                StyledText {
+                                    anchors.centerIn: parent
+                                    text: wsChip.ws
+                                    color: wsChip.mine ? Theme.base : (wsChip.owner !== "" ? Theme.overlay0 : Theme.subtext0)
+                                    font.weight: wsChip.mine ? Font.Bold : Font.Normal
+                                }
                             }
                         }
+
+                        TextButton {
+                            text: "Default"
+                            onClicked: root.defaultWorkspaces()
+                        }
+                    }
+
+                    StyledText {
+                        text: "Click to assign to this monitor, click again to unassign. Outlined ones belong to another monitor."
+                        color: Theme.overlay1
+                        font.pixelSize: Theme.fontSize - 2
                     }
                 }
             }
@@ -490,20 +588,20 @@ PanelWindow {
                     text: `${Icons.text}  Text size`
                 }
 
-                StyledSlider {
+                StyledText {
                     Layout.fillWidth: true
-                    // 80% .. 160%
-                    value: (root.textScale - 0.8) / 0.8
-                    onMoved: v => {
-                        root.textScale = Math.round((0.8 + v * 0.8) * 20) / 20;
-                        root.dirty = true;
-                    }
+                    text: "Shell, GTK apps and kitty"
+                    color: Theme.overlay1
+                    font.pixelSize: Theme.fontSize - 2
                 }
 
-                StyledText {
-                    Layout.preferredWidth: 44
-                    text: `${Math.round(root.textScale * 100)}%`
-                    color: Theme.subtext0
+                // 9 .. 20 px, 13 is the default
+                Stepper {
+                    text: `${root.textSize} px${root.textSize === 13 ? " (default)" : ""}`
+                    onStep: d => {
+                        root.textSize = Math.max(9, Math.min(20, root.textSize + d));
+                        root.dirty = true;
+                    }
                 }
             }
 

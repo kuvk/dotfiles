@@ -16,7 +16,7 @@ Popout {
 
         IconButton {
             icon: Icons.refresh
-            color: Bluetooth.discovering ? Theme.accent : Theme.subtext0
+            color: Bluetooth.discovering ? Theme.highlight : Theme.subtext0
             onClicked: Bluetooth.setDiscovering(!Bluetooth.discovering)
         }
 
