@@ -20,6 +20,7 @@ Singleton {
     property bool displays: false
     property bool powerMenu: false
     property bool settings: false
+    property bool keybinds: false
     property string wallpapers: "" // "static" | "live" | ""
     property var trayItem: null // SystemTrayItem whose menu is open
 
@@ -117,6 +118,12 @@ Singleton {
         const open = !settings;
         closeAll();
         settings = open;
+    }
+
+    function toggleKeybinds(): void {
+        const open = !keybinds;
+        closeAll();
+        keybinds = open;
     }
 
     function toggleWallpapers(kind: string): void {
