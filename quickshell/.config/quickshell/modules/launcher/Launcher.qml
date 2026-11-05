@@ -75,7 +75,10 @@ PanelWindow {
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "quickshell-launcher"
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
+    // OnDemand like the dropdowns: the focus grab below hands this window the
+    // keyboard and closes it on a click anywhere else (bar included). With
+    // Exclusive focus Hyprland never reported those clicks to the grab.
+    WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
     onShownChanged: {
         search.text = "";

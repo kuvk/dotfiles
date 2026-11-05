@@ -84,9 +84,7 @@ Singleton {
             return;
         controlCenter = false;
         launcher = false;
-        displays = false;
         powerMenu = false;
-        settings = false;
         wallpapers = "";
         popoutScreen = screen;
         popoutX = x;
@@ -100,10 +98,11 @@ Singleton {
         controlCenter = open;
     }
 
+    // Settings and Displays are regular windows: opening them closes the
+    // overlays, but nothing else closes them
     function toggleDisplays(): void {
         const open = !displays;
         closeAll();
-        pinScreen(open);
         displays = open;
     }
 
@@ -117,7 +116,6 @@ Singleton {
     function toggleSettings(): void {
         const open = !settings;
         closeAll();
-        pinScreen(open);
         settings = open;
     }
 
@@ -140,9 +138,7 @@ Singleton {
         popout = "";
         controlCenter = false;
         launcher = false;
-        displays = false;
         powerMenu = false;
-        settings = false;
         wallpapers = "";
         tooltip = "";
     }
