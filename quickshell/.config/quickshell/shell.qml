@@ -40,13 +40,28 @@ ShellRoot {
 
     PowerMenu {}
 
-    DisplaysPanel {}
+    // Regular windows: created when opened and destroyed when closed, so each
+    // opening starts at its default size (Hyprland keeps a resized size
+    // otherwise)
+    LazyLoader {
+        active: Panels.displays
+
+        DisplaysPanel {}
+    }
 
     LockScreen {}
 
-    SettingsWindow {}
+    LazyLoader {
+        active: Panels.settings
 
-    KeybindsWindow {}
+        SettingsWindow {}
+    }
+
+    LazyLoader {
+        active: Panels.keybinds
+
+        KeybindsWindow {}
+    }
 
     WallpaperPicker {}
 

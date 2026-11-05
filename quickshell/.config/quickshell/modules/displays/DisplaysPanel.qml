@@ -212,13 +212,14 @@ FloatingWindow {
     // never runs into the right edge
     implicitWidth: Math.max(760, Math.ceil(content.implicitWidth + 32))
     implicitHeight: Math.ceil(content.implicitHeight + 32)
+    // can grow, not shrink below the default size
+    minimumSize: Qt.size(implicitWidth, implicitHeight)
 
-    onShownChanged: {
-        if (shown) {
-            load();
-            Displays.refresh();
-            background.forceActiveFocus();
-        }
+    // created on each opening (LazyLoader in shell.qml)
+    Component.onCompleted: {
+        load();
+        Displays.refresh();
+        background.forceActiveFocus();
     }
 
     Connections {

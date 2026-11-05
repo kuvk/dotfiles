@@ -40,6 +40,30 @@ Singleton {
         onTriggered: root.applyGaps()
     }
 
+    // The shell's own windows stay floating: Hyprland has no rule that forbids
+    // tiling, so when one is tiled (changefloatingmode ADDRESS,0) it is
+    // reopened, and the floating rule (rules.lua) applies again
+    readonly property var shellWindows: ({ "Settings": "settings", "Displays": "displays", "Keybindings": "keybinds" })
+
+    function keepFloating(data: string): void {
+        const [address, floating] = data.split(",");
+        if (floating !== "0")
+            return;
+        const norm = a => String(a ?? "").replace(/^0x/, "");
+        let toplevel = null;
+        const all = Hyprland.toplevels.values;
+        for (let i = 0; i < all.length; i++) {
+            if (norm(all[i].address) === norm(address))
+                toplevel = all[i];
+        }
+        const flag = toplevel ? shellWindows[toplevel.title] : undefined;
+        const cls = toplevel?.lastIpcObject?.class;
+        if (!flag || (cls && cls !== "org.quickshell"))
+            return;
+        Panels[flag] = false;
+        Qt.callLater(() => Panels[flag] = true);
+    }
+
     function nextLayout(): void {
         Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/switch-layout.sh"]);
     }
@@ -53,6 +77,8 @@ Singleton {
             // a reload resets the gaps to hyprland's config
             else if (event.name === "configreloaded")
                 gapsDelay.restart();
+            else if (event.name === "changefloatingmode")
+                root.keepFloating(event.data);
         }
     }
 

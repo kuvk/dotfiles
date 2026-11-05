@@ -37,6 +37,8 @@ FloatingWindow {
     color: Theme.panelBg
     implicitWidth: 780
     implicitHeight: 560
+    // can grow, not shrink below the default size
+    minimumSize: Qt.size(implicitWidth, implicitHeight)
 
     // A regular window (floating and centered by a Hyprland rule, can be
     // tiled); closing it from Hyprland updates the panel state

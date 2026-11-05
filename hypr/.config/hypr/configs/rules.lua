@@ -24,7 +24,7 @@ hl.window_rule({
   opaque = true,
 })
 
--- Quickshell's Settings, Displays and Keybindings: floating and centered (togglefloating tiles them)
+-- Quickshell's Settings, Displays and Keybindings: floating and centered (the shell reopens one that gets tiled)
 hl.window_rule({
   name = "quickshell-windows",
   match = { class = "^org\\.quickshell$", title = "^(Settings|Displays|Keybindings)$" },
