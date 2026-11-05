@@ -1,4 +1,8 @@
 // Inspired by Catnap
+// Colors from the system theme: theme-set.py renders this file into
+// ~/.config/fastfetch/config.jsonc (a theme slot name plus ".ansi" in double
+// braces is its 24-bit color code).
+// Edit this file, not config.jsonc.
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
   "logo": {
@@ -11,11 +15,15 @@
       "left": 3,
     },
     "color": {
-      "1": "magenta",
+      "1": "{{ accent.ansi }}",
     },
   },
   "display": {
     "separator": " ",
+    "color": {
+      "keys": "{{ overlay1.ansi }}",
+      "output": "{{ text.ansi }}",
+    },
   },
   "modules": [
     {
@@ -23,22 +31,22 @@
       "type": "custom",
     },
     {
-      "key": "│ {#34}  user    {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}  user    {#keys}│",
       "type": "title",
       "format": "{user-name}",
     },
     {
-      "key": "│ {#34}󰇅  hname   {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}󰇅  hname   {#keys}│",
       "type": "title",
       "format": "{host-name}",
     },
     {
       "type": "command",
-      "key": "│ {#34}󱦟  os age  {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}󱦟  os age  {#keys}│",
       "text": "printf \"\\e[0m%s days\\e[0m\" \"$(( ($(date +%s) - $(stat -c %W /)) / 86400 ))\"",
     },
     {
-      "key": "│ {#34}󰅐  uptime  {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}󰅐  uptime  {#keys}│",
       "type": "uptime",
     },
     {
@@ -46,32 +54,32 @@
       "type": "custom",
     },
     {
-      "key": "│ {#34}󰇅  pc      {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}󰇅  pc      {#keys}│",
       "type": "host",
       "format": "{1}",
     },
     {
-      "key": "│ {#34}󰍛  cpu     {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}󰍛  cpu     {#keys}│",
       "type": "cpu",
       "showPeCoreCount": true,
     },
     {
-      "key": "│ {#34}󰍛  gpu     {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}󰍛  gpu     {#keys}│",
       "type": "gpu",
       "format": "{2} ({6})",
     },
     {
-      "key": "│ {#34}  memory  {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}  memory  {#keys}│",
       "type": "memory",
     },
     {
-      "key": "│ {#34}  root    {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}  root    {#keys}│",
       "type": "disk",
       "folders": "/",
 			"format": "{size-used} / {size-total} ({size-percentage})"
     },
     {
-      "key": "│ {#34}󱂶  home    {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}󱂶  home    {#keys}│",
       "type": "disk",
       "folders": "/home",
 			"format": "{size-used} / {size-total} ({size-percentage})"
@@ -81,36 +89,36 @@
       "type": "custom",
     },
     {
-      "key": "│ {#34}{icon}  distro  {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}{icon}  distro  {#keys}│",
       "type": "os",
     },
     {
-      "key": "│ {#34}  kernel  {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}  kernel  {#keys}│",
       "type": "kernel",
     },
     {
-      "key": "│ {#34}  wm      {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}  wm      {#keys}│",
       "type": "wm",
     },
     {
-      "key": "│ {#34}󰇄  desktop {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}󰇄  desktop {#keys}│",
       "type": "de",
 			"format": "{pretty-name}"
     },
     {
-      "key": "│ {#34}  pkgs    {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}  pkgs    {#keys}│",
       "type": "packages",
     },
     {
-      "key": "│ {#34}  term    {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}  term    {#keys}│",
       "type": "terminal",
     },
     {
-      "key": "│ {#34}  shell   {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}  shell   {#keys}│",
       "type": "shell",
     },
     {
-      "key": "│ {#34}  colors  {#keys}│",
+      "key": "│ {#{{ accent2.ansi }}}  colors  {#keys}│",
       "type": "colors",
       "symbol": "circle",
     },

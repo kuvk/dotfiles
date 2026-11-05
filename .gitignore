@@ -34,9 +34,11 @@ yazi/.config/yazi/theme.toml
 .zsh_history*
 # neovim
 lazy-lock.json
-# yazi: no plugins except the local one
+# yazi: no plugins installed with `ya pkg`, only the local ones
 yazi/.config/yazi/plugins/*
 !yazi/.config/yazi/plugins/office.yazi/
+!yazi/.config/yazi/plugins/places.yazi/
+!yazi/.config/yazi/plugins/smart-enter.yazi/
 yazi/.config/yazi/flavors/
 yazi/.config/yazi/package.toml
 # lazygit remembers recent repos and popups here
@@ -48,3 +50,4 @@ hypr/.config/hypr/monitors.json
 # cliamp keeps playlists, history and its socket next to the config
 cliamp/.config/cliamp/*
 !cliamp/.config/cliamp/config.toml
+fastfetch/.config/fastfetch/config.jsonc
