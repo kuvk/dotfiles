@@ -37,7 +37,7 @@ katakana in the lock screen's digital rain.
 | Control Center: toggles, sliders, media (with visualizer), notifications grouped by app, session buttons | `modules/controlcenter/ControlCenter.qml` | `ALT+N`, or the sliders icon (right-click toggles DND) |
 | Search launcher (just the field; apps appear as you type) | `modules/launcher/Launcher.qml` | `ALT+Space` |
 | App menu: categories on the left, apps on the right | `modules/launcher/AppMenu.qml` + `services/Apps.qml` | the Arch icon, or `ALT+CTRL+Space` |
-| Theme carousel (palette previews, type to search; other monitors are blurred) | `modules/themes/ThemePicker.qml` | `ALT+SHIFT+T`, or the Theme tile |
+| Theme carousel (each card the theme's palette as bars, type to search; other monitors are blurred) | `modules/themes/ThemePicker.qml` | `ALT+SHIFT+T`, or the Theme tile |
 | Power menu (the old wlogout layout) | `modules/powermenu/PowerMenu.qml` | `ALT+SHIFT+E`, or the power icon |
 | Lock screen | `modules/lock/LockScreen.qml` | `` ALT+` ``, hypridle, before sleep |
 | Wallpaper carousel (type to search; other monitors are blurred) | `modules/wallpaper/WallpaperPicker.qml` | `ALT+W`, Tab for live wallpapers |
@@ -66,8 +66,8 @@ Hovering a bar item shows a dot under it, an open dropdown an accent line.
 
 Preferences are set in Settings, one sidebar section each: Appearance (corner
 radius, border width, opacity, animations), Fonts (a Nerd Font and a display
-font, with "Nerd Fonts only" and "Use Nerd Symbols font" switches), Bar (clock format, weather
-location and unit, and which modules show on the primary monitor's bar and on
+font, with "Nerd Fonts only" and "Use Nerd Symbols font" switches), Bar (full width or floating with
+margins and rounded corners, clock format, weather location and unit, and which modules show on the primary monitor's bar and on
 the others; the clock always shows), Windows (window buttons, gaps for regular
 and Work-Game Mode), Notifications, Lock Screen
 (effects and the colors of the clock, rain, outlines, password dots and text),

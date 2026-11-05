@@ -86,7 +86,7 @@ Item {
                                 Panels.lastClosed = "";
                             Panels.trayItem = modelData;
                             const pos = item.mapToItem(null, item.width / 2, 0);
-                            Panels.togglePopout("traymenu", QsWindow.window.screen, pos.x);
+                            Panels.togglePopout("traymenu", QsWindow.window.screen, pos.x + Theme.barMargin);
                         }
                     }
 
