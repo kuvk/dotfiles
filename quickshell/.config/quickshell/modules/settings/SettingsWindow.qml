@@ -234,6 +234,17 @@ FloatingWindow {
                             }
 
                             SettingRow {
+                                visible: Config.barFloating
+                                label: "Bar margin"
+                                hint: "Space to the left, right and top of the floating bar"
+
+                                Stepper {
+                                    text: `${Config.barMargin} px`
+                                    onStep: d => Config.barMargin = root.clamp(Config.barMargin + d * 2, 0, 40)
+                                }
+                            }
+
+                            SettingRow {
                                 label: "Clock"
 
                                 Stepper {
