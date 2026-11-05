@@ -30,9 +30,7 @@ Or press `SUPER+CTRL+T`, or use the Theme tile in the control center.
 
 Catppuccin Mocha (default) and Catppuccin Latte are exact Catppuccin palettes.
 Every other theme is imported from [Omarchy](https://github.com/basecamp/omarchy)
-(MIT): Ethereal, Everforest, Flexoki Light, Gruvbox, Hackerman, Jade Horse,
-Kanagawa, Last Horizon, Lumon, Lupine, Matte Black, Miasma, Nord, Retro 82,
-Ristretto, Rose Pine, Solitude, Starship, Tokyo Night, Vantablack and White.
+(MIT). `theme-set.py --list` shows what's installed.
 
 To pull in new or updated Omarchy themes:
 

@@ -34,7 +34,6 @@ hypr/.config/hypr/hyprtoolkit.conf
 # zsh
 .zcompdump*
 .zsh_history*
-# neovim
 # yazi: no plugins installed with `ya pkg`, only the local ones
 yazi/.config/yazi/plugins/*
 !yazi/.config/yazi/plugins/office.yazi/

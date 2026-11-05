@@ -5,14 +5,16 @@ the system theme (see `~/.config/theme/README.md`).
 
 ## Packages
 
+`install.sh` installs everything the shell needs from `packages/core.txt` (see "Quickshell, and the
+services it talks to" and "Commands the shell and scripts run"; the Matrix lock style needs
+`unimatrix-git` from the AUR). To install by hand:
+
 ```sh
-sudo pacman -S quickshell networkmanager bluez bluez-utils pipewire wireplumber \
-  upower power-profiles-daemon brightnessctl curl ttf-nerd-fonts-symbols noto-fonts-cjk noto-fonts-emoji \
-  hyprpaper mpvpaper imagemagick ffmpeg cava cliphist wl-clipboard hyprlock hypridle \
-  kitty   # the Matrix lock style also needs unimatrix (AUR)
-# optional: brightness of external monitors over DDC/CI
-sudo pacman -S ddcutil && sudo usermod -aG i2c "$USER"   # then log in again
+sed 's/#.*//' ~/dotfiles/packages/core.txt | xargs paru -S --needed
 ```
+
+Brightness of external monitors over DDC/CI also needs `ddcutil` and
+`sudo usermod -aG i2c "$USER"`, then log in again.
 
 Needs Quickshell 0.2 or newer. No other notification daemon may run: only one
 can own the D-Bus name.
