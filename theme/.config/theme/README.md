@@ -18,21 +18,43 @@ current/                    generated (gitignored); app configs point here
 ~/.config/scripts/theme-set.py --list
 ```
 
-Or press `ALT+SHIFT+Space`, or use the Theme tile in the control center.
+Or press `ALT+SHIFT+T`, or use the Theme tile in the control center.
+
+## Included themes
+
+Catppuccin Mocha (default) and Catppuccin Latte are exact Catppuccin palettes.
+Every other theme is imported from [Omarchy](https://github.com/basecamp/omarchy)
+(MIT): Ethereal, Everforest, Flexoki Light, Gruvbox, Hackerman, Jade Horse,
+Kanagawa, Last Horizon, Lumon, Lupine, Matte Black, Miasma, Nord, Retro 82,
+Ristretto, Rose Pine, Solitude, Starship, Tokyo Night, Vantablack and White.
+
+To pull in new or updated Omarchy themes:
+
+```sh
+git clone --depth 1 https://github.com/basecamp/omarchy /tmp/omarchy
+~/.config/theme/import-omarchy.py /tmp/omarchy/themes          # all
+~/.config/theme/import-omarchy.py /tmp/omarchy/themes nord     # or some
+```
+
+Omarchy themes are semantic (background, foreground, accent, ANSI colors), so
+the importer interpolates the in-between shades. Terminal colors match Omarchy's
+kitty template. Neovim uses the theme's own colorscheme where Omarchy names one,
+and otherwise [aether](https://github.com/omacom/aether.nvim) built from the
+palette, as Omarchy does. Wallpapers aren't imported (161 MB); put one in a
+theme folder and set `wallpaper` under `[apps]`.
 
 | App | Reads | Reload |
 |---|---|---|
 | Quickshell | `current/quickshell.json` | live (file watch + IPC) |
 | Hyprland borders | `~/.config/hypr/configs/generated/theme.lua` | live (`hyprctl eval`) |
-| hyprlock | `current/hyprland.conf` | on next lock |
 | kitty | `current/kitty.conf` | live (SIGUSR1) |
 | Neovim | `current/nvim.lua` | live (`lua/theme.lua` watches it) |
 | btop | `current/btop.theme` | live (SIGUSR2) |
 | tmux | `current/tmux.conf` | live (`source-file`) |
 | starship | `current/starship.toml` (copy of `~/.config/starship.toml` + palette) | next prompt |
 | rofi | `current/rofi.rasi` | next launch |
-| waybar, swaync, wlogout | `current/gtk.css` | live for waybar and swaync, next launch for wlogout |
-| scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh`, `wlogout-set-icons.sh` |
+| waybar, swaync (fallbacks) | `current/gtk.css` | live |
+| scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |
 | GTK apps | `gsettings ... color-scheme` | live (dark/light only) |
 
 ## Adding a theme
@@ -40,7 +62,7 @@ Or press `ALT+SHIFT+Space`, or use the Theme tile in the control center.
 1. Copy `themes/catppuccin-mocha` to `themes/<name>`.
 2. Fill in all 26 slots in `[colors]`. The names are Catppuccin's because every
    config already uses them. Map your palette by role: `base`/`mantle`/`crust`
-   are backgrounds from lightest to darkest (reversed for light themes),
+   are backgrounds from lightest to darkest,
    `surface*` are raised surfaces, `overlay*` are muted text, and `text`/`subtext*`
    are foregrounds.
 3. Set `accent` (borders, highlights) and `accent2` to a slot name or a hex value.

@@ -8,8 +8,11 @@ import qs.config
 import qs.services
 import qs.modules.bar
 import qs.modules.controlcenter
+import qs.modules.displays
 import qs.modules.launcher
+import qs.modules.lock
 import qs.modules.notifications
+import qs.modules.powermenu
 
 ShellRoot {
     Variants {
@@ -23,6 +26,12 @@ ShellRoot {
     ControlCenter {}
 
     Launcher {}
+
+    PowerMenu {}
+
+    Displays {}
+
+    LockScreen {}
 
     // qs ipc call <target> <function> [args]
     IpcHandler {
@@ -83,6 +92,35 @@ ShellRoot {
 
         function gamemode(enabled: bool): void {
             Theme.gamemode = enabled;
+        }
+    }
+
+    IpcHandler {
+        target: "lock"
+
+        function lock(): void {
+            Lock.lock();
+        }
+
+        // No slide animation, for before_sleep_cmd
+        function lockNow(): void {
+            Lock.lockNow();
+        }
+    }
+
+    IpcHandler {
+        target: "power"
+
+        function toggle(): void {
+            Panels.togglePowerMenu();
+        }
+    }
+
+    IpcHandler {
+        target: "displays"
+
+        function toggle(): void {
+            Panels.toggleDisplays();
         }
     }
 

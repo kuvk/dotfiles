@@ -1,6 +1,6 @@
 -- Layer Rules
 hl.layer_rule({
-  match = { class = "^(quickshell-.*|waybar|rofi|swaync-control-center|swaync-notification-window|logout_dialog)$" },
+  match = { class = "^(quickshell-.*|waybar|rofi|swaync-control-center|swaync-notification-window)$" },
   blur = true,
   ignore_alpha = 0.5,
 })
@@ -67,13 +67,6 @@ hl.window_rule({
   name = "spotify",
   match = { class = "Spotify" },
   opacity = "0.9 0.9 1",
-})
-
--- Matrix Lock
-hl.window_rule({
-  name = "matrix-lock",
-  match = { title = "MATRIXLOCK" },
-  stay_focused = true,
 })
 
 -- Thunderbird

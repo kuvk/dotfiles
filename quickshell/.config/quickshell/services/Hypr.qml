@@ -5,8 +5,8 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 
-// Hyprland helpers. The config is Lua (hl.*), so dispatches are Lua
-// expressions, same as `hyprctl dispatch 'hl.dsp.focus({ workspace = 1 })'`.
+// Hyprland helpers. With a Lua config (hl.*), dispatches are Lua expressions,
+// same as `hyprctl dispatch 'hl.dsp.focus({ workspace = 1 })'`.
 Singleton {
     id: root
 
@@ -17,7 +17,7 @@ Singleton {
     }
 
     function focusWorkspace(id: int): void {
-        dispatch(`hl.dsp.focus({ workspace = ${id} })`);
+        dispatch(Hyprland.usingLua ? `hl.dsp.focus({ workspace = ${id} })` : `workspace ${id}`);
     }
 
     function nextLayout(): void {
