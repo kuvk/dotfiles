@@ -77,13 +77,12 @@ FloatingWindow {
     color: Theme.panelBg
     implicitWidth: 900
     implicitHeight: 640
+    // can grow, not shrink below the default size
+    minimumSize: Qt.size(implicitWidth, implicitHeight)
 
     onClosed: Panels.keybinds = false
-    onShownChanged: {
-        query = "";
-        if (shown)
-            listProc.running = true;
-    }
+    // created on each opening (LazyLoader in shell.qml)
+    Component.onCompleted: listProc.running = true
 
     Process {
         id: listProc
