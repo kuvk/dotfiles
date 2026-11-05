@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import QtQuick.Layouts
 import QtQuick.Shapes
 import Quickshell
@@ -60,24 +59,6 @@ PanelWindow {
     readonly property real overlap: -cardHeight * 0.06
     readonly property int radius: Math.max(3, Math.ceil((screenWidth - cardWidth) / (2 * (sliceWidth + overlap))) + 2)
 
-    // Cards are only created once the window is on screen. Cards built while
-    // it was still being mapped stayed blank (their masked layers rendered
-    // into the old surface) until a Tab rebuilt them.
-    property bool ready: false
-
-    onVisibleChanged: {
-        ready = false;
-        if (visible)
-            readyTimer.restart();
-    }
-
-    Timer {
-        id: readyTimer
-
-        interval: 60
-        onTriggered: root.ready = root.visible
-    }
-
     // Thumbnails generated during this opening, per kind
     property var thumbsTried: ({})
 
@@ -116,8 +97,9 @@ PanelWindow {
         const cmd = [script, "set", kind, item.path];
         if (thisMonitorOnly && screen)
             cmd.push(screen.name);
-        Quickshell.execDetached(cmd);
         Panels.wallpapers = "";
+        // wait for the picker to fade out; live wallpapers need a moment to start playing
+        Transition.run(cmd, Theme.animDuration + 250, kind === "live" ? 1200 : 400);
     }
 
     // Size of the visible slice at fractional distance `d` from the selection
@@ -131,7 +113,7 @@ PanelWindow {
         return Math.sign(d) * (a <= 1 ? a * first : first + (a - 1) * (sliceWidth + overlap));
     }
 
-    screen: Panels.focusedScreen
+    screen: Panels.overlayScreen ?? Panels.focusedScreen
     visible: reveal.value > 0
     color: "transparent"
     anchors {
@@ -358,7 +340,7 @@ PanelWindow {
             scale: 0.95 + 0.05 * reveal.value
 
             Repeater {
-                model: root.ready ? root.shownItems : []
+                model: root.shownItems
 
                 Loader {
                     id: slot
@@ -384,71 +366,62 @@ PanelWindow {
                     sourceComponent: Item {
                         id: card
 
-                        // Fixed-size picture, so its layer never reallocates
-                        // while animating; only the mask path moves
+                        // The visible parallelogram is a sheared, clipping
+                        // Item (stencil clip, no layers or shader masks, so it
+                        // survives the layer window being recreated on show).
+                        // The picture inside gets the inverse shear and stays
+                        // fixed to the card while the slice grows and shrinks.
                         Item {
-                            id: picture
+                            id: slice
 
-                            anchors.fill: parent
-                            visible: false
-                            layer.enabled: true
+                            readonly property real k: root.skew / Math.max(1, slot.visibleHeight)
 
-                            Rectangle {
-                                anchors.fill: parent
-                                color: Theme.surface0
+                            x: slot.sliceLeft
+                            y: slot.sliceTop
+                            width: Math.max(0, slot.visibleWidth - root.skew)
+                            height: slot.visibleHeight
+                            clip: true
+                            transform: Matrix4x4 {
+                                matrix: Qt.matrix4x4(1, -slice.k, 0, root.skew, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
                             }
 
-                            Image {
-                                anchors.fill: parent
-                                source: slot.modelData.thumb ? "file://" + slot.modelData.thumb : (root.kind === "static" ? "file://" + slot.modelData.path : "")
-                                sourceSize.width: 1024
-                                sourceSize.height: 640
-                                fillMode: Image.PreserveAspectCrop
-                                asynchronous: true
-                                cache: true
+                            Item {
+                                width: root.cardWidth
+                                height: root.cardHeight
+                                transform: Matrix4x4 {
+                                    matrix: Qt.matrix4x4(1, slice.k, 0, -(slot.sliceLeft + slice.k * slot.sliceTop + root.skew), 0, 1, 0, -slot.sliceTop, 0, 0, 1, 0, 0, 0, 0, 1)
+                                }
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    color: Theme.surface0
+                                }
+
+                                Image {
+                                    anchors.fill: parent
+                                    source: slot.modelData.thumb ? "file://" + slot.modelData.thumb : (root.kind === "static" ? "file://" + slot.modelData.path : "")
+                                    sourceSize.width: 1024
+                                    sourceSize.height: 640
+                                    fillMode: Image.PreserveAspectCrop
+                                    asynchronous: true
+                                    cache: true
+                                }
+
+                                Icon {
+                                    anchors.centerIn: parent
+                                    visible: !slot.modelData.thumb && root.kind === "live"
+                                    text: Icons.play
+                                    color: Theme.overlay1
+                                    font.pixelSize: 28
+                                }
                             }
 
-                            Icon {
-                                anchors.centerIn: parent
-                                visible: !slot.modelData.thumb && root.kind === "live"
-                                text: Icons.play
-                                color: Theme.overlay1
-                                font.pixelSize: 28
-                            }
-
+                            // dim the slices
                             Rectangle {
                                 anchors.fill: parent
                                 color: Theme.crust
                                 opacity: Math.min(1, Math.abs(slot.d)) * 0.45
                             }
-                        }
-
-                        Shape {
-                            id: mask
-
-                            anchors.fill: parent
-                            visible: false
-                            layer.enabled: true
-
-                            ShapePath {
-                                fillColor: "white"
-                                strokeColor: "transparent"
-                                startX: slot.sliceLeft + root.skew
-                                startY: slot.sliceTop
-                                PathLine { x: slot.sliceLeft + slot.visibleWidth; y: slot.sliceTop }
-                                PathLine { x: slot.sliceLeft + slot.visibleWidth - root.skew; y: slot.sliceTop + slot.visibleHeight }
-                                PathLine { x: slot.sliceLeft; y: slot.sliceTop + slot.visibleHeight }
-                                PathLine { x: slot.sliceLeft + root.skew; y: slot.sliceTop }
-                            }
-                        }
-
-                        MultiEffect {
-                            anchors.fill: parent
-                            source: picture
-                            maskEnabled: true
-                            maskSource: mask
-                            maskThresholdMin: 0.5
-                            maskSpreadAtMin: 1
                         }
 
                         // Outline
@@ -458,8 +431,9 @@ PanelWindow {
 
                             ShapePath {
                                 fillColor: "transparent"
-                                strokeColor: slot.isSelected ? Theme.accent : Theme.alpha(Theme.text, 0.15)
-                                strokeWidth: slot.isSelected ? Math.max(2, Theme.borderWidth) : 1
+                                strokeColor: slot.isSelected ? Theme.accent : Theme.alpha(Theme.crust, 0.9)
+                                // also smooths the clip's hard slanted edge
+                                strokeWidth: slot.isSelected ? Math.max(2, Theme.borderWidth) : 1.5
                                 startX: slot.sliceLeft + root.skew
                                 startY: slot.sliceTop
                                 PathLine { x: slot.sliceLeft + slot.visibleWidth; y: slot.sliceTop }

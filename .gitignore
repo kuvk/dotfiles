@@ -1,26 +1,50 @@
+# Files that apps or scripts write at runtime into stowed (symlinked) folders,
+# and generated output. Everything here is recreated on its own.
+
+# ---------------------------------------------------------------- general
+*.log
+*.bak
+*.tmp
+*.swp
+*~
+.DS_Store
+.directory
 __pycache__/
 __init__.py
 .mypy_cache/
-.zcompdump
-.zsh_history*
-lazy-lock.json
-bookmarks
-*assets/
-*.log
-shaders/
-cava/.config/cava/themes/
-*.bak
-generated/
-yazi/.config/yazi/plugins/*
-!yazi/.config/yazi/plugins/office.yazi/
-yazi/.config/yazi/theme.toml
-yazi/.config/yazi/flavors/
 .qmlls.ini
+.qmllint.ini
+generated/
+*assets/
+shaders/
+bookmarks
+
+# ---------------------------------------------------------------- theme output (theme-set.py)
 theme/.config/theme/current/
 kitty/.config/kitty/text-size.conf
 bat/.config/bat/themes/Current.tmTheme
 btop/.config/btop/themes/current.theme
+cava/.config/cava/themes/
 starship/.config/starship.toml
-cliamp/.config/cliamp/themes/
-cliamp/.config/cliamp/*.log
-cliamp/.config/cliamp/cliamp.sock
+yazi/.config/yazi/theme.toml
+
+# ---------------------------------------------------------------- per-app state
+# zsh
+.zcompdump*
+.zsh_history*
+# neovim
+lazy-lock.json
+# yazi: no plugins except the local one
+yazi/.config/yazi/plugins/*
+!yazi/.config/yazi/plugins/office.yazi/
+yazi/.config/yazi/flavors/
+yazi/.config/yazi/package.toml
+# lazygit remembers recent repos and popups here
+lazygit/.config/lazygit/state.yml
+# kitty's theme kitten
+kitty/.config/kitty/current-theme.conf
+# Hyprland monitor profiles (hypr-monitors.py), per machine
+hypr/.config/hypr/monitors.json
+# cliamp keeps playlists, history and its socket next to the config
+cliamp/.config/cliamp/*
+!cliamp/.config/cliamp/config.toml

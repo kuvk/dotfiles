@@ -1,15 +1,13 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Hyprland
-import Quickshell.Wayland
 import qs.config
 import qs.components
 import qs.services
 
 // Settings (gear in the Control Center, ALT+CTRL+P). Sections in a sidebar;
 // changes apply immediately and are saved by Config.
-PanelWindow {
+FloatingWindow {
     id: root
 
     readonly property bool shown: Panels.settings
@@ -33,34 +31,24 @@ PanelWindow {
         return Math.max(lo, Math.min(hi, v));
     }
 
-    screen: Panels.focusedScreen
     visible: shown
-    color: "transparent"
+    title: "Settings"
+    color: Theme.panelBg
     implicitWidth: 780
     implicitHeight: 560
-    exclusionMode: ExclusionMode.Ignore
-    WlrLayershell.namespace: "quickshell-settings"
-    WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
-    HyprlandFocusGrab {
-        active: root.shown
-        windows: [root]
-        onCleared: Panels.settings = false
-    }
+    // A regular window (floating and centered by a Hyprland rule, can be
+    // tiled); closing it from Hyprland updates the panel state
+    onClosed: Panels.settings = false
 
     Rectangle {
         anchors.fill: parent
         color: Theme.panelBg
-        radius: Theme.radius
-        border.color: Theme.border
-        border.width: Theme.borderWidth
         focus: root.shown
         Keys.onEscapePressed: Panels.settings = false
 
         RowLayout {
             anchors.fill: parent
-            anchors.margins: Theme.borderWidth
             spacing: 0
 
             // Sidebar
@@ -68,8 +56,6 @@ PanelWindow {
                 Layout.fillHeight: true
                 implicitWidth: 190
                 color: Theme.alpha(Theme.mantle, 0.6)
-                topLeftRadius: Theme.radius
-                bottomLeftRadius: Theme.radius
 
                 ColumnLayout {
                     anchors.fill: parent
@@ -236,35 +222,6 @@ PanelWindow {
                             }
 
                             SettingRow {
-                                label: "Keyboard layout"
-                                hint: "Left of the clock; click switches layout"
-
-                                Switch {
-                                    checked: Config.showLayout
-                                    onToggled: Config.showLayout = !Config.showLayout
-                                }
-                            }
-
-                            SettingRow {
-                                label: "Window title"
-                                hint: "Focused app, next to the workspaces"
-
-                                Switch {
-                                    checked: Config.showWindowTitle
-                                    onToggled: Config.showWindowTitle = !Config.showWindowTitle
-                                }
-                            }
-
-                            SettingRow {
-                                label: "Weather"
-
-                                Switch {
-                                    checked: Config.showWeather
-                                    onToggled: Config.showWeather = !Config.showWeather
-                                }
-                            }
-
-                            SettingRow {
                                 label: "Weather location"
                                 hint: "City name, or empty to detect from your IP"
 
@@ -308,6 +265,88 @@ PanelWindow {
                                     onClicked: Config.weatherFahrenheit = !Config.weatherFahrenheit
                                 }
                             }
+
+                            // Modules per bar: the primary monitor's and the others'
+                            StyledText {
+                                Layout.topMargin: 8
+                                Layout.fillWidth: true
+                                text: "Modules on the primary monitor's bar and on the other bars. The clock is always shown."
+                                color: Theme.overlay1
+                                wrapMode: Text.Wrap
+                            }
+
+                            GridLayout {
+                                Layout.fillWidth: true
+                                columns: 3
+                                columnSpacing: 16
+                                rowSpacing: 8
+
+                                StyledText {
+                                    Layout.fillWidth: true
+                                    text: "Module"
+                                    color: Theme.subtext0
+                                    font.weight: Font.DemiBold
+                                }
+
+                                StyledText {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: "Primary"
+                                    color: Theme.subtext0
+                                    font.weight: Font.DemiBold
+                                }
+
+                                StyledText {
+                                    Layout.alignment: Qt.AlignHCenter
+                                    text: "Others"
+                                    color: Theme.subtext0
+                                    font.weight: Font.DemiBold
+                                }
+
+                                Repeater {
+                                    model: Config.barModules
+
+                                    StyledText {
+                                        required property var modelData
+                                        required property int index
+
+                                        Layout.row: index + 1
+                                        Layout.column: 0
+                                        Layout.fillWidth: true
+                                        text: modelData.label
+                                        color: Theme.text
+                                    }
+                                }
+
+                                Repeater {
+                                    model: Config.barModules
+
+                                    Switch {
+                                        required property var modelData
+                                        required property int index
+
+                                        Layout.row: index + 1
+                                        Layout.column: 1
+                                        Layout.alignment: Qt.AlignHCenter
+                                        checked: Config.barShows(true, modelData.id)
+                                        onToggled: Config.setBarModule(true, modelData.id, !checked)
+                                    }
+                                }
+
+                                Repeater {
+                                    model: Config.barModules
+
+                                    Switch {
+                                        required property var modelData
+                                        required property int index
+
+                                        Layout.row: index + 1
+                                        Layout.column: 2
+                                        Layout.alignment: Qt.AlignHCenter
+                                        checked: Config.barShows(false, modelData.id)
+                                        onToggled: Config.setBarModule(false, modelData.id, !checked)
+                                    }
+                                }
+                            }
                         }
 
                         // ------------------------------------------------ Windows
@@ -315,6 +354,16 @@ PanelWindow {
                             Layout.fillWidth: true
                             visible: root.section === "windows"
                             spacing: 12
+
+                            SettingRow {
+                                label: "Window buttons"
+                                hint: "Close button on the shell's windows (Settings, Displays)"
+
+                                Switch {
+                                    checked: Config.windowButtons
+                                    onToggled: Config.windowButtons = !Config.windowButtons
+                                }
+                            }
 
                             StyledText {
                                 text: "Gaps between windows (inner) and to the screen edge (outer)."

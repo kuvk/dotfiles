@@ -13,7 +13,9 @@ Item {
     readonly property bool menuOpen: Panels.popout === "traymenu" && Panels.popoutScreen === QsWindow.window?.screen
     readonly property bool expanded: hover.hovered || menuOpen || collapseDelay.running
 
-    visible: SystemTray.items.values.length > 0
+    property bool shown: true
+
+    visible: shown && SystemTray.items.values.length > 0
     implicitWidth: arrow.implicitWidth + drawer.width
     implicitHeight: Theme.barHeight
 

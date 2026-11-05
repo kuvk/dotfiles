@@ -14,6 +14,10 @@ Singleton {
     property var info: ({ monitors: [], workspaces: {}, text_scale: 1 })
     property var brightness: ({}) // monitor name -> percent, or null if not controllable
     property bool busy: false
+    // connector name (e.g. DP-1) of the profile's primary monitor, "" if unknown
+    readonly property string primaryName: info.monitors.find(m => m.id === info.primary)?.name ?? ""
+
+    Component.onCompleted: refresh()
 
     function refresh(): void {
         stateProc.running = true;

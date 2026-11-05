@@ -15,7 +15,9 @@ Row {
     readonly property Toplevel toplevel: ToplevelManager.activeToplevel
     readonly property var entry: toplevel ? DesktopEntries.heuristicLookup(toplevel.appId) : null
 
-    visible: Config.showWindowTitle && toplevel !== null && toplevel.activated && Hyprland.focusedMonitor?.name === screen?.name
+    property bool shown: true
+
+    visible: shown && toplevel !== null && toplevel.activated && Hyprland.focusedMonitor?.name === screen?.name
     spacing: 8
     leftPadding: 8
 

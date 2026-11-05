@@ -61,13 +61,13 @@ PanelWindow {
             return;
         if (themes) {
             Panels.launcher = false;
-            Quickshell.execDetached([themeSet, item.theme]);
+            Transition.run([themeSet, item.theme], 250, 500); // after the launcher has faded out
         } else {
             launch(item);
         }
     }
 
-    screen: Panels.focusedScreen
+    screen: Panels.overlayScreen ?? Panels.focusedScreen
     visible: shown
     color: "transparent"
     implicitWidth: 560
