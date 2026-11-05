@@ -1,7 +1,6 @@
 # Apps with window rules in hypr/.config/hypr/configs/rules.lua. Optional: the dotfiles work
 # without them. "# AUR" marks AUR packages. Installed by hand: DaVinci Resolve (its PKGBUILD
-# needs editing) and Frame Checker (github.com/kuvk/frame-checker). Dolphin's rule has no
-# package here.
+# needs editing) and Frame Checker (github.com/kuvk/frame-checker).
 chromium
 blueman
 brasero

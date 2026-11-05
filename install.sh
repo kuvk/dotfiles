@@ -95,7 +95,7 @@ sudo pacman -Syu --needed --noconfirm reflector
 if [[ ! -f /etc/pacman.d/mirrorlist.bak ]]; then
     sudo cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.bak
     sudo tee /etc/xdg/reflector/reflector.conf >/dev/null <<'EOF'
-# reflector.timer runs this weekly (installed by ~/dotfiles/install.sh)
+# reflector.timer runs this weekly (installed by install.sh)
 --save /etc/pacman.d/mirrorlist
 --protocol https
 --latest 20
@@ -216,7 +216,7 @@ if $boot; then
         grep -q '^ALL_kver="/efi/arch/' "$preset" && continue
         sudo cp -n "$preset" "$preset.bak"
         sudo tee "$preset" >/dev/null <<EOF
-# mkinitcpio preset for $kernel; the kernel and image go to the ESP (~/dotfiles/install.sh)
+# mkinitcpio preset for $kernel; the kernel and image go to the ESP (install.sh)
 ALL_kver="/efi/arch/vmlinuz-$kernel"
 PRESETS=('default')
 default_image="/efi/arch/initramfs-$kernel.img"
