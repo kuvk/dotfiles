@@ -77,6 +77,12 @@ Singleton {
     readonly property int fontSize: textSize
     readonly property int iconSize: textSize + 1
     readonly property int barHeight: Math.max(34, Math.round(textSize * 2.6))
+    // Floating bar (Settings > Bar): margin on the left, right and top, the
+    // windows' outer gap so its edges line up with them (the gap below it is
+    // Hyprland's own outer gap); 0 for the full-width bar
+    readonly property int barMargin: !Config.barFloating ? 0 : gamemode ? Config.gameGapsOut : Math.max(4, Config.gapsOut)
+    // rounded like the other windows only while it floats (0 in Work-Game Mode)
+    readonly property int barRadius: barMargin > 0 ? radius : 0
     readonly property int radius: gamemode ? 0 : Config.radius
     readonly property int smallRadius: gamemode ? 0 : Math.max(0, Config.radius - 2)
     readonly property int spacing: 8

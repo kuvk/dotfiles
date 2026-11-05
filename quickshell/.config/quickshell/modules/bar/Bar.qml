@@ -21,7 +21,8 @@ PanelWindow {
     // Open a popout centered under `item`
     function toggle(name: string, item: Item): void {
         const pos = item.mapToItem(null, item.width / 2, 0);
-        Panels.togglePopout(name, screen, pos.x);
+        // window coordinates, plus the floating bar's margin
+        Panels.togglePopout(name, screen, pos.x + Theme.barMargin);
     }
 
     function isOpen(name: string): bool {
@@ -35,9 +36,25 @@ PanelWindow {
         left: true
         right: true
     }
+    margins {
+        top: Theme.barMargin
+        left: Theme.barMargin
+        right: Theme.barMargin
+    }
     implicitHeight: Theme.barHeight
-    color: Theme.barBg
+    color: "transparent"
     WlrLayershell.namespace: "quickshell-bar"
+
+    // Background: full width and square, or floating with rounded corners
+    // and the window border
+    Rectangle {
+        anchors.fill: parent
+        z: -1
+        color: Theme.barBg
+        radius: Theme.barRadius
+        border.color: Theme.barMargin > 0 ? Theme.border : "transparent"
+        border.width: Theme.barMargin > 0 ? Theme.borderWidth : 0
+    }
 
     // Left: launcher, workspaces, focused window (no hover dots here)
     Row {

@@ -10,9 +10,8 @@ import qs.components
 import qs.services
 
 // Theme picker as a carousel, the same as the wallpaper picker: the selected
-// theme is a large slanted card in the middle, the others narrow slices. Each
-// card is a palette preview: a small mock desktop drawn in that theme's
-// colors (bar, window with code, swatches).
+// theme is a tall slanted card in the middle, the others narrow slices. Each
+// card shows the theme's palette as bars, top to bottom.
 //
 // ←/→ or scroll: move   type: search   Enter: apply   Esc: clear, then close
 PanelWindow {
@@ -102,12 +101,13 @@ PanelWindow {
 
     // Card geometry from the monitor size
     readonly property real screenWidth: screen?.width ?? 1920
+    // a third of the wallpaper card's width: a tall palette strip
     readonly property real cardHeight: Math.min(475, (screen?.height ?? 1080) * 0.45)
-    readonly property real cardWidth: cardHeight * 768 / 475
-    readonly property real sliceWidth: cardHeight * 0.23
+    readonly property real cardWidth: cardHeight * 768 / 475 / 3
+    readonly property real sliceWidth: cardHeight * 0.1
     readonly property real sliceHeight: cardHeight * 0.91
-    readonly property real skew: cardHeight * 0.06
-    readonly property real overlap: -cardHeight * 0.06
+    readonly property real skew: cardHeight * 0.04
+    readonly property real overlap: -cardHeight * 0.02
     readonly property int radius: Math.max(3, Math.ceil((screenWidth - cardWidth) / (2 * (sliceWidth + overlap))) + 2)
 
     function move(delta: int): void {

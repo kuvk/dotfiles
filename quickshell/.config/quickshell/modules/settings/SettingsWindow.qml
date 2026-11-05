@@ -224,6 +224,16 @@ FloatingWindow {
                             spacing: 12
 
                             SettingRow {
+                                label: "Floating bar"
+                                hint: "Margins around the bar and rounded corners; off: full width, square"
+
+                                Switch {
+                                    checked: Config.barFloating
+                                    onToggled: Config.barFloating = !Config.barFloating
+                                }
+                            }
+
+                            SettingRow {
                                 label: "Clock"
 
                                 Stepper {
