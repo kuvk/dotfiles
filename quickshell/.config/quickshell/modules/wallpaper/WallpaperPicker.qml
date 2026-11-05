@@ -146,7 +146,13 @@ PanelWindow {
     // Thumbnails generated during this opening, per kind
     property var thumbsTried: ({})
 
+    // Debugging: `qs log | grep WPDBG` (wallpaper.py logs to ~/.cache/wallpaper-debug.log)
+    function dbg(msg: string): void {
+        console.log(`WPDBG ${Date.now() % 100000} ${msg} | root.kind="${root.kind}" shown=${root.shown} running=${listProc.running} again=${listProc.again} retries=${root.retries} items=${root.items.length} cache.static=${root.cache.static?.length ?? "null"} cache.live=${root.cache.live?.length ?? "null"}`);
+    }
+
     function load(): void {
+        dbg("load() called");
         // nothing to list while closed (a late retry or re-run used to run
         // `wallpaper.py list ""`, which fails, and kept retrying)
         if (!shown)
@@ -158,8 +164,9 @@ PanelWindow {
             listProc.again = true;
             return;
         }
-        listProc.kind = kind;
-        listProc.command = [script, "list", kind];
+        listProc.kind = root.kind;
+        listProc.command = [root.script, "list", root.kind];
+        dbg(`start ${JSON.stringify(listProc.command)}`);
         listProc.running = true;
     }
 
@@ -219,6 +226,7 @@ PanelWindow {
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     onKindChanged: {
+        dbg("kind changed");
         if (shown) {
             Hyprland.refreshMonitors();
             query = "";
@@ -268,6 +276,7 @@ PanelWindow {
 
         stdout: StdioCollector {
             onStreamFinished: {
+                root.dbg(`preload ${preload.kind} done: ${text.length}b`);
                 try {
                     const list = JSON.parse(text);
                     if (root.cache[preload.kind] === null)
@@ -309,10 +318,11 @@ PanelWindow {
         }
 
         onExited: (code, status) => {
+            root.dbg(`exited code=${code} status=${status} listProc.kind="${listProc.kind}" out=${listOut.text.length}b err=${JSON.stringify(listErr.text)} cmd=${JSON.stringify(listProc.command)}`);
             // A load came in during this run, or the tab changed: read again
             // for what is shown now (load() does nothing once closed)
-            if (again || kind !== root.kind) {
-                again = false;
+            if (listProc.again || listProc.kind !== root.kind) {
+                listProc.again = false;
                 Qt.callLater(root.load);
                 return;
             }
@@ -325,9 +335,9 @@ PanelWindow {
             // A failed or empty answer is retried (0.2 s doubling to ~6 s in
             // all) before it's believed, and an empty answer never replaces a
             // list that had wallpapers: the kept list stays on screen.
-            const known = root.cache[kind]?.length > 0;
+            const known = root.cache[listProc.kind]?.length > 0;
             if (list === null || list.length === 0) {
-                console.warn(`Wallpapers: list ${kind} ${list === null ? "failed" : "came back empty"} (exit ${code}/${status}, try ${root.retries + 1}): ${listErr.text.trim().slice(-300) || listOut.text.slice(0, 120) || "no output"}`);
+                console.warn(`Wallpapers: list ${listProc.kind} ${list === null ? "failed" : "came back empty"} (exit ${code}/${status}, try ${root.retries + 1}): ${listErr.text.trim().slice(-300) || listOut.text.slice(0, 120) || "no output"}`);
                 if (root.retries < 5) {
                     retry.interval = 200 * Math.pow(2, root.retries);
                     root.retries++;
@@ -351,7 +361,11 @@ PanelWindow {
     Timer {
         id: retry
 
-        onTriggered: if (root.shown) root.load()
+        onTriggered: {
+            root.dbg("retry timer fired");
+            if (root.shown)
+                root.load();
+        }
     }
 
     Process {
@@ -359,7 +373,11 @@ PanelWindow {
 
         property string kind: ""
 
-        onExited: if (root.shown && kind === root.kind) root.load()
+        onExited: {
+            root.dbg(`thumbs ${thumbsProc.kind} exited`);
+            if (root.shown && thumbsProc.kind === root.kind)
+                root.load();
+        }
     }
 
     Rectangle {

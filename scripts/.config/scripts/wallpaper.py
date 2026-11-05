@@ -24,6 +24,8 @@ import signal
 import socket
 import subprocess
 import sys
+import time
+import traceback
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -290,13 +292,46 @@ def notify(body: str) -> None:
         subprocess.run(["notify-send", "-a", "Wallpapers", "Wallpapers", body], check=False)
 
 
+# ---------------------------------------------------------------- debugging
+
+DEBUG_LOG = Path(os.environ.get("XDG_CACHE_HOME", HOME / ".cache")) / "wallpaper-debug.log"
+
+
+def debug(message: str) -> None:
+    """Append a line to ~/.cache/wallpaper-debug.log (last 2000 lines kept)."""
+    try:
+        DEBUG_LOG.parent.mkdir(parents=True, exist_ok=True)
+        line = f"{time.strftime('%H:%M:%S')}.{int(time.time() * 1000) % 1000:03d} [{os.getpid()}<{os.getppid()}] {message}\n"
+        with DEBUG_LOG.open("a") as f:
+            f.write(line)
+        if DEBUG_LOG.stat().st_size > 400_000:
+            lines = DEBUG_LOG.read_text().splitlines(keepends=True)[-2000:]
+            DEBUG_LOG.write_text("".join(lines))
+    except OSError:
+        pass
+
+
 def main(argv: list[str]) -> int:
+    start = time.monotonic()
+    debug(f"start argv={argv!r} cwd={os.getcwd()!r} python={sys.executable}")
+    try:
+        code = run_command(argv)
+    except BaseException as e:  # noqa: BLE001 - log everything, then re-raise
+        debug(f"EXCEPTION after {time.monotonic() - start:.3f}s: {e!r}\n{traceback.format_exc()}")
+        raise
+    debug(f"exit {code} after {time.monotonic() - start:.3f}s")
+    return code
+
+
+def run_command(argv: list[str]) -> int:
     if not argv or argv[0] in ("-h", "--help"):
         print(__doc__.strip())
         return 0
     cmd, args = argv[0], argv[1:]
     if cmd == "list" and args and args[0] in DIRS:
-        print(list_json(args[0]))
+        out = list_json(args[0])
+        debug(f"list {args[0]}: {len(json.loads(out))} items from {DIRS[args[0]]} (exists={DIRS[args[0]].is_dir()}), {len(out)} bytes")
+        print(out, flush=True)
     elif cmd == "thumbs" and args and args[0] in DIRS:
         thumbs(args[0])
     elif cmd == "set" and len(args) >= 2 and args[0] in DIRS:
@@ -313,6 +348,7 @@ def main(argv: list[str]) -> int:
     elif cmd == "restore":
         restore()
     else:
+        debug(f"unknown command {argv!r}: printing usage, exit 1")
         print(__doc__.strip(), file=sys.stderr)
         return 1
     return 0
