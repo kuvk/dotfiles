@@ -84,6 +84,18 @@ def hypr_json(what: str) -> list:
         return []
 
 
+def is_placeholder(name: str) -> bool:
+    """Outputs Hyprland makes up: FALLBACK when no real monitor is on (e.g. the laptop's
+    screen turned off and the external ones unplugged), HEADLESS-N for virtual ones.
+    They're never part of a profile, or a setup with the laptop's screen off would be saved."""
+    return name == "FALLBACK" or name.startswith("HEADLESS-")
+
+
+def live_monitors() -> list[dict]:
+    """The connected real monitors, enabled or not."""
+    return [m for m in hypr_json("monitors") if not is_placeholder(m.get("name", ""))]
+
+
 def active_workspace() -> int | None:
     try:
         return json.loads(run(["hyprctl", "-j", "activeworkspace"]) or "{}").get("id")
@@ -172,6 +184,11 @@ def load_profiles() -> dict:
         scale = data.pop("text_scale", None)
         data["text_size"] = round(TEXT_SIZE_BASE * float(scale)) if scale else TEXT_SIZE_DEFAULT
     data.setdefault("profiles", {})
+    # Profiles saved with a placeholder output (older versions did); dropped at the next save
+    data["profiles"] = {
+        key: profile for key, profile in data["profiles"].items()
+        if not any(is_placeholder(part) for part in key.split(" + "))
+    }
     return data
 
 
@@ -199,10 +216,26 @@ def default_profile(live: list[dict]) -> dict:
             "scale": round(float(m.get("scale", 1)), 6),
             "transform": m.get("transform", 0),
         }
+    enable_if_all_off(monitors, live)
 
     profile = {"version": PROFILE_VERSION, "monitors": monitors, "primary": default_primary(live, monitors)}
     profile["workspaces"] = default_workspaces(profile, live)
     return profile
+
+
+def enable_if_all_off(monitors: dict, live: list[dict]) -> bool:
+    """A setup is never saved or applied with every connected monitor off (seen at login
+    with the laptop's screen off from the last setup): turn them all on, side by side.
+    True if anything changed."""
+    connected = [m for m in live if ident(m) in monitors]
+    if not connected or any(monitors[ident(m)]["enabled"] for m in connected):
+        return False
+    x = 0
+    for m in sorted(connected, key=lambda m: (is_internal(m["name"]), m["name"])):
+        mon = monitors[ident(m)]
+        mon.update(enabled=True, x=x, y=0)
+        x += round(logical_size(mon)[0])
+    return True
 
 
 def default_primary(live: list[dict], monitors: dict) -> str:
@@ -230,23 +263,32 @@ def default_workspaces(profile: dict, live: list[dict]) -> dict[str, str]:
     return workspaces
 
 
-def current_profile(data: dict, live: list[dict]) -> tuple[str, dict]:
+def current_profile(data: dict, live: list[dict], *, save: bool = True) -> tuple[str, dict]:
+    """The profile for the connected monitors, made from the live layout the first time.
+    With save=False (Quickshell only showing it) a new or updated profile isn't written:
+    it's saved when it's applied."""
     key = profile_key(live)
     profile = data["profiles"].get(key)
+    changed = profile is None
     if profile is None:
         profile = default_profile(live)
         data["profiles"][key] = profile
-        save_profiles(data)
     # Monitors seen for the first time inside a known setup cannot happen
     # (the key would differ), but keep the profile complete anyway
     for m in live:
         profile["monitors"].setdefault(ident(m), default_profile([m])["monitors"][ident(m)])
+    if enable_if_all_off(profile["monitors"], live):
+        changed = True
+        if not effective_workspaces(profile, live):
+            profile["workspaces"] = default_workspaces(profile, live)
     # Profiles from the first version gave a lone monitor all 10 workspaces;
     # redo their workspaces with the current defaults, keep the layout
     if profile.get("version") != PROFILE_VERSION:
         profile["version"] = PROFILE_VERSION
         profile["primary"] = default_primary(live, profile["monitors"])
         profile["workspaces"] = default_workspaces(profile, live)
+        changed = True
+    if changed and save:
         save_profiles(data)
     return key, profile
 
@@ -471,7 +513,7 @@ def brightness_set(name: str, pct: int) -> None:
 
 
 def state(data: dict, live: list[dict]) -> dict:
-    key, profile = current_profile(data, live)
+    key, profile = current_profile(data, live, save=False)
     monitors = []
     for m in live:
         mid = ident(m)
@@ -554,7 +596,7 @@ def settle(timeout: float = 8.0) -> list[dict]:
     live, key, stable = [], None, 0
     end = time.monotonic() + timeout
     while time.monotonic() < end:
-        now = hypr_json("monitors")
+        now = live_monitors()
         now_key = " + ".join(sorted(m["name"] for m in now))
         stable = stable + 1 if now and now_key == key else 0
         live, key = now, now_key
@@ -569,7 +611,7 @@ def wake_dark_monitors(data: dict, live: list[dict]) -> None:
     reload (seen right after login) gets one more reload and DPMS on."""
     _, profile = current_profile(data, live)
     wanted = {mid for mid, mon in profile["monitors"].items() if mon["enabled"]}
-    now = hypr_json("monitors")
+    now = live_monitors()
     dark = [m["name"] for m in now if ident(m) in wanted and (m.get("disabled") or not m.get("dpmsStatus", True))]
     if dark:
         log(f"monitors still dark after applying: {', '.join(dark)}; reloading again")
@@ -637,7 +679,7 @@ def hotplug(startup: bool = False) -> int:
 def main(argv: list[str]) -> int:
     if argv and argv[0] in ("hotplug", "startup"):
         return hotplug(startup=argv[0] == "startup")
-    live = hypr_json("monitors")
+    live = live_monitors()
     if not live:
         print("hyprctl monitors returned nothing; is Hyprland running?", file=sys.stderr)
         return 1
