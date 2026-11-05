@@ -27,6 +27,7 @@ THEME_DIR = HOME / ".config/theme"
 THEMES_DIR = THEME_DIR / "themes"
 TEMPLATES_DIR = THEME_DIR / "templates"
 CURRENT_DIR = THEME_DIR / "current"
+ICONS_DIR = THEME_DIR / "icons"
 STATE_FILE = CURRENT_DIR / "theme"
 DEFAULT_THEME = "catppuccin-mocha"
 
@@ -184,11 +185,21 @@ def render_starship(theme: dict) -> None:
     write_if_changed(STARSHIP_OUTPUT, header + base.rstrip() + "\n" + palette)
 
 
+def icons_dir(name: str) -> str:
+    """Power menu icons from theme-icons.py, or Catppuccin's for a theme
+    that has none yet."""
+    for candidate in (name, "catppuccin-mocha"):
+        if (ICONS_DIR / candidate / "lock.svg").is_file():
+            return str(ICONS_DIR / candidate)
+    return ""
+
+
 def render_quickshell(theme: dict) -> None:
     data = {
         "theme": theme["strings"]["theme"],
         "name": theme["strings"]["theme_name"],
         "mode": theme["strings"]["mode"],
+        "icons": icons_dir(theme["strings"]["theme"]),
         "colors": {k: v for k, v in theme["colors"].items() if not k.startswith("term_")},
     }
     write_if_changed(CURRENT_DIR / "quickshell.json", json.dumps(data, indent=2) + "\n")

@@ -60,6 +60,24 @@ PanelWindow {
     readonly property real overlap: -cardHeight * 0.06
     readonly property int radius: Math.max(3, Math.ceil((screenWidth - cardWidth) / (2 * (sliceWidth + overlap))) + 2)
 
+    // Cards are only created once the window is on screen. Cards built while
+    // it was still being mapped stayed blank (their masked layers rendered
+    // into the old surface) until a Tab rebuilt them.
+    property bool ready: false
+
+    onVisibleChanged: {
+        ready = false;
+        if (visible)
+            readyTimer.restart();
+    }
+
+    Timer {
+        id: readyTimer
+
+        interval: 60
+        onTriggered: root.ready = root.visible
+    }
+
     // Thumbnails generated during this opening, per kind
     property var thumbsTried: ({})
 
@@ -340,7 +358,7 @@ PanelWindow {
             scale: 0.95 + 0.05 * reveal.value
 
             Repeater {
-                model: root.shownItems
+                model: root.ready ? root.shownItems : []
 
                 Loader {
                     id: slot
