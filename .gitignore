@@ -6,7 +6,6 @@ __init__.py
 lazy-lock.json
 bookmarks
 *assets/
-wlogout/.config/wlogout/icons/
 *.log
 shaders/
 cava/.config/cava/themes/

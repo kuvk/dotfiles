@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Services.Notifications
+import qs.config
 
 // Notification daemon (replaces swaync). Tracked notifications are the
 // history shown in the control center; `popups` are the ones on screen.
@@ -26,13 +27,9 @@ Singleton {
         popups = [];
     }
 
-    // Seconds a popup stays up, mirrors the old swaync config
+    // Seconds a popup stays up; critical ones stay until closed
     function timeoutFor(n: Notification): int {
-        if (n.urgency === NotificationUrgency.Critical)
-            return 0;
-        if (n.expireTimeout > 0)
-            return n.expireTimeout;
-        return n.urgency === NotificationUrgency.Low ? 4 : 8;
+        return n.urgency === NotificationUrgency.Critical ? 0 : Config.notificationTimeout;
     }
 
     function relativeTime(n: Notification, now: date): string {

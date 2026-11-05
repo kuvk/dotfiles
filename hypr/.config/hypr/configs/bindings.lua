@@ -8,6 +8,10 @@ local menu = "qs ipc call launcher toggle"
 local themes = "qs ipc call launcher themes"
 local browser = "brave"
 local notifications = "qs ipc call notifications toggle"
+local bar = "qs ipc call bar toggle"
+local displays = "qs ipc call displays toggle"
+local lock = "qs ipc call lock lock"
+local powermenu = "qs ipc call power toggle"
 local email = "thunderbird"
 local gamemode = "~/.config/scripts/hypr-gamemode.sh"
 
@@ -23,10 +27,12 @@ hl.bind(mainMod .. " + T", hl.dsp.exec_cmd(email))
 hl.bind(mainMod .. " + N", hl.dsp.exec_cmd(notifications))
 hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager))
 hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(menu))
-hl.bind(mainMod .. " + SHIFT + space", hl.dsp.exec_cmd(themes))
+hl.bind(mainMod .. " + SHIFT + space", hl.dsp.exec_cmd(bar))
+hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd(themes))
+hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(displays))
 hl.bind(mainMod .. " + Q", hl.dsp.window.close())
-hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd("~/.config/scripts/lockscreen.sh"))
-hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd("~/.config/scripts/wlogout-dynamic.sh"))
+hl.bind(mainMod .. " + grave", hl.dsp.exec_cmd(lock))
+hl.bind(mainMod .. " + SHIFT + E", hl.dsp.exec_cmd(powermenu))
 hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" }))
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen())
 hl.bind(mainMod .. " + S", hl.dsp.layout("togglesplit"))

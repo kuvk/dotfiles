@@ -17,6 +17,8 @@ Singleton {
     property real popoutX: 0
 
     property bool controlCenter: false
+    property bool displays: false
+    property bool powerMenu: false
     property bool launcher: false
     property string launcherMode: "apps" // "apps" | "themes"
 
@@ -37,6 +39,8 @@ Singleton {
         }
         controlCenter = false;
         launcher = false;
+        displays = false;
+        powerMenu = false;
         popoutScreen = screen;
         popoutX = x;
         popout = name;
@@ -46,6 +50,18 @@ Singleton {
         const open = !controlCenter;
         closeAll();
         controlCenter = open;
+    }
+
+    function toggleDisplays(): void {
+        const open = !displays;
+        closeAll();
+        displays = open;
+    }
+
+    function togglePowerMenu(): void {
+        const open = !powerMenu;
+        closeAll();
+        powerMenu = open;
     }
 
     function toggleLauncher(mode: string): void {
@@ -59,5 +75,7 @@ Singleton {
         popout = "";
         controlCenter = false;
         launcher = false;
+        displays = false;
+        powerMenu = false;
     }
 }

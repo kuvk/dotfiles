@@ -181,7 +181,7 @@
     },
     "custom/power": {
       "tooltip": true,
-      "on-click": "~/.config/scripts/wlogout-dynamic.sh",
+      "on-click": "qs ipc call power toggle",
       "format": "",
       "tooltip-format": "Power Menu",
     },

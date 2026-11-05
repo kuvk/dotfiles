@@ -5,7 +5,7 @@ local M = {}
 
 local dir = vim.fn.expand("~/.config/theme/current")
 local file = dir .. "/nvim.lua"
-local fallback = { colorscheme = "catppuccin-mocha", background = "dark" }
+local fallback = { name = "fallback", colorscheme = "catppuccin-mocha", background = "dark" }
 
 local function read()
   local ok, theme = pcall(dofile, file)
@@ -17,10 +17,20 @@ end
 
 function M.apply()
   local theme = read()
-  if vim.g.colors_name == theme.colorscheme then
+  if M.current == theme.name and vim.g.colors_name == theme.colorscheme then
     return
   end
+  M.current = theme.name
   vim.o.background = theme.background or "dark"
+
+  -- aether builds its colors from the palette, so it needs setup per theme
+  if theme.colorscheme == "aether" and theme.aether then
+    pcall(function()
+      require("lazy").load({ plugins = { "aether" } })
+      require("aether").setup({ colors = theme.aether })
+    end)
+  end
+
   if not pcall(vim.cmd.colorscheme, theme.colorscheme) then
     vim.notify("theme: colorscheme '" .. theme.colorscheme .. "' not available", vim.log.levels.WARN)
     vim.cmd.colorscheme(fallback.colorscheme)
