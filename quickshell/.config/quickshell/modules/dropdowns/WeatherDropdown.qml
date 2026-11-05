@@ -4,7 +4,7 @@ import qs.config
 import qs.components
 import qs.services
 
-Popout {
+Dropdown {
     id: root
 
     name: "weather"

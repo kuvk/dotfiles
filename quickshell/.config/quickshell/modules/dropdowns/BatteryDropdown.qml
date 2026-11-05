@@ -7,7 +7,7 @@ import qs.services
 
 // Battery details and power profile (power-profiles-daemon; on ASUS laptops
 // asusd maps these to Quiet / Balanced / Performance).
-Popout {
+Dropdown {
     id: root
 
     name: "battery"
