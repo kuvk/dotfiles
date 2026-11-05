@@ -15,14 +15,14 @@
       "left": 3,
     },
     "color": {
-      "1": "{{ accent.ansi }}",
+      "1": "{{ mauve.ansi }}",
     },
   },
   "display": {
     "separator": " ",
     "color": {
       "keys": "{{ overlay1.ansi }}",
-      "output": "{{ text.ansi }}",
+      "output": "{{ accent.ansi }}",
     },
   },
   "modules": [
