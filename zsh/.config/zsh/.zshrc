@@ -208,7 +208,8 @@ alias ll="eza -lAh --group-directories-first --git --icons=always"
 alias l="eza -lh  --group-directories-first --git --icons=always"
 alias ls="eza --group-directories-first --icons=always"
 alias cat="bat --style=plain,header,grid"
-alias dots="z \"$HOME/dotfiles\""
+# the repo this file is linked from (zsh/.config/zsh/.zshrc, four folders up), wherever it was cloned
+alias dots="z \"${${(%):-%x}:A:h:h:h:h}\""
 
 # yazi that follows theme changes (yazi-live.sh); on quit, the shell moves to
 # yazi's last folder

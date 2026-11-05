@@ -10,6 +10,8 @@ On a fresh Arch install, after the first boot, as yourself with the network up:
 git clone https://github.com/kuvk/dotfiles ~/dotfiles && ~/dotfiles/install.sh
 ```
 
+The clone can live anywhere (`~/.src/dotfiles`, say): the scripts find the repo through their own links.
+
 It expects the ESP at `/efi` and, for encrypted drives, the systemd initramfs (`systemd` and
 `sd-encrypt` hooks, `rd.luks.name=` in the kernel options). It sets up pacman (multilib, the g14 repo
 on ASUS laptops), mirrors with a weekly reflector timer, links the dotfiles (files in the way go to
@@ -22,7 +24,7 @@ boot menu. Run it again any time: it skips what's done.
 Each top-level folder is a [GNU Stow](https://www.gnu.org/software/stow/) package:
 
 ```sh
-cd ~/dotfiles
+cd ~/dotfiles   # or wherever you cloned it
 stow hypr quickshell theme scripts fontconfig kitty tmux zsh nvim yazi   # or any you want
 ~/.config/scripts/theme-set.py catppuccin-mocha
 ```

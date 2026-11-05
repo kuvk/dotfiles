@@ -10,7 +10,7 @@ services it talks to" and "Commands the shell and scripts run"; the Matrix lock 
 `unimatrix-git` from the AUR). To install by hand:
 
 ```sh
-sed 's/#.*//' ~/dotfiles/packages/core.txt | xargs paru -S --needed
+sed 's/#.*//' <repo>/packages/core.txt | xargs paru -S --needed
 ```
 
 Brightness of external monitors over DDC/CI also needs `ddcutil` and
