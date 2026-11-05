@@ -63,6 +63,17 @@ Singleton {
         return screens.length > 0 ? screens[0] : null;
     }
 
+    // Screen of the open overlay (launcher, control center, wallpapers, ...),
+    // fixed when it opens. Following the focused monitor live would move a
+    // shown window, and Quickshell recreates a moved layer window, which
+    // drops its focus grab and keyboard focus (and blanked the wallpaper cards).
+    property var overlayScreen: null
+
+    function pinScreen(open: bool): void {
+        if (open)
+            overlayScreen = focusedScreen;
+    }
+
     function togglePopout(name: string, screen: var, x: real): void {
         hideTooltip();
         if (popout === name && popoutScreen === screen) {
@@ -85,36 +96,42 @@ Singleton {
     function toggleControlCenter(): void {
         const open = !controlCenter;
         closeAll();
+        pinScreen(open);
         controlCenter = open;
     }
 
     function toggleDisplays(): void {
         const open = !displays;
         closeAll();
+        pinScreen(open);
         displays = open;
     }
 
     function togglePowerMenu(): void {
         const open = !powerMenu;
         closeAll();
+        pinScreen(open);
         powerMenu = open;
     }
 
     function toggleSettings(): void {
         const open = !settings;
         closeAll();
+        pinScreen(open);
         settings = open;
     }
 
     function toggleWallpapers(kind: string): void {
         const open = wallpapers !== kind;
         closeAll();
+        pinScreen(open);
         wallpapers = open ? kind : "";
     }
 
     function toggleLauncher(mode: string): void {
         const open = !(launcher && launcherMode === mode);
         closeAll();
+        pinScreen(open);
         launcherMode = mode;
         launcher = open;
     }

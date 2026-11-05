@@ -5,8 +5,8 @@ import Quickshell.Widgets
 import qs.config
 
 // A tray app's icon in one of three styles (Settings > Tray & Player):
-// original, tinted toward the theme, or monochrome (a solid theme-colored
-// silhouette cut out by the icon's own transparency, so it stays readable).
+// original, tinted toward the theme, or monochrome (recolored in the text
+// color).
 // Apps listed in "Keep original colors" always keep theirs, for icons whose
 // color means something (e.g. ROG Control Center's dGPU state).
 Item {
@@ -38,31 +38,11 @@ Item {
             }
             return src;
         }
-        // in monochrome mode it only serves as the mask below
-        visible: root.mode !== "mono"
         layer.enabled: root.mode !== "original"
         layer.effect: MultiEffect {
-            colorization: root.mode === "tinted" ? 0.5 : 0
-            colorizationColor: Theme.highlight
+            // tinted: halfway to the accent; monochrome: fully recolored
+            colorization: root.mode === "tinted" ? 0.5 : 1
+            colorizationColor: root.mode === "tinted" ? Theme.highlight : Theme.subtext1
         }
-    }
-
-    Rectangle {
-        id: fill
-
-        anchors.fill: parent
-        visible: false
-        layer.enabled: root.mode === "mono"
-        color: Theme.text
-    }
-
-    MultiEffect {
-        anchors.fill: parent
-        visible: root.mode === "mono"
-        source: fill
-        maskEnabled: true
-        maskSource: icon
-        maskThresholdMin: 0.2
-        maskSpreadAtMin: 0.3
     }
 }

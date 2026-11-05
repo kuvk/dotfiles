@@ -40,7 +40,7 @@ Scope {
             id: win
 
             required property ShellScreen modelData
-            readonly property bool main: modelData === Panels.focusedScreen
+            readonly property bool main: modelData === (Panels.overlayScreen ?? Panels.focusedScreen)
 
             screen: modelData
             visible: root.reveal > 0

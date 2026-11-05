@@ -6,7 +6,9 @@ import qs.services
 BarButton {
     id: root
 
-    visible: Media.active !== null && Media.label !== ""
+    property bool shown: true
+
+    visible: shown && Media.active !== null && Media.label !== ""
     onWheel: wheel => wheel.angleDelta.y > 0 ? Media.active?.previous() : Media.active?.next()
 
     // Small fixed-size visualizer in place of the player icon (Settings can
@@ -23,8 +25,9 @@ BarButton {
 
     Icon {
         visible: !Config.cava
-        text: Media.iconFor(Media.active)
-        color: Theme.sky
+        // a waveform while playing, an outlined note when paused
+        text: Media.active?.isPlaying ? Icons.waveform : Icons.musicOutline
+        color: Media.active?.isPlaying ? Theme.sky : Theme.overlay2
     }
 
     StyledText {
