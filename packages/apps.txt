@@ -6,7 +6,6 @@ chromium
 blueman
 brasero
 gimp
-cameractrls
 lutris
 steam
 gamescope
@@ -16,7 +15,6 @@ pavucontrol
 qbittorrent
 remmina
 spotify-launcher
-timeshift
 vlc
 libreoffice-fresh        # also yazi's office previews
 localsend-bin            # AUR
