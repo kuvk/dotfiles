@@ -13,3 +13,11 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("hyprctl setcursor Colloid-dark-cursors 24")
   hl.exec_cmd("hyprctl dispatch 'hl.dsp.focus({ workspace = 1 })'")
 end)
+
+-- Switch to the saved layout for whatever monitors are now connected
+-- (profiles in ~/.config/hypr/monitors.json, edited in the Displays panel)
+local function monitors_changed()
+  hl.exec_cmd("~/.config/scripts/hypr-monitors.py hotplug")
+end
+hl.on("monitor.added", monitors_changed)
+hl.on("monitor.removed", monitors_changed)

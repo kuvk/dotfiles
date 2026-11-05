@@ -36,9 +36,28 @@ PanelWindow {
     readonly property real overlap: -cardHeight * 0.06
     readonly property int radius: Math.ceil((width - cardWidth) / (2 * (sliceWidth + overlap))) + 1
 
+    // Thumbnails generated during this opening, per kind
+    property var thumbsTried: ({})
+
     function load(): void {
         loading = true;
+        // A list for the previous tab may still be running; restart it
+        listProc.running = false;
+        listProc.kind = kind;
+        listProc.command = [script, "list", kind];
         listProc.running = true;
+    }
+
+    function makeThumbs(): void {
+        if (thumbsTried[kind])
+            return;
+        const tried = Object.assign({}, thumbsTried);
+        tried[kind] = true;
+        thumbsTried = tried;
+        thumbsProc.running = false;
+        thumbsProc.kind = kind;
+        thumbsProc.command = [script, "thumbs", kind];
+        thumbsProc.running = true;
     }
 
     function move(delta: int): void {
@@ -84,8 +103,18 @@ PanelWindow {
             items = [];
             selected = 0;
             load();
-            background.forceActiveFocus();
+            focusTimer.restart();
+        } else {
+            thumbsTried = {};
         }
+    }
+
+    // The window may not be mapped yet when the kind changes; focus once it is
+    Timer {
+        id: focusTimer
+
+        interval: 50
+        onTriggered: background.forceActiveFocus()
     }
 
     Reveal {
@@ -97,9 +126,13 @@ PanelWindow {
     Process {
         id: listProc
 
-        command: [root.script, "list", root.kind || "static"]
+        property string kind: ""
+
         stdout: StdioCollector {
             onStreamFinished: {
+                // Ignore a list for a tab that is no longer shown
+                if (listProc.kind !== root.kind)
+                    return;
                 let list = [];
                 try {
                     list = JSON.parse(text);
@@ -112,8 +145,8 @@ PanelWindow {
                     root.selected = Math.max(0, list.findIndex(i => i.current));
                 root.loading = false;
                 // Fill in missing thumbnails, then reload once
-                if (list.some(i => !i.thumb) && !thumbsProc.running && !thumbsProc.done)
-                    thumbsProc.running = true;
+                if (list.some(i => !i.thumb))
+                    root.makeThumbs();
             }
         }
     }
@@ -121,19 +154,9 @@ PanelWindow {
     Process {
         id: thumbsProc
 
-        property bool done: false
+        property string kind: ""
 
-        command: [root.script, "thumbs", root.kind || "static"]
-        onRunningChanged: if (running) done = true
-        onExited: if (root.shown) root.load()
-    }
-
-    Connections {
-        target: root
-
-        function onShownChanged(): void {
-            thumbsProc.done = false;
-        }
+        onExited: if (root.shown && kind === root.kind) root.load()
     }
 
     Rectangle {

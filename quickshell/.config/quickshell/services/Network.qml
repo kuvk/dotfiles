@@ -5,7 +5,8 @@ import Quickshell
 import Quickshell.Io
 import qs.config
 
-// NetworkManager state through nmcli. `nmcli monitor` triggers refreshes.
+// NetworkManager state through nmcli (Wi-Fi) and ~/.config/scripts/network.py
+// (wired, VPN, details, DNS, speed test). `nmcli monitor` triggers refreshes.
 Singleton {
     id: root
 
@@ -19,6 +20,33 @@ Singleton {
     property string connectingTo: ""
     property string error: ""
 
+    readonly property string script: Quickshell.env("HOME") + "/.config/scripts/network.py"
+    // network.py status: { wired, vpns, wireguardFiles, active, dns }
+    property var details: ({ wired: [], vpns: [], wireguardFiles: [], active: null, dns: { mode: "auto", servers: [] } })
+    readonly property var activeVpns: (details.vpns ?? []).filter(v => v.active)
+
+    // Speed test progress: { phase, ping, jitter, download, upload, progress, message }
+    property var speed: ({})
+    readonly property bool testing: speedProc.running
+
+    // Throughput of the active interface (bytes/s), measured while `monitoring`
+    property bool monitoring: false
+    property real rxRate: 0
+    property real txRate: 0
+
+    readonly property string tooltip: {
+        const lines = ["Network"];
+        if (type === "ethernet")
+            lines.push(`Wired: ${connection}`);
+        else if (type === "wifi")
+            lines.push(`Wi-Fi: ${connection}`, `Signal ${strength}%`);
+        else
+            lines.push(wifiEnabled ? "Not connected" : "Wi-Fi off");
+        for (const v of activeVpns)
+            lines.push(`VPN: ${v.name}`);
+        return lines.join("\n");
+    }
+
     readonly property string icon: {
         if (type === "ethernet")
             return Icons.ethernet;
@@ -31,6 +59,48 @@ Singleton {
         statusProc.running = true;
         wifiProc.running = true;
         savedProc.running = true;
+        detailsProc.running = true;
+    }
+
+    function run(args: var): void {
+        actionProc.command = [script, ...args];
+        actionProc.running = true;
+    }
+
+    function setWired(iface: string, on: bool): void {
+        run(["wired", on ? "on" : "off", iface]);
+    }
+
+    function setVpn(name: string, up: bool): void {
+        run(["vpn", up ? "up" : "down", name]);
+    }
+
+    function importVpn(path: string): void {
+        run(["vpn", "import", path]);
+    }
+
+    function deleteVpn(name: string): void {
+        run(["vpn", "delete", name]);
+    }
+
+    function setDns(mode: string, servers: string): void {
+        run(mode === "custom" ? ["dns", "custom", servers] : ["dns", mode]);
+    }
+
+    function startSpeedtest(): void {
+        if (speedProc.running)
+            return;
+        speed = { phase: "ping" };
+        speedProc.running = true;
+    }
+
+    function formatRate(bytes: real): string {
+        const bits = bytes * 8;
+        if (bits >= 1e9)
+            return `${(bits / 1e9).toFixed(1)} Gb/s`;
+        if (bits >= 1e6)
+            return `${(bits / 1e6).toFixed(1)} Mb/s`;
+        return `${Math.round(bits / 1e3)} kb/s`;
     }
 
     function scan(): void {
@@ -182,6 +252,76 @@ Singleton {
                 root.networks = root.networks.map(n => Object.assign({}, n, {
                     saved: root.savedNetworks.includes(n.ssid)
                 }));
+            }
+        }
+    }
+
+    Process {
+        id: detailsProc
+
+        command: [root.script, "status"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    root.details = JSON.parse(text);
+                } catch (e) {}
+            }
+        }
+    }
+
+    Process {
+        id: actionProc
+
+        stderr: StdioCollector {
+            id: actionErr
+        }
+        onExited: code => {
+            root.error = code !== 0 ? (actionErr.text.trim().replace(/^Error: /, "") || "Failed") : "";
+            debounce.restart();
+        }
+    }
+
+    Process {
+        id: speedProc
+
+        command: [root.script, "speedtest"]
+        stdout: SplitParser {
+            onRead: line => {
+                try {
+                    root.speed = Object.assign({}, root.speed, JSON.parse(line));
+                } catch (e) {}
+            }
+        }
+    }
+
+    // rx/tx byte counters of the active interface, once a second
+    Process {
+        id: rateProc
+
+        property real lastRx: -1
+        property real lastTx: -1
+        property bool rxNext: true
+
+        running: root.monitoring && (root.details.active?.iface ?? "") !== ""
+        command: ["sh", "-c", `while :; do cat /sys/class/net/${root.details.active?.iface}/statistics/rx_bytes /sys/class/net/${root.details.active?.iface}/statistics/tx_bytes; sleep 1; done`]
+        onRunningChanged: {
+            lastRx = -1;
+            lastTx = -1;
+            rxNext = true;
+        }
+        stdout: SplitParser {
+            onRead: line => {
+                const v = parseFloat(line);
+                if (rateProc.rxNext) {
+                    if (rateProc.lastRx >= 0)
+                        root.rxRate = Math.max(0, v - rateProc.lastRx);
+                    rateProc.lastRx = v;
+                } else {
+                    if (rateProc.lastTx >= 0)
+                        root.txRate = Math.max(0, v - rateProc.lastTx);
+                    rateProc.lastTx = v;
+                }
+                rateProc.rxNext = !rateProc.rxNext;
             }
         }
     }

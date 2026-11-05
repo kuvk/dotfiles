@@ -2,7 +2,6 @@
 set -euo pipefail
 
 FLAG="/tmp/hypr-gamemode"
-ROFI_LAUNCHER="$HOME/.config/rofi/launcher.rasi"
 
 HYPR_MON="$HOME/.config/scripts/hypr-monitors.py"
 
@@ -24,27 +23,6 @@ notify() {
 # Opaque, square quickshell surfaces while gaming
 set_shell_gamemode() {
     qs ipc call theme gamemode "$1" >/dev/null 2>&1 || true
-}
-
-set_rofi_window_bg() {
-    local token="$1"   # @BG or @BGA
-    local f="$ROFI_LAUNCHER"
-    [[ -f "$f" ]] || return 0
-
-    awk -v tok="$token" '
-    BEGIN { in_win=0; done=0 }
-
-    /^\s*window\s*\{/ { in_win=1 }
-
-    in_win && !done && /^\s*background-color\s*:/ {
-      sub(/background-color[[:space:]]*:[[:space:]]*[^;]+;/, "background-color: " tok ";")
-      done=1
-    }
-
-    in_win && /^\s*\}/ { in_win=0 }
-
-    { print }
-  ' "$f" > "${f}.tmp" && mv "${f}.tmp" "$f"
 }
 
 # set_mainmod_for_gaming() {
@@ -142,7 +120,6 @@ enable() {
     touch "$FLAG"
 
     set_shell_gamemode true
-    set_rofi_window_bg "@BG"
     # set_mainmod_for_gaming true
     # set_kb_options_by_gamemode true    # -> grp:alt_space_toggle
 
@@ -177,7 +154,6 @@ hl.window_rule({ name = 'thunderbird', match = { class = 'org.mozilla.Thunderbir
 disable() {
     rm -f "$FLAG"
     set_shell_gamemode false
-    set_rofi_window_bg "@BGA"
     # set_mainmod_for_gaming false
     # set_kb_options_by_gamemode false   # -> grp:win_space_toggle
 

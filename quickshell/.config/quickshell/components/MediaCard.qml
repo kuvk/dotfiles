@@ -76,6 +76,15 @@ Card {
             }
         }
 
+        CavaBars {
+            Layout.alignment: Qt.AlignHCenter
+            visible: Cava.values.length > 0
+            barWidth: 8
+            maxHeight: 36
+            spacing: 4
+            color: Theme.highlight
+        }
+
         ColumnLayout {
             Layout.fillWidth: true
             visible: (root.player?.lengthSupported ?? false) && root.player.length > 0

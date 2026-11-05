@@ -8,6 +8,7 @@ or dock. The first time a setup is seen its profile is created from the
 current live layout, and workspaces are split across the monitors.
 
   hypr-monitors.py [apply]              apply the profile for the connected monitors
+  hypr-monitors.py hotplug              same, from Hyprland's monitor.added/removed events
   hypr-monitors.py state                print the current profile as JSON (Quickshell)
   hypr-monitors.py set '<json>'         save and apply changes from Quickshell
   hypr-monitors.py brightness           print brightness per monitor as JSON
@@ -24,17 +25,22 @@ lands on a whole point size) and kitty's font size.
 
 from __future__ import annotations
 
+import fcntl
 import json
+import os
 import re
 import shutil
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 HOME = Path.home()
 PROFILES_FILE = HOME / ".config/hypr/monitors.json"
 GENERATED_FILE = HOME / ".config/hypr/configs/generated/monitors.lua"
 GAMEMODE = Path("/tmp/hypr-gamemode")
+LOG_FILE = HOME / ".cache/hypr-monitors.log"
+LOCK_FILE = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "hypr-monitors.lock"
 GAMEMODE_SCRIPT = HOME / ".config/scripts/hypr-gamemode.sh"
 
 INTERNAL_PREFIXES = ("eDP", "LVDS", "DSI")
@@ -442,7 +448,46 @@ def set_state(data: dict, live: list[dict], new: dict) -> None:
     apply(data, live)
 
 
+def log(message: str) -> None:
+    try:
+        LOG_FILE.parent.mkdir(parents=True, exist_ok=True)
+        lines = LOG_FILE.read_text().splitlines()[-200:] if LOG_FILE.exists() else []
+        lines.append(time.strftime("%Y-%m-%d %H:%M:%S ") + message)
+        LOG_FILE.write_text("\n".join(lines) + "\n")
+    except OSError:
+        pass
+
+
+def hotplug() -> int:
+    """Monitors were plugged in or out: switch to the saved profile for the
+    new combination. Docks add several outputs at once, so wait for them to
+    settle; one run at a time, and run again if the set changed meanwhile."""
+    LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
+    with open(LOCK_FILE, "w") as lock:
+        try:
+            fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError:
+            return 0  # another run is handling it
+        time.sleep(1.5)
+        for _ in range(5):
+            live = hypr_json("monitors")
+            if not live:
+                return 1
+            DUPLICATES.clear()
+            descs = [(m.get("description") or "").strip() for m in live]
+            DUPLICATES.update(d for d in descs if d and descs.count(d) > 1)
+            key = profile_key(live)
+            log(f"hotplug: applying profile '{key}'")
+            apply(load_profiles(), live)
+            time.sleep(1)
+            if profile_key(hypr_json("monitors") or live) == key:
+                break
+    return 0
+
+
 def main(argv: list[str]) -> int:
+    if argv and argv[0] == "hotplug":
+        return hotplug()
     live = hypr_json("monitors")
     if not live:
         print("hyprctl monitors returned nothing; is Hyprland running?", file=sys.stderr)
@@ -453,6 +498,7 @@ def main(argv: list[str]) -> int:
     cmd = argv[0] if argv else "apply"
 
     if cmd == "apply":
+        log(f"apply: profile '{profile_key(live)}'")
         apply(data, live, force_reload="--reload" in argv)
     elif cmd == "state":
         print(json.dumps(state(data, live)))

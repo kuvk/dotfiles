@@ -7,8 +7,9 @@ import qs.config
 import qs.components
 import qs.services
 
-// Dropdown that slides out from under the bar, horizontally centered on the
-// item that opened it. One click anywhere outside it (bar included) closes it.
+// Dropdown that drops out from under the bar and settles a few pixels below
+// it with a full border, like tooltips and the Control Center. Horizontally
+// centered on the item that opened it. One click anywhere outside closes it.
 PanelWindow {
     id: root
 
@@ -20,6 +21,13 @@ PanelWindow {
     readonly property bool shown: Panels.popout === name && Panels.popoutScreen === bar.screen
     readonly property real reveal: revealer.value
 
+    // Gap under the bar, and a transparent margin so fractional monitor
+    // scales never cut the right or bottom border
+    readonly property int gap: 6
+    readonly property int pad: 4
+    readonly property int panelWidth: contentWidth
+    readonly property int panelHeight: Math.ceil(column.implicitHeight + Theme.padding * 2)
+
     screen: bar.screen
     visible: reveal > 0
     color: "transparent"
@@ -28,12 +36,12 @@ PanelWindow {
         left: true
     }
     margins {
-        left: Math.max(6, Math.min((screen?.width ?? 0) - implicitWidth - 6, Panels.popoutX - implicitWidth / 2))
+        left: Math.round(Math.max(2, Math.min((screen?.width ?? 0) - implicitWidth - 2, Panels.popoutX - implicitWidth / 2)))
     }
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
-    implicitWidth: contentWidth
-    implicitHeight: column.implicitHeight + Theme.padding * 2
+    implicitWidth: panelWidth + pad * 2
+    implicitHeight: panelHeight + gap + pad
     WlrLayershell.namespace: "quickshell-popout"
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
@@ -51,6 +59,7 @@ PanelWindow {
         onCleared: Panels.closePopout(root.name)
     }
 
+    // Clipped at the bar's edge, so the panel appears to drop out of it
     Item {
         anchors.fill: parent
         clip: true
@@ -58,17 +67,14 @@ PanelWindow {
         Rectangle {
             id: panel
 
-            // The top edge tucks under the bar, so only sides and bottom show a border
-            width: parent.width
-            height: parent.height + Theme.borderWidth
-            y: -Theme.borderWidth - height * (1 - root.reveal)
+            x: root.pad
+            y: Math.round(root.gap - (root.panelHeight + root.gap) * (1 - root.reveal))
+            width: root.panelWidth
+            height: root.panelHeight
             color: Theme.panelBg
+            radius: Theme.radius
             border.color: Theme.border
             border.width: Theme.borderWidth
-            topLeftRadius: 0
-            topRightRadius: 0
-            bottomLeftRadius: Theme.radius
-            bottomRightRadius: Theme.radius
 
             focus: root.shown
             Keys.onEscapePressed: Panels.closePopout(root.name)
@@ -78,7 +84,6 @@ PanelWindow {
 
                 anchors.fill: parent
                 anchors.margins: Theme.padding
-                anchors.topMargin: Theme.padding + Theme.borderWidth
                 spacing: Theme.spacing
             }
         }

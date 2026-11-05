@@ -2,7 +2,6 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
-import Quickshell.Hyprland
 import Quickshell.Io
 
 // Monitor profiles through ~/.config/scripts/hypr-monitors.py: layout, modes,
@@ -15,7 +14,6 @@ Singleton {
     property var info: ({ monitors: [], workspaces: {}, text_scale: 1 })
     property var brightness: ({}) // monitor name -> percent, or null if not controllable
     property bool busy: false
-    property double ignoreEventsUntil: 0
 
     function refresh(): void {
         stateProc.running = true;
@@ -24,7 +22,6 @@ Singleton {
 
     function apply(changes: var): void {
         busy = true;
-        ignoreEventsUntil = Date.now() + 5000;
         applyProc.command = [script, "set", JSON.stringify(changes)];
         applyProc.running = true;
     }
@@ -50,34 +47,21 @@ Singleton {
         }
     }
 
-    // Re-apply the matching profile when monitors are plugged in or out
+    // Hyprland runs `hypr-monitors.py hotplug` itself when monitors change
+    // (configs/autostart.lua); just refresh what the panel shows.
     Connections {
-        target: Hyprland
+        target: Quickshell
 
-        function onRawEvent(event: HyprlandEvent): void {
-            if (!["monitoradded", "monitoraddedv2", "monitorremoved", "monitorremovedv2"].includes(event.name))
-                return;
-            if (Date.now() < root.ignoreEventsUntil)
-                return;
-            hotplug.restart();
+        function onScreensChanged(): void {
+            refreshDelay.restart();
         }
     }
 
     Timer {
-        id: hotplug
+        id: refreshDelay
 
-        interval: 1500
-        onTriggered: {
-            root.ignoreEventsUntil = Date.now() + 5000;
-            hotplugProc.running = true;
-        }
-    }
-
-    Process {
-        id: hotplugProc
-
-        command: [root.script, "apply"]
-        onExited: root.refresh()
+        interval: 4000
+        onTriggered: root.refresh()
     }
 
     Process {
@@ -116,7 +100,6 @@ Singleton {
         }
         onExited: {
             root.busy = false;
-            root.ignoreEventsUntil = Date.now() + 3000;
             root.refresh();
         }
     }

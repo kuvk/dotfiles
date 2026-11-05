@@ -70,7 +70,7 @@ PanelWindow {
 
         anchors.centerIn: parent
         active: barWindow.isOpen("calendar")
-        tooltip: Qt.formatDateTime(Time.date, "dddd, d MMMM yyyy")
+        tooltip: Qt.formatDateTime(Time.date, "dddd\nd MMMM yyyy")
         onClicked: barWindow.toggle("calendar", clockButton)
 
         StyledText {
@@ -84,7 +84,7 @@ PanelWindow {
         anchors.right: clockButton.left
         anchors.verticalCenter: parent.verticalCenter
         visible: Hypr.layout !== ""
-        tooltip: `Keyboard layout: ${Hypr.layoutName || Hypr.layout}`
+        tooltip: `Keyboard layout\n${Hypr.layoutName || Hypr.layout}`
         onClicked: Hypr.nextLayout()
 
         StyledText {
@@ -101,7 +101,7 @@ PanelWindow {
         anchors.verticalCenter: parent.verticalCenter
         visible: Config.showWeather && Weather.ready
         active: barWindow.isOpen("weather")
-        tooltip: `${Weather.description}, feels like ${Weather.feelsLike}${Weather.unit}\n${Weather.location}`
+        tooltip: `${Weather.description}\nFeels like ${Weather.feelsLike}${Weather.unit}\n${Weather.location}`
         onClicked: barWindow.toggle("weather", weatherButton)
 
         Icon {
@@ -139,7 +139,7 @@ PanelWindow {
         Tray {}
 
         BarButton {
-            tooltip: System.stayAwake ? "Stay awake: on\nScreen won't lock or sleep" : "Stay awake: off"
+            tooltip: System.stayAwake ? "Allow idle and lock" : "Stay Awake"
             onClicked: System.stayAwake = !System.stayAwake
 
             Icon {
@@ -149,21 +149,10 @@ PanelWindow {
         }
 
         BarButton {
-            active: Panels.displays
-            tooltip: "Displays"
-            onClicked: Panels.toggleDisplays()
-
-            Icon {
-                text: Icons.display
-                color: Theme.teal
-            }
-        }
-
-        BarButton {
             id: audioButton
 
             active: barWindow.isOpen("audio")
-            tooltip: Audio.muted ? `Muted\n${Audio.nodeName(Audio.sink)}` : `Volume ${Math.round(Audio.volume * 100)}%\n${Audio.nodeName(Audio.sink)}`
+            tooltip: `${Audio.muted ? "Muted" : `Volume ${Math.round(Audio.volume * 100)}%`}\n${Audio.nodeName(Audio.sink)}`
             onClicked: mouse => mouse.button === Qt.RightButton ? Audio.toggleMute(Audio.sink) : barWindow.toggle("audio", audioButton)
             onWheel: wheel => Audio.setVolume(Audio.sink, Audio.volume + (wheel.angleDelta.y > 0 ? 0.05 : -0.05))
 
@@ -177,7 +166,7 @@ PanelWindow {
             id: btButton
 
             active: barWindow.isOpen("bluetooth")
-            tooltip: !Bluetooth.enabled ? "Bluetooth: off" : Bluetooth.connected.length > 0 ? `Bluetooth: ${Bluetooth.connected.map(d => d.name).join(", ")}` : "Bluetooth: on"
+            tooltip: !Bluetooth.enabled ? "Bluetooth\nOff" : Bluetooth.connected.length > 0 ? `Bluetooth\n${Bluetooth.connected.map(d => d.name).join("\n")}` : "Bluetooth\nOn, nothing connected"
             onClicked: mouse => mouse.button === Qt.RightButton ? Bluetooth.toggle() : barWindow.toggle("bluetooth", btButton)
 
             Icon {
@@ -190,7 +179,7 @@ PanelWindow {
             id: netButton
 
             active: barWindow.isOpen("network")
-            tooltip: Network.type === "ethernet" ? `Ethernet: ${Network.connection}` : Network.type === "wifi" ? `Wi-Fi: ${Network.connection} (${Network.strength}%)` : (Network.wifiEnabled ? "Not connected" : "Wi-Fi: off")
+            tooltip: Network.tooltip
             onClicked: barWindow.toggle("network", netButton)
 
             Icon {
@@ -204,7 +193,7 @@ PanelWindow {
 
             visible: Battery.available
             active: barWindow.isOpen("battery")
-            tooltip: Battery.summary
+            tooltip: Battery.summary.split(" · ").join("\n")
             onClicked: barWindow.toggle("battery", batteryButton)
 
             Icon {
@@ -215,7 +204,7 @@ PanelWindow {
 
         BarButton {
             active: Panels.controlCenter
-            tooltip: Notifs.dnd ? "Control center\nDo not disturb is on" : `Control center\n${Notifs.count} notification${Notifs.count === 1 ? "" : "s"}`
+            tooltip: `Control Center\nNotifications: ${Notifs.count}${Notifs.dnd ? "\nDo not disturb" : ""}`
             onClicked: mouse => mouse.button === Qt.RightButton ? (Notifs.dnd = !Notifs.dnd) : Panels.toggleControlCenter()
 
             Icon {
@@ -238,8 +227,19 @@ PanelWindow {
         }
 
         BarButton {
+            active: Panels.displays
+            tooltip: "Displays"
+            onClicked: Panels.toggleDisplays()
+
+            Icon {
+                text: Icons.display
+                color: Theme.teal
+            }
+        }
+
+        BarButton {
             active: Panels.powerMenu
-            tooltip: "Power menu"
+            tooltip: "Power Menu"
             onClicked: Panels.togglePowerMenu()
 
             Icon {
@@ -279,6 +279,10 @@ PanelWindow {
     }
 
     BatteryPopout {
+        bar: barWindow
+    }
+
+    TrayMenu {
         bar: barWindow
     }
 }

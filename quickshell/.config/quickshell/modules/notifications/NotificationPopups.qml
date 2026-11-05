@@ -16,21 +16,20 @@ PanelWindow {
         top: true
         right: true
     }
-    margins {
-        top: 6
-        right: 6
-    }
+    // the cards sit 10px in, leaving room for their shadow
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
-    implicitWidth: 400
-    implicitHeight: column.implicitHeight
+    implicitWidth: 420
+    implicitHeight: Math.ceil(column.implicitHeight + 20)
     WlrLayershell.namespace: "quickshell-notifications"
     WlrLayershell.layer: WlrLayer.Overlay
 
     ColumnLayout {
         id: column
 
-        width: parent.width
+        x: 10
+        y: 4
+        width: parent.width - 20
         spacing: Theme.spacing
 
         Repeater {

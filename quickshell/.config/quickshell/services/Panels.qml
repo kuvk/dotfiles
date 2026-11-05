@@ -21,6 +21,7 @@ Singleton {
     property bool powerMenu: false
     property bool settings: false
     property string wallpapers: "" // "static" | "live" | ""
+    property var trayItem: null // SystemTrayItem whose menu is open
 
     // The click that dismisses a popout can also land on the button that
     // opened it; ignore that click instead of reopening the popout.

@@ -1,23 +1,5 @@
+# Lazygit settings. Colors come from the system theme:
+# ~/.config/theme/current/lazygit.yml is loaded after this file through
+# LG_CONFIG_FILE (set in zsh and Hyprland).
 gui:
-  theme:
-    activeBorderColor:
-      - '#fab387'
-      - bold
-    inactiveBorderColor:
-      - '#89b4fa'
-    optionsTextColor:
-      - '#a6e3a1'
-    selectedLineBgColor:
-      - '#313244'
-    cherryPickedCommitBgColor:
-      - '#45475a'
-    cherryPickedCommitFgColor:
-      - '#fab387'
-    unstagedChangesColor:
-      - '#f38ba8'
-    defaultFgColor:
-      - '#cdd6f4'
-    searchingActiveBorderColor:
-      - '#f9e2af'
-    authorColors:
-      '*': '#cba6f7'
+  nerdFontsVersion: "3"

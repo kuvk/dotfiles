@@ -3,9 +3,9 @@ import Quickshell
 import qs.config
 import qs.services
 
-// Bar item. With `indicator`, hovering shows a dot underneath and an open
-// dropdown (`active`) shows an animated accent line. Hovering for a moment
-// shows `tooltip` (may contain several lines).
+// Bar item. With `indicator`, an open dropdown (`active`) shows an animated
+// accent line underneath. Hovering for a moment shows `tooltip` (one line per
+// "\n").
 MouseArea {
     id: root
 
@@ -54,25 +54,6 @@ MouseArea {
 
         anchors.centerIn: parent
         spacing: 6
-    }
-
-    // Hover dot
-    Rectangle {
-        visible: root.indicator
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottom: parent.bottom
-        anchors.bottomMargin: 3
-        width: 4
-        height: 4
-        radius: 2
-        color: Theme.accent
-        opacity: root.containsMouse && !root.active ? 1 : 0
-
-        Behavior on opacity {
-            NumberAnimation {
-                duration: Theme.animDuration
-            }
-        }
     }
 
     // Open dropdown
