@@ -44,11 +44,9 @@ Singleton {
         Hypr.applyGaps();
     }
 
-    // System information: fastfetch in a floating kitty window sized to its
-    // output (scripts/sysinfo.py), open until a key is pressed
+    // System information window (modules/sysinfo)
     function showSysinfo(): void {
-        Panels.closeAll();
-        Quickshell.execDetached([scripts + "sysinfo.py"]);
+        Panels.toggleSysinfo();
     }
     property bool hasBrightness: false
     property real brightness: 0
