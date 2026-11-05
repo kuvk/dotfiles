@@ -147,6 +147,8 @@ PanelWindow {
     property var thumbsTried: ({})
 
     function load(): void {
+        if (!shown)
+            return;
         loading = true;
         // one run at a time: a run still going (previous tab) finishes and
         // is ignored, then the list is read again for the current tab
@@ -223,7 +225,7 @@ PanelWindow {
             retry.stop();
             positionAnim.stop();
             // show the kept list at once, then refresh it
-            const kept = cache[kind];
+            const kept = cache[kind]?.length > 0 ? cache[kind] : null;
             items = kept ?? [];
             loadedKind = kept ? kind : "";
             jumpTo(kept ? currentIndex(items) : 0);
@@ -316,12 +318,20 @@ PanelWindow {
                     list = JSON.parse(listOut.text);
                 } catch (e) {}
             }
-            if (list === null || (list.length === 0 && root.retries < 2)) {
-                console.warn(`Wallpapers: list ${kind} failed (exit ${code}/${status}, try ${root.retries + 1}): ${listErr.text.trim().slice(-300) || listOut.text.slice(0, 120) || "no output"}`);
+            // A failed or empty answer is retried (0.2 s doubling to ~6 s in
+            // all) before it's believed, and an empty answer never replaces a
+            // list that had wallpapers: the kept list stays on screen.
+            const known = root.cache[kind]?.length > 0;
+            if (list === null || list.length === 0) {
+                console.warn(`Wallpapers: list ${kind} ${list === null ? "failed" : "came back empty"} (exit ${code}/${status}, try ${root.retries + 1}): ${listErr.text.trim().slice(-300) || listOut.text.slice(0, 120) || "no output"}`);
                 if (root.retries < 5) {
                     retry.interval = 200 * Math.pow(2, root.retries);
                     root.retries++;
                     retry.restart();
+                    return;
+                }
+                if (known) {
+                    root.loading = false;
                     return;
                 }
                 list = list ?? [];
@@ -337,7 +347,7 @@ PanelWindow {
     Timer {
         id: retry
 
-        onTriggered: root.load()
+        onTriggered: if (root.shown) root.load()
     }
 
     Process {
