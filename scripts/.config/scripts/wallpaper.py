@@ -289,7 +289,7 @@ def restore() -> None:
 
 def notify(body: str) -> None:
     if shutil.which("notify-send"):
-        subprocess.run(["notify-send", "-a", "Wallpapers", "Wallpapers", body], check=False)
+        subprocess.run(["notify-send", "-a", "Wallpapers", "-i", "preferences-desktop-wallpaper", body], check=False)
 
 
 # ---------------------------------------------------------------- debugging

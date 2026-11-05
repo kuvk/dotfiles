@@ -47,7 +47,8 @@ PanelWindow {
 
     HyprlandFocusGrab {
         active: root.shown
-        windows: [root]
+        // the bars too: clicking another bar icon switches to its dropdown
+        windows: [root].concat(Panels.bars)
         onCleared: Panels.controlCenter = false
     }
 
@@ -77,34 +78,27 @@ PanelWindow {
             anchors.margins: 16
             spacing: 14
 
-            // Header: time with the Settings gear level with it, date below
+            // Header: time, date below
             ColumnLayout {
                 Layout.fillWidth: true
                 spacing: 0
 
-                RowLayout {
+                StyledText {
                     Layout.fillWidth: true
-
-                    StyledText {
-                        Layout.fillWidth: true
-                        text: Qt.formatDateTime(Time.date, "HH:mm")
-                        font.pixelSize: 28
-                        font.weight: Font.Bold
-                    }
-
-                    IconButton {
-                        Layout.alignment: Qt.AlignVCenter
-                        Layout.rightMargin: -6
-                        icon: Icons.cog
-                        color: Theme.subtext0
-                        onClicked: Panels.toggleSettings()
-                    }
+                    text: Qt.formatDateTime(Time.date, "HH:mm")
+                    font.pixelSize: 28
+                    font.weight: Font.Bold
                 }
 
                 StyledText {
                     text: Qt.formatDateTime(Time.date, "dddd, d MMMM")
                     color: Theme.subtext0
                 }
+            }
+
+            // Settings, Displays, Keybindings, System information
+            ShellShortcuts {
+                Layout.fillWidth: true
             }
 
             GridLayout {
@@ -145,7 +139,7 @@ PanelWindow {
 
                 QuickToggle {
                     icon: Icons.rocket
-                    label: "Work-Game Mode"
+                    label: "Work-Game"
                     checked: System.gamemode
                     onClicked: System.toggleGamemode()
                 }

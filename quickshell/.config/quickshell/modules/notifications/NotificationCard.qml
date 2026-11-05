@@ -156,6 +156,8 @@ Item {
 
                     StyledText {
                         Layout.fillWidth: true
+                        // a title that only repeats the app name adds nothing
+                        visible: text !== "" && !(root.showAppName && text === root.notification.appName)
                         text: root.notification.summary
                         font.weight: Font.DemiBold
                         wrapMode: Text.Wrap

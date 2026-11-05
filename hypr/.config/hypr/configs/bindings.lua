@@ -50,7 +50,7 @@ hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" })) -- Float 
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen()) -- Fullscreen
 hl.bind(mainMod .. " + S", hl.dsp.layout("togglesplit")) -- Toggle split direction
 hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("~/.config/scripts/hypr-monitors.py")) -- Re-apply the monitor profile
-hl.bind(mainMod .. " + G", hl.dsp.exec_cmd(gamemode)) -- Work-Game Mode
+hl.bind(mainMod .. " + G", hl.dsp.exec_cmd(gamemode)) -- Work-Game
 hl.bind(mainMod .. " + SHIFT + slash", hl.dsp.exec_cmd(keybinds)) -- This list of keybindings
 
 -- Screenshots
