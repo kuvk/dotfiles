@@ -38,6 +38,7 @@ hl.bind(mainMod .. " + E", hl.dsp.exec_cmd(fileManager)) -- File manager
 hl.bind(mainMod .. " + space", hl.dsp.exec_cmd(menu)) -- Search apps
 hl.bind(mainMod .. " + CONTROL + space", hl.dsp.exec_cmd(appMenu)) -- App menu with categories
 hl.bind(mainMod .. " + SHIFT + space", hl.dsp.exec_cmd(bar)) -- Show / hide the bar
+hl.bind(mainMod .. " + B", hl.dsp.exec_cmd("qs ipc call bar floating")) -- Floating / full-width bar
 hl.bind(mainMod .. " + SHIFT + T", hl.dsp.exec_cmd(themes)) -- Theme carousel
 hl.bind(mainMod .. " + CONTROL + M", hl.dsp.exec_cmd(displays)) -- Displays
 hl.bind(mainMod .. " + CONTROL + P", hl.dsp.exec_cmd(settings)) -- Settings
