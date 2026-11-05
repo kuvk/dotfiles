@@ -392,6 +392,11 @@ def themes_json() -> str:
             "mode": theme["strings"]["mode"],
             "current": name == current,
             "swatches": [c["base"], c["text"], c["accent"], c["accent2"], c["red"], c["green"], c["yellow"], c["mauve"]],
+            # for the theme carousel's palette preview cards
+            "colors": {k: c[k] for k in (
+                "base", "mantle", "crust", "surface0", "surface1", "overlay0", "overlay1", "text", "subtext0",
+                "accent", "accent2", "red", "peach", "yellow", "green", "teal", "blue", "mauve", "pink",
+            )},
         })
     return json.dumps(result)
 

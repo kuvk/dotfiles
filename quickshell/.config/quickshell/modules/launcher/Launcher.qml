@@ -2,114 +2,61 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
-import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
 import qs.config
 import qs.components
 import qs.services
 
-// Centered launcher. Two modes: applications, and themes (runs theme-set.py).
+// Search launcher (ALT+Space): only the input field, a quarter down the
+// screen; matching apps appear under it once something is typed. The menu
+// with categories is modules/launcher/AppMenu.qml (ALT+CTRL+Space, Arch icon).
 PanelWindow {
     id: root
 
     readonly property bool shown: Panels.launcher
-    readonly property bool themes: Panels.launcherMode === "themes"
-    readonly property string themeSet: Quickshell.env("HOME") + "/.config/scripts/theme-set.py"
-    property var themeList: []
-
-    readonly property var apps: DesktopEntries.applications.values.filter(a => !a.noDisplay).sort((a, b) => a.name.localeCompare(b.name))
-
-    readonly property var results: {
-        const q = search.text.trim().toLowerCase();
-        if (themes)
-            return themeList.filter(t => t.name.toLowerCase().includes(q) || t.theme.includes(q));
-        if (!q)
-            return apps;
-        const scored = [];
-        for (const app of apps) {
-            const name = app.name.toLowerCase();
-            let score = 0;
-            if (name.startsWith(q))
-                score = 4;
-            else if (name.split(/[\s-]/).some(w => w.startsWith(q)))
-                score = 3;
-            else if (name.includes(q))
-                score = 2;
-            else if ([app.genericName, app.comment, app.id, ...(app.keywords ?? [])].some(s => s && s.toLowerCase().includes(q)))
-                score = 1;
-            if (score > 0)
-                scored.push({ app, score });
-        }
-        return scored.sort((a, b) => b.score - a.score).map(s => s.app);
-    }
-
-    function launch(app: DesktopEntry): void {
-        Panels.launcher = false;
-        if (app.runInTerminal) {
-            // DesktopEntry.execute() ignores Terminal=true
-            const cmd = (app.command ?? []).filter(arg => !/^%[fFuUdDnNickvm]$/.test(arg));
-            Quickshell.execDetached(["kitty", "-e", ...cmd]);
-        } else {
-            app.execute();
-        }
-    }
+    readonly property int maxRows: 7
+    readonly property int rowHeight: 52
+    readonly property var results: search.text.trim() === "" ? [] : Apps.search(search.text)
 
     function activate(index: int): void {
-        const item = results[index];
-        if (!item)
+        const app = results[index];
+        if (!app)
             return;
-        if (themes) {
-            Panels.launcher = false;
-            SwitchFx.run([themeSet, item.theme], 250, 500); // after the launcher has faded out
-        } else {
-            launch(item);
-        }
+        Panels.launcher = false;
+        Apps.launch(app);
     }
 
     screen: Panels.overlayScreen ?? Panels.focusedScreen
     visible: shown
     color: "transparent"
-    implicitWidth: 560
-    implicitHeight: 480
+    anchors {
+        top: true
+    }
+    margins {
+        top: Math.round((screen?.height ?? 1080) * 0.22)
+    }
+    implicitWidth: 600
+    // grows downward with the results, so the field never moves
+    implicitHeight: 74 + (results.length > 0 ? Math.min(results.length, maxRows) * (rowHeight + 4) + 12 : 0)
     exclusionMode: ExclusionMode.Ignore
     WlrLayershell.namespace: "quickshell-launcher"
     WlrLayershell.layer: WlrLayer.Overlay
     // OnDemand like the dropdowns: the focus grab below hands this window the
-    // keyboard and closes it on a click anywhere else (bar included). With
-    // Exclusive focus Hyprland never reported those clicks to the grab.
+    // keyboard and closes it on a click anywhere else (bar included)
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
 
     onShownChanged: {
         search.text = "";
         list.currentIndex = 0;
-        if (shown) {
+        if (shown)
             search.forceActiveFocus();
-            if (themes)
-                themeProc.running = true;
-        }
     }
 
     HyprlandFocusGrab {
         active: root.shown
         windows: [root]
         onCleared: Panels.launcher = false
-    }
-
-    Process {
-        id: themeProc
-
-        command: [root.themeSet, "--json"]
-        stdout: StdioCollector {
-            onStreamFinished: {
-                try {
-                    root.themeList = JSON.parse(text);
-                    list.currentIndex = Math.max(0, root.themeList.findIndex(t => t.current));
-                } catch (e) {
-                    console.warn("Launcher: bad theme list", e);
-                }
-            }
-        }
     }
 
     Rectangle {
@@ -121,8 +68,8 @@ PanelWindow {
 
         ColumnLayout {
             anchors.fill: parent
-            anchors.margins: 15
-            spacing: 15
+            anchors.margins: 13
+            spacing: 12
 
             Rectangle {
                 Layout.fillWidth: true
@@ -137,7 +84,7 @@ PanelWindow {
                     spacing: 12
 
                     Icon {
-                        text: root.themes ? Icons.palette : Icons.search
+                        text: Icons.search
                         color: Theme.accent2
                         font.pixelSize: 16
                     }
@@ -152,12 +99,18 @@ PanelWindow {
                         clip: true
                         onTextChanged: list.currentIndex = 0
 
-                        Keys.onEscapePressed: Panels.launcher = false
+                        Keys.onEscapePressed: {
+                            if (search.text !== "")
+                                search.text = "";
+                            else
+                                Panels.launcher = false;
+                        }
                         Keys.onReturnPressed: root.activate(list.currentIndex)
                         Keys.onEnterPressed: root.activate(list.currentIndex)
                         Keys.onUpPressed: list.decrementCurrentIndex()
                         Keys.onDownPressed: list.incrementCurrentIndex()
                         Keys.onTabPressed: list.incrementCurrentIndex()
+                        Keys.onBacktabPressed: list.decrementCurrentIndex()
                         Keys.onPressed: event => {
                             if (event.modifiers & Qt.ControlModifier) {
                                 if (event.key === Qt.Key_J || event.key === Qt.Key_N) {
@@ -172,8 +125,9 @@ PanelWindow {
 
                         StyledText {
                             anchors.fill: parent
+                            verticalAlignment: Text.AlignVCenter
                             visible: search.text === ""
-                            text: root.themes ? "Switch theme…" : "Search apps…"
+                            text: "Search apps…"
                             color: Theme.surface2
                             font.pixelSize: 16
                         }
@@ -186,6 +140,7 @@ PanelWindow {
 
                 Layout.fillWidth: true
                 Layout.fillHeight: true
+                visible: root.results.length > 0
                 clip: true
                 spacing: 4
                 model: root.results
@@ -204,7 +159,7 @@ PanelWindow {
                     required property int index
 
                     width: ListView.view.width
-                    implicitHeight: 52
+                    implicitHeight: root.rowHeight
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onEntered: list.currentIndex = index
@@ -217,29 +172,8 @@ PanelWindow {
                         spacing: 12
 
                         IconImage {
-                            visible: !root.themes
                             implicitSize: 32
-                            source: root.themes ? "" : Quickshell.iconPath(entry.modelData.icon ?? "", "application-x-executable")
-                        }
-
-                        // Theme swatches
-                        Row {
-                            visible: root.themes
-                            spacing: 0
-
-                            Repeater {
-                                model: root.themes ? entry.modelData.swatches : []
-
-                                Rectangle {
-                                    required property string modelData
-                                    required property int index
-
-                                    width: index === 0 ? 32 : 10
-                                    height: 32
-                                    color: modelData
-                                    radius: index === 0 ? 4 : 0
-                                }
-                            }
+                            source: Quickshell.iconPath(entry.modelData.icon ?? "", "application-x-executable")
                         }
 
                         ColumnLayout {
@@ -251,14 +185,16 @@ PanelWindow {
                                 text: entry.modelData.name
                                 color: entry.ListView.isCurrentItem ? Theme.highlight : Theme.text
                                 font.pixelSize: 14
+                                elide: Text.ElideRight
                             }
 
                             StyledText {
                                 Layout.fillWidth: true
                                 visible: text !== ""
-                                text: root.themes ? (entry.modelData.current ? "Current · " : "") + entry.modelData.mode : (entry.modelData.genericName || entry.modelData.comment || "")
+                                text: entry.modelData.genericName || entry.modelData.comment || ""
                                 color: Theme.overlay1
                                 font.pixelSize: 12
+                                elide: Text.ElideRight
                             }
                         }
                     }

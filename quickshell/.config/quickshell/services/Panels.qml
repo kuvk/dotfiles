@@ -22,6 +22,8 @@ Singleton {
     property bool settings: false
     property bool keybinds: false
     property string wallpapers: "" // "static" | "live" | ""
+    property bool themes: false // theme carousel
+    property bool appMenu: false // app menu dropdown with categories
     property var trayItem: null // SystemTrayItem whose menu is open
 
     // The click that dismisses a popout can also land on the button that
@@ -85,8 +87,10 @@ Singleton {
             return;
         controlCenter = false;
         launcher = false;
+        appMenu = false;
         powerMenu = false;
         wallpapers = "";
+        themes = false;
         popoutScreen = screen;
         popoutX = x;
         popout = name;
@@ -126,6 +130,20 @@ Singleton {
         keybinds = open;
     }
 
+    function toggleAppMenu(): void {
+        const open = !appMenu;
+        closeAll();
+        pinScreen(open);
+        appMenu = open;
+    }
+
+    function toggleThemes(): void {
+        const open = !themes;
+        closeAll();
+        pinScreen(open);
+        themes = open;
+    }
+
     function toggleWallpapers(kind: string): void {
         const open = wallpapers !== kind;
         closeAll();
@@ -145,8 +163,10 @@ Singleton {
         popout = "";
         controlCenter = false;
         launcher = false;
+        appMenu = false;
         powerMenu = false;
         wallpapers = "";
+        themes = false;
         tooltip = "";
     }
 }

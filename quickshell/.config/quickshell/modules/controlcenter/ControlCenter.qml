@@ -154,7 +154,7 @@ PanelWindow {
                     icon: Icons.palette
                     label: "Theme"
                     sublabel: Theme.themeName
-                    onClicked: Panels.toggleLauncher("themes")
+                    onClicked: Panels.toggleThemes()
                 }
             }
 
