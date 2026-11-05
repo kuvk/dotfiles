@@ -2,46 +2,28 @@
 set -euo pipefail
 
 FLAG="/tmp/hypr-gamemode"
-WAYBAR_CSS="$HOME/.config/waybar/mode.css"
-SWAYNC_CSS="$HOME/.config/swaync/mode.css"
 ROFI_LAUNCHER="$HOME/.config/rofi/launcher.rasi"
 
 HYPR_MON="$HOME/.config/scripts/hypr-monitors.py"
-WAYBAR_LOG="$HOME/.local/share/waybar/waybar.log"
+
+# Border colors follow the current theme
+accent="fab387"
+accent2="89b4fa"
+if [[ -f "$HOME/.config/theme/current/colors.sh" ]]; then
+    # shellcheck source=/dev/null
+    . "$HOME/.config/theme/current/colors.sh"
+    accent="${accent#\#}"
+    accent2="${accent2#\#}"
+fi
 
 notify() {
     command -v notify-send >/dev/null 2>&1 || return 0
     notify-send -a "Hyprland Gamemode" -t 1500 "󰊴" "$1"
 }
 
-restart_waybar() {
-    mkdir -p "$(dirname "$WAYBAR_LOG")"
-    pkill waybar || true
-    waybar &> "$WAYBAR_LOG" &
-}
-
-# Only update background-color for:
-#   .control-center { background-color: ...; }
-#   .notification-row .notification-background { background-color: ...; }
-set_swaync_gamemode_colors() {
-    local token="$1"  # @base or @base-rgba
-    local f="$SWAYNC_CSS"
-
-    awk -v tok="$token" '
-    BEGIN { in_cc=0; in_nr=0 }
-    /^\s*\.control-center\s*\{/ { in_cc=1 }
-    /^\s*\.notification-row[[:space:]]+\.notification-background\s*\{/ { in_nr=1 }
-
-    in_cc && /^\s*background-color\s*:/ {
-      sub(/background-color[[:space:]]*:[[:space:]]*[^;]+;/, "background-color: " tok ";")
-      in_cc=0
-    }
-    in_nr && /^\s*background-color\s*:/ {
-      sub(/background-color[[:space:]]*:[[:space:]]*[^;]+;/, "background-color: " tok ";")
-      in_nr=0
-    }
-    { print }
-  ' "$f" > "${f}.tmp" && mv "${f}.tmp" "$f"
+# Opaque, square quickshell surfaces while gaming
+set_shell_gamemode() {
+    qs ipc call theme gamemode "$1" >/dev/null 2>&1 || true
 }
 
 set_rofi_window_bg() {
@@ -159,10 +141,7 @@ set_rofi_window_bg() {
 enable() {
     touch "$FLAG"
 
-    sed -i -E 's/^( *background: *).*/\1@base;/' "$WAYBAR_CSS"
-
-    set_swaync_gamemode_colors "@base"
-    swaync-client -rs
+    set_shell_gamemode true
     set_rofi_window_bg "@BG"
     # set_mainmod_for_gaming true
     # set_kb_options_by_gamemode true    # -> grp:alt_space_toggle
@@ -182,8 +161,8 @@ hl.config({
         gaps_out = 0,
         border_size = 2,
         col = {
-            active_border = 'rgb(fab387)',
-            inactive_border = 'rgb(89b4fa)',
+            active_border = 'rgb($accent)',
+            inactive_border = 'rgb($accent2)',
         },
     },
 })
@@ -192,17 +171,12 @@ hl.window_rule({ name = 'spotify', match = { class = 'spotify' }, opaque = true,
 hl.window_rule({ name = 'thunderbird', match = { class = 'org.mozilla.Thunderbird' }, opaque = true, no_blur = true })
 "
 
-    restart_waybar
     notify "Gamemode is ON."
 }
 
 disable() {
     rm -f "$FLAG"
-    sed -i -E 's/^( *background: *).*/\1@base-rgba;/' "$WAYBAR_CSS"
-
-    set_swaync_gamemode_colors "@base-rgba"
-    swaync-client -rs
-
+    set_shell_gamemode false
     set_rofi_window_bg "@BGA"
     # set_mainmod_for_gaming false
     # set_kb_options_by_gamemode false   # -> grp:win_space_toggle
@@ -222,8 +196,8 @@ hl.config({
         gaps_out = 4,
         border_size = 2,
         col = {
-            active_border = 'rgba(fab387ee)',
-            inactive_border = 'rgba(89b4faaa)',
+            active_border = 'rgba(${accent}ee)',
+            inactive_border = 'rgba(${accent2}aa)',
         },
     },
 })
@@ -231,7 +205,6 @@ hl.window_rule({ name = 'kitty', match = { class = 'kitty' }, opaque = false, no
 hl.window_rule({ name = 'spotify', match = { class = 'spotify' }, opaque = false, no_blur = false })
 hl.window_rule({ name = 'thunderbird', match = { class = 'org.mozilla.Thunderbird' }, opaque = false, no_blur = false  })
 "
-    restart_waybar
     notify "Gamemode is OFF."
 }
 

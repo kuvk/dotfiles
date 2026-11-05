@@ -1,6 +1,6 @@
 -- Layer Rules
 hl.layer_rule({
-  match = { class = "^(waybar|rofi|swaync-control-center|swaync-notification-window|logout_dialog)$" },
+  match = { class = "^(quickshell-.*|waybar|rofi|swaync-control-center|swaync-notification-window|logout_dialog)$" },
   blur = true,
   ignore_alpha = 0.5,
 })

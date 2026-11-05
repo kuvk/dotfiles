@@ -1,4 +1,4 @@
-@import "mocha.css";
+@import "colors.css";
 #waybar {
   background: @base-rgba;
   color: @text;
