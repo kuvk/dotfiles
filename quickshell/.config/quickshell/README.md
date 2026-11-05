@@ -27,7 +27,7 @@ katakana in the lock screen's digital rain.
 | Network: Wi-Fi, wired on/off, WireGuard/VPN (import `.conf` from `~/.config/wireguard` or `~/Downloads`), details, live throughput, DNS, speed test | `modules/dropdowns/NetworkDropdown.qml` + `scripts/network.py` | click the network icon |
 | Bluetooth devices, pair, connect | `modules/dropdowns/BluetoothDropdown.qml` | click; right-click toggles power |
 | Volume, output device, per-app volume | `modules/dropdowns/AudioDropdown.qml` | click; right-click mutes, scroll changes volume |
-| Now playing; with several players, a row per player to switch to it or play/pause it (also in the Control Center) | `components/MediaCard.qml`, `modules/dropdowns/MediaDropdown.qml` | click the track; middle-click play/pause, right-click next player |
+| Now playing; with several players a card each, switched with the arrows or Left/Right (also in the Control Center) | `components/MediaCard.qml`, `modules/dropdowns/MediaDropdown.qml` | click the track; middle-click play/pause, right-click next player |
 | System tray, themed right-click menus | `modules/bar/Tray.qml`, `modules/dropdowns/TrayMenu.qml` | hover the arrow; right-click an icon |
 | Battery, power mode (Quiet / Balanced / Performance) | `modules/dropdowns/BatteryDropdown.qml` | click the battery |
 | Stay awake | `services/System.qml` | the coffee icon (holds an idle inhibitor); while media plays an inhibitor is held automatically |
