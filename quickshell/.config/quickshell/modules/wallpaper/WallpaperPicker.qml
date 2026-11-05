@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Shapes
 import Quickshell
+import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Wayland
 import qs.config
@@ -28,6 +29,76 @@ PanelWindow {
     property bool loading: false
     property string loadedKind: ""
     property bool retried: false
+    // the user moved since opening; until then a refreshed list re-selects
+    // the current wallpaper
+    property bool moved: false
+
+    // Lists kept between openings and loaded at startup (like Omarchy's
+    // picker rows), so the previews are there the moment it opens; every
+    // opening refreshes them in the background.
+    property var cache: ({ static: null, live: null })
+
+    // A freshly mapped layer surface starts with a small size and scale 1;
+    // the output's real size and (fractional) scale arrive a frame or two
+    // later. Cards built before that never showed until Tab rebuilt them.
+    // As in Omarchy's OverlayWindow, the content stays transparent and the
+    // cards aren't created until the window matches its monitor.
+    readonly property var targetMonitor: {
+        const mons = Hyprland.monitors.values;
+        for (let i = 0; i < mons.length; i++) {
+            if (screen && mons[i].name === screen.name)
+                return mons[i];
+        }
+        return null;
+    }
+    readonly property bool contentReady: shown && backingWindowVisible && !!screen && width === screen.width && height === screen.height && !!targetMonitor && Math.round(devicePixelRatio * 120) === Math.round(targetMonitor.scale * 120)
+    property bool contentRevealed: false
+
+    onContentReadyChanged: {
+        contentRevealed = false;
+        // size and scale notifications arrive while Qt is still updating the
+        // window; reveal on the next turn, once the layout has caught up
+        if (contentReady)
+            Qt.callLater(() => {
+                if (root.contentReady)
+                    root.contentRevealed = true;
+            });
+    }
+
+    // never stay invisible if the scale check can't match (odd scale rounding)
+    Timer {
+        interval: 600
+        running: root.shown && !root.contentRevealed
+        onTriggered: root.contentRevealed = true
+    }
+
+    function currentIndex(list: var): int {
+        return Math.max(0, list.findIndex(i => i.current));
+    }
+
+    function jumpTo(index: int): void {
+        jump = true;
+        selected = index;
+        jump = false;
+    }
+
+    function useList(kind: string, list: var): void {
+        const c = Object.assign({}, cache);
+        c[kind] = list;
+        cache = c;
+        if (kind !== root.kind)
+            return;
+        const first = loadedKind !== kind;
+        loadedKind = kind;
+        if (JSON.stringify(list) === JSON.stringify(items))
+            return; // unchanged: keep the cards as they are
+        const path = shownItems[selected]?.path;
+        items = list;
+        if (first || !moved)
+            jumpTo(currentIndex(shownItems));
+        else
+            jumpTo(Math.max(0, shownItems.findIndex(i => i.path === path)));
+    }
 
     readonly property var shownItems: {
         const q = query.toLowerCase();
@@ -99,6 +170,7 @@ PanelWindow {
     }
 
     function move(delta: int): void {
+        moved = true;
         if (shownItems.length > 0)
             selected = Math.max(0, Math.min(shownItems.length - 1, selected + delta));
     }
@@ -142,26 +214,58 @@ PanelWindow {
 
     onKindChanged: {
         if (shown) {
-            items = [];
-            jump = true;
+            Hyprland.refreshMonitors();
             query = "";
-            selected = 0;
-            positionAnim.stop();
-            position = 0;
-            jump = false;
+            moved = false;
             retried = false;
-            loadedKind = "";
+            positionAnim.stop();
+            // show the kept list at once, then refresh it
+            const kept = cache[kind];
+            items = kept ?? [];
+            loadedKind = kept ? kind : "";
+            jumpTo(kept ? currentIndex(items) : 0);
+            position = selected;
             load();
             focusTimer.restart();
         } else {
             thumbsTried = {};
+            contentRevealed = false;
         }
     }
 
     onQueryChanged: {
-        jump = true;
-        selected = 0;
-        jump = false;
+        moved = true;
+        jumpTo(0);
+    }
+
+    Component.onCompleted: preload.next()
+
+    // Startup: fill the cache for both kinds, one after the other
+    Process {
+        id: preload
+
+        property var pending: ["static", "live"]
+        property string kind: ""
+
+        function next(): void {
+            if (pending.length === 0)
+                return;
+            kind = pending[0];
+            pending = pending.slice(1);
+            command = [root.script, "list", kind];
+            running = true;
+        }
+
+        stdout: StdioCollector {
+            onStreamFinished: {
+                try {
+                    const list = JSON.parse(text);
+                    if (root.cache[preload.kind] === null)
+                        root.useList(preload.kind, list);
+                } catch (e) {}
+            }
+        }
+        onExited: Qt.callLater(next)
     }
 
     // The window may not be mapped yet when the kind changes; focus once it is
@@ -200,14 +304,7 @@ PanelWindow {
                     retry.restart();
                     return;
                 }
-                const first = root.loadedKind !== root.kind;
-                root.items = list;
-                root.loadedKind = root.kind;
-                if (first) {
-                    root.jump = true;
-                    root.selected = Math.max(0, list.findIndex(i => i.current));
-                    Qt.callLater(() => root.jump = false);
-                }
+                root.useList(root.kind, list);
                 root.loading = false;
                 // Fill in missing thumbnails, then reload once
                 if (list.some(i => !i.thumb))
@@ -236,7 +333,9 @@ PanelWindow {
 
         anchors.fill: parent
         color: Theme.alpha(Theme.crust, Theme.gamemode ? 1 : 0.6)
-        opacity: reveal.value
+        // transparent until the window has its monitor's size and scale
+        // (keys still work meanwhile)
+        opacity: root.contentRevealed ? reveal.value : 0
         focus: root.shown
 
         Keys.onPressed: event => {
@@ -251,9 +350,9 @@ PanelWindow {
             else if (event.key === Qt.Key_Right)
                 root.move(1);
             else if (event.key === Qt.Key_Home)
-                root.selected = 0;
+                root.move(-root.shownItems.length);
             else if (event.key === Qt.Key_End)
-                root.selected = Math.max(0, root.shownItems.length - 1);
+                root.move(root.shownItems.length);
             else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter)
                 root.apply(shift);
             else if (event.key === Qt.Key_Tab || event.key === Qt.Key_Backtab)
@@ -361,7 +460,7 @@ PanelWindow {
             scale: 0.95 + 0.05 * reveal.value
 
             Repeater {
-                model: root.shownItems
+                model: root.contentRevealed ? root.shownItems : []
 
                 Loader {
                     id: slot
@@ -482,7 +581,14 @@ PanelWindow {
                             width: slot.visibleWidth
                             height: slot.visibleHeight
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: slot.isSelected ? root.apply(false) : (root.selected = slot.index)
+                            onClicked: {
+                                if (slot.isSelected) {
+                                    root.apply(false);
+                                } else {
+                                    root.moved = true;
+                                    root.selected = slot.index;
+                                }
+                            }
                         }
                     }
                 }
