@@ -93,6 +93,8 @@ hl.window_rule({
   name = "spotify",
   match = { class = "Spotify" },
   opacity = "0.9 0.9 1",
+  -- it runs under XWayland: undo the xwayland rule's no_blur
+  no_blur = false,
 })
 
 -- Thunderbird
