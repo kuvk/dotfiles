@@ -51,7 +51,21 @@ PanelWindow {
         z: -1
         color: Theme.barBg
         radius: Theme.barRadius
+
+        // the bar is part of the dropdowns' focus grab, so a click on its
+        // empty space closes them here
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                Panels.popout = "";
+                Panels.appMenu = false;
+                Panels.controlCenter = false;
+            }
+        }
     }
+
+    Component.onCompleted: Panels.registerBar(barWindow)
+    Component.onDestruction: Panels.unregisterBar(barWindow)
 
     // Left: launcher, workspaces, focused window (no hover dots here)
     Row {
@@ -166,7 +180,7 @@ PanelWindow {
 
         BarButton {
             visible: barWindow.shows("workGame")
-            tooltip: System.gamemode ? "Leave Work-Game Mode" : "Work-Game Mode"
+            tooltip: System.gamemode ? "Leave Work-Game" : "Work-Game"
             onClicked: System.toggleGamemode()
 
             Icon {

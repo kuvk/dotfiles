@@ -423,7 +423,7 @@ FloatingWindow {
                             }
 
                             SettingRow {
-                                label: "Inner gaps in Work-Game Mode"
+                                label: "Inner gaps in Work-Game"
 
                                 Stepper {
                                     text: `${Config.gameGapsIn} px`
@@ -432,7 +432,7 @@ FloatingWindow {
                             }
 
                             SettingRow {
-                                label: "Outer gaps in Work-Game Mode"
+                                label: "Outer gaps in Work-Game"
 
                                 Stepper {
                                     text: `${Config.gameGapsOut} px`

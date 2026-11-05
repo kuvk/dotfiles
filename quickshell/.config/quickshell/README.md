@@ -31,7 +31,7 @@ katakana in the lock screen's digital rain.
 | System tray, themed right-click menus | `modules/bar/Tray.qml`, `modules/popouts/TrayMenu.qml` | hover the arrow; right-click an icon |
 | Battery, power mode (Quiet / Balanced / Performance) | `modules/popouts/BatteryPopout.qml` | click the battery |
 | Stay awake | `services/System.qml` | the coffee icon (holds an idle inhibitor); while media plays an inhibitor is held automatically |
-| Work-Game Mode (no blur/animations/rounding, game gaps, turns Stay Awake on) | `scripts/hypr-gamemode.sh` + `services/System.qml` | the rocket icon, or the Control Center tile |
+| Work-Game (no blur/animations/rounding, game gaps, turns Stay Awake on) | `scripts/hypr-gamemode.sh` + `services/System.qml` | the rocket icon, or the Control Center tile |
 | Displays | `modules/displays/DisplaysPanel.qml` | the monitor icon, or `ALT+CTRL+M` |
 | Notification popups | `modules/notifications/NotificationPopups.qml` | |
 | Control Center: toggles, sliders, media (with visualizer), notifications grouped by app, session buttons | `modules/controlcenter/ControlCenter.qml` | `ALT+N`, or the sliders icon (right-click toggles DND) |
@@ -41,6 +41,7 @@ katakana in the lock screen's digital rain.
 | Power menu (the old wlogout layout) | `modules/powermenu/PowerMenu.qml` | `ALT+SHIFT+E`, or the power icon |
 | Lock screen | `modules/lock/LockScreen.qml` | `` ALT+` ``, hypridle, before sleep |
 | Wallpaper carousel (type to search; other monitors are blurred) | `modules/wallpaper/WallpaperPicker.qml` | `ALT+W`, Tab for live wallpapers |
+| System information (fastfetch in a floating kitty window) | `services/System.qml` `showSysinfo()` | the ⓘ button in the app menu and Control Center |
 | Keybindings (built from `bindings.lua`, type to filter) | `modules/keybinds/KeybindsWindow.qml` + `scripts/hypr-keybinds.py` | `ALT+SHIFT+/` |
 | Settings | `modules/settings/SettingsWindow.qml` | `ALT+CTRL+P`, or the gear in the Control Center |
 
@@ -49,6 +50,11 @@ launch, and Esc to clear and close. The app menu switches categories with ←/�
 or Tab and filters the category as you type. The power menu takes `l` lock, `u` sleep, `e` log out,
 `r` reboot, `s` shut down. In the Control Center, `Shift+C` clears the
 notifications and `Shift+D` toggles do not disturb.
+
+The app menu's sidebar and the Control Center (under the clock) have a row
+of buttons for Settings, Displays, Keybindings and System information.
+Dropdowns close when you switch workspaces, and clicking another bar icon
+switches straight to its dropdown.
 
 Settings, Displays and Keybindings are regular windows: a Hyprland rule (`rules.lua`) makes
 them float centered; they always stay floating (tiling one reopens it), open at
@@ -59,7 +65,7 @@ or your close-window binding.
 Switching the theme or the wallpaper is animated: a capture of every monitor
 covers it while the switch happens underneath, then opens from the middle out
 along a diagonal (`services/Transition.qml`). Off with animations or in
-Work-Game Mode.
+Work-Game.
 
 Dropdowns slide out of the bar; one click anywhere outside closes them.
 Hovering a bar item shows a dot under it, an open dropdown an accent line.
@@ -69,7 +75,7 @@ radius, border width, opacity, animations), Fonts (a Nerd Font and a display
 font, with "Nerd Fonts only" and "Use Nerd Symbols font" switches), Bar (full width or floating with
 margins and rounded corners, clock format, weather location and unit, and which modules show on the primary monitor's bar and on
 the others; the clock always shows), Windows (window buttons, gaps for regular
-and Work-Game Mode), Notifications, Lock Screen
+and Work-Game), Notifications, Lock Screen
 (effects and the colors of the clock, rain, outlines, password dots and text),
 and Tray & Player (tray icon style, apps that keep their own colors, the
 visualizer and its bar count). They are saved to Quickshell's state folder

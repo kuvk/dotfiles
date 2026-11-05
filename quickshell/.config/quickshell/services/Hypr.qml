@@ -22,7 +22,7 @@ Singleton {
         dispatch(Hyprland.usingLua ? `hl.dsp.focus({ workspace = ${id} })` : `workspace ${id}`);
     }
 
-    // Window gaps from Settings; Work-Game Mode has its own
+    // Window gaps from Settings; Work-Game has its own
     function applyGaps(): void {
         const inner = Theme.gamemode ? Config.gameGapsIn : Config.gapsIn;
         const outer = Theme.gamemode ? Config.gameGapsOut : Config.gapsOut;
