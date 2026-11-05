@@ -62,7 +62,9 @@ Dropdowns slide out of the bar; one click anywhere outside closes them.
 Hovering a bar item shows a dot under it, an open dropdown an accent line.
 
 Preferences are set in Settings, one sidebar section each: Appearance (corner
-radius, border width, opacity, animations), Bar (clock format, weather
+radius, border width, opacity, animations), Fonts (text, icon and monospace
+font from the installed fonts, with presets: SF Pro + Symbols, one Nerd Font
+only, Nerd Font + Symbols), Bar (clock format, weather
 location and unit, and which modules show on the primary monitor's bar and on
 the others; the clock always shows), Windows (window buttons, gaps for regular
 and Work-Game Mode), Notifications, Lock Screen
