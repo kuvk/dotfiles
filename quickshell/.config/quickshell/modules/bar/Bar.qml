@@ -239,7 +239,8 @@ PanelWindow {
 
             Icon {
                 text: Network.icon
-                color: Network.type === "none" ? Theme.mauve : Theme.blue
+                // disabled color when Wi-Fi is off, like Bluetooth
+                color: Network.type !== "none" ? Theme.blue : (Network.wifiEnabled ? Theme.mauve : Theme.overlay1)
             }
         }
 
