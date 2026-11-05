@@ -98,7 +98,7 @@ WlSessionLock {
 
             Rectangle {
                 anchors.fill: parent
-                color: Theme.alpha(Theme.crust, Theme.gamemode ? 1 : (surface.blur && capture.hasContent ? 0.55 : 0.94))
+                color: Theme.alpha(Theme.crust, Theme.gamemode ? 1 : (surface.blur && capture.hasContent ? 0.55 : 1))
             }
 
             MatrixRain {

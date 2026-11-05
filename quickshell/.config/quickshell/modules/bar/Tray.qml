@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Services.SystemTray
 import Quickshell.Widgets
@@ -11,8 +12,8 @@ import qs.services
 Item {
     id: root
 
-    property int menusOpen: 0
-    readonly property bool expanded: hover.hovered || menusOpen > 0 || collapseDelay.running
+    readonly property bool menuOpen: Panels.popout === "traymenu" && Panels.popoutScreen === QsWindow.window?.screen
+    readonly property bool expanded: hover.hovered || menuOpen || collapseDelay.running
 
     visible: SystemTray.items.values.length > 0
     implicitWidth: arrow.implicitWidth + drawer.width
@@ -72,17 +73,31 @@ Item {
 
                     implicitWidth: 30
                     tooltip: modelData.tooltipTitle || modelData.title || modelData.id
+                    active: root.menuOpen && Panels.trayItem === modelData
                     onClicked: mouse => {
-                        if (mouse.button === Qt.LeftButton && !modelData.onlyMenu)
+                        if (mouse.button === Qt.LeftButton && !modelData.onlyMenu) {
                             modelData.activate();
-                        else if (mouse.button === Qt.MiddleButton)
+                        } else if (mouse.button === Qt.MiddleButton) {
                             modelData.secondaryActivate();
-                        else if (modelData.hasMenu)
-                            menu.open();
+                        } else if (modelData.hasMenu) {
+                            // themed menu (modules/popouts/TrayMenu.qml); the
+                            // reopen guard only applies to the same app's menu
+                            if (Panels.trayItem !== modelData)
+                                Panels.lastClosed = "";
+                            Panels.trayItem = modelData;
+                            const pos = item.mapToItem(null, item.width / 2, 0);
+                            Panels.togglePopout("traymenu", QsWindow.window.screen, pos.x);
+                        }
                     }
 
                     IconImage {
                         implicitSize: 15
+                        // Panel Settings > Monochrome tray icons
+                        layer.enabled: Config.trayMonochrome
+                        layer.effect: MultiEffect {
+                            colorization: 1
+                            colorizationColor: Theme.subtext1
+                        }
                         source: {
                             // Some apps (Steam, Discord, ...) send "name?path=/dir"
                             let icon = item.modelData.icon;
@@ -92,17 +107,6 @@ Item {
                             }
                             return icon;
                         }
-                    }
-
-                    QsMenuAnchor {
-                        id: menu
-
-                        menu: item.modelData.menu
-                        anchor.item: item
-                        anchor.edges: Edges.Bottom
-                        anchor.gravity: Edges.Bottom
-                        onOpened: root.menusOpen++
-                        onClosed: root.menusOpen = Math.max(0, root.menusOpen - 1)
                     }
                 }
             }

@@ -1,6 +1,6 @@
 # Quickshell desktop shell
 
-Replaces waybar, swaync, rofi (app launcher), wlogout and hyprlock. The look
+Replaces waybar, swaync, rofi, wlogout and hyprlock. The look
 follows the system theme (see `~/.config/theme/README.md`).
 
 ## Packages
@@ -8,13 +8,13 @@ follows the system theme (see `~/.config/theme/README.md`).
 ```sh
 sudo pacman -S quickshell networkmanager bluez bluez-utils pipewire wireplumber \
   upower power-profiles-daemon brightnessctl curl ttf-nerd-fonts-symbols noto-fonts-cjk \
-  hyprpaper mpvpaper imagemagick ffmpeg
+  hyprpaper mpvpaper imagemagick ffmpeg cava
 # optional: brightness of external monitors over DDC/CI
 sudo pacman -S ddcutil && sudo usermod -aG i2c "$USER"   # then log in again
 ```
 
-Needs Quickshell 0.2 or newer. `swaync` must not be running: only one
-notification daemon can own the D-Bus name. `noto-fonts-cjk` provides the
+Needs Quickshell 0.2 or newer. No other notification daemon may run: only one
+can own the D-Bus name. `noto-fonts-cjk` provides the
 katakana in the lock screen's digital rain.
 
 ## What's in it
@@ -24,22 +24,22 @@ katakana in the lock screen's digital rain.
 | Top bar (one per monitor), tooltips on hover | `modules/bar/Bar.qml` | starts with `qs`; `ALT+SHIFT+Space` hides/shows it |
 | Clock and calendar (week numbers, scroll for months) | `modules/popouts/CalendarPopout.qml` | click the clock |
 | Weather (wttr.in) | `modules/popouts/WeatherPopout.qml` | click the temperature |
-| Wi-Fi list, connect, password, forget | `modules/popouts/NetworkPopout.qml` | click the network icon |
+| Network: Wi-Fi, wired on/off, WireGuard/VPN (import `.conf` from `~/.config/wireguard` or `~/Downloads`), details, live throughput, DNS, speed test | `modules/popouts/NetworkPopout.qml` + `scripts/network.py` | click the network icon |
 | Bluetooth devices, pair, connect | `modules/popouts/BluetoothPopout.qml` | click; right-click toggles power |
 | Volume, output device, per-app volume | `modules/popouts/AudioPopout.qml` | click; right-click mutes, scroll changes volume |
 | Now playing | `modules/popouts/MediaPopout.qml` | click the track; middle-click play/pause, right-click next player |
-| System tray | `modules/bar/Tray.qml` | hover the arrow |
+| System tray, themed right-click menus | `modules/bar/Tray.qml`, `modules/popouts/TrayMenu.qml` | hover the arrow; right-click an icon |
 | Battery, power mode (Quiet / Balanced / Performance) | `modules/popouts/BatteryPopout.qml` | click the battery |
 | Stay awake | `services/System.qml` | the coffee icon (holds an idle inhibitor) |
 | Displays | `modules/displays/Displays.qml` | the monitor icon, or `ALT+M` |
 | Notification popups | `modules/notifications/NotificationPopups.qml` | |
-| Control center: toggles, sliders, media, notifications, session buttons | `modules/controlcenter/ControlCenter.qml` | `ALT+N`, or the sliders icon (right-click toggles DND) |
+| Control Center: toggles, sliders, media (with visualizer), notifications grouped by app, session buttons | `modules/controlcenter/ControlCenter.qml` | `ALT+N`, or the sliders icon (right-click toggles DND) |
 | App launcher | `modules/launcher/Launcher.qml` | `ALT+Space` |
 | Theme picker | same file, `themes` mode | `ALT+SHIFT+T`, or the Theme tile |
 | Power menu (the old wlogout layout) | `modules/powermenu/PowerMenu.qml` | `ALT+SHIFT+E`, or the power icon |
 | Lock screen | `modules/lock/LockScreen.qml` | `` ALT+` ``, hypridle, before sleep |
 | Wallpaper carousel | `modules/wallpaper/WallpaperPicker.qml` | `ALT+P` (static), `ALT+W` (live) |
-| Settings | `modules/settings/SettingsWindow.qml` | gear in the control center |
+| Panel Settings | `modules/settings/SettingsWindow.qml` | gear in the Control Center |
 
 The launcher takes arrows, Tab, Ctrl+J/K and Ctrl+N/P to move, Enter to launch,
 and Esc to close. The power menu takes `l` lock, `u` sleep, `e` log out,
@@ -50,7 +50,7 @@ Hovering a bar item shows a dot under it, an open dropdown an accent line.
 
 Preferences (corner radius, border width, opacity, animations, clock format,
 weather location and units, notification timeout, lock screen effects) are
-set in the Settings window and saved to Quickshell's state folder
+set in Panel Settings and saved to Quickshell's state folder
 (`~/.local/state/quickshell/by-shell/<id>/settings.json`). Defaults are in
 `config/Config.qml`.
 
@@ -130,5 +130,5 @@ qs ipc call panels close
 - With a Lua Hyprland config, workspace clicks dispatch Lua
   (`hl.dsp.focus({ workspace = N })`); with hyprlang they use `workspace N`.
 - Debug with `qs -d` or `qs log`. Quickshell reloads on save.
-- Waybar and swaync configs are still in the repo and use the theme colors, so
-  you can switch back by changing `configs/autostart.lua`.
+- The waybar config is still in the repo as a fallback; see the main
+  instructions for what can be removed.

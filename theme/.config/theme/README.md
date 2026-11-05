@@ -51,11 +51,13 @@ theme folder and set `wallpaper` under `[apps]`.
 | Neovim | `current/nvim.lua` | live (`lua/theme.lua` watches it) |
 | btop | `~/.config/btop/themes/current.theme` | live (SIGUSR2) |
 | bat | `~/.config/bat/themes/Current.tmTheme` | next run (`bat cache --build`) |
-| tmux | `current/tmux.conf` | live (`source-file`) |
-| starship | `current/starship.toml` (copy of `~/.config/starship.toml` + palette) | next prompt |
-| rofi | `current/rofi.rasi` | next launch |
-| waybar, swaync (fallbacks) | `current/gtk.css` | live |
-| scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |
+| tmux | `current/tmux.conf`, sourced last in `~/.tmux.conf` | live (`source-file`) |
+| starship | `~/.config/starship.toml` (generated from `~/.config/starship/base.toml` + palette) | next prompt |
+| waybar (fallback) | `current/gtk.css` | live |
+| lazygit | `current/lazygit.yml` (via `LG_CONFIG_FILE`) | next start |
+| yazi | `~/.config/yazi/theme.toml` | next start |
+| cava | `~/.config/cava/themes/current` | live (SIGUSR2) |
+| Chromium, Brave | managed policy `BrowserThemeColor` (one-time `browser-theme-setup.sh`) | live || scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh` |
 | GTK apps | `gsettings ... color-scheme` | live (dark/light only) |
 
 ## Adding a theme

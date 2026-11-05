@@ -3,12 +3,13 @@ import QtQuick.Layouts
 import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
+import Quickshell.Widgets
 import qs.config
 import qs.components
 import qs.services
 import qs.modules.notifications
 
-// Right-hand panel: quick toggles, sliders, media and notification history
+// Control Center: quick toggles, sliders, media, notifications and session buttons
 PanelWindow {
     id: root
 
@@ -62,33 +63,34 @@ PanelWindow {
             anchors.margins: 16
             spacing: 14
 
-            // Header
-            RowLayout {
+            // Header: time with the Panel Settings gear level with it, date below
+            ColumnLayout {
                 Layout.fillWidth: true
+                spacing: 0
 
-                ColumnLayout {
+                RowLayout {
                     Layout.fillWidth: true
-                    spacing: 0
 
                     StyledText {
+                        Layout.fillWidth: true
                         text: Qt.formatDateTime(Time.date, "HH:mm")
                         font.pixelSize: 28
                         font.weight: Font.Bold
                     }
 
-                    StyledText {
-                        text: Qt.formatDateTime(Time.date, "dddd, d MMMM")
+                    IconButton {
+                        Layout.alignment: Qt.AlignVCenter
+                        Layout.rightMargin: -6
+                        icon: Icons.cog
                         color: Theme.subtext0
+                        onClicked: Panels.toggleSettings()
                     }
                 }
 
-                IconButton {
-                    Layout.alignment: Qt.AlignTop
-                    icon: Icons.cog
+                StyledText {
+                    text: Qt.formatDateTime(Time.date, "dddd, d MMMM")
                     color: Theme.subtext0
-                    onClicked: Panels.toggleSettings()
                 }
-
             }
 
             GridLayout {
@@ -212,16 +214,92 @@ PanelWindow {
                 ListView {
                     id: notifList
 
+                    // Groups whose older notifications are shown
+                    property var expanded: ({})
+
                     anchors.fill: parent
                     clip: true
-                    spacing: 8
-                    model: Notifs.list.slice().reverse()
+                    spacing: 12
+                    model: Notifs.groups
 
-                    delegate: NotificationCard {
+                    delegate: ColumnLayout {
+                        id: group
+
                         required property var modelData
+                        readonly property bool open: notifList.expanded[modelData.app] === true
+                        readonly property string iconSource: {
+                            const icon = modelData.icon;
+                            if (!icon)
+                                return "";
+                            if (icon.startsWith("/"))
+                                return "file://" + icon;
+                            return icon.includes("://") ? icon : Quickshell.iconPath(icon, true);
+                        }
 
                         width: ListView.view.width
-                        notification: modelData
+                        spacing: 6
+
+                        // App header: icon, name, count, clear
+                        RowLayout {
+                            Layout.fillWidth: true
+                            spacing: 8
+
+                            IconImage {
+                                implicitSize: 18
+                                source: group.iconSource
+                                visible: group.iconSource !== ""
+                            }
+
+                            StyledText {
+                                Layout.fillWidth: true
+                                text: group.modelData.app
+                                color: Theme.highlight
+                                font.weight: Font.DemiBold
+                            }
+
+                            StyledText {
+                                text: group.modelData.list.length
+                                color: Theme.overlay1
+                                font.pixelSize: Theme.fontSize - 1
+                            }
+
+                            IconButton {
+                                size: 24
+                                icon: Icons.trash
+                                color: Theme.overlay1
+                                onClicked: Notifs.clearGroup(group.modelData.app)
+                            }
+                        }
+
+                        Repeater {
+                            model: group.open ? group.modelData.list : group.modelData.list.slice(0, 3)
+
+                            NotificationCard {
+                                required property var modelData
+
+                                Layout.fillWidth: true
+                                notification: modelData
+                                showAppName: false
+                            }
+                        }
+
+                        StyledText {
+                            Layout.alignment: Qt.AlignHCenter
+                            visible: group.modelData.list.length > 3
+                            text: group.open ? "Show less" : `Show ${group.modelData.list.length - 3} more`
+                            color: Theme.subtext0
+                            font.pixelSize: Theme.fontSize - 1
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    const e = Object.assign({}, notifList.expanded);
+                                    e[group.modelData.app] = !group.open;
+                                    notifList.expanded = e;
+                                }
+                            }
+                        }
                     }
                 }
 

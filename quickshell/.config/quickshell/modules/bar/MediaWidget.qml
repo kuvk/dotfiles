@@ -9,7 +9,16 @@ BarButton {
     visible: Media.active !== null && Media.label !== ""
     onWheel: wheel => wheel.angleDelta.y > 0 ? Media.active?.previous() : Media.active?.next()
 
+    // Visualizer while playing (cava), the player icon otherwise
+    CavaBars {
+        anchors.verticalCenter: parent.verticalCenter
+        visible: Cava.values.length > 0
+        barWidth: 2
+        maxHeight: Theme.iconSize
+    }
+
     Icon {
+        visible: Cava.values.length === 0
         text: Media.iconFor(Media.active)
         color: Theme.sky
     }

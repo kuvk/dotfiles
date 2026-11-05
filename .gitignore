@@ -11,10 +11,13 @@ shaders/
 cava/.config/cava/themes/
 *.bak
 generated/
-yazi/.config/yazi/plugins/
+yazi/.config/yazi/plugins/*
+!yazi/.config/yazi/plugins/office.yazi/
+yazi/.config/yazi/theme.toml
 yazi/.config/yazi/flavors/
 .qmlls.ini
 theme/.config/theme/current/
 kitty/.config/kitty/text-size.conf
 bat/.config/bat/themes/Current.tmTheme
 btop/.config/btop/themes/current.theme
+starship/.config/starship.toml
