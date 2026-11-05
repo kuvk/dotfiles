@@ -152,7 +152,7 @@ overall = { bg = "{{ base }}" }
 [mode]
 
 normal_main = { fg = "{{ base }}", bg = "{{ blue }}", bold = true }
-normal_alt  = { fg = "{{ blue }}", bg = "{{ base }}"}
+normal_alt  = { fg = "{{ blue }}", bg = "{{ surface0 }}" }
 
 # Select mode
 select_main = { fg = "{{ base }}", bg = "{{ teal }}", bold = true }
