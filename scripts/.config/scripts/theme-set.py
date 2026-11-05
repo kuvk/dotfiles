@@ -39,7 +39,13 @@ EXTRA_DESTINATIONS = {
     "bat.tmTheme": HOME / ".config/bat/themes/Current.tmTheme",
     "cava": HOME / ".config/cava/themes/current",
     "yazi-theme.toml": HOME / ".config/yazi/theme.toml",
-    "tmux.conf": HOME / ".tmux/plugins/catppuccin/tmux/themes/catppuccin_current_tmux.conf",
+    # catppuccin/tmux may be installed twice: cloned by hand to
+    # plugins/catppuccin/tmux and by TPM to plugins/tmux. Every copy that is
+    # there gets the flavor, or the one loaded last keeps the old colors.
+    "tmux.conf": [
+        HOME / ".tmux/plugins/catppuccin/tmux/themes/catppuccin_current_tmux.conf",
+        HOME / ".tmux/plugins/tmux/themes/catppuccin_current_tmux.conf",
+    ],
     "cliamp.toml": HOME / ".config/cliamp/themes/system.toml",
 }
 # Written only when the app's folder exists (don't create a half plugin dir)
@@ -212,14 +218,17 @@ def generate(name: str) -> dict:
         out_name = tpl.name.removesuffix(".tpl")
         content = render(tpl.read_text(), theme, tpl.name)
         write_if_changed(CURRENT_DIR / out_name, content)
-        if out_name in EXTRA_DESTINATIONS:
-            if out_name in ONLY_IF_PRESENT and not EXTRA_DESTINATIONS[out_name].parent.parent.is_dir():
+        targets = EXTRA_DESTINATIONS.get(out_name, [])
+        for dest in targets if isinstance(targets, list) else [targets]:
+            if out_name in ONLY_IF_PRESENT and not dest.parent.parent.is_dir():
                 continue
+            if out_name == "tmux.conf" and not (dest.parent.parent / "catppuccin.tmux").is_file():
+                continue  # some other plugin named "tmux"
             try:
-                if write_if_changed(EXTRA_DESTINATIONS[out_name], content):
+                if write_if_changed(dest, content):
                     theme["changed"].add(out_name)
             except OSError as e:
-                print(f"theme-set: could not write {EXTRA_DESTINATIONS[out_name]}: {e}", file=sys.stderr)
+                print(f"theme-set: could not write {dest}: {e}", file=sys.stderr)
 
     render_quickshell(theme)
     render_starship(theme)
@@ -262,6 +271,8 @@ def reload_apps(theme: dict) -> None:
     # bat reads themes from a cache that must be rebuilt
     if "bat.tmTheme" in theme.get("changed", ()) and shutil.which("bat"):
         run_quiet(["bat", "cache", "--build"])
+    if "yazi-theme.toml" in theme.get("changed", ()):
+        restart_yazi()
     if shutil.which("tmux") and subprocess.run(["tmux", "info"], capture_output=True).returncode == 0:
         run_quiet(["tmux", "source-file", str(HOME / ".tmux.conf")])
     # a running cliamp re-reads the theme file when told to switch to it
@@ -286,6 +297,25 @@ def reload_apps(theme: dict) -> None:
                 monitors = []
             for monitor in monitors:
                 run_quiet(["hyprctl", "hyprpaper", "wallpaper", f"{monitor},{path},cover"])
+
+
+def restart_yazi() -> None:
+    """yazi can't reload its theme: every yazi started by yazi-live.sh is told
+    to quit (it writes its folder) and the script reopens it right there."""
+    runtime = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "yazi-live"
+    if not shutil.which("ya") or not runtime.is_dir():
+        return
+    for client in runtime.glob("*.client"):
+        pid = client.stem
+        try:
+            os.kill(int(pid), 0)
+        except (ValueError, ProcessLookupError):
+            client.unlink(missing_ok=True)  # left over from a crash
+            continue
+        except PermissionError:
+            continue
+        (runtime / f"{pid}.restart").touch()
+        run_quiet(["ya", "emit-to", pid, "quit"])
 
 
 BROWSER_HELPER = "/usr/local/bin/browser-theme-policy"

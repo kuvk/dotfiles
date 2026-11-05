@@ -164,6 +164,18 @@ alias l="eza -lh  --group-directories-first --git --icons=always"
 alias ls="eza --group-directories-first --icons=always"
 alias cat="bat --style=plain,header,grid"
 alias dots="z \"$HOME/dotfiles\""
+
+# yazi that follows theme changes (yazi-live.sh); on quit, the shell moves to
+# yazi's last folder
+y() {
+    local tmp
+    tmp="$(mktemp -t yazi-cwd.XXXXXX)"
+    YAZI_LIVE_CWD_OUT="$tmp" ~/.config/scripts/yazi-live.sh "$@"
+    local cwd
+    cwd="$(command cat -- "$tmp" 2>/dev/null)"
+    [[ -n $cwd && $cwd != "$PWD" ]] && builtin cd -- "$cwd"
+    command rm -f -- "$tmp"
+}
 alias top="btop"
 alias nv="nvim"
 alias fzf="fzf --preview='bat --color=always --style=plain,header,grid {}'"
