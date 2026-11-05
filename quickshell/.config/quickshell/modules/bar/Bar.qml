@@ -82,7 +82,7 @@ PanelWindow {
             onClicked: Panels.toggleAppMenu()
 
             Icon {
-                text: Icons.arch
+                text: Distro.logo
                 color: launcherButton.containsMouse || (Panels.appMenu && Panels.overlayScreen === barWindow.screen) ? Theme.accent : Theme.accent2
                 font.pixelSize: 17
             }
