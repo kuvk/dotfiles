@@ -140,16 +140,24 @@ FloatingWindow {
                 }
 
                 Flickable {
+                    id: settingsFlick
+
                     Layout.fillWidth: true
                     Layout.fillHeight: true
                     contentHeight: page.implicitHeight
                     clip: true
                     boundsBehavior: Flickable.StopAtBounds
 
+                    ScrollBar {
+                        parent: settingsFlick
+                        flick: settingsFlick
+                    }
+
                     ColumnLayout {
                         id: page
 
-                        width: parent.width
+                        // room for the scroll bar
+                        width: settingsFlick.width - 14
                         spacing: 12
 
                         // ------------------------------------------------ Appearance
@@ -431,81 +439,35 @@ FloatingWindow {
                         ColumnLayout {
                             id: fontsPage
 
-                            // the Nerd Font to use for "Nerd Font" presets: the
-                            // current text or icon font if it is one, else
-                            // JetBrainsMono Nerd Font, else the first installed
-                            readonly property var nerdFonts: Qt.fontFamilies().filter(f => /Nerd Font/.test(f) && !f.startsWith("Symbols Nerd Font"))
-                            readonly property string nerdFont: {
-                                for (const f of [Config.uiFont, Config.iconFont, "JetBrainsMono Nerd Font"]) {
-                                    if (nerdFonts.includes(f))
-                                        return f;
-                                }
-                                return nerdFonts[0] ?? "JetBrainsMono Nerd Font";
-                            }
-                            readonly property bool textIsNerd: /Nerd Font/.test(Config.uiFont) && !Config.uiFont.startsWith("Symbols")
+                            readonly property var families: Qt.fontFamilies()
+                            // full Nerd Fonts, one entry per family (no Mono/Propo
+                            // variants, no Symbols): letters and icons
+                            readonly property var nerdFonts: families.filter(f => /Nerd Font$/.test(f) && !f.startsWith("Symbols Nerd Font"))
+                            // everything else, for the display font
+                            readonly property var displayFonts: families.filter(f => !/Nerd Font/.test(f))
 
                             Layout.fillWidth: true
                             visible: root.section === "fonts"
                             spacing: 12
 
-                            StyledText {
-                                Layout.fillWidth: true
-                                text: "Terminals keep their own fonts (kitty.conf). These are for the bar, panels and the shell's windows."
-                                color: Theme.overlay1
-                                wrapMode: Text.Wrap
-                            }
-
-                            // Presets
-                            RowLayout {
-                                Layout.fillWidth: true
-                                spacing: 8
-
-                                TextButton {
-                                    Layout.fillWidth: true
-                                    text: "SF Pro + Symbols"
-                                    onClicked: {
-                                        Config.uiFont = "SF Pro Display";
-                                        Config.iconFont = "Symbols Nerd Font";
-                                    }
-                                }
-
-                                TextButton {
-                                    Layout.fillWidth: true
-                                    text: "Nerd Font only"
-                                    onClicked: {
-                                        const f = fontsPage.nerdFont;
-                                        Config.uiFont = f;
-                                        Config.iconFont = f;
-                                    }
-                                }
-
-                                TextButton {
-                                    Layout.fillWidth: true
-                                    text: "Nerd Font + Symbols"
-                                    onClicked: {
-                                        Config.uiFont = fontsPage.nerdFont;
-                                        Config.iconFont = "Symbols Nerd Font";
-                                    }
-                                }
-                            }
-
-                            // Preview in the chosen fonts
+                            // How the bar's text and icons look with these fonts
                             Rectangle {
                                 Layout.fillWidth: true
-                                implicitHeight: preview.implicitHeight + 20
+                                implicitHeight: preview.implicitHeight + 24
                                 radius: Theme.smallRadius
-                                color: Theme.cardBg
+                                color: Theme.barBg
 
                                 Row {
                                     id: preview
 
                                     anchors.centerIn: parent
-                                    spacing: 10
+                                    spacing: 12
 
                                     Icon {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: Icons.arch
                                         color: Theme.accent2
+                                        font.pixelSize: 17
                                     }
 
                                     StyledText {
@@ -515,7 +477,7 @@ FloatingWindow {
                                     }
 
                                     Repeater {
-                                        model: [Icons.music, Icons.coffee, Icons.bluetooth, Icons.font, Icons.power]
+                                        model: [Icons.music, Icons.coffee, Icons.bluetooth, Icons.font, Icons.cog, Icons.power]
 
                                         Icon {
                                             required property string modelData
@@ -525,94 +487,62 @@ FloatingWindow {
                                             color: Theme.subtext1
                                         }
                                     }
-
-                                    StyledText {
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        text: "Mono 0O1lI"
-                                        font.family: Theme.monoFont
-                                        color: Theme.subtext0
-                                    }
                                 }
                             }
 
                             StyledText {
-                                Layout.topMargin: 6
-                                text: "Text"
-                                color: Theme.highlight
-                                font.weight: Font.Bold
-                            }
-
-                            StyledText {
                                 Layout.fillWidth: true
-                                text: "Bar, panels and windows. Any installed font, or a Nerd Font."
+                                text: "Terminals keep their own fonts (kitty.conf); these are for the bar, panels and the shell's windows."
                                 color: Theme.overlay1
                                 font.pixelSize: Theme.fontSize - 1
                                 wrapMode: Text.Wrap
                             }
 
-                            FontPicker {
-                                value: Config.uiFont
-                                onPicked: family => Config.uiFont = family
-                            }
+                            SettingRow {
+                                label: "Nerd Fonts only"
+                                hint: "Text uses the Nerd Font too; the display font is not used"
 
-                            StyledText {
-                                Layout.topMargin: 6
-                                text: "Icons"
-                                color: Theme.highlight
-                                font.weight: Font.Bold
-                            }
-
-                            StyledText {
-                                Layout.fillWidth: true
-                                text: "A Nerd Font. Symbols Nerd Font has only the icons, next to the text font; a full Nerd Font (e.g. JetBrainsMono Nerd Font) has its own letters too."
-                                color: Theme.overlay1
-                                font.pixelSize: Theme.fontSize - 1
-                                wrapMode: Text.Wrap
-                            }
-
-                            RowLayout {
-                                Layout.fillWidth: true
-                                spacing: 8
-
-                                TextButton {
-                                    text: "Symbols Nerd Font"
-                                    onClicked: Config.iconFont = "Symbols Nerd Font"
-                                }
-
-                                TextButton {
-                                    visible: fontsPage.textIsNerd
-                                    text: "Same as text"
-                                    onClicked: Config.iconFont = Config.uiFont
+                                Switch {
+                                    checked: Config.nerdFontOnly
+                                    onToggled: Config.nerdFontOnly = !Config.nerdFontOnly
                                 }
                             }
 
-                            FontPicker {
-                                value: Config.iconFont
-                                nerdOnly: true
-                                allowAll: false
-                                sample: [Icons.arch, Icons.music, Icons.coffee, Icons.bluetooth, Icons.power].join("  ")
-                                onPicked: family => Config.iconFont = family
+                            SettingRow {
+                                label: "Use Nerd Symbols font"
+                                hint: "Icons from Symbols Nerd Font; off: from the Nerd Font"
+
+                                Switch {
+                                    checked: Config.nerdSymbols
+                                    onToggled: Config.nerdSymbols = !Config.nerdSymbols
+                                }
                             }
 
                             StyledText {
-                                Layout.topMargin: 6
-                                text: "Monospace"
-                                color: Theme.highlight
-                                font.weight: Font.Bold
+                                Layout.topMargin: 4
+                                text: "Nerd Font"
+                                font.weight: Font.DemiBold
+                            }
+
+                            FontDropdown {
+                                value: Config.nerdFont
+                                options: fontsPage.nerdFonts
+                                sample: Icons.arch + " " + Icons.cog + " 0O1lI"
+                                onPicked: family => Config.nerdFont = family
                             }
 
                             StyledText {
-                                Layout.fillWidth: true
-                                text: "The lock screen's digital rain."
-                                color: Theme.overlay1
-                                font.pixelSize: Theme.fontSize - 1
+                                Layout.topMargin: 4
+                                text: "Display font"
+                                font.weight: Font.DemiBold
+                                opacity: Config.nerdFontOnly ? 0.4 : 1
                             }
 
-                            FontPicker {
-                                value: Config.monoFont
-                                nerdOnly: true
-                                sample: "0O1lI {} => 0123"
-                                onPicked: family => Config.monoFont = family
+                            FontDropdown {
+                                enabled: !Config.nerdFontOnly
+                                value: Config.displayFont
+                                options: fontsPage.displayFonts
+                                onPicked: family => Config.displayFont = family
                             }
                         }
 
