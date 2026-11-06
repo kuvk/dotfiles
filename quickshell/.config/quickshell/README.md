@@ -136,10 +136,12 @@ the first one left if that monitor is gone). `` SUPER+` ``, the power menu and h
 - **Waking up:** the monitors come back one by one, and with the laptop's screen off Hyprland can
   have only its FALLBACK output for a moment; the lock goes up only once a real screen exists, and
   once up stays until the right password, whatever the monitors do.
-- **Reloads and crashes:** the lock state is kept in `$XDG_RUNTIME_DIR/quickshell-lock`, so a
-  shell reload (editing a shell file) or a restart after a crash locks again at once, and Hyprland
-  keeps the session locked meanwhile (`misc:allow_session_lock_restore`). `scripts/shell.sh` starts
-  the shell again if it crashes.
+- **Reloads and crashes:** Hyprland keeps the session locked when the shell goes away, and a shell
+  that starts while Hyprland still holds a lock (and no other lock program runs) locks again at
+  once (`misc:allow_session_lock_restore`), as after a reload (editing a shell file) or a crash. A
+  new session never starts locked. `scripts/shell.sh` starts the shell again if it crashes, and
+  gives up after 5 failures in a row right after starting (`journalctl -t shell.sh`): a Hyprland
+  restarted after its own crash can refuse it; log in again from a TTY then.
 
 Settings > Lock Screen sets the style, **Background** (the current wallpaper) or **Image** (an
 image you choose; the wallpaper if none is chosen or it can't be read), then in sections: the clock
