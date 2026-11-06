@@ -17,6 +17,8 @@ Singleton {
     readonly property bool micMuted: source?.audio?.muted ?? true
 
     readonly property var sinks: Pipewire.nodes.values.filter(n => n.audio && n.isSink && !n.isStream)
+    // Microphones and other inputs (not apps' recording streams)
+    readonly property var sources: Pipewire.nodes.values.filter(n => n.audio && n.type === PwNodeType.AudioSource)
 
     // Application streams feeding the default sink
     readonly property var streams: linkTracker.linkGroups.map(g => g.source).filter(n => n?.audio && n.isStream)
@@ -61,6 +63,10 @@ Singleton {
         Pipewire.preferredDefaultAudioSink = node;
     }
 
+    function setDefaultSource(node: PwNode): void {
+        Pipewire.preferredDefaultAudioSource = node;
+    }
+
     function nodeName(node: PwNode): string {
         return node?.description || node?.nickname || node?.properties?.["application.name"] || node?.name || "Unknown";
     }
@@ -73,6 +79,6 @@ Singleton {
 
     // Bind every node we read volume from, otherwise pipewire won't report it
     PwObjectTracker {
-        objects: [root.sink, root.source, ...root.sinks, ...root.streams]
+        objects: [root.sink, root.source, ...root.sinks, ...root.sources, ...root.streams]
     }
 }

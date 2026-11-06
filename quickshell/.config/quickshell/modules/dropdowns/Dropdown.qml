@@ -29,6 +29,25 @@ PanelWindow {
     readonly property int pad: 4
     readonly property int panelWidth: contentWidth
     readonly property int panelHeight: Math.ceil(column.implicitHeight + Theme.padding * 2)
+    // While open, a change in height (switching tabs, content shown or hidden) slides the
+    // bottom edge. The panel is drawn inside a window as tall as the space under the bar:
+    // resizing a layer window makes it flash as if it reopened, so its size never changes,
+    // and input outside the panel goes through (mask).
+    property real shownHeight: panelHeight
+    readonly property int roomBelowBar: (screen?.height ?? 0) - Theme.barHeight - Theme.barMargin
+
+    Behavior on shownHeight {
+        enabled: root.reveal === 1
+
+        NumberAnimation {
+            duration: Theme.animDuration * 1.6
+            easing.type: Easing.OutCubic
+        }
+    }
+
+    property Region panelRegion: Region {
+        item: panel
+    }
 
     screen: bar.screen
     visible: reveal > 0
@@ -43,7 +62,8 @@ PanelWindow {
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
     implicitWidth: panelWidth + pad * 2
-    implicitHeight: panelHeight + gap + pad
+    implicitHeight: Math.max(panelHeight + gap + pad, roomBelowBar)
+    mask: panelRegion
     WlrLayershell.namespace: "quickshell-dropdown"
     WlrLayershell.layer: WlrLayer.Top
     WlrLayershell.keyboardFocus: shown ? WlrKeyboardFocus.OnDemand : WlrKeyboardFocus.None
@@ -73,7 +93,7 @@ PanelWindow {
             x: root.pad
             y: Math.round(root.gap - (root.panelHeight + root.gap) * (1 - root.reveal))
             width: root.panelWidth
-            height: root.panelHeight
+            height: Math.round(root.shownHeight)
             color: Theme.panelBg
             radius: Theme.radius
             border.color: Theme.border
@@ -83,12 +103,23 @@ PanelWindow {
             Keys.onEscapePressed: Panels.closeDropdown(root.name)
             Keys.onPressed: event => root.keyPressed(event)
 
-            ColumnLayout {
-                id: column
-
+            // Inside the border: while the height slides, content is cut there, not drawn over it
+            Item {
                 anchors.fill: parent
-                anchors.margins: Theme.padding
-                spacing: Theme.spacing
+                anchors.margins: Theme.borderWidth
+                clip: true
+
+                ColumnLayout {
+                    id: column
+
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    anchors.margins: Theme.padding - Theme.borderWidth
+                    // its full height, also while the panel is shorter
+                    height: root.panelHeight - Theme.padding * 2
+                    spacing: Theme.spacing
+                }
             }
         }
     }
