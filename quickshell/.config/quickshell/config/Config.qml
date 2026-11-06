@@ -20,9 +20,7 @@ Singleton {
     property alias nightlightTemperature: adapter.nightlightTemperature
     property alias lockStyle: adapter.lockStyle
     property alias lockImage: adapter.lockImage
-    property alias lockMatrixColor: adapter.lockMatrixColor
     property alias lockClockColor: adapter.lockClockColor
-    property alias lockDateColor: adapter.lockDateColor
     property alias lockAvatarColor: adapter.lockAvatarColor
     property alias lockBoxOutlineColor: adapter.lockBoxOutlineColor
     property alias lockBoxColor: adapter.lockBoxColor
@@ -45,7 +43,6 @@ Singleton {
     property alias lockInputOpacity: adapter.lockInputOpacity
     property alias lockDotsColor: adapter.lockDotsColor
     property alias lockTextColor: adapter.lockTextColor
-    property alias lockSolidColor: adapter.lockSolidColor
     property alias borderWidth: adapter.borderWidth
     property alias barOpacity: adapter.barOpacity
     // Floating bar: margins around it and rounded corners
@@ -139,8 +136,8 @@ Singleton {
         } catch (e) {
             console.warn("Config: no usable defaults.json, using the built-in defaults", e);
         }
-        adapter.radius = 8;
-        adapter.borderWidth = 1;
+        adapter.radius = 6;
+        adapter.borderWidth = 2;
         adapter.barOpacity = 0.85;
         adapter.barFloating = false;
         adapter.barMargin = 6;
@@ -152,41 +149,38 @@ Singleton {
         adapter.nightlightSchedule = false;
         adapter.nightlightStart = "20:00";
         adapter.nightlightEnd = "07:00";
-        adapter.nightlightTemperature = 4500;
+        adapter.nightlightTemperature = 4400;
         adapter.lockStyle = "picture";
-        adapter.lockImage = "";
-        adapter.lockMatrixColor = "magenta";
-        adapter.lockClockColor = "accent2";
-        adapter.lockDateColor = "accent2";
-        adapter.lockAvatarColor = "accent2";
+        adapter.lockImage = "/home/kuvk/Pictures/Wallpapers/dori-theme-catppuccin-mocha-cba6f7-on-1e1e2e.png";
+        adapter.lockClockColor = "accent";
+        adapter.lockAvatarColor = "accent";
         adapter.lockBoxOutlineColor = "accent";
         adapter.lockBoxColor = "base";
-        adapter.lockInputOutlineColor = "accent2";
+        adapter.lockInputOutlineColor = "accent";
         adapter.lockInputColor = "subtext0";
         adapter.lockUserColor = "accent";
         adapter.lockCheckColor = "green";
         adapter.lockFailColor = "red";
-        adapter.lockCapsColor = "yellow";
-        adapter.lockBoxOpacity = 85;
-        adapter.lockBox = true;
-        adapter.lockClock = true;
+        adapter.lockCapsColor = "peach";
+        adapter.lockBoxOpacity = 90;
+        adapter.lockBox = false;
+        adapter.lockClock = false;
         adapter.lockAvatar = true;
         adapter.lockPowerColor = "base";
         adapter.lockPowerOpacity = 85;
-        adapter.lockPowerIconColor = "text";
+        adapter.lockPowerIconColor = "accent2";
         adapter.lockPowerOutlineColor = "accent";
-        adapter.accentOverrides = {};
+        adapter.accentOverrides = {"gruvbox": {"accent": "blue", "accent2": "peach", "accent3": "mauve"}, "tokyo-night": {"accent": "teal", "accent2": "peach", "accent3": "mauve"}};
         adapter.wallpaperFollowsTheme = true;
-        adapter.lockInputOpacity = 25;
+        adapter.lockInputOpacity = 30;
         adapter.lockDotsColor = "accent2";
         adapter.lockTextColor = "text";
-        adapter.lockSolidColor = "base";
         adapter.clockFormat = "dddd HH:mm";
         adapter.barHiddenPrimary = ["displays"];
-        adapter.barHiddenOthers = ["power", "weather", "layout", "media", "displays"];
-        adapter.weatherLocation = "";
+        adapter.barHiddenOthers = ["power", "layout", "media", "displays", "weather", "clock"];
+        adapter.weatherLocation = "Knez Do, Montenegro";
         adapter.weatherFahrenheit = false;
-        adapter.notificationTimeout = 5;
+        adapter.notificationTimeout = 4;
         adapter.trayMonochrome = false;
         adapter.trayTint = false;
         adapter.trayKeepColors = "";
@@ -200,7 +194,7 @@ Singleton {
         adapter.nerdSymbols = true;
         adapter.windowButtons = false;
         adapter.gapsIn = 3;
-        adapter.gapsOut = 4;
+        adapter.gapsOut = 6;
         adapter.gameGapsIn = 3;
         adapter.gameGapsOut = 6;
         adapter.version = root.version;
@@ -246,7 +240,7 @@ Singleton {
             id: adapter
 
             property int version: 0
-            property int radius: 8
+            property int radius: 6
             // read by scripts/theme-set.py
             property string cursorTheme: "Adwaita"
             property int cursorSize: 24
@@ -254,41 +248,38 @@ Singleton {
             property bool nightlightSchedule: false
             property string nightlightStart: "20:00" // the schedule may cross midnight
             property string nightlightEnd: "07:00"
-            property int nightlightTemperature: 4500 // kelvin, read by scripts/nightlight-toggle.sh
-            // read by scripts/lockscreen.sh
-            property string lockStyle: "picture" // "rain" (Matrix) | "picture" (Background) | "image" | "solid"
-            property string lockImage: ""
-            property string lockMatrixColor: "magenta" // a unimatrix color name
+            property int nightlightTemperature: 4400 // kelvin, read by scripts/nightlight-toggle.sh
+            // the lock screen (modules/lock); the colors also go to the login screen (theme-set.py)
+            property string lockStyle: "picture" // "picture" (the wallpaper) | "image" (lockImage)
+            property string lockImage: "/home/kuvk/Pictures/Wallpapers/dori-theme-catppuccin-mocha-cba6f7-on-1e1e2e.png"
             // theme color names
-            property string lockClockColor: "accent2"
-            property string lockDateColor: "accent2"
-            property string lockAvatarColor: "accent2"
+            property string lockClockColor: "accent"
+            property string lockAvatarColor: "accent"
             property string lockBoxOutlineColor: "accent"
             property string lockBoxColor: "base"
-            property string lockInputOutlineColor: "accent2"
+            property string lockInputOutlineColor: "accent"
             property string lockInputColor: "subtext0"
             property string lockUserColor: "accent"
             property string lockCheckColor: "green"
             property string lockFailColor: "red"
-            property string lockCapsColor: "yellow"
-            property int lockBoxOpacity: 85 // percent
+            property string lockCapsColor: "peach"
+            property int lockBoxOpacity: 90 // percent
             // per theme: { "catppuccin-mocha": { accent: "mauve", accent2: "blue" } }, read by theme-set.py
-            property var accentOverrides: ({})
+            property var accentOverrides: ({"gruvbox": {"accent": "blue", "accent2": "peach", "accent3": "mauve"}, "tokyo-night": {"accent": "teal", "accent2": "peach", "accent3": "mauve"}})
             // the logo wallpaper in the theme's colors, redrawn on theme change (theme-set.py)
             property bool wallpaperFollowsTheme: true
-            property bool lockClock: true // clock and date, one color (lockClockColor)
+            property bool lockClock: false // clock and date, one color (lockClockColor)
             property bool lockAvatar: true
             // the login screen's power buttons, apart from the box
             property string lockPowerColor: "base"
             property int lockPowerOpacity: 85 // percent
-            property string lockPowerIconColor: "text"
+            property string lockPowerIconColor: "accent2"
             property string lockPowerOutlineColor: "accent"
-            property bool lockBox: true // the card behind the avatar and password (lock and login screens)
-            property int lockInputOpacity: 25 // percent
+            property bool lockBox: false // the card behind the avatar and password (lock and login screens)
+            property int lockInputOpacity: 30 // percent
             property string lockDotsColor: "accent2"
             property string lockTextColor: "text"
-            property string lockSolidColor: "base" // background of the "solid" style
-            property int borderWidth: 1
+            property int borderWidth: 2
             property real barOpacity: 0.85
             property bool barFloating: false
             property int barMargin: 6
@@ -296,10 +287,10 @@ Singleton {
             property bool animations: true
             property string clockFormat: "dddd HH:mm"
             property var barHiddenPrimary: ["displays"]
-            property var barHiddenOthers: ["power", "weather", "layout", "media", "displays"]
-            property string weatherLocation: ""
+            property var barHiddenOthers: ["power", "layout", "media", "displays", "weather", "clock"]
+            property string weatherLocation: "Knez Do, Montenegro"
             property bool weatherFahrenheit: false
-            property int notificationTimeout: 5
+            property int notificationTimeout: 4
             property bool trayMonochrome: false
             property bool trayTint: false
             // tray apps whose icon colors carry meaning (e.g. the ROG dGPU
@@ -315,7 +306,7 @@ Singleton {
             property bool nerdSymbols: true
             property bool windowButtons: false
             property int gapsIn: 3
-            property int gapsOut: 4
+            property int gapsOut: 6
             property int gameGapsIn: 3
             property int gameGapsOut: 6
         }

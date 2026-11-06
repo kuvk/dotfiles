@@ -646,27 +646,11 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Style"
-                                hint: ({
-                                    rain: "Falling characters",
-                                    picture: "Current wallpaper",
-                                    image: "An image you choose",
-                                    solid: "A theme color you choose"
-                                })[Config.lockStyle] ?? ""
+                                hint: Config.lockStyle === "image" ? "An image you choose" : "Current wallpaper"
 
                                 Stepper {
-                                    text: ({ rain: "Matrix", picture: "Background", image: "Image", solid: "Solid color" })[Config.lockStyle] ?? "Matrix"
-                                    onStep: d => Config.lockStyle = root.cycle(["rain", "picture", "image", "solid"], Config.lockStyle, d)
-                                }
-                            }
-
-                            SettingRow {
-                                visible: Config.lockStyle === "rain"
-                                label: "Matrix color"
-                                hint: "Shade follows the theme"
-
-                                Stepper {
-                                    text: Config.lockMatrixColor
-                                    onStep: d => Config.lockMatrixColor = root.cycle(["green", "cyan", "blue", "magenta", "red", "yellow", "white"], Config.lockMatrixColor, d)
+                                    text: Config.lockStyle === "image" ? "Image" : "Background"
+                                    onStep: d => Config.lockStyle = Config.lockStyle === "image" ? "picture" : "image"
                                 }
                             }
 
@@ -690,23 +674,6 @@ FloatingWindow {
                                                 Config.lockImage = text.trim();
                                         }
                                     }
-                                }
-                            }
-
-                            ColumnLayout {
-                                Layout.fillWidth: true
-                                visible: Config.lockStyle === "solid"
-                                spacing: 4
-
-                                StyledText {
-                                    text: "Background color"
-                                }
-
-                                ColorChoice {
-                                    Layout.fillWidth: true
-                                    names: ["mantle", "crust", "surface0", "surface1", ...defaultNames]
-                                    value: Config.lockSolidColor
-                                    onPicked: name => Config.lockSolidColor = name
                                 }
                             }
 
@@ -832,11 +799,8 @@ FloatingWindow {
                             }
 
                             TextButton {
-                                text: "Preview (locks the screen)"
-                                onClicked: {
-                                    Panels.closeAll();
-                                    System.runAction("lock");
-                                }
+                                text: "Preview"
+                                onClicked: Panels.lockPreview = true
                             }
                         }
 

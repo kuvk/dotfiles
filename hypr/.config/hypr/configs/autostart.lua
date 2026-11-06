@@ -7,7 +7,8 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("~/.config/scripts/hypr-monitors.py startup")
   -- Regenerate ~/.config/theme/current (no-op if nothing changed), then the shell
   hl.exec_cmd("~/.config/scripts/theme-set.py")
-  hl.exec_cmd("qs & hyprpaper & hypridle & udiskie &")
+  -- shell.sh starts the shell again if it crashes
+  hl.exec_cmd("~/.config/scripts/shell.sh & hyprpaper & hypridle & udiskie &")
   -- Saved wallpapers per monitor, once hyprpaper is up
   hl.exec_cmd("sleep 1; ~/.config/scripts/wallpaper.py restore")
   hl.exec_cmd("~/.config/scripts/autostart.sh")

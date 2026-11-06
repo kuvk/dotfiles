@@ -30,10 +30,10 @@ hl.config({
 
   misc = {
     force_default_wallpaper = 0,
-    session_lock_xray = true,
     disable_hyprland_logo = true,
     disable_splash_rendering = true,
     initial_workspace_tracking = 1,
+    -- the shell's lock screen takes the lock over after a reload or a crash restart
     allow_session_lock_restore = true,
     -- Variable refresh rate is set per monitor in Displays (hypr-monitors.py); off elsewhere
     vrr = 0,
