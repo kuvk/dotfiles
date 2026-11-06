@@ -113,8 +113,26 @@ sed -e "s|@MONITOR@|$focused|g" -e "s|@PICTURE@|$(escape "$picture")|" -e "s|@CO
     -e "s|@DOTS@|$(hex "${dots:-accent2}")|g" -e "s|@USER@|$(hex "${user_color:-accent}")|g" -e "s|@TEXT@|$(hex "${text_name:-text}")|g" \
     -e "s|@CHECK@|$(hex "${check:-green}")|g" -e "s|@FAIL@|$(hex "${fail:-red}")|g" -e "s|@CAPS@|$(hex "${caps:-yellow}")|g" \
     "${drop[@]}" "$TEMPLATE" >"$config"
-hyprlock --config "$config" "${hyprlock_args[@]}" &
-wait $!
+# hyprlock's output goes to ~/.cache/hyprlock.log (one lock's worth). It exits 0 on unlock.
+# If it crashes instead, the session stays locked (misc:allow_session_lock_restore) and a new
+# one takes over: after a sleep the monitors come back one by one, and with the laptop's
+# screen off there's a moment with none but Hyprland's FALLBACK, which hyprlock dies on.
+log="$HOME/.cache/hyprlock.log"
+: >"$log"
+for attempt in 1 2 3 4 5 6 7 8 9 10; do
+    hyprlock --config "$config" "${hyprlock_args[@]}" >>"$log" 2>&1 &
+    wait $!
+    status=$?
+    ((status == 0)) && break
+    echo "lockscreen.sh: hyprlock exited with $status (attempt $attempt); starting it again" >>"$log"
+    sleep 2
+    # its monitor may be gone now: the clock and password go to the focused one
+    now=$(hyprctl -j monitors | jq -r '.[] | select(.focused) | .name' | head -n1)
+    if [[ -n $now && $now != "$focused" && $now != FALLBACK ]]; then
+        sed -i "s|monitor = $focused\$|monitor = $now|" "$config"
+        focused=$now
+    fi
+done
 
 if [[ -n $focused ]]; then
     hyprctl dispatch "hl.dsp.focus({ monitor = \"$focused\" })" >/dev/null
