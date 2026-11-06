@@ -64,7 +64,7 @@ VRR_MODES = (0, 1, 2, 3)  # off, on, fullscreen, fullscreen games and video
 COLOR_MODES = ("srgb", "edid", "hdr", "hdredid")
 HDR_MODES = ("hdr", "hdredid")
 
-TEXT_SIZE_DEFAULT = 12  # px, for a setup with no saved size
+TEXT_SIZE_DEFAULT = 13  # px, for a setup with no saved size
 TEXT_SIZE_BASE = 13  # px that GTK's scaling factor 1 and kitty.conf's font size correspond to
 KITTY_FONT_DEFAULT = 11  # pt in kitty.conf, matching 13 px
 KITTY_TEXT_SIZE_FILE = HOME / ".config/kitty/text-size.conf"
@@ -182,6 +182,8 @@ def load_profiles() -> dict:
         data = json.loads(PROFILES_FILE.read_text())
     except (FileNotFoundError, json.JSONDecodeError):
         data = {}
+    # Each profile keeps its own text size; the top-level one is the connected setup's, for
+    # what reads it (the shell's Theme.qml, theme-set.py)
     if "text_size" not in data:
         scale = data.pop("text_scale", None)
         data["text_size"] = round(TEXT_SIZE_BASE * float(scale)) if scale else TEXT_SIZE_DEFAULT
@@ -346,6 +348,13 @@ def render_lua(profile: dict, live: list[dict]) -> str:
     return "\n".join(lines) + "\n"
 
 
+def profile_text_size(profile: dict) -> int:
+    try:
+        return max(9, min(20, int(profile.get("text_size", TEXT_SIZE_DEFAULT))))
+    except (TypeError, ValueError):
+        return TEXT_SIZE_DEFAULT
+
+
 def apply_text_size(size: int) -> None:
     """GTK and kitty font sizes for a text size in px (13 = default). theme-set.py reads
     the size from monitors.json and sets GTK's font in points."""
@@ -455,7 +464,12 @@ def apply(data: dict, live: list[dict], *, force_reload: bool = False) -> None:
         if target and ws in current and current[ws] != target["name"]:
             run(["hyprctl", "dispatch", f"hl.dsp.workspace.move({{ workspace = \"{ws}\", monitor = {lua_str(target['name'])} }})"])
 
-    apply_text_size(int(data.get("text_size", TEXT_SIZE_DEFAULT)))
+    # This setup's text size becomes the current one
+    size = profile_text_size(profile)
+    if data.get("text_size") != size:
+        data["text_size"] = size
+        save_profiles(data)
+    apply_text_size(size)
 
 
 # ---------------------------------------------------------------- brightness
@@ -555,7 +569,7 @@ def state(data: dict, live: list[dict]) -> dict:
         })
     return {
         "key": key,
-        "text_size": data.get("text_size", TEXT_SIZE_DEFAULT),
+        "text_size": profile_text_size(profile),
         "primary": profile.get("primary", ""),
         "monitors": monitors,
         "workspaces": profile["workspaces"],
@@ -586,7 +600,7 @@ def set_state(data: dict, live: list[dict], new: dict) -> None:
     if "workspaces" in new:
         profile["workspaces"] = {str(k): v for k, v in new["workspaces"].items() if v}
     if "text_size" in new:
-        data["text_size"] = max(9, min(20, int(new["text_size"])))
+        profile["text_size"] = max(9, min(20, int(new["text_size"])))
     save_profiles(data)
     apply(data, live)
 

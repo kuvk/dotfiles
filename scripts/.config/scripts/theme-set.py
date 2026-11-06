@@ -550,9 +550,9 @@ def gtk_font_pt() -> int:
     Electron apps on Wayland (Obsidian, Mullvad) apply to their content without resizing
     the window, leaving an empty strip."""
     try:
-        size = int(json.loads((HOME / ".config/hypr/monitors.json").read_text()).get("text_size", 12))
+        size = int(json.loads((HOME / ".config/hypr/monitors.json").read_text()).get("text_size", 13))
     except (OSError, ValueError, TypeError, AttributeError):
-        size = 12
+        size = 13
     return max(6, round(10 * size / 13))
 
 
