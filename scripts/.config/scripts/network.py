@@ -12,6 +12,16 @@ library only.
   network.py dns auto|cloudflare|google|quad9   DNS for the active connections
   network.py dns custom "1.1.1.1 9.9.9.9"
   network.py speedtest                  JSON lines: ping, download, upload
+  network.py stats                      JSON: the default route's interface, addresses,
+                                        byte counters and one ping to the router and 1.1.1.1
+  network.py band [auto|2.4|5|6]        JSON: the Wi-Fi band in use and available; or pin one
+  network.py qr [IFACE]                 JSON: the connected Wi-Fi as a QR code matrix (qrencode)
+  network.py password IFACE             the connected Wi-Fi's password
+  network.py eap SSID IDENTITY          join a WPA-Enterprise (PEAP/MSCHAPv2) network,
+                                        the password on stdin
+
+stats, band, qr, password and eap follow Omarchy's network panel scripts
+(omarchy-network-status, -band, -qr, -password; github.com/basecamp/omarchy, MIT).
 """
 
 from __future__ import annotations
@@ -244,6 +254,259 @@ def speedtest() -> int:
         return 1
 
 
+# ---------------------------------------------------------------- stats (omarchy-network-status)
+
+
+PROBE = "1.1.1.1"
+
+
+def run_text(cmd: list[str], stdin: str | None = None) -> tuple[int, str, str]:
+    try:
+        p = subprocess.run(cmd, input=stdin, capture_output=True, text=True, env=os.environ | {"LC_ALL": "C"})
+    except FileNotFoundError:
+        return 127, "", f"{cmd[0]} is not installed"
+    return p.returncode, p.stdout, p.stderr.strip()
+
+
+def default_route() -> dict:
+    try:
+        return json.loads(run_text(["ip", "-j", "route", "get", PROBE])[1] or "[]")[0]
+    except (json.JSONDecodeError, IndexError, KeyError):
+        return {}
+
+
+def ping_proc(host: str) -> subprocess.Popen | None:
+    try:
+        return subprocess.Popen(["ping", "-n", "-c", "1", "-W", "1", host], stdout=subprocess.PIPE,
+                                stderr=subprocess.DEVNULL, text=True, env=os.environ | {"LC_ALL": "C"})
+    except FileNotFoundError:
+        return None
+
+
+def ping_result(proc: subprocess.Popen | None) -> float | None:
+    """Milliseconds, or None for a lost probe."""
+    if proc is None:
+        return None
+    out, _ = proc.communicate()
+    for part in out.split():
+        if part.startswith(("time=", "time<")):
+            try:
+                return float(part[5:])
+            except ValueError:
+                return None
+    return None
+
+
+def stats() -> dict:
+    route = default_route()
+    iface = route.get("dev", "")
+    if not iface:
+        return {}
+    gateway = route.get("gateway", "")
+    # Both probes at once, so a lost one costs a second, not two
+    router, internet = (ping_proc(gateway) if gateway else None), ping_proc(PROBE)
+    prefix = ""
+    try:
+        for info in json.loads(run_text(["ip", "-j", "addr", "show", iface])[1] or "[]")[0].get("addr_info", []):
+            if info.get("family") == "inet":
+                prefix = str(info.get("prefixlen", ""))
+                break
+    except (json.JSONDecodeError, IndexError):
+        pass
+    net = Path(f"/sys/class/net/{iface}")
+    kind = "wifi" if (net / "wireless").is_dir() else ("ethernet" if (net / "device").exists() else "virtual")
+    result = {
+        "iface": iface,
+        "type": kind,
+        "ip": route.get("prefsrc", ""),
+        "prefix": prefix,
+        "gateway": gateway,
+        "rx_bytes": int(sysfs(iface, "statistics/rx_bytes") or 0),
+        "tx_bytes": int(sysfs(iface, "statistics/tx_bytes") or 0),
+        "internet_ping_ms": ping_result(internet),
+    }
+    if gateway:
+        result["router_ping_ms"] = ping_result(router)
+    return result
+
+
+# ---------------------------------------------------------------- Wi-Fi band (omarchy-network-band)
+
+
+NM_BANDS = {"2.4": "bg", "5": "a", "6": "6GHz"}
+
+
+def nm_get(*args: str) -> list[str]:
+    """nmcli -g values, unescaped (an SSID may contain ':')."""
+    code, out, _ = run_text(["nmcli", "-e", "no", "-g", *args])
+    return out.splitlines() if code == 0 else []
+
+
+def band_for_freq(freq: str) -> str:
+    digits = "".join(ch for ch in freq.split(".")[0] if ch.isdigit())
+    mhz = int(digits) if digits else 0
+    if 2400 <= mhz < 2500:
+        return "2.4"
+    if 4900 <= mhz < 5925:
+        return "5"
+    if 5925 <= mhz < 7125:
+        return "6"
+    return ""
+
+
+def wifi_device() -> str:
+    for line in nm_get("DEVICE,TYPE,STATE", "device", "status"):
+        dev, kind, state = (line.split(":", 2) + ["", ""])[:3]
+        if kind == "wifi" and state.startswith("connected"):
+            return dev
+    return ""
+
+
+def wifi_profile(dev: str) -> str:
+    values = nm_get("GENERAL.CONNECTION", "device", "show", dev)
+    return values[0] if values else ""
+
+
+def band_status() -> dict:
+    dev = wifi_device()
+    if not dev:
+        return {}
+    # FREQ first, SSID last: an SSID with ':' is joined back together
+    aps = []
+    for line in nm_get("IN-USE,FREQ,SSID", "device", "wifi", "list", "ifname", dev, "--rescan", "no"):
+        in_use, freq, ssid = (line.split(":", 2) + ["", ""])[:3]
+        aps.append((in_use == "*", freq, ssid))
+    current = next(((freq, ssid) for used, freq, ssid in aps if used), None)
+    if not current:
+        return {}
+    band, ssid = band_for_freq(current[0]), current[1]
+    # Every band the network answers on (the one in use always counts); a pin to a band
+    # it doesn't answer on would drop the connection
+    available = {band} | {band_for_freq(freq) for _, freq, name in aps if name == ssid}
+    available.discard("")
+    selected = (nm_get("802-11-wireless.band", "connection", "show", wifi_profile(dev)) or [""])[0]
+    selected = {v: k for k, v in NM_BANDS.items()}.get(selected, "auto")
+    return {"band": band, "available": sorted(available, key=float), "selected": selected}
+
+
+def set_band(target: str) -> int:
+    dev = wifi_device()
+    profile = wifi_profile(dev) if dev else ""
+    if not profile:
+        print("no connected Wi-Fi", file=sys.stderr)
+        return 1
+    if target != "auto" and target not in band_status().get("available", []):
+        print(f"{target} GHz is not available on this network", file=sys.stderr)
+        return 1
+    desired = "" if target == "auto" else NM_BANDS[target]
+    previous = (nm_get("802-11-wireless.band", "connection", "show", profile) or [""])[0]
+    if previous == desired:
+        return 0
+    run_text(["nmcli", "connection", "modify", profile, "802-11-wireless.band", desired])
+    # The band changes on reassociation; if it can't come back up there, put the old
+    # setting back rather than leave the machine offline
+    if run_text(["nmcli", "connection", "up", profile])[0] != 0:
+        run_text(["nmcli", "connection", "modify", profile, "802-11-wireless.band", previous])
+        run_text(["nmcli", "connection", "up", profile])
+        print(f"could not connect on {target} GHz; went back to the previous band", file=sys.stderr)
+        return 1
+    return 0
+
+
+# ---------------------------------------------------------------- QR code and password (omarchy-network-qr, -password)
+
+
+def wifi_secrets(iface: str) -> dict:
+    """SSID, security and password of the Wi-Fi connection active on iface."""
+    uuid = (nm_get("GENERAL.CON-UUID", "device", "show", iface) or [""])[0]
+    if not uuid or uuid == "--":
+        raise ValueError("No active Wi-Fi connection")
+    code, out, _ = run_text(["nmcli", "--show-secrets", "-e", "no", "-g",
+                             "802-11-wireless.ssid,802-11-wireless-security.key-mgmt,802-11-wireless-security.psk,"
+                             "802-11-wireless.hidden,802-11-wireless-security.wep-key0", "connection", "show", "uuid", uuid])
+    ssid, key_mgmt, psk, hidden, wep = (out.splitlines() + [""] * 5)[:5]
+    if not ssid:
+        raise ValueError("Could not read the Wi-Fi name")
+    if "eap" in key_mgmt or "ieee8021x" in key_mgmt:
+        raise ValueError("Enterprise Wi-Fi has no shareable password")
+    if key_mgmt and key_mgmt != "none":
+        security, password = "WPA", psk
+    elif wep:
+        security, password = "WEP", wep  # NetworkManager: key-mgmt "none" plus a WEP key
+    else:
+        security, password = "nopass", ""
+    if security != "nopass" and not password:
+        raise ValueError("Could not read the Wi-Fi password")
+    return {"ssid": ssid, "security": security, "password": password, "hidden": hidden == "yes"}
+
+
+def qr_escape(value: str) -> str:
+    for ch in "\\;,:":
+        value = value.replace(ch, "\\" + ch)
+    return value
+
+
+def qr(iface: str) -> int:
+    if not iface:
+        # the default route's device when it's Wi-Fi, else the first connected Wi-Fi
+        dev = default_route().get("dev", "")
+        iface = dev if dev and Path(f"/sys/class/net/{dev}/wireless").is_dir() else wifi_device()
+    try:
+        if not iface:
+            raise ValueError("No active Wi-Fi connection")
+        secrets = wifi_secrets(iface)
+    except ValueError as e:
+        print(e, file=sys.stderr)
+        return 1
+    payload = f"WIFI:T:{secrets['security']};S:{qr_escape(secrets['ssid'])};P:{qr_escape(secrets['password'])};"
+    if secrets["hidden"]:
+        payload += "H:true;"
+    payload += ";"
+    # ASCII art is two characters per module: one 0/1 per pair. Margin 4 is the quiet zone.
+    code, out, err = run_text(["qrencode", "--type", "ASCII", "--margin", "4", "--output", "-"], stdin=payload)
+    if code != 0:
+        print(err or "Could not make the QR code", file=sys.stderr)
+        return 1
+    matrix = ["".join("1" if "#" in line[i:i + 2] else "0" for i in range(0, len(line), 2)) for line in out.splitlines() if line]
+    print(json.dumps({"iface": iface, "ssid": secrets["ssid"], "security": secrets["security"], "rows": matrix}))
+    return 0
+
+
+def password(iface: str) -> int:
+    try:
+        secrets = wifi_secrets(iface)
+    except ValueError as e:
+        print(e, file=sys.stderr)
+        return 1
+    if not secrets["password"]:
+        print("This network has no password", file=sys.stderr)
+        return 1
+    print(secrets["password"])
+    return 0
+
+
+# ---------------------------------------------------------------- WPA-Enterprise
+
+
+def eap(ssid: str, identity: str) -> int:
+    """PEAP/MSCHAPv2 profile; the password comes on stdin and goes to nmcli's editor on
+    stdin too, never as an argument (arguments are readable in /proc)."""
+    secret = sys.stdin.readline().rstrip("\n")
+    uuid = run_text(["uuidgen"])[1].strip()
+    code, _, err = run_text(["nmcli", "connection", "add", "type", "wifi", "con-name", ssid, "ssid", ssid,
+                             "connection.uuid", uuid, "wifi-sec.key-mgmt", "wpa-eap", "802-1x.eap", "peap",
+                             "802-1x.phase2-auth", "mschapv2", "802-1x.identity", identity, "802-1x.auth-timeout", "8"])
+    if code == 0:
+        code, _, err = run_text(["nmcli", "connection", "edit", "uuid", uuid],
+                                stdin=f"set 802-1x.password {secret}\nsave\nquit\n")
+    if code == 0:
+        code, _, err = run_text(["nmcli", "connection", "up", "uuid", uuid])
+    if code != 0:
+        run_text(["nmcli", "connection", "delete", "uuid", uuid])
+        print(err or "Connection failed", file=sys.stderr)
+    return code
+
+
 def main(argv: list[str]) -> int:
     if not argv or argv[0] in ("-h", "--help"):
         print(__doc__.strip())
@@ -264,6 +527,20 @@ def main(argv: list[str]) -> int:
         return set_dns("custom", args[1])
     elif cmd == "speedtest":
         return speedtest()
+    elif cmd == "stats" and not args:
+        print(json.dumps(stats()))
+        return 0
+    elif cmd == "band" and not args:
+        print(json.dumps(band_status()))
+        return 0
+    elif cmd == "band" and len(args) == 1 and args[0] in ("auto", *NM_BANDS):
+        return set_band(args[0])
+    elif cmd == "qr" and len(args) <= 1:
+        return qr(args[0] if args else "")
+    elif cmd == "password" and len(args) == 1:
+        return password(args[0])
+    elif cmd == "eap" and len(args) == 2:
+        return eap(args[0], args[1])
     else:
         print(__doc__.strip(), file=sys.stderr)
         return 1

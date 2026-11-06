@@ -56,6 +56,7 @@ jq
 socat
 curl
 wget
+qrencode                 # the Wi-Fi QR code (network dropdown)
 speedtest-cli
 glib2
 gtk3
