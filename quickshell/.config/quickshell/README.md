@@ -219,7 +219,8 @@ off, pick the primary, change resolution and scale (only scales Hyprland
 accepts for that mode), set brightness (laptop backlight, or DDC/CI with
 `ddcutil`), set variable refresh rate (off, always, fullscreen, fullscreen games and video; only
 where the screen supports it) and the color mode (sRGB, the panel's own colors from its EDID, and HDR
-where supported), assign workspaces, and set the text size in px. Text size sets the shell font, the
+where supported), assign workspaces, and set the text size in px (13 by default, kept per combination of monitors
+like the rest, so plugging a setup in brings its size back). Text size sets the shell font, the
 GTK and Qt font size in points (13 px is 10 pt) and kitty's font size. Apply writes
 `~/.config/hypr/configs/generated/monitors.lua` and reloads Hyprland.
 Brightness changes right away.
