@@ -14,18 +14,16 @@ import Quickshell.Services.Pam
 // - locking waits until a real screen is there: after a sleep the monitors come back one
 //   by one, and with the laptop's screen off there's a moment with only Hyprland's
 //   FALLBACK output;
-// - the lock outlives the shell: its state is kept in the runtime folder, so a reload
-//   (editing a shell file) or a restart after a crash locks again at once. Hyprland keeps
-//   the session locked meanwhile (misc:allow_session_lock_restore lets the new one in).
+// - the lock outlives the shell: Hyprland keeps the session locked when the shell goes
+//   away (a reload, or a crash), and a shell starting while Hyprland holds a lock nobody
+//   else draws locks again at once (misc:allow_session_lock_restore lets it in).
 Singleton {
     id: root
 
     readonly property string userName: Quickshell.env("USER")
-    readonly property string stateFile: Quickshell.env("XDG_RUNTIME_DIR") + "/quickshell-lock"
 
-    // Asked to lock: true from lock() until the right password. Read from the state file
-    // when the shell starts, before the lock surfaces exist.
-    property bool locked: lockState.text().trim() === "locked"
+    // Asked to lock: true from lock() until the right password
+    property bool locked: false
     // The session lock is up on every screen (WlSessionLock.secure)
     property bool secure: false
     // The monitor with the clock and password: the one focused when locking
@@ -71,20 +69,27 @@ Singleton {
     }
 
     onLockedChanged: {
-        lockState.setText(locked ? "locked\n" : "unlocked\n");
         setCursorHidden(locked);
         if (locked)
             checkCapsLock();
     }
 
-    Component.onCompleted: setCursorHidden(locked)
+    Component.onCompleted: {
+        setCursorHidden(false);
+        strandedProc.running = true;
+    }
 
-    FileView {
-        id: lockState
+    // Hyprland lists a held session lock (LOCK) among the reasons a monitor can't go
+    // solitary, and keeps it when the lock screen's program is gone. Held with no other
+    // lock program running, it's this shell's from before a reload or crash: lock again.
+    Process {
+        id: strandedProc
 
-        path: root.stateFile
-        blockLoading: true
-        printErrors: false
+        command: ["sh", "-c", "! pgrep -x hyprlock >/dev/null && hyprctl -j monitors | jq -e 'any(.[]; (.solitaryBlockedBy // []) | index(\"LOCK\"))' >/dev/null"]
+        onExited: code => {
+            if (code === 0)
+                root.lock();
+        }
     }
 
     PamContext {
