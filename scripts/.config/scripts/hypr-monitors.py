@@ -9,6 +9,7 @@ current live layout, and workspaces are split across the monitors.
 
   hypr-monitors.py [apply]              apply the profile for the connected monitors
   hypr-monitors.py hotplug              same, from Hyprland's monitor.added/removed events
+                                        (while the screen is locked, once it's unlocked)
   hypr-monitors.py startup              same, at login (waits for late outputs)
   hypr-monitors.py state                print the current profile as JSON (Quickshell)
   hypr-monitors.py set '<json>'         save and apply changes from Quickshell
@@ -634,6 +635,37 @@ def handled_just_now(key: str) -> bool:
         return False
 
 
+LOCKSCREEN_LOCK = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "lockscreen.lock"
+
+
+def locked() -> bool:
+    """hyprlock is up, or lockscreen.sh is (it holds its lock file for the whole lock,
+    also in the moment between a crashed hyprlock and the one taking over)."""
+    if subprocess.run(["pidof", "hyprlock"], stdout=subprocess.DEVNULL).returncode == 0:
+        return True
+    try:
+        with open(LOCKSCREEN_LOCK, "a") as f:
+            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            fcntl.flock(f, fcntl.LOCK_UN)
+    except BlockingIOError:
+        return True
+    except OSError:
+        pass
+    return False
+
+
+def wait_for_unlock() -> None:
+    """No reload under the lock screen: monitors coming back from sleep one by one made a
+    reload with half of them, and hyprlock crashed. Outputs added meanwhile use the
+    catch-all monitor rule; the profile is applied once unlocked."""
+    if not locked():
+        return
+    log("screen locked: waiting to apply the monitor profile until it's unlocked")
+    while locked():
+        time.sleep(2)
+    time.sleep(1)
+
+
 def hotplug(startup: bool = False) -> int:
     """Monitors were plugged in or out (or the session just started): switch
     to the saved profile for the connected set. Waits for the set to settle;
@@ -645,8 +677,12 @@ def hotplug(startup: bool = False) -> int:
             fcntl.flock(lock, fcntl.LOCK_EX if startup else fcntl.LOCK_EX | fcntl.LOCK_NB)
         except BlockingIOError:
             return 0  # another run is handling it
+        wait_for_unlock()
         live = settle()
         for _ in range(5):
+            if locked():
+                wait_for_unlock()
+                live = settle()
             if not live:
                 return 1
             DUPLICATES.clear()
