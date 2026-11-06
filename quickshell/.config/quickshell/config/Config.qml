@@ -108,13 +108,11 @@ Singleton {
     property alias cava: adapter.cava
     property alias cavaBars: adapter.cavaBars
 
-    // Idle (hypridle, through services/Idle.qml): minutes until the screen locks, the screens
-    // go off and the machine sleeps; 0 is never. The *Battery ones apply on battery.
+    // Idle (services/Idle.qml): minutes until the screen locks and the machine sleeps; 0 is
+    // never. The *Battery ones apply on battery.
     property alias idleLock: adapter.idleLock
-    property alias idleScreenOff: adapter.idleScreenOff
     property alias idleSuspend: adapter.idleSuspend
     property alias idleLockBattery: adapter.idleLockBattery
-    property alias idleScreenOffBattery: adapter.idleScreenOffBattery
     property alias idleSuspendBattery: adapter.idleSuspendBattery
 
     // Window gaps (Hyprland), normal and in Work-Game
@@ -207,10 +205,8 @@ Singleton {
         adapter.gameGapsIn = 3;
         adapter.gameGapsOut = 6;
         adapter.idleLock = 10;
-        adapter.idleScreenOff = 20;
         adapter.idleSuspend = 30;
         adapter.idleLockBattery = 5;
-        adapter.idleScreenOffBattery = 10;
         adapter.idleSuspendBattery = 15;
         adapter.version = root.version;
     }
@@ -325,10 +321,8 @@ Singleton {
             property int gameGapsIn: 3
             property int gameGapsOut: 6
             property int idleLock: 10
-            property int idleScreenOff: 20
             property int idleSuspend: 30
             property int idleLockBattery: 5
-            property int idleScreenOffBattery: 10
             property int idleSuspendBattery: 15
         }
     }

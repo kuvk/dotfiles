@@ -37,11 +37,11 @@ together: the shell, the lock screen and the theme switcher call each other.
 
 | Package | What it has |
 |---|---|
-| `hypr` | Hyprland config in Lua, hypridle, Work-Game, window rules. `SUPER+/` lists every key |
+| `hypr` | Hyprland config in Lua, Work-Game, window rules. `SUPER+/` lists every key |
 | `quickshell` | Bar, notifications, launchers, clipboard history, panels, settings. See [its README](quickshell/.config/quickshell/README.md) |
 | `theme` | One palette rendered into every app, with live reloads. See [its README](theme/.config/theme/README.md) |
 | `scripts` | `theme-set.py`, `wallpaper.py`, `logo-wallpaper.py` (wallpapers with the logo), `logo-render.py` (draws the logo like kitty does), `theme-boot.sh` (boot splash and menu in the current theme), `hypr-monitors.py`, `shell.sh` (starts the shell, again after a crash), `webapp.py`, `network.py`, `update.sh` (updates everything), `sysmaintenance.sh` (cleans up) and others |
-| `sddm` | Login screen (`kuvk/`, the QML theme), laid out like the lock screen: your wallpaper, fonts, cursor, monitor scales and Lock Screen settings. `hyprland.lua` is the greeter's own Hyprland config (it picks the boot GPU and sets your cursor) and `sddm.conf` points SDDM at it. Not stowed; install with `sudo sddm/install.sh` |
+| `sddm` | Login screen (`kuvk/`, the QML theme), laid out like the lock screen: your wallpaper, fonts, cursor, monitor scales and Lock Screen settings. `hyprland.lua` is the greeter's own Hyprland config (it sets your cursor and monitor layout) and `sddm.conf` points SDDM at it. Not stowed; install with `sudo sddm/install.sh` |
 | `plymouth` | Boot splash: the logo (`theme/logo/ascii-dori`), a password field for the encrypted drives and a progress bar. Not stowed; install with `sudo plymouth/install.sh`, which uses the current theme's colors (`--preview FILE` to see it first). After a theme change, the **Update** notification or `theme-boot.sh` reinstalls it and the boot menu |
 | `limine` | Boot menu: the logo above an Omarchy-style tree of kernels, in the theme's colors. Not stowed; install with `sudo limine/install.sh`, which uses the current theme's colors; `theme-boot.sh` reruns it after a theme change (`--resolution WxH`, `--print` for the config, `--preview FILE` for the wallpaper) |
 | `packages` | Package lists for `install.sh`: `core.txt` (needed), `apps.txt` (apps with window rules), `vm.txt` (virtual machines and Docker), `flatpak.txt`, `nvidia.txt`, `intel.txt`, `laptop.txt` (ASUS ROG, g14 repo), `desktop.txt`. Not stowed |

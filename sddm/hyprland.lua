@@ -1,21 +1,8 @@
 -- The greeter's compositor, /usr/share/sddm/hypr/hyprland.lua, installed by sddm/install.sh
 
--- Only the GPU that drives the built-in screen (the kernel's boot display). Leaving the other
--- (NVIDIA, with the HDMI port) untouched spares the session a 3 s "Flip event timeout" when it
--- takes that screen over after login. Card numbers can swap between boots, so look it up.
-local boot_card
-for i = 0, 7 do
-  local f = io.open("/sys/class/drm/card" .. i .. "/device/boot_vga")
-  if f then
-    local value = f:read("l")
-    f:close()
-    if value == "1" then
-      boot_card = "/dev/dri/card" .. i
-      break
-    end
-  end
-end
-hl.env("AQ_DRM_DEVICES", boot_card or "/dev/dri/card1:/dev/dri/card0")
+-- Every GPU, the order left to aquamarine. Picking only the boot display's GPU (AQ_DRM_DEVICES)
+-- showed the login screen on the laptop's screen alone, and the same setting broke Hyprland 0.57.1
+-- in the session.
 
 -- Your cursor from Settings (theme-set.py writes it), if the greeter can read that theme.
 -- Read as data, as below.
@@ -47,7 +34,7 @@ hl.config({
   input = {
     kb_layout = "us",
     kb_options = "ctrl:nocaps",
-    numlock_by_default = true,
+    -- numlock_by_default = true,
     touchpad = {
       disable_while_typing = true,
       tap_to_click = true,

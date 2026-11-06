@@ -12,7 +12,7 @@ Singleton {
     readonly property string scripts: Quickshell.env("HOME") + "/.config/scripts/"
 
     property bool nightlight: false
-    // Holds a systemd idle inhibitor, which hypridle respects
+    // Holds idle off: no idle lock or sleep (services/Idle.qml)
     property bool stayAwake: false
     // Work-Game: "normal", "work" or "game" (hypr-gamemode.sh reports it over IPC)
     property string mode: "normal"
@@ -21,7 +21,7 @@ Singleton {
     readonly property string modeLabel: ({ normal: "Off", work: "Work", game: "Game" })[mode] ?? "Off"
     // Stay Awake was switched on by Game mode, so leaving it switches it off
     property bool awakeForGamemode: false
-    // Something is playing: keep the screen awake
+    // Something is playing: idle is held off too
     readonly property bool mediaPlaying: Media.players.some(p => p.isPlaying)
 
     // Work-Game makes the bar full width; SUPER+CTRL+B can still float it while it
@@ -150,7 +150,7 @@ Singleton {
             Lock.lock();
             break;
         case "suspend":
-            // hypridle locks before sleeping (before_sleep_cmd)
+            // scripts/sleep-lock.sh locks before sleeping
             Quickshell.execDetached(["systemctl", "suspend"]);
             break;
         // hyprshutdown asks every app to close (an app with unsaved work can ask first), exits
@@ -173,16 +173,6 @@ Singleton {
     }
 
     Component.onCompleted: refresh()
-
-    Process {
-        running: root.stayAwake
-        command: ["systemd-inhibit", "--what=idle", "--who=quickshell", "--why=Stay awake", "sleep", "infinity"]
-    }
-
-    Process {
-        running: root.mediaPlaying && !root.stayAwake
-        command: ["systemd-inhibit", "--what=idle", "--who=quickshell", "--why=Media playing", "sleep", "infinity"]
-    }
 
     Timer {
         id: delayedRefresh

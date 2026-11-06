@@ -32,7 +32,7 @@ can own the D-Bus name.
 | System tray, themed right-click menus | `modules/bar/Tray.qml`, `modules/dropdowns/TrayMenu.qml` | hover the arrow; right-click an icon |
 | Battery, power mode (Quiet / Balanced / Performance) | `modules/dropdowns/BatteryDropdown.qml` | click the battery |
 | Night light | `scripts/nightlight-toggle.sh` + `services/System.qml` | the Control Center tile, or `SUPER+CTRL+N`; temperature and schedule in Settings |
-| Stay awake | `services/System.qml` | the coffee icon (holds an idle inhibitor); while media plays an inhibitor is held automatically |
+| Stay awake | `services/System.qml` | the coffee icon: no idle lock or sleep; the same while media plays |
 | Work-Game: **Work** mode (no blur, animations or rounding, own gaps, live wallpapers paused) and **Game** mode (the same, plus a plain US keyboard and Stay Awake) | `scripts/hypr-gamemode.sh` + `services/System.qml` | `SUPER+G` Work, `SUPER+CTRL+G` Game (each again for off); the rocket icon or Control Center tile goes normal, Work, Game. The icon is mauve in Work, accent3 in Game |
 | Displays | `modules/displays/DisplaysPanel.qml` | the monitor icon, or `SUPER+CTRL+M` |
 | Notification popups, with actions and inline replies; web apps show their own name and icon | `modules/notifications/NotificationPopups.qml` | |
@@ -42,7 +42,7 @@ can own the D-Bus name.
 | App menu: categories on the left, apps on the right | `modules/launcher/AppMenu.qml` + `services/Apps.qml` | the Arch icon, or `SUPER+CTRL+Space` |
 | Theme carousel (each card the theme's palette as bars, type to search; other monitors are blurred) | `modules/themes/ThemePicker.qml` | `SUPER+CTRL+T`, or the Theme tile |
 | Power menu (log out, reboot and shut down go through hyprshutdown, which closes apps first) | `modules/powermenu/PowerMenu.qml` | `SUPER+CTRL+Q`, or the power icon |
-| Lock screen (Settings > Lock Screen has a preview) | `modules/lock/` + `services/Lock.qml` | `` SUPER+` ``, the power menu, hypridle |
+| Lock screen (Settings > Lock Screen has a preview) | `modules/lock/` + `services/Lock.qml` | `` SUPER+` ``, the power menu, idle, the lid, before every sleep |
 | Wallpaper carousel (type to search; other monitors are blurred) | `modules/wallpaper/WallpaperPicker.qml` | `SUPER+W`, Tab for live wallpapers |
 | System information (fastfetch's output drawn cell by cell like kitty, in a window sized to it; it opens once the output is ready, Ctrl+C copies it) | `modules/sysinfo/SysinfoWindow.qml` | the ⓘ button in the app menu and Control Center |
 | Keybindings (built from `bindings.lua`, type to filter) | `modules/keybinds/KeybindsWindow.qml` + `scripts/hypr-keybinds.py` | `SUPER+/` |
@@ -80,8 +80,8 @@ display font, "Nerd Fonts only" and "Use Nerd Symbols font" switches, hinting an
 margins and rounded corners, clock format, weather location and unit, and which modules show on the primary monitor's bar and on
 the others; the clock always shows), Windows (window buttons, gaps for regular
 and Work-Game), Notifications, Lock Screen (style; sections for the clock and date, avatar, box,
-password field and the login screen's power buttons), Idle (minutes until the screen locks, the
-screens go off and the machine sleeps; on a laptop a second set for battery),
+password field and the login screen's power buttons), Idle (minutes until the screen locks and the
+machine sleeps; on a laptop a second set for battery),
 and Tray & Player (tray icon style, apps that keep their own colors, the
 visualizer and its bar count). They are saved to Quickshell's state folder
 (`~/.local/state/quickshell/by-shell/<id>/settings.json`). **Save as defaults** writes them to
@@ -128,8 +128,10 @@ Screenshots (`hyprshot`) send their own notification. Neovim and yazi show their
 The lock screen is part of the shell (`modules/lock/`, `services/Lock.qml`), after
 [Omarchy](https://github.com/basecamp/omarchy)'s Quickshell lock (MIT). It's a Wayland session
 lock: a surface on every monitor, with the clock and password on the one focused when locking (or
-the first one left if that monitor is gone). `` SUPER+` ``, the power menu and hypridle
-(`loginctl lock-session`, before sleep) lock it with `qs ipc call lock lock`.
+the first one left if that monitor is gone). `` SUPER+` ``, the power menu, the idle timer, the lid
+and every suspend lock it (`qs ipc call lock lock`). It stays on screen until the machine sleeps:
+unlike Omarchy's lock it doesn't turn the screens off, as Hyprland on the laptop's Intel + NVIDIA
+crashed when the NVIDIA GPU was left without a lit output.
 
 - **Password:** checked by the system's PAM stack (`/etc/pam.d/login`, the same as hyprlock
   used), so nothing in your home folder decides it. Keys typed on any monitor count.
@@ -152,14 +154,28 @@ the login screen's power buttons (background with opacity, icons, outline). **Pr
 without locking. The login screen (`sddm/kuvk`) uses the same settings, sizes and positions, and
 always the wallpaper as its background.
 
-## Idle
+## Idle and sleep
 
-hypridle does the idle work: `hypr/hypridle.conf` has the lock and sleep commands and sources
-`~/.config/hypr/configs/generated/hypridle.conf`, which the shell writes from Settings > Idle
-(`services/Idle.qml`). On a machine with a battery the battery times apply while unplugged. hypridle
-reads its config only when it starts, so the shell starts it, and restarts it when the times or the
-power source change; idle time then counts from that moment. Stay Awake and playing media hold it
-off (systemd idle inhibitors).
+The shell does idle itself, after [Omarchy](https://github.com/basecamp/omarchy)'s idle service and
+sleep lock (MIT); there's no hypridle.
+
+- **Idle** (`services/Idle.qml`): Hyprland reports the idle time (Quickshell's `IdleMonitor`, which
+  respects apps' own idle inhibitors, like a playing video). The screen locks and the machine
+  sleeps after the times in Settings > Idle, the battery ones while unplugged on a laptop; any
+  input starts over. Stay Awake and playing media hold both off. The screens go off when it sleeps.
+  The Displays panel reads monitor brightness (DDC/CI) only while it's open and the screen isn't
+  locked: probing the monitors as they woke from sleep upset them.
+- **Before every suspend** (the power menu, idle, the lid): `scripts/sleep-monitor.sh`, started at
+  login, holds a logind delay inhibitor; when logind announces the sleep it runs
+  `scripts/sleep-lock.sh`, which locks and waits until the lock is up on every screen, within
+  logind's delay window (`InhibitDelayMaxSec`: 15 s with the drop-in `install.sh` adds, 5 s
+  otherwise). If it can't, a notification says the session slept unlocked.
+- **The lid** (`scripts/lid-close.sh`, from `bindings.lua`): with no external monitor connected it
+  locks at once, and logind suspends (`HandleLidSwitch`, suspend by default, on battery and plugged in
+  alike). With one connected the laptop counts as docked: logind ignores the lid
+  (`HandleLidSwitchDocked`), nothing locks, and the laptop's screen stays a monitor (turn it off in
+  Displays). Unplugging the monitors with the lid closed makes logind suspend after a while, and
+  `sleep-lock.sh` locks first.
 
 ## Web apps
 

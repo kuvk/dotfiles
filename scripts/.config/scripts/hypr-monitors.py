@@ -362,35 +362,12 @@ def apply_text_size(size: int) -> None:
         run(["pkill", "-USR1", "-x", "kitty"])
 
 
-def boot_gpu_outputs() -> set[str] | None:
-    """Connector names (eDP-1, HDMI-A-1...) on the GPU the login screen uses: the kernel's
-    boot display, as sddm/hyprland.lua picks it. None if that can't be told."""
-    drm = Path("/sys/class/drm")
-    for card in drm.glob("card[0-9]*"):
-        if "-" in card.name:
-            continue
-        try:
-            if (card / "device/boot_vga").read_text().strip() != "1":
-                continue
-        except OSError:
-            continue
-        return {c.name.split("-", 1)[1] for c in drm.glob(card.name + "-*")}
-    return None
-
-
-def export_greeter_layout(data: dict, profile: dict, live: list[dict]) -> None:
-    """The login screen's monitors, one per line: output, scale, position, transform.
-    It only drives the boot GPU's monitors, so those take their own saved profile when there
-    is one (a laptop's screen alone, though a dGPU monitor is plugged in too); otherwise this
-    profile's layout (position "disabled" if turned off). Monitors not connected keep their
-    last scale at an automatic position, for when they're plugged in."""
+def export_greeter_layout(profile: dict, live: list[dict]) -> None:
+    """The login screen's monitors, one per line: output, scale, position, transform, as in
+    this profile (position "disabled" if turned off). Monitors not connected keep their last
+    scale at an automatic position, for when they're plugged in."""
     if not GREETER_LAYOUT.parent.is_dir():
         return
-    outputs = boot_gpu_outputs()
-    shown = [m for m in live if outputs is None or m["name"] in outputs] or live
-    if len(shown) < len(live):
-        profile = data["profiles"].get(profile_key(shown), profile)
-        live = shown
     rows: dict[str, tuple[str, str, str]] = {}
     try:
         for line in GREETER_LAYOUT.read_text().splitlines():
@@ -419,7 +396,7 @@ def export_greeter_layout(data: dict, profile: dict, live: list[dict]) -> None:
 
 def apply(data: dict, live: list[dict], *, force_reload: bool = False) -> None:
     key, profile = current_profile(data, live)
-    export_greeter_layout(data, profile, live)
+    export_greeter_layout(profile, live)
     content = render_lua(profile, live)
 
     GENERATED_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -609,7 +586,8 @@ def settle(timeout: float = 8.0) -> list[dict]:
 
 def wake_dark_monitors(data: dict, live: list[dict]) -> None:
     """A monitor that should be on but is disabled or has DPMS off after the
-    reload (seen right after login) gets one more reload and DPMS on."""
+    reload (seen right after login) gets one more reload and DPMS on. Only then: a
+    needless DPMS on forces another modeset, which blanks the screens for a moment."""
     _, profile = current_profile(data, live)
     wanted = {mid for mid, mon in profile["monitors"].items() if mon["enabled"]}
     now = live_monitors()
@@ -618,7 +596,7 @@ def wake_dark_monitors(data: dict, live: list[dict]) -> None:
         log(f"monitors still dark after applying: {', '.join(dark)}; reloading again")
         run(["hyprctl", "reload"])
         time.sleep(1)
-    run(["hyprctl", "dispatch", 'hl.dsp.dpms({ action = "on" })'])
+        run(["hyprctl", "dispatch", 'hl.dsp.dpms({ action = "on" })'])
 
 
 def last_run_id(key: str) -> str:
@@ -715,7 +693,7 @@ def main(argv: list[str]) -> int:
         log(f"apply: profile '{profile_key(live)}'")
         apply(data, live, force_reload="--reload" in argv)
     elif cmd == "export-greeter":
-        export_greeter_layout(data, current_profile(data, live)[1], live)
+        export_greeter_layout(current_profile(data, live)[1], live)
     elif cmd == "state":
         print(json.dumps(state(data, live)))
     elif cmd == "set" and len(argv) > 1:

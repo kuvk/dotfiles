@@ -42,8 +42,6 @@
   "iconTheme": "Papirus",
   "idleLock": 10,
   "idleLockBattery": 5,
-  "idleScreenOff": 20,
-  "idleScreenOffBattery": 10,
   "idleSuspend": 30,
   "idleSuspendBattery": 15,
   "lockAvatar": true,

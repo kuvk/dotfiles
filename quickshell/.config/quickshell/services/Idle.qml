@@ -2,61 +2,94 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
-import Quickshell.Io
 import Quickshell.Services.UPower
+import Quickshell.Wayland
 import qs.config
 
-// The idle times from Settings > Idle, for hypridle: lock, screens off, sleep. hypridle.conf
-// (in the repo) has the rest and sources the listeners written here. On a machine with a
-// battery, the battery times apply while unplugged. hypridle reads its config only when it
-// starts, so a change of times or of power source restarts it, which also counts idle time
-// from then on: unplugging after 7 idle minutes locks 5 minutes later, not never.
+// Idle: lock after Settings > Idle's lock time, sleep after its sleep time (the battery times
+// while unplugged on a machine with a battery). The lock stays on screen until then: the screens
+// go off when the machine sleeps (services/Lock.qml says why). After Omarchy's idle service (shell/plugins/services/idle,
+// github.com/basecamp/omarchy, MIT): Hyprland reports the idle time (ext-idle-notify,
+// apps' own idle inhibitors respected), one cycle per idle stretch with its deadlines set when
+// it starts, any input cancels it. Stay Awake and playing media hold it off.
 Singleton {
     id: root
 
-    readonly property string file: Quickshell.env("HOME") + "/.config/hypr/configs/generated/hypridle.conf"
     readonly property bool onBattery: Battery.available && UPower.onBattery
-
     readonly property int lockMinutes: onBattery ? Config.idleLockBattery : Config.idleLock
-    readonly property int screenOffMinutes: onBattery ? Config.idleScreenOffBattery : Config.idleScreenOff
-    readonly property int suspendMinutes: onBattery ? Config.idleSuspendBattery : Config.idleSuspend
+    readonly property int sleepMinutes: onBattery ? Config.idleSuspendBattery : Config.idleSuspend
+    // 0 is never, not "at once"
+    readonly property real firstMinutes: Math.min(lockMinutes || Infinity, sleepMinutes || Infinity)
+    readonly property bool enabled: !System.stayAwake && !System.mediaPlaying && firstMinutes !== Infinity
 
-    readonly property string listeners: {
-        const out = [`# Written by Quickshell (services/Idle.qml) from Settings > Idle${onBattery ? ", on battery" : ""}; sourced by hypridle.conf\n`];
-        const listener = (minutes, timeout, resume) => {
-            if (minutes > 0)
-                out.push(`listener {\n    timeout = ${minutes * 60}\n    on-timeout = ${timeout}\n${resume ? `    on-resume = ${resume}\n` : ""}}\n`);
-        };
-        listener(lockMinutes, "loginctl lock-session");
-        listener(screenOffMinutes, `hyprctl dispatch 'hl.dsp.dpms({ action = "off" })'`, `sleep 1; hyprctl dispatch 'hl.dsp.dpms({ action = "on" })'`);
-        listener(suspendMinutes, "systemctl suspend");
-        return out.join("\n");
-    }
-
-    // Steppers change the times one step at a time: write once they settle
-    onListenersChanged: applyDelay.restart()
-    Component.onCompleted: applyDelay.restart()
+    property bool inCycle: false
+    // The idle monitor goes on a few seconds after the shell starts: made at once, at login, it
+    // was never told about idle (after a shell reload it was)
+    property bool started: false
 
     Timer {
-        id: applyDelay
+        interval: 5000
+        running: true
+        onTriggered: root.started = true
+    }
 
-        interval: 1000
-        onTriggered: {
-            if (generated.text() !== root.listeners) {
-                generated.setText(root.listeners);
-                Quickshell.execDetached(["sh", "-c", "pkill -x hypridle; while pgrep -x hypridle >/dev/null; do sleep 0.1; done; exec hypridle"]);
-            } else {
-                // after a shell restart, or a first start with the file already right
-                Quickshell.execDetached(["sh", "-c", "pgrep -x hypridle >/dev/null || exec hypridle"]);
-            }
+    function startCycle(): void {
+        if (inCycle)
+            return;
+        inCycle = true;
+        // the deadlines of this idle stretch: a change of settings applies from the next
+        arm(lockTimer, lockMinutes);
+        arm(sleepTimer, sleepMinutes);
+    }
+
+    function arm(timer: Timer, minutes: int): void {
+        if (minutes <= 0)
+            return;
+        const ms = (minutes - firstMinutes) * 60000;
+        if (ms <= 0)
+            timer.triggered();
+        else {
+            timer.interval = ms;
+            timer.restart();
         }
     }
 
-    FileView {
-        id: generated
+    function cancelCycle(): void {
+        inCycle = false;
+        lockTimer.stop();
+        sleepTimer.stop();
+    }
 
-        path: root.file
-        blockLoading: true
-        printErrors: false
+    onEnabledChanged: if (!enabled) cancelCycle()
+
+    // qs ipc call idle status
+    function status(): string {
+        return JSON.stringify({
+            enabled, started, stayAwake: System.stayAwake, mediaPlaying: System.mediaPlaying, onBattery,
+            lockMinutes, sleepMinutes, idleAfterSeconds: monitor.timeout, idle: monitor.isIdle, inCycle,
+            lockIn: lockTimer.running ? lockTimer.interval / 1000 : null, sleepIn: sleepTimer.running ? sleepTimer.interval / 1000 : null
+        });
+    }
+
+    IdleMonitor {
+        id: monitor
+
+        enabled: root.enabled && root.started
+        timeout: root.enabled ? root.firstMinutes * 60 : 60
+        respectInhibitors: true
+        onIsIdleChanged: isIdle ? root.startCycle() : root.cancelCycle()
+    }
+
+    Timer {
+        id: lockTimer
+
+        onTriggered: if (root.inCycle) Lock.lock()
+    }
+
+    // The lock comes first: scripts/sleep-lock.sh locks before every suspend
+    Timer {
+        id: sleepTimer
+
+        onTriggered: if (root.inCycle) Quickshell.execDetached(["systemctl", "suspend"])
     }
 }

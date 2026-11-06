@@ -165,6 +165,13 @@ vm=false
 for unit in "${services[@]}"; do
     if sudo systemctl enable "$unit" &>/dev/null; then echo "Enabled $unit"; else note "Couldn't enable $unit"; fi
 done
+# The lock screen gets up to 15 s, not logind's 5, to come up before a suspend
+# (scripts/sleep-lock.sh). logind reads it on reload.
+sudo install -Dm644 /dev/stdin /etc/systemd/logind.conf.d/20-inhibit-delay.conf <<'EOF'
+[Login]
+InhibitDelayMaxSec=15
+EOF
+sudo systemctl reload systemd-logind || note "Couldn't reload logind; the longer lock delay applies after a reboot"
 if $vm; then
     # VMs without a password prompt, and libvirt's NAT network up on every boot
     sudo usermod -aG libvirt "$USER"

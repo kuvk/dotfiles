@@ -824,7 +824,7 @@ FloatingWindow {
 
                             StyledText {
                                 Layout.fillWidth: true
-                                text: "Idle time until each happens, counted from the last key or mouse movement. Stay Awake and playing media hold all of them off."
+                                text: "Idle time until each happens, counted from the last key or mouse movement. The lock screen stays up until the machine sleeps, which turns the screens off. Stay Awake and playing media hold both off."
                                 color: Theme.subtext0
                                 wrapMode: Text.Wrap
                             }
@@ -832,10 +832,10 @@ FloatingWindow {
                             Repeater {
                                 // the battery set only where there is a battery
                                 model: Battery.available ? [
-                                    { title: "Plugged in", now: !Idle.onBattery, keys: ["idleLock", "idleScreenOff", "idleSuspend"] },
-                                    { title: "On battery", now: Idle.onBattery, keys: ["idleLockBattery", "idleScreenOffBattery", "idleSuspendBattery"] }
+                                    { title: "Plugged in", now: !Idle.onBattery, keys: ["idleLock", "idleSuspend"] },
+                                    { title: "On battery", now: Idle.onBattery, keys: ["idleLockBattery", "idleSuspendBattery"] }
                                 ] : [
-                                    { title: "", now: true, keys: ["idleLock", "idleScreenOff", "idleSuspend"] }
+                                    { title: "", now: true, keys: ["idleLock", "idleSuspend"] }
                                 ]
 
                                 ColumnLayout {
@@ -854,8 +854,7 @@ FloatingWindow {
                                     Repeater {
                                         model: [
                                             { label: "Lock the screen", key: idleSet.modelData.keys[0] },
-                                            { label: "Turn the screens off", key: idleSet.modelData.keys[1] },
-                                            { label: "Sleep", key: idleSet.modelData.keys[2] }
+                                            { label: "Sleep", key: idleSet.modelData.keys[1] }
                                         ]
 
                                         SettingRow {
