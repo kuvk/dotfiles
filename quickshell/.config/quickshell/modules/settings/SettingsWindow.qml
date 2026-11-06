@@ -21,6 +21,7 @@ FloatingWindow {
         { id: "windows", label: "Windows", icon: Icons.display },
         { id: "notifications", label: "Notifications", icon: Icons.bell },
         { id: "lock", label: "Lock Screen", icon: Icons.lock },
+        { id: "idle", label: "Idle", icon: Icons.bed },
         { id: "nightlight", label: "Night Light", icon: Icons.nightlight },
         { id: "tray", label: "Tray & Player", icon: Icons.music }
     ]
@@ -31,6 +32,17 @@ FloatingWindow {
     function cycle(list: var, value: var, step: int): var {
         const i = Math.max(0, list.indexOf(value));
         return list[(i + step + list.length) % list.length];
+    }
+
+    // Settings > Idle: minutes, 0 is never
+    readonly property var idleSteps: [0, 1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120, 180]
+
+    function minutesText(minutes: int): string {
+        if (minutes === 0)
+            return "Never";
+        if (minutes < 60)
+            return `${minutes} min`;
+        return `${Math.floor(minutes / 60)} h` + (minutes % 60 ? ` ${minutes % 60} min` : "");
     }
 
     // "HH:mm" moved by some minutes, wrapping around midnight
@@ -679,7 +691,7 @@ FloatingWindow {
 
                             // Sections: each part of the lock screen, and the login screen's power
                             // buttons. Colors also go to the login screen (theme-set.py --login).
-                            LockSection {
+                            SettingsHeading {
                                 text: "Clock and date"
                             }
 
@@ -697,7 +709,7 @@ FloatingWindow {
                                 onEdited: loginApply.restart()
                             }
 
-                            LockSection {
+                            SettingsHeading {
                                 text: "Avatar"
                             }
 
@@ -715,7 +727,7 @@ FloatingWindow {
                                 onEdited: loginApply.restart()
                             }
 
-                            LockSection {
+                            SettingsHeading {
                                 text: "Box"
                             }
 
@@ -741,7 +753,7 @@ FloatingWindow {
                                 onEdited: loginApply.restart()
                             }
 
-                            LockSection {
+                            SettingsHeading {
                                 text: "Password field"
                             }
 
@@ -767,7 +779,7 @@ FloatingWindow {
                                 }
                             }
 
-                            LockSection {
+                            SettingsHeading {
                                 text: "Power buttons (login screen)"
                             }
 
@@ -801,6 +813,65 @@ FloatingWindow {
                             TextButton {
                                 text: "Preview"
                                 onClicked: Panels.lockPreview = true
+                            }
+                        }
+
+                        // ------------------------------------------------ Idle
+                        ColumnLayout {
+                            Layout.fillWidth: true
+                            visible: root.section === "idle"
+                            spacing: 12
+
+                            StyledText {
+                                Layout.fillWidth: true
+                                text: "Idle time until each happens, counted from the last key or mouse movement. Stay Awake and playing media hold all of them off."
+                                color: Theme.subtext0
+                                wrapMode: Text.Wrap
+                            }
+
+                            Repeater {
+                                // the battery set only where there is a battery
+                                model: Battery.available ? [
+                                    { title: "Plugged in", now: !Idle.onBattery, keys: ["idleLock", "idleScreenOff", "idleSuspend"] },
+                                    { title: "On battery", now: Idle.onBattery, keys: ["idleLockBattery", "idleScreenOffBattery", "idleSuspendBattery"] }
+                                ] : [
+                                    { title: "", now: true, keys: ["idleLock", "idleScreenOff", "idleSuspend"] }
+                                ]
+
+                                ColumnLayout {
+                                    id: idleSet
+
+                                    required property var modelData
+
+                                    Layout.fillWidth: true
+                                    spacing: 12
+
+                                    SettingsHeading {
+                                        visible: idleSet.modelData.title !== ""
+                                        text: idleSet.modelData.title + (idleSet.modelData.now ? "  (now)" : "")
+                                    }
+
+                                    Repeater {
+                                        model: [
+                                            { label: "Lock the screen", key: idleSet.modelData.keys[0] },
+                                            { label: "Turn the screens off", key: idleSet.modelData.keys[1] },
+                                            { label: "Sleep", key: idleSet.modelData.keys[2] }
+                                        ]
+
+                                        SettingRow {
+                                            id: idleRow
+
+                                            required property var modelData
+
+                                            label: modelData.label
+
+                                            Stepper {
+                                                text: root.minutesText(Config[idleRow.modelData.key])
+                                                onStep: d => Config[idleRow.modelData.key] = root.cycle(root.idleSteps, Config[idleRow.modelData.key], d)
+                                            }
+                                        }
+                                    }
+                                }
                             }
                         }
 

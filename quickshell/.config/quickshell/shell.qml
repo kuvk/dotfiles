@@ -32,6 +32,9 @@ ShellRoot {
     onSquareCornersChanged: applyShape()
     Component.onCompleted: applyShape()
 
+    // hypridle with the idle times from Settings, for the power source in use
+    readonly property bool idleOnBattery: Idle.onBattery
+
     Variants {
         model: Quickshell.screens
 

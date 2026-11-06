@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import qs.config
 import qs.components
 
-// A section heading in Settings > Lock Screen
+// A heading inside a Settings page (Lock Screen, Idle)
 StyledText {
     Layout.topMargin: 8
     font.weight: Font.Bold
