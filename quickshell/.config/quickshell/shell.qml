@@ -32,8 +32,8 @@ ShellRoot {
     onSquareCornersChanged: applyShape()
     Component.onCompleted: applyShape()
 
-    // hypridle with the idle times from Settings, for the power source in use
-    readonly property bool idleOnBattery: Idle.onBattery
+    // Idle lock and sleep, with the times from Settings for the power source in use
+    readonly property bool idleEnabled: Idle.enabled
 
     Variants {
         model: Quickshell.screens
@@ -187,7 +187,7 @@ ShellRoot {
         }
     }
 
-    // hypridle (lock_cmd, before_sleep_cmd) and SUPER+`
+    // SUPER+`, the idle timer, and scripts/sleep-lock.sh before every suspend
     IpcHandler {
         target: "lock"
 
@@ -197,6 +197,20 @@ ShellRoot {
 
         function isLocked(): bool {
             return Lock.locked;
+        }
+
+        // { requested, secure }: sleep-lock.sh waits for secure before letting the machine sleep
+        function status(): string {
+            return JSON.stringify({ requested: Lock.locked, secure: Lock.secure });
+        }
+    }
+
+    IpcHandler {
+        target: "idle"
+
+        // what idle is doing, and what holds it off
+        function status(): string {
+            return Idle.status();
         }
     }
 

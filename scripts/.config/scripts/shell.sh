@@ -4,9 +4,20 @@
 # still holds a lock). Stops with Hyprland, when the shell quits on its own (exit 0), or after
 # it failed within seconds of starting 5 times in a row: Hyprland restarted after its own crash
 # can refuse it, and retrying wouldn't help (journalctl -t shell.sh says so).
-socket="$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/.socket.sock"
+
+# Hyprland is still running: its pid in hyprland.lock (a crashed one leaves its socket file behind)
+hyprland_lock="$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/hyprland.lock"
+hyprland_alive() {
+    local pid
+    read -r pid 2>/dev/null <"$hyprland_lock" && kill -0 "$pid" 2>/dev/null
+}
+# At login autostart can run before Hyprland has written its lock file (a few tenths of a second)
+for _ in {1..50}; do
+    [[ -s $hyprland_lock ]] && break
+    sleep 0.1
+done
 quick_failures=0
-while [[ -S $socket ]]; do
+while hyprland_alive; do
     started=$SECONDS
     qs && break
     if ((SECONDS - started < 10)); then

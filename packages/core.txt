@@ -16,7 +16,6 @@ sddm-git                 # AUR
 
 # Hyprland
 hyprland
-hypridle
 hyprpaper
 hyprsunset
 hyprshot

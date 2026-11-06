@@ -1,0 +1,48 @@
+#!/bin/bash
+# Locks the screen before every suspend (the power menu, the idle timer, the lid): holds a
+# logind delay inhibitor, and when logind announces a sleep (PrepareForSleep), runs
+# sleep-lock.sh and lets go so the sleep goes ahead. Then takes a new inhibitor for the next
+# one. Started at login (autostart.lua); stops with Hyprland. After Omarchy's
+# omarchy-system-sleep-monitor (github.com/basecamp/omarchy, MIT).
+
+# Hyprland is still running: its pid in hyprland.lock (a crashed one leaves its socket file behind)
+hyprland_lock="$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/hyprland.lock"
+hyprland_alive() {
+    local pid
+    read -r pid 2>/dev/null <"$hyprland_lock" && kill -0 "$pid" 2>/dev/null
+}
+# At login autostart can run before Hyprland has written its lock file (a few tenths of a second)
+for _ in {1..50}; do
+    [[ -s $hyprland_lock ]] && break
+    sleep 0.1
+done
+scripts=$(dirname "$(readlink -f "$0")")
+
+if [[ ${1:-} != --inhibited ]]; then
+    exec 9>"$XDG_RUNTIME_DIR/sleep-monitor.lock"
+    flock -n 9 || exit 0 # one per session
+    while hyprland_alive; do
+        systemd-inhibit --what=sleep --mode=delay --who=Quickshell \
+            --why="Lock the screen before sleeping" "$0" --inhibited
+        sleep 1
+    done
+    exit 0
+fi
+
+# Inside the inhibitor: wait for the sleep, lock, exit (which releases the inhibitor)
+coproc events {
+    exec dbus-monitor --system \
+        "type='signal',sender='org.freedesktop.login1',interface='org.freedesktop.login1.Manager',member='PrepareForSleep'"
+}
+trap 'kill "$events_PID" 2>/dev/null' EXIT
+
+while hyprland_alive; do
+    if read -r -t 5 line <&"${events[0]}"; then
+        if [[ $line == *"boolean true"* ]]; then
+            "$scripts/sleep-lock.sh"
+            exit 0
+        fi
+    elif (($? <= 128)); then
+        exit 1 # dbus-monitor ended: start over
+    fi
+done

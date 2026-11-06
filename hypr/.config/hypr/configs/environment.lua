@@ -1,34 +1,22 @@
 -- Environment Variables
 
--- GPUs, found at each start (card numbers can swap between boots). The boot display's GPU
--- (the one driving the built-in screen, or the only one) renders; others only drive their
--- own ports. With one GPU there's nothing to choose. AQ_DRM_DEVICES takes /dev/dri/cardN,
--- not the /dev/dri/by-path names: their colons are its separator.
-local gpus, boot_gpu = {}, nil
+-- The boot display's GPU (the one driving the built-in screen, or the only one), found at each
+-- start: card numbers can swap between boots. aquamarine renders on it by itself; setting
+-- AQ_DRM_DEVICES to that same order broke Hyprland 0.57.1 on the laptop (every modeset after the
+-- first on the NVIDIA outputs failed), so the order is left to aquamarine.
+local boot_gpu = nil
 for i = 0, 15 do
-  local vendor_file = io.open("/sys/class/drm/card" .. i .. "/device/vendor")
-  if vendor_file then
-    local gpu = { path = "/dev/dri/card" .. i, vendor = vendor_file:read("l") }
-    vendor_file:close()
-    local boot_file = io.open("/sys/class/drm/card" .. i .. "/device/boot_vga")
-    if boot_file then
-      if boot_file:read("l") == "1" then
-        boot_gpu = gpu
-      end
-      boot_file:close()
-    end
-    table.insert(gpus, gpu)
-  end
-end
-
-if #gpus > 1 and boot_gpu then
-  local order = { boot_gpu.path }
-  for _, gpu in ipairs(gpus) do
-    if gpu ~= boot_gpu then
-      table.insert(order, gpu.path)
+  local boot_file = io.open("/sys/class/drm/card" .. i .. "/device/boot_vga")
+  if boot_file then
+    local is_boot = boot_file:read("l") == "1"
+    boot_file:close()
+    local vendor_file = is_boot and io.open("/sys/class/drm/card" .. i .. "/device/vendor")
+    if vendor_file then
+      boot_gpu = { vendor = vendor_file:read("l") }
+      vendor_file:close()
+      break
     end
   end
-  hl.env("AQ_DRM_DEVICES", table.concat(order, ":"))
 end
 
 -- NVIDIA rendering the desktop (the desktop PC): video decoding and GLX through its driver.

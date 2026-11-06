@@ -111,3 +111,6 @@ hl.bind("XF86AudioNext", hl.dsp.exec_cmd("playerctl next"), player_opts) -- Next
 hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), player_opts) -- Play / pause
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), player_opts) -- Play / pause
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), player_opts) -- Previous track
+
+-- lid closed: lock, unless an external monitor keeps it in use (not listed in the keybindings)
+hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("~/.config/scripts/lid-close.sh"), { locked = true })
