@@ -1,21 +1,28 @@
 import QtQuick
 import QtQuick.Layouts
+import Quickshell
 import qs.config
 import qs.components
 import qs.services
+import qs.modules.dropdowns.network
 
-// Network: Wi-Fi, wired, VPN (WireGuard and NetworkManager VPNs) and tools
-// (details, live throughput, DNS, speed test).
+// Network: the connection with its live stats, the Wi-Fi band, DNS, VPNs, wired ports and
+// the Wi-Fi networks (connected, known, other), with buttons for the Wi-Fi QR code and the
+// speed test.
+//
+// The layout and behavior follow Omarchy's network panel (shell/plugins/panels/network,
+// github.com/basecamp/omarchy, MIT), in this shell's style.
 Dropdown {
     id: root
 
     name: "network"
-    // 380, or wider if the font doesn't fit the DNS choices on one line
-    contentWidth: Math.max(380, dnsRowWidth + Theme.padding * 2)
+    // wide enough for the stats grid, or the DNS choices on one line
+    contentWidth: Math.max(400, dnsRowWidth + Theme.padding * 2)
 
-    property string tab: "wifi"
     // SSID whose password field is open
-    property string askPassword: ""
+    property string passwordSsid: ""
+    property string passwordText: ""
+    property string identityText: ""
     property string customDns: ""
 
     readonly property var dnsChoices: [
@@ -39,79 +46,190 @@ Dropdown {
         font.pixelSize: Theme.fontSize - 1
     }
 
-    readonly property var tabs: [
-        { id: "wifi", label: "Wi-Fi", icon: Icons.wifiLevels[4] },
-        { id: "wired", label: "Wired", icon: Icons.ethernet },
-        { id: "vpn", label: "VPN", icon: Icons.shield },
-        { id: "tools", label: "Tools", icon: Icons.gauge }
-    ]
+    // Omarchy's lines under a working connection, one every few seconds
+    readonly property var phrases: ["Wiring bits", "Handling packets", "Sorting frames", "Hauling bytes", "Routing crumbs", "Counting collisions", "Bending light"]
+    property int phrase: 0
+
+    readonly property bool canShareWifi: Network.type === "wifi" && Network.connectedWifi !== null && !Network.isEnterprise(Network.connectedWifi.security)
+
+    function openPassword(ssid: string): void {
+        if (passwordSsid !== ssid) {
+            passwordText = "";
+            identityText = "";
+        }
+        passwordSsid = ssid;
+    }
+
+    function closePassword(): void {
+        passwordSsid = "";
+        passwordText = "";
+        identityText = "";
+    }
+
+    function activate(net: var): void {
+        if (Network.busy)
+            return;
+        if (net.connected)
+            Network.disconnect(net.ssid);
+        else if (net.secured && !net.known)
+            passwordSsid === net.ssid ? closePassword() : openPassword(net.ssid);
+        else
+            Network.connect(net.ssid);
+    }
+
+    function submitPassword(net: var): void {
+        if (Network.busy || passwordText === "")
+            return;
+        if (!Network.isEnterprise(net.security))
+            Network.connectWithPassword(net.ssid, passwordText);
+        else if (identityText !== "")
+            Network.connectEnterprise(net.ssid, identityText, passwordText);
+        else
+            return;
+        passwordText = "";
+    }
+
+    function formatPing(ms: real): string {
+        if (!Network.hasPing)
+            return "--";
+        if (ms < 0)
+            return "Timeout";
+        return `${ms > 0 && ms < 10 ? ms.toFixed(1) : Math.round(ms)} ms`;
+    }
 
     onShownChanged: {
-        askPassword = "";
-        Network.monitoring = shown;
-        if (shown) {
-            tab = Network.type === "ethernet" ? "wired" : "wifi";
-            Network.refresh();
-            Network.scan();
+        closePassword();
+        Network.promptSsid = "";
+        Network.failureSsid = "";
+        customDns = "";
+    }
+
+    // A wrong or missing password opens that network's field again
+    Connections {
+        target: Network
+
+        function onPromptSsidChanged(): void {
+            if (Network.promptSsid !== "" && root.shown)
+                root.openPassword(Network.promptSsid);
+        }
+
+        function onActionKindChanged(): void {
+            if (Network.actionKind === "" && Network.failureSsid === "" && root.passwordSsid !== "" && Network.networkFor(root.passwordSsid)?.connected)
+                root.closePassword();
         }
     }
 
-    SectionHeader {
-        title: "Network"
+    Timer {
+        interval: 2800
+        repeat: true
+        running: root.shown && Network.type !== "none" && !Network.restricted
+        onTriggered: phraseFade.restart()
+    }
 
-        IconButton {
-            icon: Icons.refresh
-            color: Network.scanning ? Theme.highlight : Theme.subtext0
-            onClicked: {
-                Network.refresh();
-                Network.scan();
-            }
+    SequentialAnimation {
+        id: phraseFade
+
+        NumberAnimation {
+            target: heroMeta
+            property: "opacity"
+            to: 0
+            duration: Theme.animDuration
+        }
+
+        ScriptAction {
+            script: root.phrase = (root.phrase + 1) % root.phrases.length
+        }
+
+        NumberAnimation {
+            target: heroMeta
+            property: "opacity"
+            to: 1
+            duration: Theme.animDuration * 1.3
         }
     }
 
-    // Tabs
+    // ---------------------------------------------------------------- the connection
+
     RowLayout {
         Layout.fillWidth: true
-        spacing: 4
+        spacing: 12
 
-        Repeater {
-            model: root.tabs
+        Icon {
+            text: Network.icon
+            color: Network.restricted ? Theme.red : (Network.type !== "none" ? Theme.highlight : Theme.overlay1)
+            font.pixelSize: Theme.iconSize * 2
+            Layout.preferredWidth: Theme.iconSize * 2.2
+        }
 
-            MouseArea {
-                id: tabButton
+        ColumnLayout {
+            Layout.fillWidth: true
+            spacing: 1
 
-                required property var modelData
-                readonly property bool current: root.tab === modelData.id
+            StyledText {
+                Layout.fillWidth: true
+                text: {
+                    if (Network.type === "wifi")
+                        return Network.connection;
+                    if (Network.type === "ethernet") {
+                        const speed = Network.wiredDevice?.linkSpeed ?? 0;
+                        return speed > 0 ? `Ethernet (${speed >= 1000 ? `${speed / 1000} Gb/s` : `${speed} Mb/s`})` : "Ethernet";
+                    }
+                    return "Disconnected";
+                }
+                font.pixelSize: Theme.fontSize + 2
+                font.weight: Font.Bold
+            }
+
+            StyledText {
+                id: heroMeta
 
                 Layout.fillWidth: true
-                implicitHeight: 32
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
-                onClicked: root.tab = modelData.id
-
-                Rectangle {
-                    anchors.fill: parent
-                    radius: Theme.smallRadius
-                    color: tabButton.current ? Theme.alpha(Theme.highlight, 0.2) : (tabButton.containsMouse ? Theme.hoverBg : "transparent")
+                text: {
+                    if (Network.connectivity === "portal")
+                        return "SIGN-IN REQUIRED";
+                    if (Network.restricted)
+                        return "LIMITED INTERNET ACCESS";
+                    if (Network.type !== "none")
+                        return root.phrases[root.phrase].toUpperCase();
+                    return Network.hasWifi && !Network.wifiEnabled ? "WI-FI IS OFF" : "NOT CONNECTED";
                 }
-
-                Row {
-                    anchors.centerIn: parent
-                    spacing: 6
-
-                    Icon {
-                        text: tabButton.modelData.icon
-                        color: tabButton.current ? Theme.highlight : Theme.subtext0
-                        font.pixelSize: Theme.iconSize - 1
-                    }
-
-                    StyledText {
-                        text: tabButton.modelData.label
-                        color: tabButton.current ? Theme.highlight : Theme.text
-                        font.pixelSize: Theme.fontSize - 1
-                    }
-                }
+                color: Network.restricted ? Theme.red : Theme.subtext0
+                font.pixelSize: Theme.fontSize - 2
+                font.weight: Font.Bold
+                font.letterSpacing: 1.2
             }
+        }
+
+        IconButton {
+            visible: root.canShareWifi
+            icon: Icons.qrcode
+            color: Theme.subtext0
+            onClicked: Panels.toggleWifiQr()
+        }
+
+        IconButton {
+            visible: (Network.stats.iface ?? "") !== ""
+            icon: Icons.speedometer
+            color: Theme.subtext0
+            onClicked: Panels.toggleSpeedTest()
+        }
+
+        Switch {
+            visible: Network.hasWifi
+            checked: Network.wifiEnabled
+            onToggled: Network.setWifiEnabled(!Network.wifiEnabled)
+        }
+    }
+
+    // NetworkManager found a login page between the link and the internet
+    TextButton {
+        Layout.fillWidth: true
+        visible: Network.connectivity === "portal"
+        text: `${Icons.web}  Sign in to the network`
+        primary: true
+        onClicked: {
+            Panels.closeDropdown(root.name);
+            Quickshell.execDetached(["xdg-open", "http://ping.archlinux.org/nm-check.txt"]);
         }
     }
 
@@ -123,149 +241,186 @@ Dropdown {
         wrapMode: Text.Wrap
     }
 
-    // ---------------------------------------------------------------- Wi-Fi
-    ColumnLayout {
+    // Every row stays while waiting for numbers ("--"), so nothing moves when they arrive
+    GridLayout {
         Layout.fillWidth: true
-        visible: root.tab === "wifi"
-        spacing: Theme.spacing
+        visible: (Network.stats.iface ?? "") !== ""
+        columns: 4
+        columnSpacing: 12
+        rowSpacing: 4
 
-        RowLayout {
-            Layout.fillWidth: true
-
-            StyledText {
-                Layout.fillWidth: true
-                text: Network.wifiEnabled ? "Wi-Fi is on" : "Wi-Fi is off"
-                color: Theme.subtext0
-            }
-
-            Switch {
-                checked: Network.wifiEnabled
-                onToggled: Network.setWifiEnabled(!Network.wifiEnabled)
-            }
+        Label {
+            text: "Ping"
         }
 
-        Flickable {
+        Value {
+            text: root.formatPing(Network.ping)
+            color: Network.hasPing && Network.packetLoss > 0 ? Theme.red : Theme.text
+        }
+
+        Label {
+            text: "Packet loss"
+        }
+
+        Value {
+            text: Network.hasPing ? `${Network.packetLoss}%` : "--"
+            color: Network.hasPing && Network.packetLoss > 0 ? Theme.red : Theme.text
+        }
+
+        Label {
+            text: "Receiving"
+        }
+
+        Value {
+            text: Network.hasStats && Network.lastSample ? Network.formatRate(Network.rxRate) : "--"
+        }
+
+        Label {
+            text: "Sending"
+        }
+
+        Value {
+            text: Network.hasStats && Network.lastSample ? Network.formatRate(Network.txRate) : "--"
+        }
+
+        Label {
+            text: "Downloaded"
+        }
+
+        Value {
+            text: Network.hasStats ? Network.formatBytes(Network.stats.rx_bytes) : "--"
+        }
+
+        Label {
+            text: "Uploaded"
+        }
+
+        Value {
+            text: Network.hasStats ? Network.formatBytes(Network.stats.tx_bytes) : "--"
+        }
+
+        Label {
+            text: "IP address"
+        }
+
+        Value {
+            text: Network.stats.ip || "--"
+            copyable: true
+        }
+
+        Label {
+            text: "Gateway"
+        }
+
+        Value {
+            text: Network.stats.gateway || "--"
+            copyable: true
+        }
+    }
+
+    // ---------------------------------------------------------------- Wi-Fi band
+
+    Separator {
+        visible: Network.canSelectBand
+    }
+
+    RowLayout {
+        Layout.fillWidth: true
+        visible: Network.canSelectBand
+
+        Caption {
             Layout.fillWidth: true
-            Layout.preferredHeight: Math.min(contentHeight, 320)
-            visible: Network.wifiEnabled
-            contentHeight: list.implicitHeight
-            clip: true
+            // under Automatic the header names the band in use; a pin shows in the pills
+            text: !Network.bandPinned && Network.bandCurrent ? `WI-FI BAND: ${Network.bandCurrent} GHZ` : "WI-FI BAND"
+        }
 
-            ColumnLayout {
-                id: list
+        Caption {
+            text: "AUTOMATIC"
+        }
 
-                width: parent.width
-                spacing: 2
+        Switch {
+            checked: !Network.bandPinned
+            opacity: Network.bandBusy ? 0.5 : 1
+            onToggled: Network.setBand(Network.bandPinned ? "auto" : (Network.bandCurrent || Network.bandAvailable[0]))
+        }
+    }
 
-                Repeater {
-                    model: Network.networks
+    RowLayout {
+        Layout.fillWidth: true
+        visible: Network.canSelectBand && Network.bandPinned
+        spacing: 6
 
-                    ColumnLayout {
-                        id: net
+        Repeater {
+            model: Network.bandAvailable
 
-                        required property var modelData
+            Chip {
+                required property string modelData
 
-                        Layout.fillWidth: true
-                        spacing: 4
+                text: `${modelData} GHz`
+                current: Network.bandEffective === modelData
+                onClicked: Network.setBand(modelData)
+            }
+        }
+    }
 
-                        ListItem {
-                            icon: Icons.wifiLevels[Math.min(4, Math.floor(net.modelData.signal / 20))]
-                            label: net.modelData.ssid
-                            sublabel: Network.connectingTo === net.modelData.ssid ? "Connecting…" : net.modelData.active ? "Connected" : net.modelData.saved ? "Saved" : (net.modelData.security || "Open")
-                            highlighted: net.modelData.active
-                            onClicked: {
-                                if (net.modelData.active)
-                                    Network.disconnect();
-                                else if (net.modelData.saved || !net.modelData.security)
-                                    Network.connect(net.modelData.ssid, "");
-                                else
-                                    root.askPassword = root.askPassword === net.modelData.ssid ? "" : net.modelData.ssid;
-                            }
+    // ---------------------------------------------------------------- DNS
 
-                            Icon {
-                                visible: net.modelData.security !== ""
-                                text: Icons.lock
-                                color: Theme.overlay1
-                                font.pixelSize: 11
-                                width: 20
-                                height: 30
-                            }
+    Separator {}
 
-                            IconButton {
-                                visible: net.modelData.saved && !net.modelData.active
-                                icon: Icons.trash
-                                color: Theme.overlay1
-                                size: 26
-                                onClicked: Network.forget(net.modelData.ssid)
-                            }
-                        }
+    Caption {
+        text: "DNS"
+    }
 
-                        PasswordField {
-                            visible: root.askPassword === net.modelData.ssid
-                            active: visible
-                            onAccepted: password => {
-                                Network.connect(net.modelData.ssid, password);
-                                root.askPassword = "";
-                            }
-                        }
-                    }
+    RowLayout {
+        Layout.fillWidth: true
+        spacing: 6
+
+        Repeater {
+            model: root.dnsChoices
+
+            Chip {
+                required property var modelData
+
+                text: modelData.label
+                current: Network.dnsMode === modelData.id
+                onClicked: {
+                    if (modelData.id === "custom")
+                        root.customDns = current ? (Network.details.dns?.servers ?? []).join(" ") : " ";
+                    else
+                        Network.setDns(modelData.id, "");
                 }
             }
         }
     }
 
-    // ---------------------------------------------------------------- Wired
-    ColumnLayout {
-        Layout.fillWidth: true
-        visible: root.tab === "wired"
-        spacing: 2
-
-        StyledText {
-            Layout.fillWidth: true
-            visible: (Network.details.wired ?? []).length === 0
-            text: "No wired network adapter"
-            color: Theme.subtext0
-            horizontalAlignment: Text.AlignHCenter
+    InputField {
+        visible: root.customDns !== ""
+        placeholder: "Servers, e.g. 1.1.1.1 9.9.9.9 (Enter)"
+        text: root.customDns.trim()
+        active: visible
+        onAccepted: value => {
+            if (value.trim() !== "")
+                Network.setDns("custom", value.trim());
+            root.customDns = "";
         }
-
-        Repeater {
-            model: Network.details.wired ?? []
-
-            ListItem {
-                id: wired
-
-                required property var modelData
-                readonly property bool connected: modelData.state === "connected"
-
-                icon: Icons.ethernet
-                label: modelData.connection || modelData.iface
-                sublabel: connected ? `Connected · ${modelData.iface}` : modelData.state === "unavailable" ? "Cable unplugged" : "Disconnected"
-                highlighted: connected
-                cursorShape: Qt.ArrowCursor
-
-                Switch {
-                    anchors.verticalCenter: parent.verticalCenter
-                    checked: wired.connected
-                    enabled: wired.modelData.state !== "unavailable"
-                    onToggled: Network.setWired(wired.modelData.iface, !wired.connected)
-                }
-            }
-        }
+        onCanceled: root.customDns = ""
     }
 
     // ---------------------------------------------------------------- VPN
+
+    Separator {
+        visible: vpnSection.visible
+    }
+
     ColumnLayout {
+        id: vpnSection
+
         Layout.fillWidth: true
-        visible: root.tab === "vpn"
+        visible: (Network.details.vpns ?? []).length > 0 || (Network.details.wireguardFiles ?? []).length > 0
         spacing: 2
 
-        StyledText {
-            Layout.fillWidth: true
-            visible: (Network.details.vpns ?? []).length === 0 && (Network.details.wireguardFiles ?? []).length === 0
-            text: "No VPNs yet. Put WireGuard .conf files in\n~/.config/wireguard or ~/Downloads to import them."
-            color: Theme.subtext0
-            horizontalAlignment: Text.AlignHCenter
-            wrapMode: Text.Wrap
+        Caption {
+            text: "VPN"
         }
 
         Repeater {
@@ -283,9 +438,9 @@ Dropdown {
                 onClicked: Network.setVpn(modelData.name, !modelData.active)
 
                 IconButton {
-                    visible: !vpn.modelData.active
-                    icon: Icons.trash
-                    color: Theme.overlay1
+                    visible: !vpn.modelData.active && vpn.containsMouse
+                    icon: Icons.closeCircle
+                    color: Theme.red
                     size: 26
                     onClicked: Network.deleteVpn(vpn.modelData.name)
                 }
@@ -298,14 +453,6 @@ Dropdown {
             }
         }
 
-        StyledText {
-            Layout.topMargin: 6
-            visible: (Network.details.wireguardFiles ?? []).length > 0
-            text: "Import WireGuard config"
-            color: Theme.subtext0
-            font.pixelSize: Theme.fontSize - 1
-        }
-
         Repeater {
             model: Network.details.wireguardFiles ?? []
 
@@ -313,7 +460,7 @@ Dropdown {
                 required property string modelData
 
                 icon: Icons.plus
-                label: modelData.slice(modelData.lastIndexOf("/") + 1)
+                label: `Import ${modelData.slice(modelData.lastIndexOf("/") + 1)}`
                 sublabel: modelData.slice(0, modelData.lastIndexOf("/")).replace(/^\/home\/[^/]+/, "~")
                 implicitHeight: 40
                 onClicked: Network.importVpn(modelData)
@@ -321,230 +468,91 @@ Dropdown {
         }
     }
 
-    // ---------------------------------------------------------------- Tools
+    // ---------------------------------------------------------------- wired ports with a cable
+
+    Separator {
+        visible: wiredSection.visible
+    }
+
     ColumnLayout {
+        id: wiredSection
+
+        readonly property var ports: (Network.details.wired ?? []).filter(w => w.state !== "unavailable")
+
         Layout.fillWidth: true
-        visible: root.tab === "tools"
-        spacing: Theme.spacing
+        visible: ports.length > 0
+        spacing: 2
 
-        readonly property var active: Network.details.active
-
-        StyledText {
-            visible: parent.active === null
-            text: "Not connected"
-            color: Theme.subtext0
+        Caption {
+            text: "WIRED"
         }
 
-        // Details and live throughput
-        GridLayout {
-            Layout.fillWidth: true
-            visible: parent.active !== null
-            columns: 2
-            columnSpacing: 12
-            rowSpacing: 4
+        Repeater {
+            model: wiredSection.ports
 
-            Repeater {
-                model: {
-                    const a = Network.details.active;
-                    if (!a)
-                        return [];
-                    const rows = [
-                        ["Connection", `${a.connection} (${a.iface})`],
-                        ["IP address", a.ip4 || "—"],
-                        ["Gateway", a.gateway || "—"],
-                        ["DNS", (a.dns ?? []).join(", ") || "—"]
-                    ];
-                    if (a.link_speed)
-                        rows.push(["Link speed", `${a.link_speed} Mb/s`]);
-                    if (a.type === "wifi")
-                        rows.push(["Signal", `${Network.strength}%`]);
-                    rows.push(["Download", Network.formatRate(Network.rxRate)], ["Upload", Network.formatRate(Network.txRate)]);
-                    return rows;
-                }
+            ListItem {
+                id: wired
 
-                Item {
-                    required property var modelData
-                    required property int index
+                required property var modelData
+                readonly property bool connected: modelData.state === "connected"
 
-                    Layout.columnSpan: 2
-                    Layout.fillWidth: true
-                    implicitHeight: 20
+                icon: Icons.ethernet
+                label: modelData.connection || modelData.iface
+                sublabel: connected ? `Connected · ${modelData.iface}` : `Disconnected · ${modelData.iface}`
+                highlighted: connected
+                onClicked: Network.setWired(modelData.iface, !connected)
 
-                    StyledText {
-                        anchors.left: parent.left
-                        text: parent.modelData[0]
-                        color: Theme.overlay1
-                    }
-
-                    StyledText {
-                        anchors.right: parent.right
-                        width: Math.min(implicitWidth, parent.width - 110)
-                        horizontalAlignment: Text.AlignRight
-                        text: parent.modelData[1]
-                    }
+                Switch {
+                    anchors.verticalCenter: parent.verticalCenter
+                    checked: wired.connected
+                    onToggled: Network.setWired(wired.modelData.iface, !wired.connected)
                 }
             }
         }
+    }
 
-        // DNS
-        StyledText {
-            Layout.topMargin: 4
-            text: "DNS"
-            color: Theme.subtext0
-            font.pixelSize: Theme.fontSize - 1
-        }
+    // ---------------------------------------------------------------- Wi-Fi networks
 
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 6
+    Separator {
+        visible: Network.hasWifi && Network.wifiEnabled
+    }
 
-            Repeater {
-                model: root.dnsChoices
+    Caption {
+        visible: Network.hasWifi && Network.wifiEnabled && (Network.scanning || Network.networks.length === 0)
+        text: Network.scanning ? "SCANNING WI-FI…" : "NO NETWORKS FOUND"
+    }
 
-                MouseArea {
-                    id: dnsChip
+    Item {
+        Layout.fillWidth: true
+        implicitHeight: Math.min(rows.implicitHeight, 300)
+        visible: Network.hasWifi && Network.wifiEnabled && Network.networks.length > 0
 
-                    required property var modelData
-                    readonly property bool current: (Network.details.dns?.mode ?? "auto") === modelData.id
+        Flickable {
+            id: networkList
 
-                    Layout.fillWidth: true
-                    Layout.preferredWidth: dnsLabel.implicitWidth + 20
-                    Layout.preferredHeight: 28
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: {
-                        if (modelData.id === "custom")
-                            root.customDns = current ? (Network.details.dns.servers ?? []).join(" ") : " ";
-                        else
-                            Network.setDns(modelData.id, "");
-                    }
+            anchors.fill: parent
+            contentHeight: rows.implicitHeight
+            boundsBehavior: Flickable.StopAtBounds
+            clip: true
 
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: height / 2
-                        color: dnsChip.current ? Theme.alpha(Theme.highlight, 0.25) : (dnsChip.containsMouse ? Theme.hoverBg : Theme.cardBg)
-                        border.color: dnsChip.current ? Theme.highlight : "transparent"
-                        border.width: Theme.borderWidth
-                    }
+            ColumnLayout {
+                id: rows
 
-                    StyledText {
-                        id: dnsLabel
+                width: networkList.width
+                spacing: 2
 
-                        anchors.centerIn: parent
-                        text: dnsChip.modelData.label
-                        color: dnsChip.current ? Theme.highlight : Theme.text
-                        font.pixelSize: Theme.fontSize - 1
+                Repeater {
+                    model: Network.networks
+
+                    WifiRow {
+                        dropdown: root
                     }
                 }
             }
         }
 
-        Rectangle {
-            Layout.fillWidth: true
-            visible: root.customDns !== ""
-            implicitHeight: 34
-            radius: Theme.smallRadius
-            color: Theme.cardBg
-            border.color: dnsInput.activeFocus ? Theme.highlight : "transparent"
-            border.width: Theme.borderWidth
-
-            TextInput {
-                id: dnsInput
-
-                anchors.fill: parent
-                anchors.leftMargin: 10
-                anchors.rightMargin: 10
-                verticalAlignment: TextInput.AlignVCenter
-                color: Theme.text
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSize
-                clip: true
-                text: root.customDns.trim()
-                onAccepted: {
-                    if (text.trim() !== "")
-                        Network.setDns("custom", text.trim());
-                    root.customDns = "";
-                }
-
-                StyledText {
-                    anchors.fill: parent
-                    visible: dnsInput.text === ""
-                    text: "Servers, e.g. 1.1.1.1 9.9.9.9 (Enter)"
-                    color: Theme.overlay1
-                }
-            }
-        }
-
-        // Speed test
-        RowLayout {
-            Layout.fillWidth: true
-            Layout.topMargin: 4
-
-            StyledText {
-                Layout.fillWidth: true
-                text: "Speed test"
-                color: Theme.subtext0
-                font.pixelSize: Theme.fontSize - 1
-            }
-
-            TextButton {
-                text: Network.testing ? "Testing…" : "Run"
-                primary: !Network.testing
-                enabled: !Network.testing
-                onClicked: Network.startSpeedtest()
-            }
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            visible: Network.speed.phase !== undefined
-            spacing: 6
-
-            Repeater {
-                model: [
-                    { label: "Ping", value: Network.speed.ping !== undefined ? `${Network.speed.ping} ms` : "…", active: Network.speed.phase === "ping" },
-                    { label: "Download", value: Network.speed.download !== undefined ? `${Network.speed.download}` : "…", unit: "Mb/s", active: Network.speed.phase === "download" },
-                    { label: "Upload", value: Network.speed.upload !== undefined ? `${Network.speed.upload}` : "…", unit: "Mb/s", active: Network.speed.phase === "upload" }
-                ]
-
-                Card {
-                    id: speedCard
-
-                    required property var modelData
-
-                    Layout.fillWidth: true
-                    implicitHeight: 58
-                    border.color: modelData.active ? Theme.highlight : "transparent"
-                    border.width: Theme.borderWidth
-
-                    ColumnLayout {
-                        anchors.centerIn: parent
-                        spacing: 0
-
-                        StyledText {
-                            Layout.alignment: Qt.AlignHCenter
-                            text: speedCard.modelData.value
-                            font.pixelSize: Theme.fontSize + 3
-                            font.weight: Font.Bold
-                        }
-
-                        StyledText {
-                            Layout.alignment: Qt.AlignHCenter
-                            text: speedCard.modelData.label + (speedCard.modelData.unit ? ` (${speedCard.modelData.unit})` : "")
-                            color: Theme.overlay1
-                            font.pixelSize: Theme.fontSize - 2
-                        }
-                    }
-                }
-            }
-        }
-
-        StyledText {
-            Layout.fillWidth: true
-            visible: Network.speed.phase === "error"
-            text: `Speed test failed: ${Network.speed.message ?? ""}`
-            color: Theme.red
-            wrapMode: Text.Wrap
+        ScrollBar {
+            flick: networkList
         }
     }
 
@@ -563,4 +571,5 @@ Dropdown {
             }
         }
     }
+
 }

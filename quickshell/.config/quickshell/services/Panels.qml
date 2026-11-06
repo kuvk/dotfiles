@@ -25,6 +25,8 @@ Singleton {
     property string wallpapers: "" // "static" | "live" | ""
     property bool themes: false // theme carousel
     property bool appMenu: false // app menu dropdown with categories
+    property bool wifiQr: false // the connected Wi-Fi as a QR code
+    property bool speedTest: false // internet speed test dials
     property var trayItem: null // SystemTrayItem whose menu is open
 
     // The click that dismisses a dropdown can also land on the button that
@@ -120,6 +122,8 @@ Singleton {
         powerMenu = false;
         wallpapers = "";
         themes = false;
+        wifiQr = false;
+        speedTest = false;
         dropdownScreen = screen;
         dropdownX = x;
         dropdown = name;
@@ -194,6 +198,21 @@ Singleton {
         launcher = open;
     }
 
+    // Both open from the network dropdown, on its monitor
+    function toggleWifiQr(): void {
+        const open = !wifiQr;
+        closeAll();
+        pinScreen(open);
+        wifiQr = open;
+    }
+
+    function toggleSpeedTest(): void {
+        const open = !speedTest;
+        closeAll();
+        pinScreen(open);
+        speedTest = open;
+    }
+
     function toggleClipboard(): void {
         const open = !clipboard;
         closeAll();
@@ -210,6 +229,8 @@ Singleton {
         powerMenu = false;
         wallpapers = "";
         themes = false;
+        wifiQr = false;
+        speedTest = false;
         tooltip = "";
     }
 }

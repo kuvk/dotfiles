@@ -26,7 +26,7 @@ can own the D-Bus name.
 | Top bar (one per monitor), tooltips on hover | `modules/bar/Bar.qml` | starts with `qs`; `SUPER+SHIFT+B` hides/shows it, `SUPER+CTRL+B` floats it |
 | Clock and calendar (week numbers, scroll for months) | `modules/dropdowns/CalendarDropdown.qml` | click the clock |
 | Weather (wttr.in) | `modules/dropdowns/WeatherDropdown.qml` | click the temperature |
-| Network: Wi-Fi, wired on/off, WireGuard/VPN (import `.conf` from `~/.config/wireguard` or `~/Downloads`), details, live throughput, DNS, speed test | `modules/dropdowns/NetworkDropdown.qml` + `scripts/network.py` | click the network icon |
+| Network, after Omarchy's panel: the connection with ping, packet loss, throughput, IP and gateway (click to copy); Wi-Fi band (Automatic or pinned); DNS; VPNs (import WireGuard `.conf` from `~/.config/wireguard` or `~/Downloads`); wired ports with a cable; Wi-Fi networks as Connected, Known and Other, filled in live while it's open. Buttons for the Wi-Fi QR code (with the password on request) and the speed test (download and upload dials) | `modules/dropdowns/NetworkDropdown.qml`, `modules/network/` + `services/Network.qml` (Quickshell.Networking) + `scripts/network.py` | click the network icon |
 | Bluetooth devices, pair, connect | `modules/dropdowns/BluetoothDropdown.qml` | click; right-click toggles power |
 | Volume, output and input device, per-app volume | `modules/dropdowns/AudioDropdown.qml` | click; right-click mutes, scroll changes volume |
 | Now playing; with several players a card each, switched with the arrows or Left/Right (also in the Control Center) | `components/MediaCard.qml`, `modules/dropdowns/MediaDropdown.qml` | click the track; middle-click play/pause, right-click next player |
@@ -94,6 +94,20 @@ color fringes. Cursors reach the login screen only from `/usr/share/icons`. An i
 `-Light` and `-Dark` versions follows the color theme. The Window buttons switch adds a close button
 to shell windows and GTK apps with their own title bar; minimize and maximize never show. Windows
 without a title bar (most Qt apps) have no button to show.
+
+## Network
+
+Wi-Fi comes from NetworkManager over D-Bus (`Quickshell.Networking`): while the dropdown is open
+the Wi-Fi scanner runs and networks appear as scans report them; connecting, forgetting and the
+Wi-Fi switch go through it too, and a wrong or missing password opens the network's password field
+again. `scripts/network.py` covers the rest: wired, VPN and DNS (`status`), the live stats with a ping to
+the router and 1.1.1.1 every 1.5 s (`stats`), the Wi-Fi band (`band`), the QR code (`qr`, needs
+`qrencode`), the password (`password`), WPA-Enterprise sign-in (`eap`, the password on stdin) and the
+speed test against Cloudflare (`speedtest`).
+
+The dropdown, the QR code and the speed test dials follow
+[Omarchy](https://github.com/basecamp/omarchy)'s network panel, Wi-Fi QR and speed test overlay
+(MIT, © David Heinemeier Hansson), restyled for this shell.
 
 ## Notifications
 

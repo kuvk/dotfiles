@@ -2,24 +2,28 @@ import QtQuick
 import QtQuick.Layouts
 import qs.config
 import qs.components
+import qs.services
 
+// One-line text input: Enter accepts, Esc cancels
 Rectangle {
-    id: root
+    id: field
 
+    property string placeholder
+    property alias text: input.text
+    property bool password: false
     property bool active: false
-    signal accepted(string password)
+    signal accepted(string value)
+    signal canceled
 
     Layout.fillWidth: true
-    implicitHeight: 36
+    implicitHeight: 34
     radius: Theme.smallRadius
     color: Theme.cardBg
     border.color: input.activeFocus ? Theme.highlight : "transparent"
+    border.width: Theme.borderWidth
 
-    onActiveChanged: {
-        input.text = "";
-        if (active)
-            input.forceActiveFocus();
-    }
+    onActiveChanged: if (active) input.forceActiveFocus()
+    Component.onCompleted: if (active) input.forceActiveFocus()
 
     TextInput {
         id: input
@@ -31,14 +35,15 @@ Rectangle {
         color: Theme.text
         font.family: Theme.font
         font.pixelSize: Theme.fontSize
-        echoMode: TextInput.Password
+        echoMode: field.password ? TextInput.Password : TextInput.Normal
         clip: true
-        onAccepted: if (text.length > 0) root.accepted(text)
+        onAccepted: field.accepted(text)
+        Keys.onEscapePressed: field.canceled()
 
         StyledText {
             anchors.fill: parent
             visible: input.text === ""
-            text: "Password"
+            text: field.placeholder
             color: Theme.overlay1
         }
     }

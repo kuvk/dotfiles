@@ -89,6 +89,15 @@ Singleton {
     // Network
     readonly property var wifiLevels: [g(0xf092f), g(0xf091f), g(0xf0922), g(0xf0925), g(0xf0928)]
     readonly property string wifiOff: g(0xf092d)
+    // signed in to a captive portal, or no internet behind the link
+    readonly property string wifiAlert: g(0xf0929)
+    readonly property string ethernetOff: g(0xf0202)
+    readonly property string qrcode: g(0xf0432)
+    readonly property string speedometer: g(0xf04c5)
+    readonly property string closeCircle: g(0xf0159)
+    readonly property string lockOutline: g(0xf033e)
+    readonly property string copy: g(0xf018f)
+    readonly property string web: g(0xf059f)
     readonly property string ethernet: g(0xf0200)
     readonly property string shield: g(0xf132)
     readonly property string gauge: g(0xf0e4)

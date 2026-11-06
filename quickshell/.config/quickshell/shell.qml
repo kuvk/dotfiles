@@ -11,6 +11,7 @@ import qs.modules.controlcenter
 import qs.modules.displays
 import qs.modules.keybinds
 import qs.modules.launcher
+import qs.modules.network
 import qs.modules.notifications
 import qs.modules.powermenu
 import qs.modules.settings
@@ -54,6 +55,11 @@ ShellRoot {
     AppMenu {}
 
     PowerMenu {}
+
+    // From the network dropdown
+    WifiQr {}
+
+    SpeedTest {}
 
     // Regular windows: created when opened and destroyed when closed, so each
     // opening starts at its default size (Hyprland keeps a resized size
