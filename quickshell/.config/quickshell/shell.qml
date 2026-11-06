@@ -11,6 +11,7 @@ import qs.modules.controlcenter
 import qs.modules.displays
 import qs.modules.keybinds
 import qs.modules.launcher
+import qs.modules.lock
 import qs.modules.network
 import qs.modules.notifications
 import qs.modules.powermenu
@@ -55,6 +56,11 @@ ShellRoot {
     AppMenu {}
 
     PowerMenu {}
+
+    // The session lock, and Settings' preview of it
+    LockScreen {}
+
+    LockPreview {}
 
     // From the network dropdown
     WifiQr {}
@@ -175,6 +181,19 @@ ShellRoot {
         function mode(name: string): void {
             Theme.gamemode = name !== "normal";
             System.setMode(name);
+        }
+    }
+
+    // hypridle (lock_cmd, before_sleep_cmd) and SUPER+`
+    IpcHandler {
+        target: "lock"
+
+        function lock(): void {
+            Lock.lock();
+        }
+
+        function isLocked(): bool {
+            return Lock.locked;
         }
     }
 

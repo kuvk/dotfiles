@@ -6,8 +6,7 @@ the system theme (see `~/.config/theme/README.md`).
 ## Packages
 
 `install.sh` installs everything the shell needs from `packages/core.txt` (see "Quickshell, and the
-services it talks to" and "Commands the shell and scripts run"; the Matrix lock style needs
-`unimatrix-git` from the AUR). To install by hand:
+services it talks to" and "Commands the shell and scripts run"). To install by hand:
 
 ```sh
 sed 's/#.*//' <repo>/packages/core.txt | xargs paru -S --needed
@@ -43,7 +42,7 @@ can own the D-Bus name.
 | App menu: categories on the left, apps on the right | `modules/launcher/AppMenu.qml` + `services/Apps.qml` | the Arch icon, or `SUPER+CTRL+Space` |
 | Theme carousel (each card the theme's palette as bars, type to search; other monitors are blurred) | `modules/themes/ThemePicker.qml` | `SUPER+CTRL+T`, or the Theme tile |
 | Power menu (log out, reboot and shut down go through hyprshutdown, which closes apps first) | `modules/powermenu/PowerMenu.qml` | `SUPER+CTRL+Q`, or the power icon |
-| Lock screen | hyprlock with `scripts/lockscreen.sh` | `` SUPER+` ``, hypridle |
+| Lock screen (Settings > Lock Screen has a preview) | `modules/lock/` + `services/Lock.qml` | `` SUPER+` ``, the power menu, hypridle |
 | Wallpaper carousel (type to search; other monitors are blurred) | `modules/wallpaper/WallpaperPicker.qml` | `SUPER+W`, Tab for live wallpapers |
 | System information (fastfetch's output drawn cell by cell like kitty, in a window sized to it; it opens once the output is ready, Ctrl+C copies it) | `modules/sysinfo/SysinfoWindow.qml` | the ⓘ button in the app menu and Control Center |
 | Keybindings (built from `bindings.lua`, type to filter) | `modules/keybinds/KeybindsWindow.qml` + `scripts/hypr-keybinds.py` | `SUPER+/` |
@@ -125,23 +124,30 @@ Screenshots (`hyprshot`) send their own notification. Neovim and yazi show their
 
 ## Lock screen
 
-Locking uses hyprlock (`~/.config/scripts/lockscreen.sh`), with the clock and password on the
-monitor focused when locking. Settings > Lock Screen sets its style, then in sections: the clock
-and date (on or off, one color), the avatar (on or off, outline), the box behind them (on or off,
-outline, background with opacity), the password field (outline, background with opacity, typing
-dots, user name, text, and the checking, wrong password and Caps Lock states) and the login
-screen's power buttons (background with opacity, icons, outline). The styles:
+The lock screen is part of the shell (`modules/lock/`, `services/Lock.qml`), after
+[Omarchy](https://github.com/basecamp/omarchy)'s Quickshell lock (MIT). It's a Wayland session
+lock: a surface on every monitor, with the clock and password on the one focused when locking (or
+the first one left if that monitor is gone). `` SUPER+` ``, the power menu and hypridle
+(`loginctl lock-session`, before sleep) lock it with `qs ipc call lock lock`.
 
-- **Matrix**: a fullscreen kitty running unimatrix on every monitor, showing through hyprlock's
-  transparent background (`misc:session_lock_xray`). It locks about a second later, once the
-  rain is on screen, so that's the frame a wake-up shows first.
-- **Background**: the current wallpaper, opaque.
-- **Image**: an image you choose, opaque; the wallpaper if none is chosen.
-- **Solid color**: a theme color you choose, opaque.
+- **Password:** checked by the system's PAM stack (`/etc/pam.d/login`, the same as hyprlock
+  used), so nothing in your home folder decides it. Keys typed on any monitor count.
+- **Waking up:** the monitors come back one by one, and with the laptop's screen off Hyprland can
+  have only its FALLBACK output for a moment; the lock goes up only once a real screen exists, and
+  once up stays until the right password, whatever the monitors do.
+- **Reloads and crashes:** the lock state is kept in `$XDG_RUNTIME_DIR/quickshell-lock`, so a
+  shell reload (editing a shell file) or a restart after a crash locks again at once, and Hyprland
+  keeps the session locked meanwhile (`misc:allow_session_lock_restore`). `scripts/shell.sh` starts
+  the shell again if it crashes.
 
-The look is in `theme/.config/theme/templates/hyprlock.conf.tpl`. The login screen (`sddm/kuvk`) uses
-the same settings and the same sizes and positions, and always the wallpaper as its background. hypridle runs the script on
-`loginctl lock-session` and before sleep.
+Settings > Lock Screen sets the style, **Background** (the current wallpaper) or **Image** (an
+image you choose; the wallpaper if none is chosen or it can't be read), then in sections: the clock
+and date (on or off, one color), the avatar (`~/.face`; on or off, outline), the box behind them
+(on or off, outline, background with opacity), the password field (outline, background with
+opacity, typing dots, user name, text, and the checking, wrong password and Caps Lock states) and
+the login screen's power buttons (background with opacity, icons, outline). **Preview** shows it
+without locking. The login screen (`sddm/kuvk`) uses the same settings, sizes and positions, and
+always the wallpaper as its background.
 
 ## Web apps
 

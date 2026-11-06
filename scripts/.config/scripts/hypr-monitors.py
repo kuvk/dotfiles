@@ -635,28 +635,15 @@ def handled_just_now(key: str) -> bool:
         return False
 
 
-LOCKSCREEN_LOCK = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "lockscreen.lock"
-
-
 def locked() -> bool:
-    """hyprlock is up, or lockscreen.sh is (it holds its lock file for the whole lock,
-    also in the moment between a crashed hyprlock and the one taking over)."""
-    if subprocess.run(["pidof", "hyprlock"], stdout=subprocess.DEVNULL).returncode == 0:
-        return True
-    try:
-        with open(LOCKSCREEN_LOCK, "a") as f:
-            fcntl.flock(f, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            fcntl.flock(f, fcntl.LOCK_UN)
-    except BlockingIOError:
-        return True
-    except OSError:
-        pass
-    return False
+    """The session is locked: Hyprland lists a held lock (LOCK) among the reasons a monitor
+    can't go solitary, also while the lock screen is restarting after a crash."""
+    return any("LOCK" in (m.get("solitaryBlockedBy") or []) for m in hypr_json("monitors"))
 
 
 def wait_for_unlock() -> None:
-    """No reload under the lock screen: monitors coming back from sleep one by one made a
-    reload with half of them, and hyprlock crashed. Outputs added meanwhile use the
+    """No reload under the lock screen: monitors come back from sleep one by one, and a
+    reload with half of them crashed the lock screen. Outputs added meanwhile use the
     catch-all monitor rule; the profile is applied once unlocked."""
     if not locked():
         return

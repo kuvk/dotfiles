@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import QtQuick.Window
 import SddmComponents
 
-// Login screen in the look of the lock screen (theme/.config/theme/templates/hyprlock.conf.tpl):
+// Login screen in the look of the lock screen (quickshell/.config/quickshell/modules/lock/LockView.qml):
 // wallpaper, clock top right, avatar and password in a centered card. The card and
 // controls show on the monitor with the keyboard, which follows the mouse.
 Rectangle {
@@ -68,8 +68,8 @@ Rectangle {
         cache: false
     }
 
-    // Clock and date, top right, where the lock screen puts them (templates/hyprlock.conf.tpl:
-    // 72 pt and 28 pt, which Pango draws at 96 and 37 px; tops 10 and 120 px down, 30 in)
+    // Clock and date, top right, where the lock screen puts them (96 and 37 px; tops 10 and
+    // 120 px down, 30 in)
     // (Settings > Lock Screen > Clock and date)
     Item {
         anchors.fill: parent

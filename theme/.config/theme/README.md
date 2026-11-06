@@ -69,16 +69,15 @@ theme folder and set `wallpaper` under `[apps]`.
 | Qt apps | Kvantum theme `current` (`templates/kvantum-current.*`), `qt5ct.conf` and `qt6ct.conf`: edit the templates, not the output | when an app next starts |
 | KDE apps | `~/.config/kdeglobals` | when an app next starts |
 | hyprshutdown, Hyprland's update and donation windows | `~/.config/hypr/hyprtoolkit.conf` | when a window next opens |
-| hyprlock | `current/hyprlock.conf` (`lockscreen.sh` fills in the monitor) | next lock |
 | Cursor | Settings > Appearance; `theme-set.py` writes it to Hyprland, GTK, XWayland and the login screen | now; open apps when restarted |
 | Icons | Settings > Appearance; `theme-set.py` writes it to GTK, Qt and hyprtoolkit | GTK now; Qt when restarted |
-| Fonts | Settings > Fonts; `theme-set.py` writes them to `gsettings`, `settings.ini`, qt5ct, qt6ct, hyprtoolkit, hyprlock, SDDM, and hinting and antialiasing to `current/fontconfig.conf` | reopened apps |
+| Fonts | Settings > Fonts; `theme-set.py` writes them to `gsettings`, `settings.ini`, qt5ct, qt6ct, hyprtoolkit, SDDM, and hinting and antialiasing to `current/fontconfig.conf` | reopened apps |
 | File dialogs | `xdg-desktop-portal-gtk`, restarted when `gtk.css` changes | live |
 | Screen share picker | `hyprland-share-picker`, a Qt app using the Qt theme | next open |
 | Window buttons | Settings > Windows; `theme-set.py` writes `gtk-decoration-layout` and `gsettings` (close only); `gtk.css` styles the button | GTK apps with a title bar, when reopened |
 | Login screen (SDDM) | `/var/lib/kuvk-shell/theme.conf`, once `sddm/install.sh` has run; colors come from Settings > Lock Screen | next logout |
 | swayimg | `current/swayimg.lua` (loaded by `~/.config/swayimg/init.lua`) | live (SIGUSR1) |
-| scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh`, `lockscreen.sh`, `theme-boot.sh` |
+| scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh`, `theme-boot.sh` |
 | Boot splash (Plymouth), boot menu (Limine) | `current/colors.sh` and the logo, read when their installers run | after a theme change: the **Update** notification, or `theme-boot.sh` |
 | Wallpaper | Settings > Appearance > Wallpaper follows theme: the logo in accent2 on base, drawn per theme (`logo-wallpaper.py`) | on switch, with the lock and login screens |
 | GTK apps | adw-gtk3 if installed, otherwise Adwaita, in the theme's mode; icons and `color-scheme` through `gsettings` and `settings.ini`; colors in `~/.config/gtk-{3,4}.0/gtk.css` | mode live; colors when an app next starts |

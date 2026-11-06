@@ -17,7 +17,6 @@ sddm-git                 # AUR
 # Hyprland
 hyprland
 hypridle
-hyprlock
 hyprpaper
 hyprsunset
 hyprshot
@@ -65,7 +64,7 @@ pacman-contrib           # paccache, pacdiff (sysmaintenance.sh, update.sh)
 reflector                # ranks mirrors; enable reflector.timer
 flatpak
 mpvpaper                 # AUR, video wallpapers
-unimatrix-git            # AUR, the lock screen's rain
+unimatrix-git            # AUR, Matrix rain in a terminal
 
 # Theme: GTK, Qt, icons, fonts
 adw-gtk-theme

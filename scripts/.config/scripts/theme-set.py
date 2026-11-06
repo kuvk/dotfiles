@@ -199,7 +199,8 @@ def blend(a: str, b: str, amount: float) -> str:
 
 
 def shell_settings() -> dict:
-    """What's chosen in Quickshell's Settings."""
+    """What's chosen in Quickshell's Settings: the saved settings, then the shell's
+    defaults.json (a fresh install, before the shell has saved any), then these."""
     settings = {
         "displayFont": "SF Pro Display",
         "nerdFont": "JetBrainsMono Nerd Font",
@@ -207,35 +208,36 @@ def shell_settings() -> dict:
         "fontHinting": "slight",
         "fontAntialiasing": "rgba",
         "windowButtons": False,
-        "lockClockColor": "accent2",
-        "lockDateColor": "accent2",
-        "lockAvatarColor": "accent2",
+        "lockClockColor": "accent",
+        "lockAvatarColor": "accent",
         "lockBoxOutlineColor": "accent",
         "lockBoxColor": "base",
-        "lockInputOutlineColor": "accent2",
+        "lockInputOutlineColor": "accent",
         "lockInputColor": "subtext0",
         "lockDotsColor": "accent2",
         "lockUserColor": "accent",
         "lockTextColor": "text",
         "lockCheckColor": "green",
         "lockFailColor": "red",
-        "lockCapsColor": "yellow",
-        "lockBoxOpacity": 85,
-        "lockBox": True,
+        "lockCapsColor": "peach",
+        "lockBoxOpacity": 90,
+        "lockBox": False,
         "wallpaperFollowsTheme": True,
-        "lockClock": True,
+        "lockClock": False,
         "lockAvatar": True,
         "lockPowerColor": "base",
         "lockPowerOpacity": 85,
-        "lockPowerIconColor": "text",
+        "lockPowerIconColor": "accent2",
         "lockPowerOutlineColor": "accent",
-        "accentOverrides": {},
-        "lockInputOpacity": 25,
+        "accentOverrides": {"gruvbox": {"accent": "blue", "accent2": "peach", "accent3": "mauve"}, "tokyo-night": {"accent": "teal", "accent2": "peach", "accent3": "mauve"}},
+        "lockInputOpacity": 30,
         "cursorTheme": "Adwaita",
         "cursorSize": 24,
         "iconTheme": "Papirus",
     }
-    for path in (HOME / ".local/state/quickshell/by-shell").glob("*/settings.json"):
+    sources = [HOME / ".config/quickshell/config/defaults.json"]
+    sources += sorted((HOME / ".local/state/quickshell/by-shell").glob("*/settings.json"))
+    for path in sources:
         try:
             saved = json.loads(path.read_text())
         except (OSError, json.JSONDecodeError):
