@@ -67,21 +67,9 @@ Singleton {
         capsProc.running = true;
     }
 
-    // No pointer on the lock screen; shown again after a reload or crash while unlocked
-    function setCursorHidden(hidden: bool): void {
-        Quickshell.execDetached(["hyprctl", "eval", `hl.config({ cursor = { invisible = ${hidden} } })`]);
-    }
+    onLockedChanged: if (locked) checkCapsLock()
 
-    onLockedChanged: {
-        setCursorHidden(locked);
-        if (locked)
-            checkCapsLock();
-    }
-
-    Component.onCompleted: {
-        setCursorHidden(false);
-        strandedProc.running = true;
-    }
+    Component.onCompleted: strandedProc.running = true
 
     // Hyprland lists a held session lock (LOCK) among the reasons a monitor can't go
     // solitary, and keeps it when the lock screen's program is gone. Held with no other

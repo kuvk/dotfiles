@@ -11,6 +11,7 @@ current live layout, and workspaces are split across the monitors.
   hypr-monitors.py hotplug              same, from Hyprland's monitor.added/removed events
                                         (while the screen is locked, once it's unlocked)
   hypr-monitors.py startup              same, at login (waits for late outputs)
+  hypr-monitors.py lid                  the lid opened or closed: apply again (clamshell)
   hypr-monitors.py state                print the current profile as JSON (Quickshell)
   hypr-monitors.py set '<json>'         save and apply changes from Quickshell
   hypr-monitors.py export-greeter       save the monitor layout for the login screen
@@ -394,8 +395,37 @@ def export_greeter_layout(profile: dict, live: list[dict]) -> None:
         log(f"could not write {GREETER_LAYOUT}: {e}")
 
 
+def lid_closed() -> bool:
+    for state in Path("/proc/acpi/button/lid").glob("*/state"):
+        try:
+            if "closed" in state.read_text():
+                return True
+        except OSError:
+            pass
+    return False
+
+
+def with_clamshell(profile: dict, live: list[dict]) -> dict:
+    """Clamshell, after Omarchy's: with the lid closed and another monitor on, the laptop's
+    screen is off, whatever the profile says; the profile keeps the choice for when the lid
+    opens. Never the last screen left on."""
+    if not lid_closed():
+        return profile
+    mons = profile["monitors"]
+    internal = [ident(m) for m in live if is_internal(m["name"])]
+    others_on = any(mons.get(ident(m), {}).get("enabled") for m in live if not is_internal(m["name"]))
+    if not internal or not others_on:
+        return profile
+    effective = dict(profile, monitors={mid: dict(mon) for mid, mon in mons.items()})
+    for mid in internal:
+        if mid in effective["monitors"]:
+            effective["monitors"][mid]["enabled"] = False
+    return effective
+
+
 def apply(data: dict, live: list[dict], *, force_reload: bool = False) -> None:
     key, profile = current_profile(data, live)
+    profile = with_clamshell(profile, live)
     export_greeter_layout(profile, live)
     content = render_lua(profile, live)
 
@@ -492,6 +522,8 @@ def brightness_set(name: str, pct: int) -> None:
 
 def state(data: dict, live: list[dict]) -> dict:
     key, profile = current_profile(data, live, save=False)
+    # "enabled" stays the profile's choice; "lid_closed" says clamshell has it off for now
+    effective = with_clamshell(profile, live)["monitors"]
     monitors = []
     for m in live:
         mid = ident(m)
@@ -506,6 +538,7 @@ def state(data: dict, live: list[dict]) -> dict:
             "model": m.get("model", ""),
             "internal": is_internal(m["name"]),
             "enabled": mon["enabled"],
+            "lid_closed": mon["enabled"] and not effective[mid]["enabled"],
             "mode": mon["mode"],
             "modes": available_modes(m) or [mon["mode"]],
             "x": mon["x"],
@@ -677,9 +710,28 @@ def hotplug(startup: bool = False) -> int:
     return 0
 
 
+def lid() -> int:
+    """The lid opened or closed (bindings.lua): apply the profile again, which turns the
+    laptop's screen off or back on (with_clamshell). Not under the lock screen."""
+    with open(LOCK_FILE, "w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        wait_for_unlock()
+        live = settle(3)
+        if not live:
+            return 1
+        DUPLICATES.clear()
+        descs = [(m.get("description") or "").strip() for m in live]
+        DUPLICATES.update(d for d in descs if d and descs.count(d) > 1)
+        log(f"lid {'closed' if lid_closed() else 'open'}: applying profile '{profile_key(live)}'")
+        apply(load_profiles(), live)
+    return 0
+
+
 def main(argv: list[str]) -> int:
     if argv and argv[0] in ("hotplug", "startup"):
         return hotplug(startup=argv[0] == "startup")
+    if argv == ["lid"]:
+        return lid()
     live = live_monitors()
     if not live:
         print("hyprctl monitors returned nothing; is Hyprland running?", file=sys.stderr)
