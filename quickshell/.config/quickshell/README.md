@@ -80,7 +80,8 @@ display font, "Nerd Fonts only" and "Use Nerd Symbols font" switches, hinting an
 margins and rounded corners, clock format, weather location and unit, and which modules show on the primary monitor's bar and on
 the others; the clock always shows), Windows (window buttons, gaps for regular
 and Work-Game), Notifications, Lock Screen (style; sections for the clock and date, avatar, box,
-password field and the login screen's power buttons),
+password field and the login screen's power buttons), Idle (minutes until the screen locks, the
+screens go off and the machine sleeps; on a laptop a second set for battery),
 and Tray & Player (tray icon style, apps that keep their own colors, the
 visualizer and its bar count). They are saved to Quickshell's state folder
 (`~/.local/state/quickshell/by-shell/<id>/settings.json`). **Save as defaults** writes them to
@@ -148,6 +149,15 @@ opacity, typing dots, user name, text, and the checking, wrong password and Caps
 the login screen's power buttons (background with opacity, icons, outline). **Preview** shows it
 without locking. The login screen (`sddm/kuvk`) uses the same settings, sizes and positions, and
 always the wallpaper as its background.
+
+## Idle
+
+hypridle does the idle work: `hypr/hypridle.conf` has the lock and sleep commands and sources
+`~/.config/hypr/configs/generated/hypridle.conf`, which the shell writes from Settings > Idle
+(`services/Idle.qml`). On a machine with a battery the battery times apply while unplugged. hypridle
+reads its config only when it starts, so the shell starts it, and restarts it when the times or the
+power source change; idle time then counts from that moment. Stay Awake and playing media hold it
+off (systemd idle inhibitors).
 
 ## Web apps
 
