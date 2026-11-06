@@ -52,6 +52,27 @@ Dropdown {
     }
 
     StyledText {
+        visible: Audio.sources.length > 0
+        text: "Input"
+        color: Theme.subtext0
+        font.pixelSize: Theme.fontSize - 1
+    }
+
+    Repeater {
+        model: Audio.sources
+
+        ListItem {
+            required property PwNode modelData
+
+            icon: modelData === Audio.source ? Icons.check : Icons.mic
+            label: Audio.nodeName(modelData)
+            highlighted: modelData === Audio.source
+            implicitHeight: 36
+            onClicked: Audio.setDefaultSource(modelData)
+        }
+    }
+
+    StyledText {
         visible: Audio.streams.length > 0
         text: "Applications"
         color: Theme.subtext0
