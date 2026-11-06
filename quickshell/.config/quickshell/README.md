@@ -173,9 +173,11 @@ sleep lock (MIT); there's no hypridle.
 - **The lid** (`scripts/lid-close.sh`, from `bindings.lua`): with no external monitor connected it
   locks at once, and logind suspends (`HandleLidSwitch`, suspend by default, on battery and plugged in
   alike). With one connected the laptop counts as docked: logind ignores the lid
-  (`HandleLidSwitchDocked`), nothing locks, and the laptop's screen stays a monitor (turn it off in
-  Displays). Unplugging the monitors with the lid closed makes logind suspend after a while, and
-  `sleep-lock.sh` locks first.
+  (`HandleLidSwitchDocked`), nothing locks, and the laptop's screen goes off while the lid is closed
+  (clamshell, after Omarchy's: `hypr-monitors.py lid`, also run when it opens). The profile keeps
+  your Displays choice for the laptop's screen, so it comes back when the lid opens; it's never the
+  last screen turned off. Unplugging the monitors with the lid closed makes logind suspend after a
+  while, and `sleep-lock.sh` locks first.
 
 ## Web apps
 

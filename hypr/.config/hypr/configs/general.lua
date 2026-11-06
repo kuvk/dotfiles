@@ -38,4 +38,10 @@ hl.config({
     -- Variable refresh rate is set per monitor in Displays (hypr-monitors.py); off elsewhere
     vrr = 0,
   },
+
+  -- Hyprland's own lines in hyprland.log (in RAM, $XDG_RUNTIME_DIR/hypr/), so a crash on a
+  -- monitor plugged in after a sleep leaves something to report; off again once caught
+  debug = {
+    disable_logs = false,
+  },
 })

@@ -418,8 +418,8 @@ FloatingWindow {
                             id: chipText
 
                             anchors.centerIn: parent
-                            text: chip.modelData.name + (chip.modelData.enabled ? "" : " (off)")
-                            color: chip.index === root.selected ? Theme.base : (chip.modelData.enabled ? Theme.text : Theme.overlay1)
+                            text: chip.modelData.name + (!chip.modelData.enabled ? " (off)" : chip.modelData.lid_closed ? " (lid closed)" : "")
+                            color: chip.index === root.selected ? Theme.base : (chip.modelData.enabled && !chip.modelData.lid_closed ? Theme.text : Theme.overlay1)
                         }
                     }
                 }
@@ -444,9 +444,22 @@ FloatingWindow {
                     text: "Enabled"
                 }
 
-                Switch {
-                    checked: root.current?.enabled ?? false
-                    onToggled: root.setEnabled(root.selected, !checked)
+                // The saved choice; with the lid closed and another monitor on, the laptop's
+                // screen is off anyway (clamshell) and comes back as chosen here
+                RowLayout {
+                    spacing: 10
+
+                    Switch {
+                        checked: root.current?.enabled ?? false
+                        onToggled: root.setEnabled(root.selected, !checked)
+                    }
+
+                    StyledText {
+                        visible: !!root.current?.lid_closed
+                        text: "Off while the lid is closed"
+                        color: Theme.overlay1
+                        font.pixelSize: Theme.fontSize - 2
+                    }
                 }
 
                 StyledText {

@@ -92,7 +92,8 @@ Item {
         cache: false
     }
 
-    // Takes the keys; a click anywhere gives it the keyboard again
+    // Takes the keys; a click anywhere gives it the keyboard again. The pointer hides after
+    // 5 s without moving and shows again when it moves.
     Item {
         id: keys
 
@@ -120,8 +121,26 @@ Item {
         }
 
         MouseArea {
+            id: pointer
+
+            property bool idle: false
+
             anchors.fill: parent
+            hoverEnabled: !root.preview
+            cursorShape: idle ? Qt.BlankCursor : Qt.ArrowCursor
             onClicked: root.takeFocus()
+            onPositionChanged: {
+                idle = false;
+                idleTimer.restart();
+            }
+
+            Timer {
+                id: idleTimer
+
+                interval: 5000
+                running: !root.preview
+                onTriggered: pointer.idle = true
+            }
         }
     }
 

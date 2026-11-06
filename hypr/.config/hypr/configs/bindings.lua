@@ -112,5 +112,7 @@ hl.bind("XF86AudioPause", hl.dsp.exec_cmd("playerctl play-pause"), player_opts) 
 hl.bind("XF86AudioPlay", hl.dsp.exec_cmd("playerctl play-pause"), player_opts) -- Play / pause
 hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), player_opts) -- Previous track
 
--- lid closed: lock, unless an external monitor keeps it in use (not listed in the keybindings)
+-- lid closed: lock, or with an external monitor the laptop's screen off; opened: back on
+-- (not listed in the keybindings)
 hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("~/.config/scripts/lid-close.sh"), { locked = true })
+hl.bind("switch:off:Lid Switch", hl.dsp.exec_cmd("~/.config/scripts/hypr-monitors.py lid"), { locked = true })
