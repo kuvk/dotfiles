@@ -14,9 +14,9 @@ hl.config({
       active_border = theme.active_border,
       inactive_border = theme.inactive_border,
     },
-    -- Only windows with an `immediate` rule tear (games, rules.lua): lower input latency
     resize_on_border = false,
-    allow_tearing = false,
+    -- Only windows with an `immediate` rule tear (games, rules.lua): lower input latency
+    allow_tearing = true,
     layout = "dwindle",
   },
 
@@ -48,6 +48,6 @@ hl.config({
   -- Hyprland's own lines in hyprland.log (in RAM, $XDG_RUNTIME_DIR/hypr/), so a crash on a
   -- monitor plugged in after a sleep leaves something to report; off again once caught
   debug = {
-    disable_logs = true,
+    disable_logs = false,
   },
 })
