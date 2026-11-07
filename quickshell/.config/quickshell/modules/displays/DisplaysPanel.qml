@@ -14,7 +14,7 @@ FloatingWindow {
     readonly property bool shown: Panels.displays
     readonly property var scalePresets: [1, 1.25, 1.333333, 1.5, 1.6, 1.666667, 1.75, 2, 2.5, 3, 4]
     // Hyprland's per-monitor vrr values, and color modes (cm)
-    readonly property var vrrNames: ["Off", "Always", "Fullscreen", "Fullscreen games and video"]
+    readonly property var vrrNames: ["Off", "Always", "Fullscreen", "Games and video"]
     readonly property var colorNames: ({
             srgb: "Standard (sRGB)",
             edid: "The panel's own (EDID)",
@@ -210,7 +210,7 @@ FloatingWindow {
 
     function applyChanges(): void {
         Displays.apply({
-            monitors: mons.map(m => ({ id: m.id, enabled: m.enabled, mode: m.mode, x: m.x, y: m.y, scale: m.scale, transform: m.transform, vrr: m.vrr, cm: m.cm, sdrbrightness: m.sdrbrightness })),
+            monitors: mons.map(m => ({ id: m.id, enabled: m.enabled, mode: m.mode, x: m.x, y: m.y, scale: m.scale, transform: m.transform, vrr: m.vrr, cm: m.cm, sdrbrightness: m.sdrbrightness, autohdr: m.autohdr, bitdepth: m.bitdepth })),
             workspaces: workspaces,
             text_size: textSize,
             primary: primary
@@ -521,7 +521,7 @@ FloatingWindow {
                     }
 
                     StyledText {
-                        text: "For games. Turning on at fullscreen can blank some screens"
+                        text: "May blink when it switches"
                         color: Theme.overlay1
                         font.pixelSize: Theme.fontSize - 2
                     }
@@ -535,6 +535,55 @@ FloatingWindow {
                     enabled: root.current?.enabled ?? false
                     text: root.current ? (root.colorNames[root.current.cm] ?? root.current.cm) : ""
                     onStep: delta => root.update(root.selected, { cm: root.cycle(root.colorModes(root.current), root.current.cm, delta) })
+                }
+
+                StyledText {
+                    text: "Color depth"
+                    visible: depthRow.visible
+                }
+
+                // Screens that take 10-bit (their EDID); HDR always runs in 10-bit
+                RowLayout {
+                    id: depthRow
+
+                    visible: !!root.current?.enabled && (root.current?.max_bitdepth ?? 8) >= 10 && !root.currentHdr
+                    spacing: 10
+
+                    Stepper {
+                        text: `${root.current?.bitdepth ?? 10}-bit`
+                        onStep: delta => root.update(root.selected, { bitdepth: (root.current?.bitdepth ?? 10) === 10 ? 8 : 10 })
+                    }
+
+                    StyledText {
+                        text: (root.current?.bitdepth ?? 10) === 10 ? "Smoother gradients" : (root.current?.hdr_capable ? "HDR in 8 bits" : "")
+                        visible: text !== ""
+                        color: Theme.overlay1
+                        font.pixelSize: Theme.fontSize - 2
+                    }
+                }
+
+                StyledText {
+                    text: "Auto HDR"
+                    visible: autoHdrRow.visible
+                }
+
+                // HDR screens not set to HDR: HDR while a fullscreen app shows HDR content
+                RowLayout {
+                    id: autoHdrRow
+
+                    visible: !!root.current?.enabled && !!root.current?.hdr_capable && !root.currentHdr
+                    spacing: 10
+
+                    Switch {
+                        checked: root.current?.autohdr ?? true
+                        onToggled: root.update(root.selected, { autohdr: !(root.current?.autohdr ?? true) })
+                    }
+
+                    StyledText {
+                        text: root.current?.autohdr ?? true ? "HDR in fullscreen; may blink" : "Always SDR"
+                        color: Theme.overlay1
+                        font.pixelSize: Theme.fontSize - 2
+                    }
                 }
 
                 StyledText {

@@ -298,9 +298,11 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
+                            // the action can close the notification, and this card with it
+                            const notification = root.notification;
                             modelData.invoke();
-                            if (!root.notification.resident)
-                                root.notification.dismiss();
+                            if (notification && !notification.resident)
+                                notification.dismiss();
                         }
 
                         Rectangle {

@@ -25,6 +25,12 @@ assigned or left unassigned in the Displays panel.
 Per monitor also: variable refresh rate (off by default: turning it on and off at
 fullscreen blanks some screens for a moment) and the color mode: sRGB, the panel's
 own colors from its EDID (wide-gamut screens), or HDR where the screen supports it.
+On an HDR screen not set to HDR, Auto HDR (on by default) switches it to HDR while a
+fullscreen app shows HDR content (video, games), the screen going dark for a moment each
+way. Off, the screen is treated as SDR only, so apps send SDR.
+
+Color depth: 10-bit by default where the screen takes it (its EDID: the color depth, or an
+HDMI screen's deep color flags), else 8. HDR always runs in 10-bit.
 
 Text size is in px (9-20, default 13), like Omarchy's display text size: it
 sets the shell font, GTK's font size (theme-set.py --text-size) and kitty's
@@ -60,7 +66,7 @@ WORKSPACES = 10
 MAX_PER_MONITOR = 5
 PROFILE_VERSION = 2
 
-VRR_MODES = (0, 1, 2, 3)  # off, on, fullscreen, fullscreen games and video
+VRR_MODES = (0, 1, 2, 3)  # off, always, fullscreen, games and video
 COLOR_MODES = ("srgb", "edid", "hdr", "hdredid")
 HDR_MODES = ("hdr", "hdredid")
 
@@ -103,6 +109,46 @@ def active_workspace() -> int | None:
         return json.loads(run(["hyprctl", "-j", "activeworkspace"]) or "{}").get("id")
     except (json.JSONDecodeError, AttributeError):
         return None
+
+
+def edid_bits(name: str) -> int:
+    """The most bits per color the monitor on connector NAME takes, from its EDID: the
+    header's color depth (EDID 1.4), else the HDMI block's deep color flags (EDID 1.3
+    HDMI screens). 8 when it says nothing."""
+    bits = 8
+    for path in Path("/sys/class/drm").glob(f"card*-{name}/edid"):
+        try:
+            edid = path.read_bytes()
+        except OSError:
+            continue
+        if len(edid) < 128:
+            continue
+        # byte 20: a digital input's color depth in bits 6-4 (EDID 1.4)
+        if edid[18] == 1 and edid[19] >= 4 and edid[20] & 0x80:
+            bits = max(bits, {1: 6, 2: 8, 3: 10, 4: 12, 5: 14, 6: 16}.get((edid[20] >> 4) & 7, 8))
+        # CTA extensions: the HDMI vendor block (OUI 00-0C-03); byte 6 bit 4 is DC_30bit,
+        # bit 5 DC_36bit
+        for start in range(128, len(edid) - 127, 128):
+            block = edid[start:start + 128]
+            if block[0] != 0x02:
+                continue
+            i, end = 4, min(block[2], 127)
+            while i < end:
+                tag, length = block[i] >> 5, block[i] & 0x1F
+                data = block[i + 1:i + 1 + length]
+                if tag == 3 and len(data) >= 6 and bytes(data[:3]) == b"\x03\x0c\x00":
+                    if data[5] & 0x20:
+                        bits = max(bits, 12)
+                    elif data[5] & 0x10:
+                        bits = max(bits, 10)
+                i += 1 + length
+    return bits
+
+
+def max_bitdepth(m: dict) -> int:
+    """8 or 10: what Hyprland can send this monitor (it does 8 and 10; HDR screens take 10)."""
+    hdr = (m.get("hardwareDetails") or {}).get("hdr")
+    return 10 if hdr or edid_bits(m["name"]) >= 10 else 8
 
 
 def is_internal(name: str) -> bool:
@@ -329,7 +375,16 @@ def render_lua(profile: dict, live: list[dict]) -> str:
         if cm != "srgb":
             extra += f", cm = {lua_str(cm)}"
         if cm in HDR_MODES:
+            # HDR needs 10-bit
             extra += f", bitdepth = 10, sdrbrightness = {float(mon.get('sdrbrightness', 1.0)):g}"
+        else:
+            # 10-bit where the screen takes it (Displays: Color depth), smoother gradients and
+            # what Auto HDR needs
+            if max_bitdepth(by_id[mid]) >= 10 and int(mon.get("bitdepth", 10)) == 10:
+                extra += ", bitdepth = 10"
+            # Auto HDR off: Hyprland treats an HDR screen as SDR only
+            if (by_id[mid].get("hardwareDetails") or {}).get("hdr") and not mon.get("autohdr", True):
+                extra += ", supports_hdr = -1"
         lines.append(
             f"hl.monitor({{ output = {sel}, mode = {lua_str(mon['mode'])}, "
             f"position = \"{round(mon['x'])}x{round(mon['y'])}\", scale = \"{scale_str(mon['scale'])}\", "
@@ -562,6 +617,9 @@ def state(data: dict, live: list[dict]) -> dict:
             "vrr": mon.get("vrr", 0),
             "cm": mon.get("cm", "srgb"),
             "sdrbrightness": mon.get("sdrbrightness", 1.0),
+            "autohdr": bool(mon.get("autohdr", True)),
+            "bitdepth": int(mon.get("bitdepth", 10)),
+            "max_bitdepth": max_bitdepth(m),
             "vrr_capable": bool(hw.get("vrrCapable")),
             "hdr_capable": bool(hw.get("hdr")),
         })
@@ -580,7 +638,7 @@ def set_state(data: dict, live: list[dict], new: dict) -> None:
         mon = profile["monitors"].get(m["id"])
         if mon is None:
             continue
-        for field in ("enabled", "mode", "x", "y", "scale", "transform", "vrr", "cm", "sdrbrightness"):
+        for field in ("enabled", "mode", "x", "y", "scale", "transform", "vrr", "cm", "sdrbrightness", "autohdr", "bitdepth"):
             if field in m:
                 mon[field] = m[field]
         if mon.get("vrr") not in VRR_MODES:
@@ -588,6 +646,8 @@ def set_state(data: dict, live: list[dict], new: dict) -> None:
         if mon.get("cm") not in COLOR_MODES:
             mon["cm"] = "srgb"
         mon["sdrbrightness"] = max(0.5, min(2.0, float(mon.get("sdrbrightness", 1.0))))
+        mon["autohdr"] = bool(mon.get("autohdr", True))
+        mon["bitdepth"] = 8 if int(mon.get("bitdepth", 10)) == 8 else 10
         w, h = parse_mode(mon["mode"])
         mon["scale"] = clean_scale(float(mon["scale"]), w, h)
     if not any(mon["enabled"] for mon in profile["monitors"].values()):
