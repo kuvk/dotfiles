@@ -1,0 +1,2 @@
+# Hybrid laptop (NVIDIA next to the built-in GPU): prime-run starts an app on the NVIDIA card
+nvidia-prime

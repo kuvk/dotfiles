@@ -83,8 +83,8 @@ PanelWindow {
 
             Icon {
                 text: Distro.logo
-                color: launcherButton.containsMouse || (Panels.appMenu && Panels.overlayScreen === barWindow.screen) ? Theme.accent : Theme.accent2
-                font.pixelSize: 17
+                color: launcherButton.containsMouse || (Panels.appMenu && Panels.overlayScreen === barWindow.screen) ? Theme.accent2 : Theme.accent
+                font.pixelSize: Theme.iconSize
             }
         }
 
@@ -186,7 +186,7 @@ PanelWindow {
 
             Icon {
                 text: Icons.coffee
-                color: System.stayAwake ? Theme.accent : Theme.overlay1
+                color: System.stayAwake ? Theme.peach : Theme.overlay1
             }
         }
 

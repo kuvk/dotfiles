@@ -1,0 +1,3 @@
+# AMD GPU: Vulkan, which Steam and games need (Mesa, with video decoding, is in core.txt)
+vulkan-radeon
+lib32-vulkan-radeon

@@ -1,3 +1,5 @@
-# Desktop PC. "# AUR" marks AUR packages.
-coolercontrol-bin        # AUR
+# Desktop PC: fans, pumps and RGB
+coolercontrol            # the app; its daemon below runs as a service
+coolercontrold
+liquidctl                # AIO coolers and other USB devices
 openrgb

@@ -1,10 +1,9 @@
-# ASUS ROG laptop. linux-g14 and nvidia-laptop-power-cfg come from the g14 repo, which goes at
-# the bottom of /etc/pacman.conf:
+# ASUS ROG laptop, after asus-linux.org (no supergfxd: ROG Control Center manages the GPU).
+# nvidia-laptop-power-cfg and rog-control-center come from the g14 repo, which goes at the
+# bottom of /etc/pacman.conf:
 #   [g14]
 #   Server = https://arch.asus-linux.org
-linux-g14
-linux-g14-headers
+# Its linux-g14 kernel isn't installed: the stock kernel works on these laptops.
 nvidia-laptop-power-cfg
-nvidia-prime
 asusctl
 rog-control-center

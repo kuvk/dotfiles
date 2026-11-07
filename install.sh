@@ -16,7 +16,7 @@
 set -euo pipefail
 
 dotfiles=$(dirname "$(readlink -f "$0")")
-not_stowed=(limine packages plymouth sddm)
+not_stowed=(limine nvidia-hybrid packages plymouth sddm)
 
 step() { printf '\n\e[1;34m==> %s\e[0m\n' "$1"; }
 note() { printf '\e[33m%s\e[0m\n' "$1"; }
@@ -57,14 +57,22 @@ $laptop && [[ $vendor == ASUSTeK* ]] && asus_laptop=true
 groups=(core)
 has_gpu 0x10de && groups+=(nvidia)
 has_gpu 0x8086 && groups+=(intel)
-if $asus_laptop && ask "ASUS laptop: add the g14 repo, its kernel and asusctl (packages/laptop.txt)?" y; then
+has_gpu 0x1002 && groups+=(amd)
+# NVIDIA next to another GPU in a laptop: prime-run
+$laptop && has_gpu 0x10de && ((${#gpus[@]} >= 2)) && groups+=(hybrid)
+# Both asked on every machine, as not every laptop or desktop needs them; what the hardware
+# suggests is the default
+if ask "ASUS laptop: the g14 repo, asusctl and ROG Control Center (packages/laptop.txt)?" "$($asus_laptop && echo y || echo n)"; then
     groups+=(laptop)
 fi
-if ! $laptop && ask "Desktop PC: fan and RGB control (packages/desktop.txt)?" y; then
+if ask "Desktop PC: fan, pump and RGB control: CoolerControl, liquidctl, OpenRGB (packages/desktop.txt)?" "$($laptop && echo n || echo y)"; then
     groups+=(desktop)
 fi
 ask "Apps with window rules (packages/apps.txt)?" y && groups+=(apps)
-ask "Virtual machines and Docker (packages/vm.txt)?" y && groups+=(vm)
+if ask "Virtual machines and Docker (packages/vm.txt)?" y; then
+    groups+=(vm)
+    has_gpu 0x10de && groups+=(nvidia-docker)
+fi
 flatpak=false
 ask "Flatpak apps (packages/flatpak.txt)?" y && flatpak=true
 

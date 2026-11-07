@@ -3,3 +3,5 @@ nvidia-open-dkms
 nvidia-utils
 lib32-nvidia-utils
 nvidia-settings
+egl-wayland              # NVIDIA's EGL for Wayland apps
+cuda                     # GPU computing (DaVinci Resolve, AI tools); several GB

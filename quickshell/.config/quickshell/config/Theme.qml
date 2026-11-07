@@ -79,6 +79,9 @@ Singleton {
     property int textSize: 13
     readonly property int fontSize: textSize
     readonly property int iconSize: textSize + 1
+    // Bar: workspace dots one size down, the tray's arrow two
+    readonly property int smallIconSize: textSize - 1
+    readonly property int tinyIconSize: textSize - 2
     readonly property int barHeight: Math.max(34, Math.round(textSize * 2.6))
     // Floating bar (Settings > Bar): its own margin on the left, right and
     // top (the gap below it is Hyprland's outer gap); 0 for the full-width bar

@@ -32,7 +32,7 @@ Row {
             Icon {
                 text: ws.current ? Icons.workspaceActive : Icons.workspace
                 color: ws.current || ws.containsMouse ? Theme.accent : (ws.modelData.urgent ? Theme.red : Theme.accent2)
-                font.pixelSize: 12
+                font.pixelSize: Theme.smallIconSize
             }
         }
     }

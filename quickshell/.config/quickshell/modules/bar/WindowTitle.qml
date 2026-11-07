@@ -28,7 +28,7 @@ Row {
 
     IconImage {
         anchors.verticalCenter: parent.verticalCenter
-        implicitSize: 15
+        implicitSize: Theme.iconSize
         source: root.shellWindow ? "" : Apps.iconSource(root.entry?.icon ?? "", "")
         visible: source != ""
     }
@@ -44,6 +44,7 @@ Row {
         anchors.verticalCenter: parent.verticalCenter
         width: Math.min(implicitWidth, 220)
         text: root.shellWindow ? (root.toplevel?.title ?? "") : (root.entry?.name || root.toplevel?.appId || root.toplevel?.title || "")
-        color: Theme.accent
+        // the clock's color
+        color: Theme.text
     }
 }

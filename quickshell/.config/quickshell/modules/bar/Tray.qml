@@ -41,7 +41,7 @@ Item {
         Icon {
             text: Icons.chevronLeft
             color: root.expanded ? Theme.accent : Theme.overlay2
-            font.pixelSize: 11
+            font.pixelSize: Theme.tinyIconSize
         }
     }
 
