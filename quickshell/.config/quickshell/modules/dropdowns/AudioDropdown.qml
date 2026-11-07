@@ -4,21 +4,21 @@ import Quickshell.Services.Pipewire
 import qs.config
 import qs.components
 import qs.services
+import qs.modules.dropdowns.common
+import qs.modules.dropdowns.audio
 
+// Sound: the output and input volume, the devices to choose from, and each app's volume
 Dropdown {
     id: root
 
     name: "audio"
     contentWidth: 360
 
-    SectionHeader {
-        title: "Sound"
-
-        StyledText {
-            anchors.verticalCenter: parent.verticalCenter
-            text: `${Math.round(Audio.volume * 100)}%`
-            color: Theme.subtext0
-        }
+    Hero {
+        icon: Audio.icon
+        iconColor: Audio.muted ? Theme.overlay1 : Theme.highlight
+        title: Audio.sink ? Audio.nodeName(Audio.sink) : "No output"
+        status: Audio.muted ? "MUTED" : `VOLUME ${Math.round(Audio.volume * 100)}%`
     }
 
     VolumeRow {
@@ -31,10 +31,10 @@ Dropdown {
         icon: Audio.micMuted ? Icons.micMuted : Icons.mic
     }
 
-    StyledText {
-        text: "Output"
-        color: Theme.subtext0
-        font.pixelSize: Theme.fontSize - 1
+    Separator {}
+
+    Caption {
+        text: "OUTPUT"
     }
 
     Repeater {
@@ -51,11 +51,13 @@ Dropdown {
         }
     }
 
-    StyledText {
+    Separator {
         visible: Audio.sources.length > 0
-        text: "Input"
-        color: Theme.subtext0
-        font.pixelSize: Theme.fontSize - 1
+    }
+
+    Caption {
+        visible: Audio.sources.length > 0
+        text: "INPUT"
     }
 
     Repeater {
@@ -72,11 +74,13 @@ Dropdown {
         }
     }
 
-    StyledText {
+    Separator {
         visible: Audio.streams.length > 0
-        text: "Applications"
-        color: Theme.subtext0
-        font.pixelSize: Theme.fontSize - 1
+    }
+
+    Caption {
+        visible: Audio.streams.length > 0
+        text: "APPLICATIONS"
     }
 
     Repeater {
@@ -90,10 +94,10 @@ Dropdown {
             Layout.fillWidth: true
             spacing: 2
 
-            StyledText {
+            Label {
                 Layout.fillWidth: true
                 text: stream.modelData.properties["application.name"] ?? Audio.nodeName(stream.modelData)
-                font.pixelSize: Theme.fontSize - 1
+                elide: Text.ElideRight
             }
 
             VolumeRow {
@@ -103,19 +107,11 @@ Dropdown {
         }
     }
 
-    StyledText {
-        Layout.fillWidth: true
+    FooterLink {
         text: "Volume control"
-        color: Theme.accent2
-        horizontalAlignment: Text.AlignRight
-
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                Panels.dropdown = "";
-                System.run(["pavucontrol"]);
-            }
+        onClicked: {
+            Panels.dropdown = "";
+            System.run(["pavucontrol"]);
         }
     }
 }

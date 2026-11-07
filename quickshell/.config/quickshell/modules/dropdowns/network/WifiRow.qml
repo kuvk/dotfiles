@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import qs.config
 import qs.components
 import qs.services
+import qs.modules.dropdowns.common
 
 // A Wi-Fi network under its section's title (connected, known, other), with its password
 // field. After the network rows of Omarchy's network panel (github.com/basecamp/omarchy, MIT).

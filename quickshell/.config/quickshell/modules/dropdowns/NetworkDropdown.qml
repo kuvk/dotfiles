@@ -4,6 +4,7 @@ import Quickshell
 import qs.config
 import qs.components
 import qs.services
+import qs.modules.dropdowns.common
 import qs.modules.dropdowns.network
 
 // Network: the connection with its live stats, the Wi-Fi band, DNS, VPNs, wired ports and
@@ -130,7 +131,7 @@ Dropdown {
         id: phraseFade
 
         NumberAnimation {
-            target: heroMeta
+            target: hero.statusItem
             property: "opacity"
             to: 0
             duration: Theme.animDuration
@@ -141,7 +142,7 @@ Dropdown {
         }
 
         NumberAnimation {
-            target: heroMeta
+            target: hero.statusItem
             property: "opacity"
             to: 1
             duration: Theme.animDuration * 1.3
@@ -150,55 +151,30 @@ Dropdown {
 
     // ---------------------------------------------------------------- the connection
 
-    RowLayout {
-        Layout.fillWidth: true
-        spacing: 12
+    Hero {
+        id: hero
 
-        Icon {
-            text: Network.icon
-            color: Network.restricted ? Theme.red : (Network.type !== "none" ? Theme.highlight : Theme.overlay1)
-            font.pixelSize: Theme.iconSize * 2
-            Layout.preferredWidth: Theme.iconSize * 2.2
-        }
-
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 1
-
-            StyledText {
-                Layout.fillWidth: true
-                text: {
-                    if (Network.type === "wifi")
-                        return Network.connection;
-                    if (Network.type === "ethernet") {
-                        const speed = Network.wiredDevice?.linkSpeed ?? 0;
-                        return speed > 0 ? `Ethernet (${speed >= 1000 ? `${speed / 1000} Gb/s` : `${speed} Mb/s`})` : "Ethernet";
-                    }
-                    return "Disconnected";
-                }
-                font.pixelSize: Theme.fontSize + 2
-                font.weight: Font.Bold
+        icon: Network.icon
+        iconColor: Network.restricted ? Theme.red : (Network.type !== "none" ? Theme.highlight : Theme.overlay1)
+        title: {
+            if (Network.type === "wifi")
+                return Network.connection;
+            if (Network.type === "ethernet") {
+                const speed = Network.wiredDevice?.linkSpeed ?? 0;
+                return speed > 0 ? `Ethernet (${speed >= 1000 ? `${speed / 1000} Gb/s` : `${speed} Mb/s`})` : "Ethernet";
             }
-
-            StyledText {
-                id: heroMeta
-
-                Layout.fillWidth: true
-                text: {
-                    if (Network.connectivity === "portal")
-                        return "SIGN-IN REQUIRED";
-                    if (Network.restricted)
-                        return "LIMITED INTERNET ACCESS";
-                    if (Network.type !== "none")
-                        return root.phrases[root.phrase].toUpperCase();
-                    return Network.hasWifi && !Network.wifiEnabled ? "WI-FI IS OFF" : "NOT CONNECTED";
-                }
-                color: Network.restricted ? Theme.red : Theme.subtext0
-                font.pixelSize: Theme.fontSize - 2
-                font.weight: Font.Bold
-                font.letterSpacing: 1.2
-            }
+            return "Disconnected";
         }
+        status: {
+            if (Network.connectivity === "portal")
+                return "SIGN-IN REQUIRED";
+            if (Network.restricted)
+                return "LIMITED INTERNET ACCESS";
+            if (Network.type !== "none")
+                return root.phrases[root.phrase].toUpperCase();
+            return Network.hasWifi && !Network.wifiEnabled ? "WI-FI IS OFF" : "NOT CONNECTED";
+        }
+        statusColor: Network.restricted ? Theme.red : Theme.subtext0
 
         IconButton {
             visible: root.canShareWifi
@@ -330,7 +306,7 @@ Dropdown {
 
         Caption {
             Layout.fillWidth: true
-            // under Automatic the header names the band in use; a pin shows in the pills
+            // under Automatic the header names the band in use; a pin shows in the buttons
             text: !Network.bandPinned && Network.bandCurrent ? `WI-FI BAND: ${Network.bandCurrent} GHZ` : "WI-FI BAND"
         }
 
@@ -556,20 +532,11 @@ Dropdown {
         }
     }
 
-    StyledText {
-        Layout.fillWidth: true
+    FooterLink {
         text: "Connection editor"
-        color: Theme.highlight
-        horizontalAlignment: Text.AlignRight
-
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            onClicked: {
-                Panels.dropdown = "";
-                System.run(["nm-connection-editor"]);
-            }
+        onClicked: {
+            Panels.dropdown = "";
+            System.run(["nm-connection-editor"]);
         }
     }
-
 }

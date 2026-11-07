@@ -17,6 +17,7 @@ local lock = "qs ipc call lock lock"
 local powermenu = "qs ipc call power toggle"
 local settings = "qs ipc call settings toggle"
 local keybinds = "qs ipc call keybinds toggle"
+local sysinfo = "~/.config/scripts/sysinfo.sh"
 local music = "kitty --class cliamp -e cliamp"
 local email = "thunderbird"
 local gamemode = "~/.config/scripts/hypr-gamemode.sh"
@@ -44,6 +45,7 @@ hl.bind(mainMod .. " + CONTROL + B", hl.dsp.exec_cmd("qs ipc call bar floating")
 hl.bind(mainMod .. " + CONTROL + T", hl.dsp.exec_cmd(themes)) -- Theme carousel
 hl.bind(mainMod .. " + CONTROL + M", hl.dsp.exec_cmd(displays)) -- Displays
 hl.bind(mainMod .. " + CONTROL + S", hl.dsp.exec_cmd(settings)) -- Settings
+hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd(sysinfo)) -- System information
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(music)) -- Music player (cliamp)
 hl.bind(mainMod .. " + Q", hl.dsp.window.close()) -- Close window
 hl.bind(mainMod .. " + CONTROL + Q", hl.dsp.exec_cmd(powermenu)) -- Power menu

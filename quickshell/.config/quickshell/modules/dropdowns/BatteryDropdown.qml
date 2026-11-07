@@ -4,6 +4,7 @@ import Quickshell.Services.UPower
 import qs.config
 import qs.components
 import qs.services
+import qs.modules.dropdowns.common
 
 // Battery details and power profile (power-profiles-daemon; on ASUS laptops
 // asusd maps these to Quiet / Balanced / Performance).
@@ -11,82 +12,67 @@ Dropdown {
     id: root
 
     name: "battery"
-    contentWidth: 320
+    // the power mode buttons share the width equally, each wide enough for the longest label
+    contentWidth: Math.max(340, modes.count * (modeWidth + 20) + (modes.count - 1) * 6 + Theme.padding * 2)
 
-    RowLayout {
-        Layout.fillWidth: true
-        spacing: 14
+    readonly property int modeWidth: {
+        // advanceWidth() alone doesn't update when the font changes
+        modeMetrics.font;
+        return Math.ceil(Math.max(...modes.model.map(m => modeMetrics.advanceWidth(m.label))));
+    }
 
-        Icon {
-            text: Battery.icon
-            color: Battery.color
-            font.pixelSize: 32
-        }
+    FontMetrics {
+        id: modeMetrics
 
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 0
+        font.family: Theme.font
+        font.pixelSize: Theme.fontSize - 1
+        font.weight: Font.DemiBold
+    }
 
-            StyledText {
-                text: `${Math.round(Battery.percent * 100)}%`
-                font.pixelSize: 26
-                font.weight: Font.Bold
-            }
-
-            StyledText {
-                Layout.fillWidth: true
-                text: Battery.state
-                color: Theme.subtext0
-            }
-        }
+    Hero {
+        icon: Battery.icon
+        iconColor: Battery.color
+        title: `${Math.round(Battery.percent * 100)}%`
+        status: Battery.state.toUpperCase()
     }
 
     GridLayout {
         Layout.fillWidth: true
         columns: 2
         columnSpacing: 12
-        rowSpacing: 6
+        rowSpacing: 4
 
-        StyledText {
+        Label {
             text: "Remaining"
-            color: Theme.overlay1
         }
 
-        StyledText {
-            Layout.fillWidth: true
-            text: Battery.timeLeft || "—"
-            horizontalAlignment: Text.AlignRight
+        Value {
+            text: Battery.timeLeft || "--"
         }
 
-        StyledText {
+        Label {
             text: Battery.charging ? "Charging at" : "Power draw"
-            color: Theme.overlay1
         }
 
-        StyledText {
-            Layout.fillWidth: true
-            text: Battery.watts > 0 ? `${Battery.watts.toFixed(1)} W` : "—"
-            horizontalAlignment: Text.AlignRight
+        Value {
+            text: Battery.watts > 0 ? `${Battery.watts.toFixed(1)} W` : "--"
         }
 
-        StyledText {
+        Label {
             visible: Battery.device?.healthSupported ?? false
             text: "Health"
-            color: Theme.overlay1
         }
 
-        StyledText {
-            Layout.fillWidth: true
+        Value {
             visible: Battery.device?.healthSupported ?? false
             text: `${Math.round(Battery.device?.healthPercentage ?? 0)}%`
-            horizontalAlignment: Text.AlignRight
         }
     }
 
-    StyledText {
-        text: "Power mode"
-        color: Theme.subtext0
-        font.pixelSize: Theme.fontSize - 1
+    Separator {}
+
+    Caption {
+        text: "POWER MODE"
     }
 
     RowLayout {
@@ -94,50 +80,24 @@ Dropdown {
         spacing: 6
 
         Repeater {
+            id: modes
+
             model: [
                 { label: "Quiet", profile: PowerProfile.PowerSaver, icon: Icons.moon },
                 { label: "Balanced", profile: PowerProfile.Balanced, icon: Icons.sliders },
                 { label: "Performance", profile: PowerProfile.Performance, icon: Icons.g(0xf0e7) }
             ]
 
-            MouseArea {
-                id: mode
-
+            Chip {
                 required property var modelData
-                readonly property bool selected: PowerProfiles.profile === modelData.profile
 
-                Layout.fillWidth: true
-                implicitHeight: 52
+                // equal shares of the row
+                Layout.preferredWidth: 1
                 visible: modelData.profile !== PowerProfile.Performance || PowerProfiles.hasPerformanceProfile
-                hoverEnabled: true
-                cursorShape: Qt.PointingHandCursor
+                icon: modelData.icon
+                text: modelData.label
+                current: PowerProfiles.profile === modelData.profile
                 onClicked: PowerProfiles.profile = modelData.profile
-
-                Rectangle {
-                    anchors.fill: parent
-                    radius: Theme.smallRadius
-                    color: mode.selected ? Theme.alpha(Theme.highlight, 0.25) : (mode.containsMouse ? Theme.hoverBg : Theme.cardBg)
-                    border.color: mode.selected ? Theme.highlight : "transparent"
-                    border.width: Theme.borderWidth
-                }
-
-                ColumnLayout {
-                    anchors.centerIn: parent
-                    spacing: 2
-
-                    Icon {
-                        Layout.alignment: Qt.AlignHCenter
-                        text: mode.modelData.icon
-                        color: mode.selected ? Theme.highlight : Theme.subtext0
-                    }
-
-                    StyledText {
-                        Layout.alignment: Qt.AlignHCenter
-                        text: mode.modelData.label
-                        color: mode.selected ? Theme.highlight : Theme.text
-                        font.pixelSize: Theme.fontSize - 1
-                    }
-                }
             }
         }
     }

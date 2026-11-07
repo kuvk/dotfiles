@@ -48,9 +48,10 @@ Singleton {
         Hypr.applyGaps();
     }
 
-    // System information window (modules/sysinfo)
+    // System Information: fastfetch in a kitty window (scripts/sysinfo.sh), opened or closed
     function showSysinfo(): void {
-        Panels.toggleSysinfo();
+        Panels.closeAll();
+        Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/sysinfo.sh"]);
     }
     property bool hasBrightness: false
     property real brightness: 0

@@ -204,7 +204,8 @@ Rectangle {
             anchors.verticalCenterOffset: 85
             implicitWidth: 260
             implicitHeight: 36
-            radius: height / 2
+            // a box with the windows' corners (Hyprland's rounding)
+            radius: 6
             color: Qt.alpha(root.c.input, Number(root.c.inputOpacity))
             border.width: 1
             border.color: root.failed ? root.c.fail : (root.busy ? root.c.check : root.c.inputOutline)

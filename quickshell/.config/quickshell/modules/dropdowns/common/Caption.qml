@@ -4,7 +4,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// Small capitals over a section of the network dropdown
+// Small capitals over a section of a dropdown
 StyledText {
     color: Theme.subtext0
     font.pixelSize: Theme.fontSize - 2

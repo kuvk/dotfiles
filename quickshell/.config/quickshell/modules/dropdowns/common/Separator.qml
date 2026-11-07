@@ -4,7 +4,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// A line between sections of the network dropdown
+// A line between sections of a dropdown
 Rectangle {
     Layout.fillWidth: true
     Layout.topMargin: 2

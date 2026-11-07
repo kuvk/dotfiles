@@ -3,6 +3,7 @@ import QtQuick.Layouts
 import qs.config
 import qs.components
 import qs.services
+import qs.modules.dropdowns.common
 
 // Month view with ISO week numbers.
 // Scroll or use the arrows to change month, click the title to go back to today.
@@ -52,13 +53,13 @@ Dropdown {
 
     onShownChanged: if (shown) today()
 
-    StyledText {
-        Layout.fillWidth: true
-        text: Qt.formatDateTime(Time.date, "dddd, d MMMM yyyy  ·  HH:mm")
-        color: Theme.subtext0
-        font.pixelSize: Theme.fontSize + 1
-        horizontalAlignment: Text.AlignHCenter
+    Hero {
+        icon: Icons.calendar
+        title: Qt.formatDateTime(Time.date, "dddd, d MMMM yyyy")
+        status: `WEEK ${root.isoWeek(Time.date)} · ${Qt.formatDateTime(Time.date, "HH:mm")}`
     }
+
+    Separator {}
 
     RowLayout {
         Layout.fillWidth: true
@@ -73,7 +74,7 @@ Dropdown {
             text: Qt.formatDate(new Date(root.year, root.month, 1), "MMMM yyyy")
             color: Theme.highlight
             font.weight: Font.Bold
-            font.pixelSize: Theme.fontSize + 4
+            font.pixelSize: Theme.fontSize + 2
             horizontalAlignment: Text.AlignHCenter
 
             MouseArea {

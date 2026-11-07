@@ -5,7 +5,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// A stat in the network dropdown; with `copyable`, a click copies it
+// A stat in a dropdown, beside its Label; with `copyable`, a click copies it
 StyledText {
     id: value
 

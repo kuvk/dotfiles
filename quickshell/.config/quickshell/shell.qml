@@ -16,7 +16,6 @@ import qs.modules.network
 import qs.modules.notifications
 import qs.modules.powermenu
 import qs.modules.settings
-import qs.modules.sysinfo
 import qs.modules.transition
 import qs.modules.wallpaper
 import qs.modules.themes
@@ -83,12 +82,6 @@ ShellRoot {
         active: Panels.settings
 
         SettingsWindow {}
-    }
-
-    LazyLoader {
-        active: Panels.sysinfo
-
-        SysinfoWindow {}
     }
 
     LazyLoader {
@@ -267,7 +260,7 @@ ShellRoot {
         target: "sysinfo"
 
         function toggle(): void {
-            Panels.toggleSysinfo();
+            System.showSysinfo();
         }
     }
 
