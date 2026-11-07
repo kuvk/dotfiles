@@ -79,7 +79,8 @@ theme folder and set `wallpaper` under `[apps]`.
 | swayimg | `current/swayimg.lua` (loaded by `~/.config/swayimg/init.lua`) | live (SIGUSR1) |
 | scripts | `current/colors.sh` | sourced by `hypr-gamemode.sh`, `theme-boot.sh` |
 | Boot splash (Plymouth), boot menu (Limine) | `current/colors.sh` and the logo, read when their installers run | after a theme change: the **Update** notification, or `theme-boot.sh` |
-| Wallpaper | Settings > Appearance > Wallpaper follows theme: the logo in accent2 on base, drawn per theme (`logo-wallpaper.py`) | on switch, with the lock and login screens |
+| Hyprland look | gaps, corners, window opacity and blur from Settings, in `generated/theme.lua` (`--hypr`) | on change in Settings |
+| Wallpaper | the theme's background (the logo in accent2 on base, drawn per theme by `logo-wallpaper.py`) while the desktop shows it; another wallpaper stays. Settings > Appearance > Wallpaper > Theme's goes back to it | on switch; the lock and login screens follow on their own |
 | GTK apps | adw-gtk3 if installed, otherwise Adwaita, in the theme's mode; icons and `color-scheme` through `gsettings` and `settings.ini`; colors in `~/.config/gtk-{3,4}.0/gtk.css` | mode live; colors when an app next starts |
 
 fastfetch uses `~/.config/fastfetch/config.jsonc`, generated from `base.jsonc` on each theme switch.

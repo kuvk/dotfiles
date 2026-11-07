@@ -70,7 +70,7 @@ trap 'rm -rf "$build"' EXIT
 # The logo drawn like kitty draws it, in 24px rows (scripts/.config/scripts/logo-render.py)
 "$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$accent2" --cell-height 24 --out "$build/logo.png"
 # The password field and progress bar are as wide as the logo; the field is a box with the
-# windows' corners (Hyprland's rounding)
+# windows' corners (Hyprland's rounding) and a 2 px outline, like the lock and login screens'
 ew=$(magick identify -format %w "$build/logo.png")
 magick -size "${ew}x48" xc:none -fill "$surface0" -stroke "$accent" -strokewidth 2 \
     -draw "roundrectangle 1,1 $((ew - 2)),46 6,6" "$build/entry.png"
@@ -111,9 +111,9 @@ if [[ $mode == preview* ]]; then
     magick -size 1920x1080 "xc:$base" \
         "$build/logo.png" -geometry +$((960 - lw / 2))+$ly -composite \
         "$build/entry.png" -geometry +$ex+$ey -composite \
-        \( "$build/bullet.png" -resize 7x7 \) -geometry +$((ex + ew / 2 - 15))+$((ey + 20)) -composite \
-        \( "$build/bullet.png" -resize 7x7 \) -geometry +$((ex + ew / 2 - 3))+$((ey + 20)) -composite \
-        \( "$build/bullet.png" -resize 7x7 \) -geometry +$((ex + ew / 2 + 9))+$((ey + 20)) -composite \
+        \( "$build/bullet.png" -resize 9x9 \) -geometry +$((ex + ew / 2 - 17))+$((ey + 19)) -composite \
+        \( "$build/bullet.png" -resize 9x9 \) -geometry +$((ex + ew / 2 - 4))+$((ey + 19)) -composite \
+        \( "$build/bullet.png" -resize 9x9 \) -geometry +$((ex + ew / 2 + 9))+$((ey + 19)) -composite \
         "$build/hint.png" -geometry +$((960 - $(magick identify -format %w "$build/hint.png") / 2))+$((ey + 48 + 16)) -composite \
         "$preview"
     echo "Preview: $preview"

@@ -8,9 +8,13 @@ RowLayout {
 
     property string label
     property string hint: ""
+    // Only used in normal mode: dimmed and locked in Work and Game
+    property bool normalOnly: false
     default property alias control: holder.data
 
     Layout.fillWidth: true
+    enabled: !normalOnly || !Theme.gamemode
+    opacity: enabled ? 1 : 0.4
     spacing: 12
 
     ColumnLayout {
@@ -25,7 +29,7 @@ RowLayout {
         StyledText {
             Layout.fillWidth: true
             visible: text !== ""
-            text: root.hint
+            text: root.enabled ? root.hint : "Not used in Work and Game modes"
             color: Theme.overlay1
             font.pixelSize: Theme.fontSize - 2
         }

@@ -9,7 +9,7 @@ MouseArea {
 
     implicitWidth: 40
     implicitHeight: 22
-    cursorShape: Qt.PointingHandCursor
+    cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
     onClicked: toggled()
 
     Rectangle {

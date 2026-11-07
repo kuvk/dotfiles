@@ -15,8 +15,8 @@ Options:
   --size PERCENTS      logo height as a share of the screen height (default: 30)
   --res WxH            image size (default: the highest resolution any connected monitor
                        has, else 2560x1440; works from a console too)
-  --output-dir DIR     where the images go (default: ~/Pictures/Wallpapers, which the
-                       wallpaper picker lists)
+  --output-dir DIR     where the images go (default: ~/.local/share/dotfiles/backgrounds/
+                       default, which the wallpaper picker lists)
   --logo FILE          another text logo (default: ~/.config/theme/logo/ascii-dori)
   --output FILE        one file at this path instead (one color and size only; theme-set.py
                        uses it for the wallpaper that follows the theme)
@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import itertools
 import json
+import os
 import re
 import shutil
 import subprocess
@@ -40,7 +41,7 @@ from pathlib import Path
 HOME = Path.home()
 THEME_COLORS = HOME / ".config/theme/current/quickshell.json"
 DEFAULT_LOGO = HOME / ".config/theme/logo/ascii-dori"
-DEFAULT_DIR = HOME / "Pictures/Wallpapers"
+DEFAULT_DIR = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "dotfiles/backgrounds/default"
 RENDER = Path(__file__).resolve().with_name("logo-render.py")
 HEX_RE = re.compile(r"^#?[0-9a-fA-F]{6}$")
 

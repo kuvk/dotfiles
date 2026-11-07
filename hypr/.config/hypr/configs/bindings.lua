@@ -22,6 +22,7 @@ local music = "kitty --class cliamp -e cliamp"
 local email = "thunderbird"
 local gamemode = "~/.config/scripts/hypr-gamemode.sh"
 local nightlight = "~/.config/scripts/nightlight-toggle.sh"
+local singleWindow = "~/.config/scripts/hypr-single-window.sh"
 
 ---------------------
 ---- KEYBINDINGS ----
@@ -54,6 +55,7 @@ hl.bind(mainMod .. " + V", hl.dsp.window.float({ action = "toggle" })) -- Float 
 hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(clipboard)) -- Clipboard history
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen()) -- Fullscreen
 hl.bind(mainMod .. " + S", hl.dsp.layout("togglesplit")) -- Toggle split direction
+hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd(singleWindow)) -- Single window: a lone window keeps its shape, on / off
 hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("~/.config/scripts/hypr-monitors.py")) -- Re-apply the monitor profile
 hl.bind(mainMod .. " + G", hl.dsp.exec_cmd(gamemode .. " work")) -- Work-Game: Work mode on / off
 hl.bind(mainMod .. " + CONTROL + G", hl.dsp.exec_cmd(gamemode .. " game")) -- Work-Game: Game mode on / off

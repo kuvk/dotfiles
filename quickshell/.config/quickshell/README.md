@@ -74,12 +74,12 @@ Dropdowns slide out of the bar; one click anywhere outside closes them.
 Hovering a bar item shows a dot under it, an open dropdown an accent line.
 
 Preferences are set in Settings, one sidebar section each: Appearance (the three accents per theme,
-whether the wallpaper follows the theme, corner radius, cursor and size, icon theme, border width,
-opacity, animations), Fonts (a Nerd Font and a
+the theme's wallpaper again, corner radius for the shell and windows, cursor and size, icon theme,
+border width, bar, panel and window opacity, blur, animations; the ones for normal mode are dimmed in Work-Game), Fonts (a Nerd Font and a
 display font, "Nerd Fonts only" and "Use Nerd Symbols font" switches, hinting and antialiasing), Bar (full width or floating with
 margins and rounded corners, clock format, weather location and unit, and which modules show on the primary monitor's bar and on
 the others; the clock always shows), Windows (window buttons, gaps for regular
-and Work-Game), Notifications, Lock Screen (style; sections for the clock and date, avatar, box,
+and Work-Game), Notifications, Lock Screen (image; sections for the clock and date, avatar, box,
 password field and the login screen's power buttons), Idle (minutes until the screen locks and the
 machine sleeps; on a laptop a second set for battery),
 and Tray & Player (tray icon style, apps that keep their own colors, the
@@ -145,8 +145,12 @@ crashed when the NVIDIA GPU was left without a lit output.
   gives up after 5 failures in a row right after starting (`journalctl -t shell.sh`): a Hyprland
   restarted after its own crash can refuse it; log in again from a TTY then.
 
-Settings > Lock Screen sets the style, **Background** (the current wallpaper) or **Image** (an
-image you choose; the wallpaper if none is chosen or it can't be read), then in sections: the clock
+Settings > Lock Screen sets the **Image**: the theme's background (it changes with the theme)
+until you choose another, and the theme's again with **Theme's** or by choosing it; the theme's
+too if yours can't be read. `wallpaper.py lock` makes it ready whenever it changes: the file
+itself when it's light (the theme backgrounds), else a JPEG scaled to the largest screen, so a
+large picture never holds up locking and nothing stays loaded while unlocked. Then in sections:
+the clock
 and date (on or off, one color), the avatar (`~/.face`; on or off, outline), the box behind them
 (on or off, outline, background with opacity), the password field (outline, background with
 opacity, typing dots, user name, text, and the checking, wrong password and Caps Lock states) and
@@ -192,14 +196,26 @@ Appearance > "Use system title bar and borders".
 ## Wallpapers
 
 `~/.config/scripts/wallpaper.py` backs the carousel. Static wallpapers go in
-`~/Pictures/Wallpapers` (hyprpaper), live ones in `~/Pictures/WallpapersLive`
-(mpvpaper, one process per monitor, paused while covered by windows). Enter
-applies to every monitor, Shift+Enter to the focused one only. The choice is
-saved and restored at login. With Settings > Appearance > Wallpaper follows theme on, each theme
-or accent change draws the logo in accent2 on base and sets it; picking another wallpaper turns it
-off. `SUPER+CTRL+W` stops live wallpapers and
-`SUPER+SHIFT+W` pauses them. Put source videos in `~/Pictures/WallpapersLive/source`
-and run `convert-live-wallpapers.py` to make lighter 1440p/30fps copies.
+`~/.local/share/dotfiles/backgrounds/default` (hyprpaper), live ones in
+`~/.local/share/dotfiles/backgrounds/live` (mpvpaper, one process per monitor, paused while
+covered by windows). More folders for either go in `~/.config/dotfiles/backgrounds.json`
+(created with empty lists; `~` works):
+
+```json
+{ "static": ["~/Pictures/Wallpapers"], "live": ["~/Videos/Wallpapers"] }
+```
+
+Enter applies to every monitor, Shift+Enter to the focused one only. The choice is saved and
+restored at login.
+
+Each theme has its own background, the logo in accent2 on base, which `theme-set.py` draws into
+`backgrounds/default` once per theme and colors. While the desktop shows it (the default), it
+changes with the theme; another wallpaper stays through theme changes. Picking the theme's own, or
+Settings > Appearance > Wallpaper > **Theme's**, makes it follow again. The lock screen does the same on its
+own (Settings > Lock Screen > Image: the theme's until you choose one, the theme's again with
+**Theme's** or by choosing it), and the login screen shows what the lock screen does.
+`SUPER+CTRL+W` stops live wallpapers and `SUPER+SHIFT+W` pauses them. Put source videos in
+`backgrounds/live/source` and run `convert-live-wallpapers.py` to make lighter 1440p/30fps copies.
 
 ## Displays
 

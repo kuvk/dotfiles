@@ -4,7 +4,7 @@
 #   sudo sddm/install.sh     install or update; the previous config goes to *.bak
 #
 # /var/lib/kuvk-shell is yours to write and readable by the greeter, which can't read your
-# home folder: theme-set.py keeps theme.conf there, wallpaper.py the wallpaper, and
+# home folder: theme-set.py keeps theme.conf there, wallpaper.py the lock screen's background, and
 # hypr-monitors.py each monitor's scale.
 set -euo pipefail
 

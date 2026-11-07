@@ -23,13 +23,16 @@ apps are told to reload.
   theme-set.py --login    rewrite the login screen's colors from Settings > Lock Screen
   theme-set.py --text-size  GTK's font size from Displays > Text size (hypr-monitors.py)
   theme-set.py --follow-wallpaper
-                          the logo wallpaper in this theme's colors, when Settings >
-                          Appearance > Wallpaper follows theme is on
+                          the logo wallpaper in this theme's colors, while the desktop
+                          shows the theme's background (picked in the wallpaper picker,
+                          or Settings > Appearance > Wallpaper > Theme's)
   theme-set.py --window-buttons on|off
                           close button in GTK apps (Settings > Windows saves the choice)
+  theme-set.py --hypr      Hyprland's gaps, corners, window opacity and blur from Settings
+                          into its generated theme.lua (the shell runs it on a change)
   theme-set.py --shape rounded|square
                           corners of the status lines in tmux, nvim and yazi, Neovim's
-                          windows, LazyGit and the starship prompt
+                          windows, LazyGit, btop and the starship prompt
                           (quickshell sets it: square in Work-Game or at radius 0)
 """
 
@@ -208,16 +211,16 @@ def shell_settings() -> dict:
         "fontHinting": "slight",
         "fontAntialiasing": "rgba",
         "windowButtons": False,
-        "lockClockColor": "accent",
+        "lockClockColor": "accent2",
         "lockAvatarColor": "accent",
         "lockBoxOutlineColor": "accent",
         "lockBoxColor": "base",
         "lockInputOutlineColor": "accent",
-        "lockInputColor": "subtext0",
+        "lockInputColor": "base",
         "lockDotsColor": "accent2",
         "lockUserColor": "accent",
         "lockTextColor": "text",
-        "lockCheckColor": "green",
+        "lockCheckColor": "accent",
         "lockFailColor": "red",
         "lockCapsColor": "peach",
         "lockBoxOpacity": 90,
@@ -229,10 +232,17 @@ def shell_settings() -> dict:
         "lockPowerOpacity": 85,
         "lockPowerIconColor": "accent2",
         "lockPowerOutlineColor": "accent",
-        "accentOverrides": {"gruvbox": {"accent": "blue", "accent2": "peach", "accent3": "mauve"}, "tokyo-night": {"accent": "teal", "accent2": "peach", "accent3": "mauve"}},
-        "lockInputOpacity": 30,
+        "accentOverrides": {"gruvbox": {"accent": "blue", "accent2": "peach", "accent3": "mauve"}, "hackerman": {"accent": "sapphire", "accent2": "mauve", "accent3": "peach"}, "nord": {"accent": "sapphire", "accent2": "mauve", "accent3": "peach"}},
+        "lockInputOpacity": 65,
         "cursorTheme": "Adwaita",
         "cursorSize": 24,
+        # Hyprland's look in normal mode (hyprland.lua.tpl)
+        "radius": 6,
+        "gapsIn": 5,
+        "gapsOut": 10,
+        "activeOpacity": 0.98,
+        "inactiveOpacity": 0.95,
+        "blur": True,
         "iconTheme": "Papirus",
     }
     sources = [HOME / ".config/quickshell/config/defaults.json"]
@@ -360,6 +370,12 @@ def load_theme(name: str) -> dict:
         "xft_hinting": "0" if hinting == "none" else "1",
         "decoration_layout": ":close" if shell["windowButtons"] else ":",
         "border_style": "single" if current_shape() == "square" else "rounded",
+        "hypr_gaps_in": str(int(shell["gapsIn"])),
+        "hypr_gaps_out": str(int(shell["gapsOut"])),
+        "hypr_rounding": str(int(shell["radius"])),
+        "hypr_active_opacity": f"{float(shell['activeOpacity']):g}",
+        "hypr_inactive_opacity": f"{float(shell['inactiveOpacity']):g}",
+        "hypr_blur": "true" if shell["blur"] else "false",
         # the login screen uses the lock screen's colors
         "login_clock": colors.get(shell["lockClockColor"], colors["text"]),
         "login_date": colors.get(shell["lockClockColor"], colors["text"]),  # one color for both
@@ -474,13 +490,34 @@ def icons_dir(name: str) -> str:
     return ""
 
 
+def theme_background(theme: dict) -> Path | None:
+    """This theme's own background: the logo in accent2 on base (logo-wallpaper.py), drawn
+    once per theme and colors into ~/.local/share/dotfiles/backgrounds/default. The wallpaper
+    and the lock screen show it while they follow the theme (Settings)."""
+    colors, name = theme["colors"], theme["strings"]["theme"]
+    folder = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "dotfiles/backgrounds/default"
+    path = folder / f"dori-theme-{name}-{colors['accent2'][1:]}-on-{colors['base'][1:]}.png"
+    if path.exists():
+        return path
+    folder.mkdir(parents=True, exist_ok=True)
+    for old in folder.glob(f"dori-theme-{name}-*.png"):  # this theme in older colors
+        old.unlink(missing_ok=True)
+    run_quiet([str(HOME / ".config/scripts/logo-wallpaper.py"), "--bg", colors["base"], "--fg", colors["accent2"],
+               "--size", "30", "--output", str(path)])
+    return path if path.exists() else None
+
+
 def render_quickshell(theme: dict) -> None:
+    background = theme_background(theme)
+    theme["background"] = background
     data = {
         "theme": theme["strings"]["theme"],
         "name": theme["strings"]["theme_name"],
         "mode": theme["strings"]["mode"],
         "icons": icons_dir(theme["strings"]["theme"]),
         "colors": {k: v for k, v in theme["colors"].items() if not k.startswith("term_")},
+        # the lock screen shows it unless you chose your own image (Settings > Lock Screen)
+        "background": str(background) if background else "",
     }
     write_if_changed(CURRENT_DIR / "quickshell.json", json.dumps(data, indent=2) + "\n")
 
@@ -724,6 +761,15 @@ def themes_json() -> str:
     return json.dumps(result)
 
 
+def write_hypr_look() -> None:
+    """Only Hyprland's generated theme.lua again, with the gaps, corners, opacity and blur
+    from Settings, so Hyprland starts with them (the shell applies them live)."""
+    theme = load_theme(current_theme())
+    content = render((TEMPLATES_DIR / "hyprland.lua.tpl").read_text(), theme, "hyprland.lua.tpl")
+    write_if_changed(CURRENT_DIR / "hyprland.lua", content)
+    write_if_changed(EXTRA_DESTINATIONS["hyprland.lua"], content)
+
+
 def set_shape(shape: str) -> None:
     if not write_if_changed(CURRENT_DIR / "shape", shape + "\n"):
         return
@@ -733,28 +779,37 @@ def set_shape(shape: str) -> None:
     if subprocess.run(["tmux", "info"], capture_output=True).returncode == 0:
         run_quiet(["tmux", "source-file", str(HOME / ".tmux.conf")])
     restart_yazi()
+    btop_corners(shape)
+
+
+def btop_corners(shape: str) -> None:
+    """btop has no includes and rewrites btop.conf itself, so the one line is changed in
+    place; a running btop re-reads it on SIGUSR2."""
+    conf = HOME / ".config/btop/btop.conf"
+    try:
+        text = conf.read_text()
+    except OSError:
+        return
+    line = f"rounded_corners = {'false' if shape == 'square' else 'true'}"
+    new = re.sub(r"^rounded_corners\s*=.*$", line, text, count=1, flags=re.M)
+    if new != text:
+        conf.write_text(new)
+        run_quiet(["pkill", "-USR2", "-x", "btop"])
 
 
 def follow_wallpaper(theme: dict) -> None:
-    """Settings > Appearance > Wallpaper follows theme: the logo in accent2 on base, drawn once
-    per theme and colors (logo-wallpaper.py) and set on every monitor, so the lock and login
-    screens follow too. Picking another wallpaper turns this off (WallpaperPicker.qml)."""
+    """The theme's background (theme_background) on every monitor while the wallpaper
+    follows the theme: picking the theme's own background turns that on (the wallpaper
+    picker, Settings > Appearance > Wallpaper > Theme's), picking another turns it off. The lock screen follows the
+    theme on its own (Settings > Lock Screen)."""
     if not shell_settings().get("wallpaperFollowsTheme"):
         return
-    colors, name = theme["colors"], theme["strings"]["theme"]
-    folder = HOME / "Pictures/Wallpapers"
-    path = folder / f"dori-theme-{name}-{colors['accent2'][1:]}-on-{colors['base'][1:]}.png"
-    scripts = HOME / ".config/scripts"
-    if not path.exists():
-        for old in folder.glob(f"dori-theme-{name}-*.png"):  # this theme in older colors
-            old.unlink(missing_ok=True)
-        run_quiet([str(scripts / "logo-wallpaper.py"), "--bg", colors["base"], "--fg", colors["accent2"],
-                   "--size", "30", "--output", str(path)])
-        if not path.exists():
-            return
+    path = theme.get("background") or theme_background(theme)
+    if not path:
+        return
     current = HOME / ".local/state/wallpaper/current"
     if current.resolve() != path.resolve():
-        run_quiet([str(scripts / "wallpaper.py"), "set", "static", str(path)])
+        run_quiet([str(HOME / ".config/scripts/wallpaper.py"), "set", "static", str(path)])
 
 
 def offer_boot_update() -> None:
@@ -779,6 +834,9 @@ def offer_boot_update() -> None:
 def main(argv: list[str]) -> int:
     if argv and argv[0] in ("-h", "--help"):
         print(__doc__.strip())
+        return 0
+    if argv == ["--hypr"]:
+        write_hypr_look()
         return 0
     if len(argv) == 2 and argv[0] == "--shape" and argv[1] in ("rounded", "square"):
         set_shape(argv[1])

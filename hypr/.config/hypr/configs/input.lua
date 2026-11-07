@@ -25,10 +25,12 @@ hl.config({
     workspace_swipe_forever = false,
   },
   cursor = {
-    no_hardware_cursors = 1,
+    -- no_hardware_cursors = 1,
     -- XCursor themes only: otherwise Hyprland starts with the first hyprcursor theme it
     -- finds, as Adwaita isn't one, until autostart sets the cursor
-    enable_hyprcursor = false,
+    -- enable_hyprcursor = false,
+    hide_on_key_press = true,
+    warp_on_change_workspace = 1,
   },
 })
 

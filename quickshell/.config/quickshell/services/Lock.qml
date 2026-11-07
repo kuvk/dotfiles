@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Io
 import Quickshell.Services.Pam
+import qs.config
 
 // Lock state and the password check, for the lock surfaces on every screen
 // (modules/lock/LockScreen.qml). After Omarchy's lock (shell/plugins/lock,
@@ -33,10 +34,34 @@ Singleton {
     // The monitor with the clock and password: the one focused when locking
     property string mainScreen: ""
 
+    // The background: the theme's own (Theme.background, theme-set.py) unless you chose an
+    // image in Settings > Lock Screen (the theme's when that can't be read). Whenever it
+    // changes, `wallpaper.py lock` makes it ready to load at once (a copy scaled to the
+    // largest screen when it's bigger, also given to the login screen), so locking never
+    // waits for a large picture and nothing stays loaded while unlocked.
+    // an image that couldn't be read; choosing another one tries again
+    property string failedImage: ""
+    readonly property string backgroundPath: !Config.lockFollowsTheme && Config.lockImage !== "" && Config.lockImage !== failedImage ? Config.lockImage : Theme.background
+    // file://path?v=stamp of the file to show
+    property string background: ""
+
     property string password: ""
     property bool authenticating: false
     property bool failed: false
     property bool capsLock: false
+
+    function prepareBackground(): void {
+        if (backgroundPath === "")
+            return;
+        if (prepareProc.running) {
+            prepareProc.again = true;
+            return;
+        }
+        prepareProc.path = backgroundPath;
+        prepareProc.running = true;
+    }
+
+    onBackgroundPathChanged: prepareBackground()
 
     function lock(): void {
         if (locked)
@@ -69,7 +94,45 @@ Singleton {
 
     onLockedChanged: if (locked) checkCapsLock()
 
-    Component.onCompleted: strandedProc.running = true
+    Component.onCompleted: {
+        strandedProc.running = true;
+        prepareBackground();
+    }
+
+    // a larger monitor may need a larger copy (made again only then)
+    Connections {
+        target: Quickshell
+
+        function onScreensChanged(): void {
+            root.prepareBackground();
+        }
+    }
+
+    Process {
+        id: prepareProc
+
+        property string path
+        // asked again while running
+        property bool again: false
+
+        command: [Quickshell.env("HOME") + "/.config/scripts/wallpaper.py", "lock", path]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                const [file, stamp] = text.trim().split("\t");
+                if (file && stamp && prepareProc.path === root.backgroundPath)
+                    root.background = `file://${file}?v=${stamp}`;
+            }
+        }
+        onExited: code => {
+            // your image can't be read: the theme's background
+            if (code !== 0 && path === Config.lockImage && !Config.lockFollowsTheme)
+                root.failedImage = path;
+            if (again || path !== root.backgroundPath) {
+                again = false;
+                Qt.callLater(root.prepareBackground);
+            }
+        }
+    }
 
     // Hyprland lists a held session lock (LOCK) among the reasons a monitor can't go
     // solitary, and keeps it when the lock screen's program is gone. Held with no other

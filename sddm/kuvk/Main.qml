@@ -5,8 +5,9 @@ import QtQuick.Window
 import SddmComponents
 
 // Login screen in the look of the lock screen (quickshell/.config/quickshell/modules/lock/LockView.qml):
-// wallpaper, clock top right, avatar and password in a centered card. The card and
-// controls show on the monitor with the keyboard, which follows the mouse.
+// its background (the lock screen's, from wallpaper.py), clock top right, avatar and password in a
+// centered card. The card and controls show on the monitor with the keyboard, which follows the
+// mouse.
 Rectangle {
     id: root
 
@@ -207,7 +208,8 @@ Rectangle {
             // a box with the windows' corners (Hyprland's rounding)
             radius: 6
             color: Qt.alpha(root.c.input, Number(root.c.inputOpacity))
-            border.width: 1
+            // 2 px like the box, the shell's borders and the boot screen's field
+            border.width: 2
             border.color: root.failed ? root.c.fail : (root.busy ? root.c.check : root.c.inputOutline)
 
             transform: Translate {
