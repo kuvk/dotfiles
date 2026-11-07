@@ -8,6 +8,8 @@ require("configs.input")
 
 -- Environment and autostart
 require("configs.environment")
+-- No cursor until the shell is up (a cold start only)
+require("configs.startup-cursor")
 require("configs.autostart")
 
 -- Configuration

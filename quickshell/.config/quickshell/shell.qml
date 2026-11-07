@@ -29,7 +29,19 @@ ShellRoot {
     }
 
     onSquareCornersChanged: applyShape()
-    Component.onCompleted: applyShape()
+    Component.onCompleted: {
+        applyShape();
+        cursorReveal.start();
+    }
+
+    // Hyprland hides the cursor while it starts (hypr/configs/startup-cursor.lua); with the
+    // bar and wallpaper drawn, it may show. A no-op after that, and when the shell restarts.
+    Timer {
+        id: cursorReveal
+
+        interval: 300
+        onTriggered: Quickshell.execDetached(["hyprctl", "eval", "if kuvk_cursor_reveal then kuvk_cursor_reveal() end"])
+    }
 
     // Idle lock and sleep, with the times from Settings for the power source in use
     readonly property bool idleEnabled: Idle.enabled

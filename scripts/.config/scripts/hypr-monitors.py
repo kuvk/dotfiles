@@ -162,16 +162,14 @@ def clean_scale(scale: float, width: int, height: int) -> float:
     return round(k / 120, 6)
 
 
-def best_mode(m: dict) -> str:
+def preferred_mode(m: dict) -> str:
+    """The monitor's own preferred mode, which Hyprland lists first (as `mode = "preferred"`
+    picks it), not the largest: a 1440p@144 screen that also takes 4K@60 keeps 1440p@144.
+    Displays changes it, and the profile keeps the choice."""
     modes = available_modes(m)
     if not modes:
         return mode_str(m.get("width", 1920), m.get("height", 1080), m.get("refreshRate", 60))
-
-    def key(s: str) -> tuple:
-        w, h = parse_mode(s)
-        return (w * h, float(s.split("@")[1]))
-
-    return max(modes, key=key)
+    return modes[0]
 
 
 # ---------------------------------------------------------------- profiles
@@ -214,7 +212,7 @@ def default_profile(live: list[dict]) -> dict:
         enabled = not m.get("disabled", False)
         monitors[ident(m)] = {
             "enabled": enabled,
-            "mode": mode_str(m["width"], m["height"], m["refreshRate"]) if enabled else best_mode(m),
+            "mode": mode_str(m["width"], m["height"], m["refreshRate"]) if enabled else preferred_mode(m),
             "x": m.get("x", 0),
             "y": m.get("y", 0),
             "scale": round(float(m.get("scale", 1)), 6),

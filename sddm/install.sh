@@ -28,6 +28,9 @@ ln -sfn "$shared/theme.conf" "$theme/theme.conf.user"
 install -d -m 0755 /usr/share/sddm/hypr
 [[ -f /usr/share/sddm/hypr/hyprland.lua ]] && cp -n /usr/share/sddm/hypr/hyprland.lua /usr/share/sddm/hypr/hyprland.lua.bak
 install -m 0644 "$here/hyprland.lua" /usr/share/sddm/hypr/hyprland.lua
+# the blank cursor it starts with (the session's, hypr/.config/hypr/cursors)
+install -D -m 0644 "$here/../hypr/.config/hypr/cursors/kuvk-startup/index.theme" /usr/share/sddm/hypr/cursors/kuvk-startup/index.theme
+install -D -m 0644 "$here/../hypr/.config/hypr/cursors/kuvk-startup/cursors/left_ptr" /usr/share/sddm/hypr/cursors/kuvk-startup/cursors/left_ptr
 
 [[ -f /etc/sddm.conf ]] && cp -n /etc/sddm.conf /etc/sddm.conf.bak
 install -m 0644 "$here/sddm.conf" /etc/sddm.conf
