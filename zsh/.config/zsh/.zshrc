@@ -187,9 +187,9 @@ if [[ -d "$HOME/.tmux/plugins/tmuxifier" ]]; then
         eval "$(command tmuxifier init -)"
         tmuxifier "$@"
     }
-    alias tnew="tmuxifier new-session"
-    alias tedit="tmuxifier edit-session"
-    alias tload="tmuxifier load-session"
+    alias tn="tmuxifier new-session"
+    alias te="tmuxifier edit-session"
+    alias tl="tmuxifier load-session"
 fi
 
 if [[ -d "$HOME/.pyenv" ]]; then
@@ -204,8 +204,8 @@ fi
 # ALIASES
 alias cd="z"
 alias cdi="zi"
-alias ll="eza -lAh --group-directories-first --git --icons=always"
-alias l="eza -lh  --group-directories-first --git --icons=always"
+alias ll="eza -lA --group-directories-first --git --icons=always"
+alias l="eza -l  --group-directories-first --git --icons=always"
 alias ls="eza --group-directories-first --icons=always"
 alias cat="bat --style=plain,header,grid"
 # the repo this file is linked from (zsh/.config/zsh/.zshrc, four folders up), wherever it was cloned
@@ -238,7 +238,3 @@ fi
 # Syntax highlighting
 _compiled $HOME/.local/share/zsh-plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 # Its colors come from the theme: current/zsh-colors.zsh (templates/zsh-colors.zsh.tpl)
-
-# if [[ -o interactive ]]; then
-#     fastfetch
-# fi
