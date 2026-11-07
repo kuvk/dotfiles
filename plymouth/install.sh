@@ -69,10 +69,11 @@ trap 'rm -rf "$build"' EXIT
 # passwords); the farewell line in accent2, large, alone on the screen
 # The logo drawn like kitty draws it, in 24px rows (scripts/.config/scripts/logo-render.py)
 "$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$accent2" --cell-height 24 --out "$build/logo.png"
-# The password field and progress bar are as wide as the logo
+# The password field and progress bar are as wide as the logo; the field is a box with the
+# windows' corners (Hyprland's rounding)
 ew=$(magick identify -format %w "$build/logo.png")
 magick -size "${ew}x48" xc:none -fill "$surface0" -stroke "$accent" -strokewidth 2 \
-    -draw "roundrectangle 1,1 $((ew - 2)),46 23,23" "$build/entry.png"
+    -draw "roundrectangle 1,1 $((ew - 2)),46 6,6" "$build/entry.png"
 magick -background none -fill "$subtext0" -font "$font" -pointsize 16 label:"Speak, friend, and enter!" "$build/hint.png"
 magick -background none -fill "$accent2" -font "$font" -pointsize 16 label:"Tell me, friend, when did you abandon reason for madness?" "$build/wrong1.png"
 magick -background none -fill "$accent" -font "$font" -pointsize 16 label:"You shall not pass!" "$build/wrong2.png"

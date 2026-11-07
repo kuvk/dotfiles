@@ -5,6 +5,7 @@ import qs.config
 import qs.components
 import qs.services
 
+// A device's or app's volume: mute button and slider
 RowLayout {
     id: root
 

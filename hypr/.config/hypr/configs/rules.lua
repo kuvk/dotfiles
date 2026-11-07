@@ -43,10 +43,18 @@ hl.window_rule({
   opaque = true,
 })
 
--- Quickshell's Settings, Displays, Keybindings and System Information: floating and centered (the shell reopens one that gets tiled)
+-- Quickshell's Settings, Displays and Keybindings: floating and centered (the shell reopens one that gets tiled)
 hl.window_rule({
   name = "quickshell-windows",
-  match = { class = "^org\\.quickshell$", title = "^(Settings|Displays|Keybindings|System Information)$" },
+  match = { class = "^org\\.quickshell$", title = "^(Settings|Displays|Keybindings)$" },
+  float = true,
+  center = true,
+})
+
+-- System Information (scripts/sysinfo.sh): fastfetch in kitty, at the size kitty opens with
+hl.window_rule({
+  name = "sysinfo",
+  match = { class = "^kuvk-sysinfo$" },
   float = true,
   center = true,
 })

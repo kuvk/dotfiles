@@ -252,7 +252,8 @@ Item {
             anchors.verticalCenterOffset: 85
             width: 260
             height: 36
-            radius: height / 2
+            // a box with the windows' corners (Hyprland's rounding), square in Work-Game
+            radius: Theme.radius
             color: Theme.alpha(root.tint(Config.lockInputColor), Config.lockInputOpacity / 100)
             border.width: 1
             border.color: root.tint(Lock.failed ? Config.lockFailColor : (Lock.authenticating ? Config.lockCheckColor : Config.lockInputOutlineColor))

@@ -3,97 +3,72 @@ import QtQuick.Layouts
 import qs.config
 import qs.components
 import qs.services
+import qs.modules.dropdowns.common
 
+// Weather from wttr.in: now, a few details, and the days ahead
 Dropdown {
     id: root
 
     name: "weather"
-    contentWidth: 320
+    contentWidth: 460
 
     onShownChanged: if (shown && Weather.ready && Date.now() - Weather.updated > 10 * 60 * 1000) Weather.refresh()
 
-    StyledText {
-        Layout.fillWidth: true
-        visible: !Weather.ready
-        text: "Weather unavailable"
-        color: Theme.subtext0
-        horizontalAlignment: Text.AlignHCenter
+    Hero {
+        icon: Weather.ready ? Weather.icon : Icons.weatherSunny
+        iconColor: Weather.ready ? Theme.yellow : Theme.overlay1
+        title: Weather.ready ? `${Weather.temp}${Weather.unit}` : "Weather"
+        status: Weather.ready ? Weather.description.toUpperCase() : "WEATHER UNAVAILABLE"
     }
 
-    RowLayout {
+    GridLayout {
         Layout.fillWidth: true
         visible: Weather.ready
-        spacing: 14
+        columns: 4
+        columnSpacing: 12
+        rowSpacing: 4
 
-        Icon {
-            text: Weather.icon
-            color: Theme.yellow
-            font.pixelSize: 40
-            Layout.preferredWidth: 56
+        Label {
+            text: "Feels like"
         }
 
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 0
+        Value {
+            text: `${Weather.feelsLike}${Weather.unit}`
+        }
 
-            StyledText {
-                text: `${Weather.temp}${Weather.unit}`
-                font.pixelSize: 28
-                font.weight: Font.Bold
-            }
+        Label {
+            text: "Humidity"
+        }
 
-            StyledText {
-                Layout.fillWidth: true
-                text: Weather.description
-                color: Theme.subtext0
-            }
+        Value {
+            text: `${Weather.humidity}%`
+        }
 
-            StyledText {
-                Layout.fillWidth: true
-                text: `${Icons.mapMarker}  ${Weather.location}`
-                color: Theme.overlay1
-                font.pixelSize: Theme.fontSize - 2
-            }
+        Label {
+            text: "Wind"
+        }
+
+        Value {
+            text: `${Weather.wind} ${Weather.windUnit}`
+        }
+
+        Label {
+            text: "Location"
+        }
+
+        Value {
+            text: Weather.location || "--"
+            elide: Text.ElideRight
         }
     }
 
-    RowLayout {
-        Layout.fillWidth: true
+    Separator {
         visible: Weather.ready
-        spacing: 8
+    }
 
-        Repeater {
-            model: [
-                { icon: Icons.weatherSunny, label: "Feels like", value: `${Weather.feelsLike}${Weather.unit}` },
-                { icon: Icons.tint, label: "Humidity", value: `${Weather.humidity}%` },
-                { icon: Icons.wind, label: "Wind", value: `${Weather.wind} ${Weather.windUnit}` }
-            ]
-
-            Card {
-                required property var modelData
-
-                Layout.fillWidth: true
-                implicitHeight: 54
-
-                ColumnLayout {
-                    anchors.centerIn: parent
-                    spacing: 2
-
-                    StyledText {
-                        Layout.alignment: Qt.AlignHCenter
-                        text: modelData.value
-                        font.weight: Font.DemiBold
-                    }
-
-                    StyledText {
-                        Layout.alignment: Qt.AlignHCenter
-                        text: modelData.label
-                        color: Theme.overlay1
-                        font.pixelSize: Theme.fontSize - 2
-                    }
-                }
-            }
-        }
+    Caption {
+        visible: Weather.ready
+        text: "FORECAST"
     }
 
     Repeater {
@@ -111,6 +86,7 @@ Dropdown {
             StyledText {
                 Layout.preferredWidth: 90
                 text: day.index === 0 ? "Today" : Qt.formatDate(new Date(day.modelData.date + "T12:00:00"), "dddd")
+                font.pixelSize: Theme.fontSize - 1
             }
 
             Icon {
@@ -119,31 +95,21 @@ Dropdown {
                 color: Theme.yellow
             }
 
-            StyledText {
+            Label {
                 Layout.fillWidth: true
                 text: day.modelData.description
-                color: Theme.subtext0
-                font.pixelSize: Theme.fontSize - 1
+                elide: Text.ElideRight
             }
 
-            StyledText {
+            Value {
+                Layout.fillWidth: false
                 text: `${day.modelData.max}° / ${day.modelData.min}°`
             }
         }
     }
 
-    StyledText {
-        Layout.fillWidth: true
-        visible: Weather.ready
-        text: `Updated ${Qt.formatTime(Weather.updated, "HH:mm")} · wttr.in`
-        color: Theme.overlay0
-        font.pixelSize: Theme.fontSize - 2
-        horizontalAlignment: Text.AlignRight
-
-        MouseArea {
-            anchors.fill: parent
-            cursorShape: Qt.PointingHandCursor
-            onClicked: Weather.refresh()
-        }
+    FooterLink {
+        text: Weather.ready ? `Updated ${Qt.formatTime(Weather.updated, "HH:mm")} · wttr.in` : "Try again"
+        onClicked: Weather.refresh()
     }
 }

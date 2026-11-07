@@ -8,6 +8,7 @@ import qs.config
 import qs.components
 import qs.services
 import qs.modules.notifications
+import qs.modules.dropdowns.common
 
 // Control Center: quick toggles, sliders, media, notifications and session buttons
 PanelWindow {
@@ -100,23 +101,32 @@ PanelWindow {
                 anchors.margins: 16
                 spacing: 14
 
-                // Header: time, date below
-                ColumnLayout {
-                    Layout.fillWidth: true
-                    spacing: 0
+                // Header like the dropdowns': its icon and name on the left, notifications
+                // under it; the time and date on the right
+                Hero {
+                    icon: Icons.sliders
+                    iconColor: Notifs.dnd ? Theme.mauve : Theme.highlight
+                    title: "Control Center"
+                    status: Notifs.dnd ? "DO NOT DISTURB" : (Notifs.count > 0 ? `${Notifs.count} NOTIFICATION${Notifs.count === 1 ? "" : "S"}` : "NO NOTIFICATIONS")
 
-                    StyledText {
-                        Layout.fillWidth: true
-                        text: Qt.formatDateTime(Time.date, "HH:mm")
-                        font.pixelSize: 28
-                        font.weight: Font.Bold
-                    }
+                    ColumnLayout {
+                        spacing: 1
 
-                    StyledText {
-                        text: Qt.formatDateTime(Time.date, "dddd, d MMMM")
-                        color: Theme.subtext0
+                        StyledText {
+                            Layout.alignment: Qt.AlignRight
+                            text: Qt.formatDateTime(Time.date, "HH:mm")
+                            font.pixelSize: Theme.fontSize + 2
+                            font.weight: Font.Bold
+                        }
+
+                        Caption {
+                            Layout.alignment: Qt.AlignRight
+                            text: Qt.formatDateTime(Time.date, "ddd d MMMM").toUpperCase()
+                        }
                     }
                 }
+
+                Separator {}
 
                 // Settings, Displays, Keybindings, System information
                 ShellShortcuts {
@@ -175,6 +185,16 @@ PanelWindow {
                     }
                 }
 
+                Separator {
+                    visible: media.visible
+                }
+
+                MediaCard {
+                    id: media
+
+                    Layout.fillWidth: true
+                }
+
                 // Sliders
                 RowLayout {
                     Layout.fillWidth: true
@@ -214,12 +234,16 @@ PanelWindow {
                     }
                 }
 
-                MediaCard {
-                    Layout.fillWidth: true
-                }
+                Separator {}
 
-                SectionHeader {
-                    title: "Notifications"
+                // in small capitals like the dropdowns' sections
+                RowLayout {
+                    Layout.fillWidth: true
+
+                    Caption {
+                        Layout.fillWidth: true
+                        text: "NOTIFICATIONS"
+                    }
 
                     MouseArea {
                         id: clearButton
@@ -464,6 +488,8 @@ PanelWindow {
                         color: Theme.overlay1
                     }
                 }
+
+                Separator {}
 
                 // Session actions
                 RowLayout {

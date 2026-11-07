@@ -6,8 +6,9 @@ import qs.config
 import qs.components
 import qs.services
 
-// Centered content on a dark scrim over the monitor the network dropdown was on, like
-// Omarchy's Wi-Fi QR and speed test overlays. Esc or a click on the scrim closes it.
+// Centered content over the monitor the network dropdown was on, like Omarchy's Wi-Fi QR
+// and speed test overlays, on the same blurred, dimmed background as the wallpaper and
+// theme pickers and the power menu. Esc or a click on the background closes it.
 PanelWindow {
     id: root
 
@@ -42,7 +43,7 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.alpha(Theme.crust, Theme.gamemode ? 0.95 : 0.78)
+        color: Theme.alpha(Theme.crust, Theme.gamemode ? 1 : 0.6)
         opacity: root.reveal
 
         MouseArea {

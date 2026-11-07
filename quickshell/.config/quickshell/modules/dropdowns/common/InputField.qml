@@ -4,7 +4,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// One-line text input: Enter accepts, Esc cancels
+// One-line text input in a dropdown: Enter accepts, Esc cancels
 Rectangle {
     id: field
 

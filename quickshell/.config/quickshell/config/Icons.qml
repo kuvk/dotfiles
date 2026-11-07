@@ -29,6 +29,7 @@ Singleton {
     readonly property string coffee: g(0xf0f4)
     readonly property string rocket: g(0xf135)
     readonly property string sliders: g(0xf1de)
+    readonly property string calendar: g(0xf00ed)
     readonly property string display: g(0xf108)
     readonly property string text: g(0xf031)
     readonly property string signOut: g(0xf08b)

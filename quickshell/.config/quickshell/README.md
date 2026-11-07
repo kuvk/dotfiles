@@ -37,14 +37,14 @@ can own the D-Bus name.
 | Displays | `modules/displays/DisplaysPanel.qml` | the monitor icon, or `SUPER+CTRL+M` |
 | Notification popups, with actions and inline replies; web apps show their own name and icon | `modules/notifications/NotificationPopups.qml` | |
 | Clipboard history in RAM (a reboot wipes it): text and images, type to filter | `modules/launcher/Clipboard.qml` | `SUPER+SHIFT+V` |
-| Control Center: toggles, sliders, media (with visualizer), notifications grouped by app, session buttons | `modules/controlcenter/ControlCenter.qml` | `SUPER+N`, or the sliders icon (right-click toggles DND) |
+| Control Center: a header like the dropdowns' (its name and the notification count on the left, time and date on the right), toggles, sliders, media (with visualizer), notifications grouped by app, session buttons | `modules/controlcenter/ControlCenter.qml` | `SUPER+N`, or the sliders icon (right-click toggles DND) |
 | Search launcher (just the field; apps appear as you type) | `modules/launcher/Launcher.qml` | `SUPER+Space` |
 | App menu: categories on the left, apps on the right | `modules/launcher/AppMenu.qml` + `services/Apps.qml` | the Arch icon, or `SUPER+CTRL+Space` |
 | Theme carousel (each card the theme's palette as bars, type to search; other monitors are blurred) | `modules/themes/ThemePicker.qml` | `SUPER+CTRL+T`, or the Theme tile |
 | Power menu (log out, reboot and shut down go through hyprshutdown, which closes apps first) | `modules/powermenu/PowerMenu.qml` | `SUPER+CTRL+Q`, or the power icon |
 | Lock screen (Settings > Lock Screen has a preview) | `modules/lock/` + `services/Lock.qml` | `` SUPER+` ``, the power menu, idle, the lid, before every sleep |
 | Wallpaper carousel (type to search; other monitors are blurred) | `modules/wallpaper/WallpaperPicker.qml` | `SUPER+W`, Tab for live wallpapers |
-| System information (fastfetch's output drawn cell by cell like kitty, in a window sized to it; it opens once the output is ready, Ctrl+C copies it) | `modules/sysinfo/SysinfoWindow.qml` | the ⓘ button in the app menu and Control Center |
+| System information: fastfetch in a kitty window sized to its output, after Omarchy's About window; no cursor or prompt, the text selectable, any key closes it | `scripts/sysinfo.sh` (run again, it closes the window; fitted to the output from inside kitty, the size remembered for the next time) | `SUPER+SHIFT+I`, or the ⓘ button in the app menu and Control Center |
 | Keybindings (built from `bindings.lua`, type to filter) | `modules/keybinds/KeybindsWindow.qml` + `scripts/hypr-keybinds.py` | `SUPER+/` |
 | Settings | `modules/settings/SettingsWindow.qml` | `SUPER+CTRL+S`, or the gear in the Control Center |
 
@@ -59,7 +59,7 @@ of buttons for Settings, Displays, Keybindings and System information.
 Dropdowns close when you switch workspaces, and clicking another bar icon
 switches straight to its dropdown.
 
-Settings, Displays, Keybindings and System Information are regular windows: a Hyprland rule (`rules.lua`) makes
+Settings, Displays and Keybindings are regular windows: a Hyprland rule (`rules.lua`) makes
 them float centered; they always stay floating (tiling one reopens it), open at
 their default size and can grow but not shrink below it. They have no close
 button unless Settings > Windows > Window buttons is on; close them with Esc
@@ -234,7 +234,14 @@ services/          state singletons: Apps, Audio, Battery, Bluetooth, Cava, Disp
                    Media, Network (nmcli), Notifs, Panels, SwitchFx, System, Time, Weather
 components/        small reusable widgets
 modules/           bar, controlcenter, displays, dropdowns, keybinds, launcher, notifications,
-                   powermenu, settings, sysinfo, themes, transition, wallpaper
+                   powermenu, settings, themes, transition, wallpaper
+  dropdowns/       one <Name>Dropdown.qml per bar dropdown, on Dropdown.qml
+    common/        what they're built from, after the network one: Hero (big icon, title,
+                   status in small capitals, controls; the Control Center's header too),
+                   Caption, Separator, Label + Value (stats), Chip (choices), InputField,
+                   FooterLink
+    audio/         VolumeRow
+    network/       WifiRow
 ```
 
 ## IPC
