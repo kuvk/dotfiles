@@ -1,0 +1,26 @@
+#!/bin/sh
+# On AC power the NVIDIA card stays powered; on battery it may power off when idle again
+# (runtime PM, which nvidia-laptop-power-cfg turns on). On hybrid laptops the HDMI and USB-C
+# ports are wired to it, so plugging a monitor in woke a powered-off card, and Hyprland 0.57.1
+# crashed while it came back.
+#
+# Run by 90-nvidia-ac-power.rules when the power source changes and when the NVIDIA driver
+# binds (after 80-nvidia-pm.rules has set "auto"). Installed root-owned by install.sh, as
+# udev runs it as root.
+
+mode=auto
+for supply in /sys/class/power_supply/*; do
+    # Mains: the barrel charger; USB: a USB-C charger or powered dock
+    case "$(cat "$supply/type" 2>/dev/null)" in
+        Mains | USB) [ "$(cat "$supply/online" 2>/dev/null)" = 1 ] && mode=on ;;
+    esac
+done
+
+for device in /sys/bus/pci/devices/*; do
+    [ "$(cat "$device/vendor" 2>/dev/null)" = 0x10de ] || continue
+    case "$(cat "$device/class" 2>/dev/null)" in
+        # VGA or 3D controller: the card itself, not its audio
+        0x0300* | 0x0302*) [ -w "$device/power/control" ] && echo "$mode" >"$device/power/control" ;;
+    esac
+done
+exit 0

@@ -158,6 +158,11 @@ services=(NetworkManager bluetooth power-profiles-daemon sddm fstrim.timer)
 if [[ " ${groups[*]} " == *" nvidia "* ]]; then
     services+=(nvidia-suspend nvidia-hibernate nvidia-resume)
     $laptop && services+=(nvidia-powerd)
+    # Hybrid laptop (NVIDIA next to the built-in GPU): the NVIDIA card stays powered on AC, so
+    # plugging a monitor into its ports doesn't wake it, which crashed Hyprland 0.57.1
+    if $laptop && ((${#gpus[@]} >= 2)); then
+        sudo "$dotfiles/nvidia-hybrid/install.sh" >/dev/null || note "Couldn't install the NVIDIA AC power rule"
+    fi
 fi
 [[ " ${groups[*]} " == *" desktop "* ]] && services+=(coolercontrold)
 vm=false

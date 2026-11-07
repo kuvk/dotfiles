@@ -1,0 +1,7 @@
+# The NVIDIA card stays powered on AC power, so plugging a monitor into its ports doesn't have
+# to wake it (/usr/local/lib/kuvk/nvidia-ac-power explains why). Installed by
+# nvidia-hybrid/install.sh on hybrid laptops; after 80-nvidia-pm.rules, which sets "auto" when
+# the driver binds.
+
+ACTION=="add|change", SUBSYSTEM=="power_supply", ATTR{type}=="Mains|USB", RUN+="/usr/local/lib/kuvk/nvidia-ac-power"
+ACTION=="add|bind", SUBSYSTEM=="pci", ATTR{vendor}=="0x10de", ATTR{class}=="0x030000|0x030200", RUN+="/usr/local/lib/kuvk/nvidia-ac-power"
