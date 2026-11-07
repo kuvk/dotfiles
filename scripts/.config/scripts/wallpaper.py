@@ -1,17 +1,24 @@
 #!/usr/bin/env python3
-"""Wallpapers and live (video) wallpapers, used by the Quickshell carousel.
+"""Wallpapers and live (video) wallpapers, used by the Quickshell carousel, and the lock
+screen's background.
 
-Static wallpapers live in ~/Pictures/Wallpapers and are shown with hyprpaper.
-Live wallpapers live in ~/Pictures/WallpapersLive and play with mpvpaper, one
-process per monitor. The static choice is restored at login; live wallpapers
-last until logout.
+Static wallpapers live in ~/.local/share/dotfiles/backgrounds/default (the themes' own
+backgrounds too, drawn by theme-set.py) and are shown with hyprpaper. Live wallpapers live
+in ~/.local/share/dotfiles/backgrounds/live and play with mpvpaper, one process per
+monitor. More folders for either go in ~/.config/dotfiles/backgrounds.json:
+  {"static": ["~/Pictures/Wallpapers"], "live": ["~/Videos/Wallpapers"]}
+(created with empty lists if missing). The static choice is restored at login; live
+wallpapers last until logout.
 
   wallpaper.py list static|live          JSON list for the picker
   wallpaper.py thumbs static|live        create missing thumbnails
   wallpaper.py set static|live PATH [MONITOR]   apply (all monitors if none)
   wallpaper.py stop [MONITOR]            stop live wallpapers
   wallpaper.py pause [on|off]            pause/resume live wallpapers (toggles without on|off)
-  wallpaper.py export-greeter            copy the wallpaper for the login screen
+  wallpaper.py lock PATH                 the lock screen's background: a copy small enough
+                                         to load at once (PATH itself if it is), also for the
+                                         login screen; prints it and a stamp, tab-separated
+  wallpaper.py export-greeter            copy the lock screen's background for the login screen
   wallpaper.py default [PATH]            first run: PATH (or the bundled wallpaper), unless one is chosen
   wallpaper.py restore                   re-apply the saved static wallpapers (autostart)
 """
@@ -32,10 +39,13 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 HOME = Path.home()
+BACKGROUNDS = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "dotfiles/backgrounds"
 DIRS = {
-    "static": HOME / "Pictures/Wallpapers",
-    "live": HOME / "Pictures/WallpapersLive",
+    "static": BACKGROUNDS / "default",
+    "live": BACKGROUNDS / "live",
 }
+# More folders to list, per kind (edited by hand)
+EXTRA_DIRS_FILE = HOME / ".config/dotfiles/backgrounds.json"
 EXTS = {
     "static": {".jpg", ".jpeg", ".png", ".webp"},
     "live": {".mp4", ".webm", ".mkv", ".mov"},
@@ -46,7 +56,10 @@ SKIP_DIRS = {"source"}
 STATE_DIR = Path(os.environ.get("XDG_STATE_HOME", HOME / ".local/state")) / "wallpaper"
 STATE_FILE = STATE_DIR / "state.json"
 GREETER_DIR = Path("/var/lib/kuvk-shell")  # only exists after sddm/install.sh
-CURRENT_LINK = STATE_DIR / "current"  # hyprpaper.conf and the lock screen point here
+CURRENT_LINK = STATE_DIR / "current"  # hyprpaper.conf points here
+# The lock screen's background, ready to load (see prepare_lock), and what it was made from
+LOCK_IMAGE = STATE_DIR / "lock.jpg"
+LOCK_INFO = STATE_DIR / "lock.json"
 # Shipped with the dotfiles (theme package); used until another is picked
 DEFAULT_WALLPAPER = HOME / ".config/theme/wallpapers/dori-base.png"
 CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME", HOME / ".cache")) / "wallpaper-thumbs"
@@ -100,14 +113,40 @@ def save_state(state: dict) -> None:
 # ---------------------------------------------------------------- listing
 
 
+def ensure_dirs() -> None:
+    """The backgrounds folders, and the extra folders file with empty lists, if missing."""
+    for d in DIRS.values():
+        d.mkdir(parents=True, exist_ok=True)
+    if not EXTRA_DIRS_FILE.exists():
+        EXTRA_DIRS_FILE.parent.mkdir(parents=True, exist_ok=True)
+        EXTRA_DIRS_FILE.write_text(json.dumps({"static": [], "live": []}, indent=2) + "\n")
+
+
+def roots(kind: str) -> list[Path]:
+    """The folders to list: the backgrounds one, then those in backgrounds.json."""
+    out = [DIRS[kind]]
+    try:
+        extra = json.loads(EXTRA_DIRS_FILE.read_text()).get(kind, [])
+    except (OSError, json.JSONDecodeError, AttributeError):
+        extra = []
+    for entry in extra if isinstance(extra, list) else []:
+        if isinstance(entry, str) and entry.strip():
+            d = Path(os.path.expandvars(entry.strip())).expanduser()
+            if d not in out:
+                out.append(d)
+    return out
+
+
 def collect(kind: str) -> list[Path]:
-    root = DIRS[kind]
-    if not root.is_dir():
-        return []
-    files = []
-    for p in root.rglob("*"):
-        if p.is_file() and p.suffix.lower() in EXTS[kind] and not SKIP_DIRS & set(p.relative_to(root).parts[:-1]):
-            files.append(p)
+    files, seen = [], set()
+    for root in roots(kind):
+        if not root.is_dir():
+            continue
+        for p in root.rglob("*"):
+            if p.is_file() and p.suffix.lower() in EXTS[kind] and not SKIP_DIRS & set(p.relative_to(root).parts[:-1]):
+                if p not in seen:
+                    seen.add(p)
+                    files.append(p)
     return sorted(files, key=lambda p: p.name.lower())
 
 
@@ -190,27 +229,94 @@ def set_static(path: Path, monitor: str | None) -> None:
         STATE_DIR.mkdir(parents=True, exist_ok=True)
         CURRENT_LINK.unlink(missing_ok=True)
         CURRENT_LINK.symlink_to(path)
-        export_greeter()
     save_state(state)
 
 
+def largest_screen() -> tuple[int, int]:
+    """The largest width and height among the monitors, in pixels (2560x1440 without any)."""
+    try:
+        mons = json.loads(run(["hyprctl", "-j", "monitors"]) or "[]")
+        sizes = [(int(m["width"]), int(m["height"])) for m in mons if m.get("width")]
+    except (json.JSONDecodeError, KeyError, TypeError, ValueError):
+        sizes = []
+    if not sizes:
+        return 2560, 1440
+    return max(w for w, _ in sizes), max(h for _, h in sizes)
+
+
+def image_size(path: Path) -> tuple[int, int] | None:
+    magick = shutil.which("magick")
+    cmd = [magick, "identify"] if magick else [shutil.which("identify") or "identify"]
+    out = run([*cmd, "-format", "%w %h", f"{path}[0]"]).split()
+    return (int(out[0]), int(out[1])) if len(out) == 2 and all(o.isdigit() for o in out) else None
+
+
+def prepare_lock(src: Path) -> Path | None:
+    """The lock screen's background, ready to load at once: SRC itself when it's light (a
+    flat picture like the themes' logo backgrounds, or one no bigger than the largest
+    screen), else a JPEG copy scaled to cover the largest screen (a large wallpaper took a
+    moment to decode at every lock).
+    Made again only when SRC or the screens change. The login screen gets the same file."""
+    try:
+        st = src.stat()
+    except OSError:
+        return None
+    width, height = largest_screen()
+    made_from = {"source": str(src), "mtime": int(st.st_mtime), "size": st.st_size, "screen": [width, height]}
+    try:
+        info = json.loads(LOCK_INFO.read_text())
+    except (OSError, json.JSONDecodeError):
+        info = {}
+    out = Path(info.get("image", ""))
+    if info.get("from") == made_from and out.is_file():
+        return out
+    dims = image_size(src)
+    fits = dims and dims[0] <= width * 1.25 and dims[1] <= height * 1.25
+    if st.st_size <= 1_000_000 or (fits and st.st_size <= 4_000_000):
+        out = src
+    else:
+        magick = shutil.which("magick") or shutil.which("convert")
+        if not magick:
+            return src
+        STATE_DIR.mkdir(parents=True, exist_ok=True)
+        tmp = LOCK_IMAGE.with_suffix(".tmp.jpg")
+        subprocess.run([magick, f"{src}[0]", "-auto-orient", "-resize", f"{width}x{height}^",
+                        "-quality", "90", str(tmp)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if not tmp.exists():
+            return src
+        tmp.replace(LOCK_IMAGE)
+        out = LOCK_IMAGE
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    LOCK_INFO.write_text(json.dumps({"from": made_from, "image": str(out)}) + "\n")
+    export_greeter()
+    return out
+
+
 def export_greeter() -> None:
-    """The login screen can't read the home folder, so it gets its own copy."""
-    if not GREETER_DIR.is_dir() or not CURRENT_LINK.exists():
+    """The login screen can't read the home folder, so it gets its own copy of the lock
+    screen's background."""
+    try:
+        image = Path(json.loads(LOCK_INFO.read_text()).get("image", ""))
+    except (OSError, json.JSONDecodeError):
+        return
+    if not GREETER_DIR.is_dir() or not image.is_file():
         return
     tmp = GREETER_DIR / "wallpaper.tmp"
     try:
-        shutil.copyfile(CURRENT_LINK, tmp)
+        shutil.copyfile(image, tmp)
         tmp.replace(GREETER_DIR / "wallpaper")
     except OSError as e:
         print(f"wallpaper: could not copy for the login screen: {e}", file=sys.stderr)
 
 
 def use_default(path: Path | None = None) -> None:
-    """With no wallpaper chosen yet (a fresh install), choose PATH, or else the bundled one,
-    for every monitor: desktop, lock screen and login screen. It's copied into
-    ~/Pictures/Wallpapers first if it isn't there, so the picker lists it. Works before
-    Hyprland runs."""
+    """The backgrounds folders (and backgrounds.json) if missing, the bundled background in
+    the default one, and with no wallpaper chosen yet (a fresh install) PATH, or else the
+    bundled one, for every monitor; also the lock and login screens' background. Works
+    before Hyprland runs."""
+    ensure_dirs()
+    if DEFAULT_WALLPAPER.is_file() and not (DIRS["static"] / DEFAULT_WALLPAPER.name).exists():
+        shutil.copyfile(DEFAULT_WALLPAPER, DIRS["static"] / DEFAULT_WALLPAPER.name)
     source = path if path and path.is_file() else DEFAULT_WALLPAPER
     if not CURRENT_LINK.exists() and source.exists():
         dest = source if source.parent == DIRS["static"] else DIRS["static"] / source.name
@@ -223,7 +329,10 @@ def use_default(path: Path | None = None) -> None:
         state = load_state()
         state["static"] = {"*": str(dest)}
         save_state(state)
-    export_greeter()
+    # the lock and login screens' background until the shell sets its own (services/Lock.qml)
+    lock_source = path if path and path.is_file() else DIRS["static"] / DEFAULT_WALLPAPER.name
+    if not LOCK_INFO.exists() and lock_source.is_file():
+        prepare_lock(lock_source)
 
 
 # ---------------------------------------------------------------- live
@@ -380,9 +489,16 @@ def run_command(argv: list[str]) -> int:
         return 0
     cmd, args = argv[0], argv[1:]
     if cmd == "list" and args and args[0] in DIRS:
+        ensure_dirs()
         out = list_json(args[0])
         debug(f"list {args[0]}: {len(json.loads(out))} items from {DIRS[args[0]]} (exists={DIRS[args[0]].is_dir()}), {len(out)} bytes")
         print(out, flush=True)
+    elif cmd == "lock" and args:
+        out = prepare_lock(Path(args[0]).expanduser())
+        if out is None:
+            return 1
+        st = out.stat()
+        print(f"{out}\t{st.st_ino}-{int(st.st_mtime)}-{st.st_size}", flush=True)
     elif cmd == "export-greeter":
         export_greeter()
     elif cmd == "default":

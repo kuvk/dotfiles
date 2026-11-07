@@ -45,7 +45,7 @@ Singleton {
             stayAwake = false;
             awakeForGamemode = false;
         }
-        Hypr.applyGaps();
+        Hypr.applyLook();
     }
 
     // System Information: fastfetch in a kitty window (scripts/sysinfo.sh), opened or closed

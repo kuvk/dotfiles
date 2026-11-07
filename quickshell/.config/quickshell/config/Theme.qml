@@ -16,6 +16,8 @@ Singleton {
     property string mode: "dark"
     // power menu icons for this theme (theme-icons.py), "" = use glyphs
     property string iconsDir: ""
+    // the theme's own background (theme-set.py): the wallpaper and lock screen while they follow the theme
+    property string background: ""
     // Set by hypr-gamemode.sh over IPC: opaque surfaces, square corners, no animations
     property bool gamemode: false
 
@@ -111,6 +113,7 @@ Singleton {
                 root.themeName = data.name ?? root.themeName;
                 root.mode = data.mode ?? "dark";
                 root.iconsDir = data.icons ?? "";
+                root.background = data.background ?? "";
             } catch (e) {
                 console.warn("Theme: could not parse", path, e);
             }

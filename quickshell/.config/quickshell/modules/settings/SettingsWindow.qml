@@ -259,16 +259,19 @@ FloatingWindow {
                                 }
                             }
 
+                            // The desktop follows the theme while it shows the theme's background
+                            // (picked in the wallpaper picker, or Theme's here); any other
+                            // wallpaper stays through theme changes
                             SettingRow {
-                                label: "Wallpaper follows theme"
-                                hint: "The logo in the second accent on the base color, on the desktop, lock and login screens. Picking another wallpaper turns this off"
+                                label: "Wallpaper"
+                                hint: Config.wallpaperFollowsTheme ? "The theme's background, changes with the theme" : "Your own, kept when the theme changes"
 
-                                Switch {
-                                    checked: Config.wallpaperFollowsTheme
-                                    onToggled: {
-                                        Config.wallpaperFollowsTheme = !Config.wallpaperFollowsTheme;
-                                        if (Config.wallpaperFollowsTheme)
-                                            followApply.restart();
+                                TextButton {
+                                    text: "Theme's"
+                                    enabled: !Config.wallpaperFollowsTheme
+                                    onClicked: {
+                                        Config.wallpaperFollowsTheme = true;
+                                        followApply.restart();
                                     }
                                 }
                             }
@@ -290,7 +293,8 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Corner radius"
-                                hint: "Hyprland windows use 6"
+                                normalOnly: true
+                                hint: "Windows, the shell and terminal apps"
 
                                 Stepper {
                                     text: `${Config.radius} px`
@@ -378,6 +382,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Bar opacity"
+                                normalOnly: true
                                 hint: "No blur below 50%"
 
                                 Stepper {
@@ -388,6 +393,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Panel opacity"
+                                normalOnly: true
                                 hint: "Dropdowns, launchers, tooltips"
 
                                 Stepper {
@@ -397,7 +403,40 @@ FloatingWindow {
                             }
 
                             SettingRow {
+                                label: "Active window opacity"
+                                normalOnly: true
+                                hint: "Fullscreen windows stay opaque"
+
+                                Stepper {
+                                    text: `${Math.round(Config.activeOpacity * 100)}%`
+                                    onStep: d => Config.activeOpacity = Math.round(root.clamp(Config.activeOpacity + d * 0.01, 0.5, 1) * 100) / 100
+                                }
+                            }
+
+                            SettingRow {
+                                label: "Inactive window opacity"
+                                normalOnly: true
+
+                                Stepper {
+                                    text: `${Math.round(Config.inactiveOpacity * 100)}%`
+                                    onStep: d => Config.inactiveOpacity = Math.round(root.clamp(Config.inactiveOpacity + d * 0.01, 0.5, 1) * 100) / 100
+                                }
+                            }
+
+                            SettingRow {
+                                label: "Blur"
+                                normalOnly: true
+                                hint: "Behind windows and the shell"
+
+                                Switch {
+                                    checked: Config.blur
+                                    onToggled: Config.blur = !Config.blur
+                                }
+                            }
+
+                            SettingRow {
                                 label: "Animations"
+                                normalOnly: true
 
                                 Switch {
                                     checked: Config.animations
@@ -598,6 +637,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Inner gaps"
+                                normalOnly: true
 
                                 Stepper {
                                     text: `${Config.gapsIn} px`
@@ -607,6 +647,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Outer gaps"
+                                normalOnly: true
 
                                 Stepper {
                                     text: `${Config.gapsOut} px`
@@ -656,34 +697,45 @@ FloatingWindow {
                             visible: root.section === "lock"
                             spacing: 12
 
+                            // The theme's background (it changes with the theme) until the user chooses
+                            // another image; choosing the theme's own follows the theme again.
+                            // The login screen shows the same.
                             SettingRow {
-                                label: "Style"
-                                hint: Config.lockStyle === "image" ? "An image you choose" : "Current wallpaper"
-
-                                Stepper {
-                                    text: Config.lockStyle === "image" ? "Image" : "Background"
-                                    onStep: d => Config.lockStyle = Config.lockStyle === "image" ? "picture" : "image"
-                                }
-                            }
-
-                            SettingRow {
-                                visible: Config.lockStyle === "image"
                                 label: "Image"
-                                hint: Config.lockImage || "None: uses the wallpaper"
+                                hint: Config.lockFollowsTheme || Config.lockImage === "" ? "The theme's background, on the lock and login screens" : Config.lockImage.slice(Config.lockImage.lastIndexOf("/") + 1)
 
-                                TextButton {
-                                    text: "Choose…"
-                                    onClicked: lockImagePicker.running = true
+                                RowLayout {
+                                    spacing: 8
+
+                                    TextButton {
+                                        visible: !Config.lockFollowsTheme && Config.lockImage !== ""
+                                        text: "Theme's"
+                                        onClicked: {
+                                            Config.lockFollowsTheme = true;
+                                            Config.lockImage = "";
+                                        }
+                                    }
+
+                                    TextButton {
+                                        text: "Choose…"
+                                        onClicked: lockImagePicker.running = true
+                                    }
                                 }
 
                                 Process {
                                     id: lockImagePicker
 
-                                    command: ["zenity", "--file-selection", "--title=Lock screen image", "--file-filter=Images | *.png *.jpg *.jpeg *.webp"]
+                                    command: ["zenity", "--file-selection", "--title=Lock screen image",
+                                        `--filename=${Quickshell.env("HOME")}/.local/share/dotfiles/backgrounds/default/`,
+                                        "--file-filter=Images | *.png *.jpg *.jpeg *.webp"]
                                     stdout: StdioCollector {
                                         onStreamFinished: {
-                                            if (text.trim() !== "")
-                                                Config.lockImage = text.trim();
+                                            const path = text.trim();
+                                            if (path === "")
+                                                return;
+                                            const theirs = path === Theme.background;
+                                            Config.lockFollowsTheme = theirs;
+                                            Config.lockImage = theirs ? "" : path;
                                         }
                                     }
                                 }

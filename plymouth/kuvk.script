@@ -145,11 +145,15 @@ fun set_hint(image) {
 bullet.sprites = [];
 global.bullet_count = 0;
 
-# Dots are 7px with 5px gaps, centered in the field as a group
+# Dots are 9px with 4px gaps, centered in the field as a group: the lock and login screens'
+# dots (11px "●" with 3px spacing in a 36px field) at this 48px field's size
+bullet.size = 9;
+bullet.gap = 4;
+
 fun position_bullet(index) {
-  row_width = global.bullet_count * (7 + 5) - 5;
-  x = entry.x + entry.image.GetWidth() / 2 - row_width / 2 + index * (7 + 5);
-  bullet.sprites[index].SetPosition(x, entry.y + entry.image.GetHeight() / 2 - 3.5, 10002);
+  row_width = global.bullet_count * (bullet.size + bullet.gap) - bullet.gap;
+  x = entry.x + entry.image.GetWidth() / 2 - row_width / 2 + index * (bullet.size + bullet.gap);
+  bullet.sprites[index].SetPosition(x, entry.y + entry.image.GetHeight() / 2 - bullet.size / 2, 10002);
 }
 
 fun display_normal_callback() {
@@ -216,7 +220,7 @@ fun display_password_callback(prompt, bullets) {
   }
 
   # Create and show bullets for current password, as many as fit in the field
-  max_bullets = Math.Int((entry.image.GetWidth() - 40) / (7 + 5));
+  max_bullets = Math.Int((entry.image.GetWidth() - 40) / (bullet.size + bullet.gap));
   bullets_to_show = bullets;
   if (bullets_to_show > max_bullets) {
     bullets_to_show = max_bullets;
@@ -225,8 +229,8 @@ fun display_password_callback(prompt, bullets) {
   global.bullet_count = bullets_to_show;
   for (index = 0; index < bullets_to_show; index++) {
     if (!bullet.sprites[index]) {
-      # Scale bullet image to 7x7 pixels
-      bullet.sprites[index] = Sprite(bullet.image.Scale(7, 7));
+      # The bullet image drawn large, scaled down to the dot size
+      bullet.sprites[index] = Sprite(bullet.image.Scale(bullet.size, bullet.size));
     }
 
     position_bullet(index);

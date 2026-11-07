@@ -11,8 +11,9 @@ import qs.services
 
 // Wallpaper carousel: the selected wallpaper is a large slanted
 // card in the middle, the others are narrow slanted slices to the left and
-// right. Same picker for static (~/Pictures/Wallpapers) and live
-// (~/Pictures/WallpapersLive) wallpapers; Tab switches between them.
+// right. Same picker for static (~/.local/share/dotfiles/backgrounds/default) and live
+// (backgrounds/live) wallpapers, plus the folders in ~/.config/dotfiles/backgrounds.json
+// (wallpaper.py); Tab switches between them.
 //
 // ←/→ or scroll: move   type: search   Enter: all monitors
 // Shift+Enter: this monitor   Tab: static/live   Delete: stop live   Esc: close
@@ -184,10 +185,9 @@ PanelWindow {
         const item = shownItems[selected];
         if (!item)
             return;
-        // Picking a wallpaper ends Settings > Appearance > Wallpaper follows theme, unless it's the
-        // theme's own logo wallpaper (dori-theme-*, drawn by theme-set.py)
-        if (!item.path.includes("/dori-theme-"))
-            Config.wallpaperFollowsTheme = false;
+        // Settings > Appearance > Wallpaper follows theme: on with the theme's own background
+        // (theme-set.py) on every monitor, off with anything else
+        Config.wallpaperFollowsTheme = kind === "static" && !thisMonitorOnly && item.path === Theme.background;
         const cmd = [script, "set", kind, item.path];
         if (thisMonitorOnly && screen)
             cmd.push(screen.name);
@@ -651,7 +651,7 @@ PanelWindow {
                     if (root.loading && root.items.length === 0)
                         return "Loading…";
                     if (root.items.length === 0)
-                        return `Nothing in ~/Pictures/${root.kind === "live" ? "WallpapersLive" : "Wallpapers"}`;
+                        return `Nothing in ~/.local/share/dotfiles/backgrounds/${root.kind === "live" ? "live" : "default"} or ~/.config/dotfiles/backgrounds.json's folders`;
                     if (root.shownItems.length === 0)
                         return `No match for "${root.query}"`;
                     return root.shownItems[root.selected]?.name ?? "";

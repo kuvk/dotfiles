@@ -27,8 +27,6 @@ Item {
     }
 
     property date now: new Date()
-    // bumped at each lock, so a changed wallpaper is read again
-    property int version: 0
 
     function tint(name: string): color {
         return Theme[name] ?? Theme.text;
@@ -51,10 +49,8 @@ Item {
         target: Lock
 
         function onLockedChanged(): void {
-            if (Lock.locked) {
-                root.version++;
+            if (Lock.locked)
                 root.takeFocus();
-            }
         }
 
         function onFailedChanged(): void {
@@ -74,22 +70,16 @@ Item {
 
     Component.onCompleted: Qt.callLater(takeFocus)
 
-    // Settings > Lock Screen > Style: the wallpaper, or a chosen image (the wallpaper
-    // when none is chosen or it can't be read)
+    // The theme's background, or the chosen image (Settings > Lock Screen; services/Lock.qml).
+    // Already no larger than the largest screen (wallpaper.py lock), so it loads at once,
+    // before the lock is up; decoded once for every screen (Qt's image cache).
     Image {
-        readonly property string wallpaper: Quickshell.env("HOME") + "/.local/state/wallpaper/current"
-        readonly property bool useImage: Config.lockStyle === "image" && Config.lockImage !== "" && Config.lockImage !== failedImage
-        // an image that couldn't be read; choosing another one tries again
-        property string failedImage: ""
-
         anchors.fill: parent
-        source: "file://" + (useImage ? Config.lockImage : wallpaper) + "?v=" + root.version
-        onStatusChanged: if (status === Image.Error && useImage) failedImage = Config.lockImage
+        source: Lock.background
+        onStatusChanged: if (status === Image.Error && Lock.backgroundPath === Config.lockImage) Lock.failedImage = Config.lockImage
         fillMode: Image.PreserveAspectCrop
-        sourceSize.width: root.width
-        sourceSize.height: root.height
         asynchronous: false
-        cache: false
+        cache: true
     }
 
     // Takes the keys; a click anywhere gives it the keyboard again. The pointer hides after
@@ -255,7 +245,8 @@ Item {
             // a box with the windows' corners (Hyprland's rounding), square in Work-Game
             radius: Theme.radius
             color: Theme.alpha(root.tint(Config.lockInputColor), Config.lockInputOpacity / 100)
-            border.width: 1
+            // 2 px like the box, the shell's borders and the boot screen's field
+            border.width: 2
             border.color: root.tint(Lock.failed ? Config.lockFailColor : (Lock.authenticating ? Config.lockCheckColor : Config.lockInputOutlineColor))
 
             transform: Translate {

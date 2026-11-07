@@ -22,22 +22,37 @@ Singleton {
         dispatch(Hyprland.usingLua ? `hl.dsp.focus({ workspace = ${id} })` : `workspace ${id}`);
     }
 
-    // Window gaps from Settings; Work-Game has its own
-    function applyGaps(): void {
+    // Window gaps, corners, opacity and blur from Settings, at once; theme-set.py --hypr
+    // writes them to Hyprland's generated theme.lua as well, so it starts with them.
+    // Work-Game has its own gaps; its square corners, opaque windows and no blur come from
+    // hypr-gamemode.sh, which a config reload undoes, so it runs again then (restyle).
+    function applyLook(): void {
         const inner = Theme.gamemode ? Config.gameGapsIn : Config.gapsIn;
         const outer = Theme.gamemode ? Config.gameGapsOut : Config.gapsOut;
-        Quickshell.execDetached(["hyprctl", "eval", `hl.config({ general = { gaps_in = ${inner}, gaps_out = ${outer} } })`]);
+        const look = Theme.gamemode ? "" : `, decoration = { rounding = ${Config.radius}, active_opacity = ${Config.activeOpacity}, inactive_opacity = ${Config.inactiveOpacity}, blur = { enabled = ${Config.blur} } }`;
+        Quickshell.execDetached(["hyprctl", "eval", `hl.config({ general = { gaps_in = ${inner}, gaps_out = ${outer} }${look} })`]);
     }
 
-    readonly property string gapsKey: [Theme.gamemode, Config.gapsIn, Config.gapsOut, Config.gameGapsIn, Config.gameGapsOut].join(",")
-    onGapsKeyChanged: gapsDelay.restart()
+    readonly property string lookKey: [Theme.gamemode, Config.gapsIn, Config.gapsOut, Config.gameGapsIn, Config.gameGapsOut, Config.radius, Config.activeOpacity, Config.inactiveOpacity, Config.blur].join(",")
+    onLookKeyChanged: gapsDelay.restart()
     Component.onCompleted: gapsDelay.restart()
+
+    // the normal look, for the next start; long enough for Config to save it
+    readonly property string savedKey: [Config.gapsIn, Config.gapsOut, Config.radius, Config.activeOpacity, Config.inactiveOpacity, Config.blur].join(",")
+    onSavedKeyChanged: saveDelay.restart()
+
+    Timer {
+        id: saveDelay
+
+        interval: 1000
+        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--hypr"])
+    }
 
     Timer {
         id: gapsDelay
 
         interval: 300
-        onTriggered: root.applyGaps()
+        onTriggered: root.applyLook()
     }
 
     // The shell's own windows stay floating: Hyprland has no rule that forbids
@@ -74,9 +89,12 @@ Singleton {
         function onRawEvent(event: HyprlandEvent): void {
             if (event.name === "activelayout")
                 devices.running = true;
-            // a reload resets the gaps to hyprland's config
-            else if (event.name === "configreloaded")
+            // a reload resets the gaps, corners and blur to hyprland's config
+            else if (event.name === "configreloaded") {
                 gapsDelay.restart();
+                if (Theme.gamemode)
+                    Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/hypr-gamemode.sh", "restyle"]);
+            }
             else if (event.name === "changefloatingmode")
                 root.keepFloating(event.data);
         }

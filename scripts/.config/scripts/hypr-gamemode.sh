@@ -9,6 +9,8 @@
 #   hypr-gamemode.sh game     Game mode, or back to normal if already in it (SUPER+CTRL+G)
 #   hypr-gamemode.sh cycle    normal, Work, Game, normal (the bar and Control Center)
 #   hypr-gamemode.sh normal   leave either mode
+#   hypr-gamemode.sh restyle  the mode's look again (the shell runs it after Hyprland
+#                             reloads its config, which brings back the normal look)
 #
 # /tmp/hypr-gamemode holds the mode; it exists in both, as other scripts only check that.
 set -euo pipefail
@@ -51,12 +53,14 @@ current_mode() {
 }
 
 style_on() {
+    # every window opaque: there's no blur behind them
     hyprctl eval "
 hl.config({
     animations = { enabled = false },
     decoration = {
         shadow = { enabled = false },
         blur = { enabled = false },
+        active_opacity = 1,
         inactive_opacity = 1,
         rounding = 0,
     },
@@ -68,24 +72,18 @@ hl.config({
         },
     },
 })
-hl.window_rule({ name = 'kitty', match = { class = 'kitty' }, opaque = true, no_blur = true  })
-hl.window_rule({ name = 'spotify', match = { class = 'spotify' }, opaque = true, no_blur = true })
-hl.window_rule({ name = 'thunderbird', match = { class = 'org.mozilla.Thunderbird' }, opaque = true, no_blur = true })
 " || true
     "$HOME/.config/scripts/wallpaper.py" pause on 2>/dev/null || true
 }
 
 style_off() {
+    # decoration.lua again (opacity, shadow, blur), so its values live in one place; the
+    # shell then sets the corners and blur from Settings (services/Hypr.qml)
     hyprctl eval "
+package.loaded['configs.decoration'] = nil
+require('configs.decoration')
 hl.config({
     animations = { enabled = true },
-    decoration = {
-        shadow = { enabled = true },
-        blur = { enabled = true },
-        inactive_opacity = 0.9,
-        rounding = 6,
-        rounding_power = 2,
-    },
     general = {
         border_size = 2,
         col = {
@@ -94,9 +92,6 @@ hl.config({
         },
     },
 })
-hl.window_rule({ name = 'kitty', match = { class = 'kitty' }, opaque = false, no_blur = false })
-hl.window_rule({ name = 'spotify', match = { class = 'spotify' }, opaque = false, no_blur = false })
-hl.window_rule({ name = 'thunderbird', match = { class = 'org.mozilla.Thunderbird' }, opaque = false, no_blur = false  })
 " || true
     "$HOME/.config/scripts/wallpaper.py" pause off 2>/dev/null || true
 }
@@ -148,8 +143,9 @@ case ${1:-work} in
         esac
         ;;
     normal) set_mode normal ;;
+    restyle) [[ $mode == normal ]] || style_on ;;
     *)
-        echo "usage: hypr-gamemode.sh [work|game|cycle|normal]" >&2
+        echo "usage: hypr-gamemode.sh [work|game|cycle|normal|restyle]" >&2
         exit 1
         ;;
 esac
