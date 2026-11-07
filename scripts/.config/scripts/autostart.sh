@@ -26,5 +26,5 @@ fi
 
 # ROG Control Center
 if command -v rog-control-center >/dev/null; then
-    sleep 10 && rog-control-center &
+    sleep 5 && rog-control-center --background --autostart &
 fi
