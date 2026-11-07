@@ -1,8 +1,7 @@
 -- The greeter's compositor, /usr/share/sddm/hypr/hyprland.lua, installed by sddm/install.sh
 
--- Every GPU, the order left to aquamarine. Picking only the boot display's GPU (AQ_DRM_DEVICES)
--- showed the login screen on the laptop's screen alone, and the same setting broke Hyprland 0.57.1
--- in the session.
+-- Every GPU, the order left to aquamarine: AQ_DRM_DEVICES with only the boot display's GPU
+-- would leave the other GPU's monitors dark.
 
 -- The session's cursor from Settings (theme-set.py writes it), if the greeter can read that theme.
 -- Read as data, as below.
@@ -20,10 +19,9 @@ end
 hl.env("XCURSOR_SIZE", cursor_size)
 
 -- No cursor until the login screen is up, as in the session (hypr/configs/startup-cursor.lua):
--- Hyprland's first frames come before the cursor theme and the monitors' scales, and showed a
--- larger cursor shrinking. A blank theme (installed next to this file) and a hidden pointer
--- until the greeter's window opens; 10 s at most. The pointer is shown from Lua itself, so
--- the login screen never stays without one.
+-- Hyprland's first frames come before the cursor theme and the monitors' scales. A blank theme
+-- (installed next to this file) and a hidden pointer until the greeter's window opens, 10 s at
+-- most; shown from Lua itself, so the login screen is never left without one.
 local blank = "/usr/share/sddm/hypr/cursors"
 hl.env("XCURSOR_PATH", blank .. ":/usr/share/icons:/usr/share/pixmaps")
 local blank_file = io.open(blank .. "/kuvk-startup/cursors/left_ptr")

@@ -34,8 +34,7 @@ hl.config({
     force_zero_scaling = true,
   },
 })
--- No `opaque`: XWayland menus are windows too, and it filled their
--- transparent rounded corners with solid color
+-- XWayland windows: opaque, no blur
 hl.window_rule({
   name = "xwayland",
   match = { xwayland = true },

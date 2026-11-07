@@ -39,7 +39,8 @@ fi
 # notify TITLE [BODY]
 notify() {
     command -v notify-send >/dev/null 2>&1 || return 0
-    notify-send -a "Work-Game" -i input-gaming "$@"
+    # the body is a key hint: the shell shows it smaller (x-kuvk.hint)
+    notify-send -a "Work-Game" -i input-gaming -c x-kuvk.hint "$@"
 }
 
 current_mode() {

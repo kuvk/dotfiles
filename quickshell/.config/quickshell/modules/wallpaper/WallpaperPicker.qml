@@ -651,7 +651,7 @@ PanelWindow {
                     if (root.loading && root.items.length === 0)
                         return "Loading…";
                     if (root.items.length === 0)
-                        return `Nothing in ~/.local/share/dotfiles/backgrounds/${root.kind === "live" ? "live" : "default"} or ~/.config/dotfiles/backgrounds.json's folders`;
+                        return `No ${root.kind === "live" ? "live " : ""}wallpapers. Add folders in ~/.config/dotfiles/backgrounds.json`;
                     if (root.shownItems.length === 0)
                         return `No match for "${root.query}"`;
                     return root.shownItems[root.selected]?.name ?? "";

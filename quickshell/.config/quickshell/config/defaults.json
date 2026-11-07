@@ -77,6 +77,8 @@
   "nightlightSchedule": false,
   "nightlightStart": "20:00",
   "nightlightTemperature": 4500,
+  "notificationBorder": true,
+  "notificationShadow": true,
   "notificationTimeout": 5,
   "panelOpacity": 0.95,
   "radius": 6,

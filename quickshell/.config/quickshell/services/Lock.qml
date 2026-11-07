@@ -18,9 +18,9 @@ import qs.config
 // - the lock outlives the shell: Hyprland keeps the session locked when the shell goes
 //   away (a reload, or a crash), and a shell starting while Hyprland holds a lock nobody
 //   else draws locks again at once (misc:allow_session_lock_restore lets it in).
-// Unlike Omarchy's, it doesn't turn the screens off while locked: with Hyprland on the
-// laptop's Intel + NVIDIA, the NVIDIA GPU left without a lit output crashed Hyprland (DPMS off,
-// or a monitor dropping out on wake). The screens go off when the machine sleeps.
+// Unlike Omarchy's, it doesn't turn the screens off while locked: on hybrid laptops Hyprland
+// doesn't survive the NVIDIA GPU losing all its lit outputs (DPMS off). The screens go off
+// when the machine sleeps.
 // scripts/sleep-lock.sh asks for the lock before every suspend and waits for `secure`.
 Singleton {
     id: root

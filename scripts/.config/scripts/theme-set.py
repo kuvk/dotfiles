@@ -812,23 +812,21 @@ def follow_wallpaper(theme: dict) -> None:
         run_quiet([str(HOME / ".config/scripts/wallpaper.py"), "set", "static", str(path)])
 
 
-def offer_boot_update() -> None:
-    """A notification with an Update button when the boot splash and menu were built from
-    other colors (theme-boot.sh --check); the button opens a kitty window with theme-boot.sh,
-    its password prompt and output (theme-boot.sh --window)."""
+def notify_switch(summary: str) -> None:
+    """The theme notification. When the boot menu and splash still have other colors
+    (theme-boot.sh --check), it says so, and its Update button runs theme-boot.sh in a
+    kitty window (password prompt and output)."""
     script = HOME / ".config/scripts/theme-boot.sh"
-    if not script.exists() or not shutil.which("notify-send"):
+    stale = script.exists() and subprocess.run(
+        [str(script), "--check"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0
+    if not stale or not shutil.which("notify-send"):
+        notify(summary)
         return
-    if subprocess.run([str(script), "--check"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode != 0:
-        return
-    ask = (
-        'a=$(notify-send -a "Boot screens" -i preferences-desktop-theme -A update=Update '
-        '"Boot screens use the old theme" '
-        '"The boot menu and splash keep their colors until updated. Update asks for your password '
-        'and takes about a minute."); [ "$a" = update ] && exec "$0" --window'
-    )
-    subprocess.Popen(["bash", "-c", ask, str(script)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                     start_new_session=True)
+    ask = ('a=$(notify-send -a Theme -i preferences-desktop-theme -c x-kuvk.hint -A update=Update "$1" "$2"); '
+           '[ "$a" = update ] && exec "$0" --window')
+    body = "Click Update for the bootloader and Plymouth to follow the new theme."
+    subprocess.Popen(["bash", "-c", ask, str(script), summary, body],
+                     stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
 
 
 def main(argv: list[str]) -> int:
@@ -911,11 +909,12 @@ def main(argv: list[str]) -> int:
 
     reload_apps(theme)
     follow_wallpaper(theme)
-    # The boot screens only change when their installers run: offer it after a real change
-    if colors_file.read_text() != before:
-        offer_boot_update()
+    # A switch, or new colors (an accent from Settings): the boot screens follow only when
+    # their installers run, which the notification offers
     if argv:
-        notify(f"Switched to {theme['strings']['theme_name']}")
+        notify_switch(f"Switched to {theme['strings']['theme_name']}")
+    elif colors_file.read_text() != before:
+        notify_switch("Theme colors changed")
     return 0
 
 

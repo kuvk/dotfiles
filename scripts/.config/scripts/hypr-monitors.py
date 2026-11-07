@@ -272,9 +272,9 @@ def default_profile(live: list[dict]) -> dict:
 
 
 def enable_if_all_off(monitors: dict, live: list[dict]) -> bool:
-    """A setup is never saved or applied with every connected monitor off (seen at login
-    with the laptop's screen off from the last setup): turn them all on, side by side.
-    True if anything changed."""
+    """A setup is never saved or applied with every connected monitor off (a laptop screen
+    off from the last setup, alone at login): turn them all on, side by side. True if
+    anything changed."""
     connected = [m for m in live if ident(m) in monitors]
     if not connected or any(monitors[ident(m)]["enabled"] for m in connected):
         return False

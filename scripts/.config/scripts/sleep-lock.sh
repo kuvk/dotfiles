@@ -40,6 +40,6 @@ done
 
 # The machine sleeps anyway: say so on the screen it wakes up to
 echo "sleep-lock.sh: suspending without a secure lock (not locked within ${budget} ms)" >&2
-notify-send -u critical -a "Lock screen" "The screen didn't lock before sleeping" \
-    "It wasn't locked within ${budget} ms, so the session slept unlocked." 2>/dev/null
+notify-send -u critical -a "Lock screen" "Slept without locking" \
+    "Not locked within ${budget} ms." 2>/dev/null
 exit 1

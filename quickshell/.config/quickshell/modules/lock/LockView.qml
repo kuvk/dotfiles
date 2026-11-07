@@ -104,7 +104,7 @@ Item {
             } else if (event.key === Qt.Key_Backspace) {
                 Lock.password = event.modifiers & Qt.ControlModifier ? "" : Lock.password.slice(0, -1);
             } else if (event.text !== "" && event.text >= " " && !event.isAutoRepeat) {
-                // a held key repeats while a woken monitor stalls the compositor: only one
+                // no auto-repeat: a stall after wake would repeat a held key
                 Lock.failed = false;
                 Lock.password += event.text;
             }

@@ -1,9 +1,8 @@
 -- Environment Variables
 
 -- The boot display's GPU (the one driving the built-in screen, or the only one), found at each
--- start: card numbers can swap between boots. aquamarine renders on it by itself; setting
--- AQ_DRM_DEVICES to that same order broke Hyprland 0.57.1 on the laptop (every modeset after the
--- first on the NVIDIA outputs failed), so the order is left to aquamarine.
+-- start: card numbers can swap between boots. aquamarine renders on it by itself, so
+-- AQ_DRM_DEVICES isn't set: forcing the order makes modesets on the other GPU's outputs fail.
 local boot_gpu = nil
 for i = 0, 15 do
   local boot_file = io.open("/sys/class/drm/card" .. i .. "/device/boot_vga")

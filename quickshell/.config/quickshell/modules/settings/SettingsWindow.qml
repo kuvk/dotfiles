@@ -264,7 +264,7 @@ FloatingWindow {
                             // wallpaper stays through theme changes
                             SettingRow {
                                 label: "Wallpaper"
-                                hint: Config.wallpaperFollowsTheme ? "The theme's background, changes with the theme" : "Your own, kept when the theme changes"
+                                hint: Config.wallpaperFollowsTheme ? "Follows the theme" : "Your own"
 
                                 TextButton {
                                     text: "Theme's"
@@ -689,6 +689,26 @@ FloatingWindow {
                                     onStep: d => Config.notificationTimeout = root.clamp(Config.notificationTimeout + d, 2, 60)
                                 }
                             }
+
+                            SettingRow {
+                                label: "Border"
+                                hint: "Accent outline on screen"
+
+                                Switch {
+                                    checked: Config.notificationBorder
+                                    onToggled: Config.notificationBorder = !Config.notificationBorder
+                                }
+                            }
+
+                            SettingRow {
+                                label: "Shadow"
+                                normalOnly: true
+
+                                Switch {
+                                    checked: Config.notificationShadow
+                                    onToggled: Config.notificationShadow = !Config.notificationShadow
+                                }
+                            }
                         }
 
                         // ------------------------------------------------ Lock screen
@@ -702,7 +722,7 @@ FloatingWindow {
                             // The login screen shows the same.
                             SettingRow {
                                 label: "Image"
-                                hint: Config.lockFollowsTheme || Config.lockImage === "" ? "The theme's background, on the lock and login screens" : Config.lockImage.slice(Config.lockImage.lastIndexOf("/") + 1)
+                                hint: Config.lockFollowsTheme || Config.lockImage === "" ? "The theme's, also on the login screen" : Config.lockImage.slice(Config.lockImage.lastIndexOf("/") + 1)
 
                                 RowLayout {
                                     spacing: 8
@@ -876,7 +896,7 @@ FloatingWindow {
 
                             StyledText {
                                 Layout.fillWidth: true
-                                text: "Idle time until each happens, counted from the last key or mouse movement. The lock screen stays up until the machine sleeps, which turns the screens off. Stay Awake and playing media hold both off."
+                                text: "Minutes without input. Stay Awake and playing media hold both off."
                                 color: Theme.subtext0
                                 wrapMode: Text.Wrap
                             }
@@ -955,7 +975,7 @@ FloatingWindow {
 
                             SettingRow {
                                 label: "Schedule"
-                                hint: "A manual toggle holds until the next change"
+                                hint: "A manual toggle holds until the next switch"
 
                                 Switch {
                                     checked: Config.nightlightSchedule
@@ -1041,7 +1061,7 @@ FloatingWindow {
 
                             StyledText {
                                 Layout.fillWidth: true
-                                text: "Used everywhere but terminals. Reopen apps to apply."
+                                text: "Everywhere but terminals. Reopen apps to apply."
                                 color: Theme.overlay1
                                 font.pixelSize: Theme.fontSize - 1
                                 wrapMode: Text.Wrap

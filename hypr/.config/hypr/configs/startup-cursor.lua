@@ -1,10 +1,8 @@
--- No cursor until the desktop is up, after Omarchy's default/hypr/startup-cursor.lua.
--- Hyprland draws its first frames before the cursor theme and the monitors' scales are in
--- place, which showed as a larger cursor shrinking at login. At a cold start it gets a blank
--- cursor theme and a hidden pointer. The theme (../cursors/kuvk-startup) is one transparent
--- pixel: until the pointer is hidden, a 24 px transparent cursor came out as a dark square.
--- The shell reveals it once it is up (shell.qml calls kuvk_cursor_reveal); after 15 s it is
--- revealed anyway.
+-- No cursor until the desktop is up, after Omarchy's default/hypr/startup-cursor.lua:
+-- Hyprland's first frames come before the cursor theme and the monitors' scales are set.
+-- At a cold start it gets a blank cursor theme (../cursors/kuvk-startup, one transparent
+-- pixel, so nothing shows before the pointer is hidden) and a hidden pointer. The shell
+-- reveals it once it is up (shell.qml calls kuvk_cursor_reveal), or after 15 s.
 --
 -- Lua globals don't survive a config reload, so whether the cursor is still hidden is kept
 -- in the compositor's environment (KUVK_CURSOR_PENDING), and this file sets the reveal up

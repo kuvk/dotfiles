@@ -116,6 +116,8 @@ Singleton {
         bodyImagesSupported: true
         imageSupported: true
         persistenceSupported: true
+        // kept in Notification.hints: the shell's scripts mark key hints as x-kuvk.hint
+        extraHints: ["category"]
 
         onNotification: n => {
             n.tracked = true;

@@ -65,12 +65,13 @@ Item {
         implicitHeight: layout.implicitHeight + 24
         radius: Theme.radius
         color: root.popup ? Theme.panelBg : root.solid ? Qt.tint(Theme.base, Theme.cardBg) : Theme.cardBg
-        // only critical notifications get an outline
-        border.width: root.critical ? Theme.borderWidth : 0
-        border.color: Theme.red
+        // On screen: an accent outline (Settings > Notifications > Border); critical ones,
+        // anywhere, a red one
+        border.width: root.critical || (root.popup && Config.notificationBorder) ? Theme.borderWidth : 0
+        border.color: root.critical ? Theme.red : Theme.border
         clip: true
 
-        layer.enabled: root.popup && !Theme.gamemode
+        layer.enabled: root.popup && !Theme.gamemode && Config.notificationShadow
         // Close to Hyprland's window shadow (decoration.lua): black at 0x66, soft, slightly down
         layer.effect: MultiEffect {
             shadowEnabled: true
@@ -91,6 +92,7 @@ Item {
 
             visible: root.timeout > 0
             anchors.top: parent.top
+            anchors.topMargin: card.border.width
             anchors.left: parent.left
             anchors.leftMargin: card.radius
             height: 2
@@ -184,6 +186,8 @@ Item {
                         // a title that only repeats the app name adds nothing
                         visible: text !== "" && !(root.showAppName && text === root.appName)
                         text: root.notification.summary
+                        // the card's text: one size below the global size
+                        font.pixelSize: Theme.fontSize - 1
                         font.weight: Font.DemiBold
                         wrapMode: Text.Wrap
                         maximumLineCount: 2
@@ -195,6 +199,9 @@ Item {
                         text: root.body
                         textFormat: Text.StyledText
                         color: Theme.subtext1
+                        // one size below the title; a hint from the shell's scripts (keys, an
+                        // Update to run: category x-kuvk.hint) one more
+                        font.pixelSize: root.notification.hints?.category === "x-kuvk.hint" ? Theme.fontSize - 2 : Theme.fontSize - 1
                         wrapMode: Text.Wrap
                         maximumLineCount: root.popup ? 4 : 8
                         onLinkActivated: link => Qt.openUrlExternally(link)
@@ -228,7 +235,7 @@ Item {
                     verticalAlignment: TextInput.AlignVCenter
                     color: Theme.text
                     font.family: Theme.font
-                    font.pixelSize: Theme.fontSize
+                    font.pixelSize: Theme.fontSize - 1
                     clip: true
                     onAccepted: {
                         if (text.trim() === "")
@@ -315,6 +322,7 @@ Item {
                             anchors.centerIn: parent
                             width: Math.min(implicitWidth, parent.width - 12)
                             text: action.modelData.text
+                            font.pixelSize: Theme.fontSize - 1
                         }
                     }
                 }

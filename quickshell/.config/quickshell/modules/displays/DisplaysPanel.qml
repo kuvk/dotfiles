@@ -16,10 +16,10 @@ FloatingWindow {
     // Hyprland's per-monitor vrr values, and color modes (cm)
     readonly property var vrrNames: ["Off", "Always", "Fullscreen", "Games and video"]
     readonly property var colorNames: ({
-            srgb: "Standard (sRGB)",
-            edid: "The panel's own (EDID)",
+            srgb: "sRGB",
+            edid: "Built-in",
             hdr: "HDR",
-            hdredid: "HDR, the panel's own colors"
+            hdredid: "HDR, built-in"
         })
     readonly property bool currentHdr: root.current !== null && (root.current.cm === "hdr" || root.current.cm === "hdredid")
 
@@ -677,7 +677,7 @@ FloatingWindow {
                     }
 
                     StyledText {
-                        text: "Click to assign to this monitor, click again to unassign. Outlined ones belong to another monitor."
+                        text: "Click to assign or unassign. Outlined: on another monitor."
                         color: Theme.overlay1
                         font.pixelSize: Theme.fontSize - 2
                     }

@@ -98,6 +98,8 @@ Singleton {
 
     // Notifications: seconds a popup stays up (critical ones stay until closed)
     property alias notificationTimeout: adapter.notificationTimeout
+    property alias notificationBorder: adapter.notificationBorder
+    property alias notificationShadow: adapter.notificationShadow
 
     // Lock screen
 
@@ -194,6 +196,8 @@ Singleton {
         adapter.weatherLocation = "";
         adapter.weatherFahrenheit = false;
         adapter.notificationTimeout = 5;
+        adapter.notificationBorder = true;
+        adapter.notificationShadow = true;
         adapter.trayMonochrome = false;
         adapter.trayTint = false;
         adapter.trayKeepColors = "";
@@ -314,6 +318,9 @@ Singleton {
             property string weatherLocation: ""
             property bool weatherFahrenheit: false
             property int notificationTimeout: 5
+            // on-screen notifications: an accent outline, and a shadow
+            property bool notificationBorder: true
+            property bool notificationShadow: true
             property bool trayMonochrome: false
             property bool trayTint: false
             // tray apps whose icon colors carry meaning (e.g. the ROG dGPU

@@ -45,8 +45,7 @@ hl.config({
     vrr = 0,
   },
 
-  -- Hyprland's own lines in hyprland.log (in RAM, $XDG_RUNTIME_DIR/hypr/), so a crash on a
-  -- monitor plugged in after a sleep leaves something to report; off again once caught
+  -- Hyprland's own lines in hyprland.log (in RAM, $XDG_RUNTIME_DIR/hypr/), for bug reports
   debug = {
     disable_logs = false,
   },

@@ -95,7 +95,7 @@ case ${1:-} in
 esac
 
 if [[ ${1:-} != --force && $current == "$installed" ]]; then
-    note "The boot screens already use the current theme."
+    note "The boot screens already match the theme."
     exit 0
 fi
 
@@ -103,5 +103,5 @@ if [[ -t 0 ]]; then
     sudo "$self" --as-root "$USER"
 else
     pkexec "$self" --as-root "$USER"
-fi && note "The boot screens use the current theme from the next boot." \
-    || { note "The boot screens weren't updated."; exit 1; }
+fi && note "Boot screens updated, from the next boot." \
+    || { note "Boot screens not updated."; exit 1; }
