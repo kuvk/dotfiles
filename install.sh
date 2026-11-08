@@ -246,20 +246,27 @@ EOF
         echo "$kernel: kernel and image now go to /efi/arch"
     done
 
-    # Only the boot screen's GPU driver in the initramfs, for the splash. The kms hook would
-    # add every GPU's (NVIDIA's makes the image five times bigger).
+    # GPU drivers in the initramfs, named rather than the kms hook's (every built-in driver,
+    # but not NVIDIA's DKMS modules): the boot screen's GPU for the splash, and NVIDIA's on any
+    # machine with an NVIDIA card, also a hybrid laptop. Loaded later, it can appear after the
+    # login screen's Hyprland has started, which doesn't survive a new GPU. NVIDIA's firmware
+    # makes the images about 150 MB each.
     mkinit=/etc/mkinitcpio.conf
     sudo cp -n "$mkinit" "$mkinit.bak"
     if grep -q '^MODULES=()' "$mkinit"; then
         case $boot_gpu in
             0x8086) modules=${boot_driver:-i915}; [[ $modules == xe ]] || modules=i915 ;;
-            0x10de) modules="nvidia nvidia_modeset nvidia_uvm nvidia_drm" ;;
             0x1002) modules=amdgpu ;;
             *) modules= ;;
         esac
         [[ -n $modules ]] && sudo sed -i "s/^MODULES=()/MODULES=($modules)/" "$mkinit" && echo "MODULES=($modules)"
     fi
-    if grep -qE '^MODULES=\(.+\)' "$mkinit"; then
+    if has_gpu 0x10de; then
+        sudo install -d /etc/mkinitcpio.conf.d
+        echo 'MODULES+=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)' | sudo tee /etc/mkinitcpio.conf.d/nvidia.conf >/dev/null
+        echo "NVIDIA in the initramfs (/etc/mkinitcpio.conf.d/nvidia.conf)"
+    fi
+    if grep -qE '^MODULES=\(.+\)' "$mkinit" || [[ -f /etc/mkinitcpio.conf.d/nvidia.conf ]]; then
         sudo sed -i -E '/^HOOKS=/{s/ kms\b//}' "$mkinit"
     fi
     grep -qE '^HOOKS=.*\bplymouth\b' "$mkinit" || sudo sed -i -E '/^HOOKS=/s/\bsystemd\b/systemd plymouth/' "$mkinit"
