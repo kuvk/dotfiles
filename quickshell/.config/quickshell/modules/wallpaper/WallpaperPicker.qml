@@ -419,78 +419,12 @@ PanelWindow {
         }
 
         // Tabs and search
-        ColumnLayout {
+        PickerTabs {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: carousel.top
             anchors.bottomMargin: 30
-            spacing: 12
             opacity: reveal.value
-
-            Row {
-                Layout.alignment: Qt.AlignHCenter
-                spacing: 8
-
-                Repeater {
-                    model: [
-                        { kind: "static", label: "Wallpapers" },
-                        { kind: "live", label: "Live wallpapers" }
-                    ]
-
-                    MouseArea {
-                        id: tab
-
-                        required property var modelData
-                        readonly property bool current: root.kind === modelData.kind
-
-                        width: tabLabel.implicitWidth + 28
-                        height: 32
-                        cursorShape: Qt.PointingHandCursor
-                        onClicked: Panels.wallpapers = modelData.kind
-
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: Theme.radius
-                            color: tab.current ? Theme.alpha(Theme.highlight, 0.25) : Theme.alpha(Theme.base, 0.6)
-                            border.color: tab.current ? Theme.highlight : "transparent"
-                            border.width: Theme.borderWidth
-                        }
-
-                        StyledText {
-                            id: tabLabel
-
-                            anchors.centerIn: parent
-                            text: tab.modelData.label
-                            color: tab.current ? Theme.highlight : Theme.subtext0
-                            font.weight: Font.DemiBold
-                        }
-                    }
-                }
-            }
-
-            Rectangle {
-                Layout.alignment: Qt.AlignHCenter
-                implicitWidth: 320
-                implicitHeight: 34
-                radius: height / 2
-                color: Theme.alpha(Theme.base, 0.75)
-                border.color: root.query !== "" ? Theme.highlight : "transparent"
-                border.width: Theme.borderWidth
-
-                Row {
-                    anchors.centerIn: parent
-                    spacing: 8
-
-                    Icon {
-                        text: Icons.search
-                        color: root.query !== "" ? Theme.highlight : Theme.overlay1
-                    }
-
-                    StyledText {
-                        text: root.query !== "" ? root.query : "Type to search"
-                        color: root.query !== "" ? Theme.text : Theme.overlay1
-                    }
-                }
-            }
+            picker: root
         }
 
         Item {
@@ -505,135 +439,8 @@ PanelWindow {
             Repeater {
                 model: root.contentRevealed ? root.shownItems : []
 
-                Loader {
-                    id: slot
-
-                    required property var modelData
-                    required property int index
-                    // fractional distance from the (animated) selection
-                    readonly property real d: index - root.position
-                    readonly property bool isSelected: index === root.selected
-                    // visible slice inside the fixed-size card
-                    readonly property real visibleWidth: root.lerp(root.cardWidth, root.sliceWidth, d)
-                    readonly property real visibleHeight: root.lerp(root.cardHeight, root.sliceHeight, d)
-                    readonly property real sliceLeft: (root.cardWidth - visibleWidth) / 2
-                    readonly property real sliceTop: (root.cardHeight - visibleHeight) / 2
-
-                    active: Math.abs(index - root.selected) <= root.radius
-                    visible: active
-                    z: 1000 - Math.round(Math.abs(d) * 10)
-                    width: root.cardWidth
-                    height: root.cardHeight
-                    x: carousel.width / 2 + root.centerOffset(d) - width / 2
-
-                    sourceComponent: Item {
-                        id: card
-
-                        // The visible parallelogram is a sheared, clipping
-                        // Item (stencil clip, no layers or shader masks, so it
-                        // survives the layer window being recreated on show).
-                        // The picture inside gets the inverse shear and stays
-                        // fixed to the card while the slice grows and shrinks.
-                        Item {
-                            id: slice
-
-                            readonly property real k: root.skew / Math.max(1, slot.visibleHeight)
-
-                            x: slot.sliceLeft
-                            y: slot.sliceTop
-                            width: Math.max(0, slot.visibleWidth - root.skew)
-                            height: slot.visibleHeight
-                            clip: true
-                            transform: Matrix4x4 {
-                                matrix: Qt.matrix4x4(1, -slice.k, 0, root.skew, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)
-                            }
-
-                            Item {
-                                width: root.cardWidth
-                                height: root.cardHeight
-                                transform: Matrix4x4 {
-                                    matrix: Qt.matrix4x4(1, slice.k, 0, -(slot.sliceLeft + slice.k * slot.sliceTop + root.skew), 0, 1, 0, -slot.sliceTop, 0, 0, 1, 0, 0, 0, 0, 1)
-                                }
-
-                                Rectangle {
-                                    anchors.fill: parent
-                                    color: Theme.surface0
-                                }
-
-                                Image {
-                                    anchors.fill: parent
-                                    source: slot.modelData.thumb ? "file://" + slot.modelData.thumb : (root.kind === "static" ? "file://" + slot.modelData.path : "")
-                                    sourceSize.width: 1024
-                                    sourceSize.height: 640
-                                    fillMode: Image.PreserveAspectCrop
-                                    asynchronous: true
-                                    cache: true
-                                }
-
-                                Icon {
-                                    anchors.centerIn: parent
-                                    visible: !slot.modelData.thumb && root.kind === "live"
-                                    text: Icons.play
-                                    color: Theme.overlay1
-                                    font.pixelSize: 28
-                                }
-                            }
-
-                            // dim the slices
-                            Rectangle {
-                                anchors.fill: parent
-                                color: Theme.crust
-                                opacity: Math.min(1, Math.abs(slot.d)) * 0.45
-                            }
-                        }
-
-                        // Outline
-                        Shape {
-                            anchors.fill: parent
-                            preferredRendererType: Shape.CurveRenderer
-
-                            ShapePath {
-                                fillColor: "transparent"
-                                strokeColor: slot.isSelected ? Theme.accent : Theme.alpha(Theme.crust, 0.9)
-                                // also smooths the clip's hard slanted edge
-                                strokeWidth: slot.isSelected ? Math.max(2, Theme.borderWidth) : 1.5
-                                startX: slot.sliceLeft + root.skew
-                                startY: slot.sliceTop
-                                PathLine { x: slot.sliceLeft + slot.visibleWidth; y: slot.sliceTop }
-                                PathLine { x: slot.sliceLeft + slot.visibleWidth - root.skew; y: slot.sliceTop + slot.visibleHeight }
-                                PathLine { x: slot.sliceLeft; y: slot.sliceTop + slot.visibleHeight }
-                                PathLine { x: slot.sliceLeft + root.skew; y: slot.sliceTop }
-                            }
-                        }
-
-                        // Current wallpaper marker
-                        Rectangle {
-                            visible: slot.modelData.current && slot.isSelected
-                            x: slot.sliceLeft + slot.visibleWidth - 22
-                            y: slot.sliceTop + 12
-                            width: 10
-                            height: 10
-                            radius: 5
-                            color: Theme.accent
-                        }
-
-                        // Clicks only on the visible slice
-                        MouseArea {
-                            x: slot.sliceLeft
-                            y: slot.sliceTop
-                            width: slot.visibleWidth
-                            height: slot.visibleHeight
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: {
-                                if (slot.isSelected) {
-                                    root.apply(false);
-                                } else {
-                                    root.moved = true;
-                                    root.selected = slot.index;
-                                }
-                            }
-                        }
-                    }
+                WallpaperCard {
+                    picker: root
                 }
             }
         }
