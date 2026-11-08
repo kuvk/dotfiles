@@ -12,6 +12,8 @@ failed=0
 fail() { printf '\e[31m%s\e[0m\n' "$1"; failed=1; }
 
 mapfile -t tracked < <(git ls-files --cached --others --exclude-standard)
+# migrations and this check name the old paths on purpose
+mapfile -t current < <(printf '%s\n' "${tracked[@]}" | grep -vE '^migrations/|^bin/\.local/bin/hyprdori-check$')
 
 # Scripts parse: shell, Python and Lua by their first line or extension
 for file in "${tracked[@]}"; do
@@ -30,10 +32,10 @@ done
 # Old names: the project is hyprdori (github.com/kuvk/... is the account and stays)
 while IFS= read -r line; do
     fail "old name: $line"
-done < <(git grep -n -I -i -E 'kuvk' -- "${tracked[@]}" 2>/dev/null | grep -v -E 'github\.com/kuvk/')
+done < <(git grep -n -I -i -E 'kuvk' -- "${current[@]}" 2>/dev/null | grep -v -E 'github\.com/kuvk/')
 while IFS= read -r line; do
     fail "old path: $line"
-done < <(git grep -n -I -E '(\.config/scripts/(theme-set|wallpaper|hypr-monitors|webapp|update|sysmaintenance|logo-wallpaper|convert-live-wallpapers)\.(py|sh))|share/dotfiles|config/dotfiles' -- "${tracked[@]}" 2>/dev/null)
+done < <(git grep -n -I -E '(\.config/scripts/(theme-set|wallpaper|hypr-monitors|webapp|update|sysmaintenance|logo-wallpaper|convert-live-wallpapers)\.(py|sh))|share/dotfiles|config/dotfiles' -- "${current[@]}" 2>/dev/null)
 
 if ((failed)); then
     exit 1
