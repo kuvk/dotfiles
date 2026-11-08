@@ -1,11 +1,13 @@
 -- Highlights that differ from bufferline's defaults, from the current theme
 local function custom_highlights()
   local p = require("theme").palette
-  local fill = p.dark_bg
-  if fill then
-    vim.api.nvim_set_hl(0, "BufferLineFill", { bg = fill })
-    vim.api.nvim_set_hl(0, "BufferLineSeparator", { fg = fill })
-    vim.api.nvim_set_hl(0, "BufferLineSeparatorSelected", { fg = fill })
+  -- the editor's background, with a thin muted line between buffers
+  local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
+  if p.muted then
+    vim.api.nvim_set_hl(0, "BufferLineFill", { bg = normal })
+    vim.api.nvim_set_hl(0, "BufferLineSeparator", { fg = p.muted, bg = normal })
+    vim.api.nvim_set_hl(0, "BufferLineSeparatorSelected", { fg = p.muted, bg = normal })
+    vim.api.nvim_set_hl(0, "BufferLineSeparatorVisible", { fg = p.muted, bg = normal })
   end
   if p.blue then
     vim.api.nvim_set_hl(0, "StatusLine", { fg = p.blue })

@@ -93,10 +93,13 @@ description = "navigate right"
 
 [ui]
 accent = "blue"
-# single-line dividers between panes and no outer frame, no scrollbar column, like tmux
+# single-line dividers between panes and around the pane area (one next to the sidebar), no
+# scrollbar column
 pane_gaps = false
-pane_outer_borders = false
+pane_outer_borders = true
 pane_scrollbars = false
+# agents' states as distinct glyphs (blocked, working, done, idle) rather than dots
+status_indicators = "symbols"
 confirm_close = false
 prompt_new_tab_name = false
 mouse_capture = true

@@ -21,17 +21,16 @@ opt.background = "dark"
 opt.signcolumn = "yes"
 -- Rounded floating windows, square in Work-Game (theme.lua), hover and signature help included
 opt.winborder = require("theme").border()
--- Split dividers: the vertical ones fill their column and the horizontal ones half a
--- row, in the file tree's background (theme.lua), so they look about equally thick
+-- Split dividers: thin lines (their color in theme.lua)
 opt.fillchars = {
   eob = " ",
-  vert = "█",
-  vertleft = "█",
-  vertright = "█",
-  verthoriz = "█",
-  horiz = "▀",
-  horizup = "▀",
-  horizdown = "▀",
+  vert = "│",
+  vertleft = "┤",
+  vertright = "├",
+  verthoriz = "┼",
+  horiz = "─",
+  horizup = "┴",
+  horizdown = "┬",
 }
 
 -- Folds from treesitter, two levels deep at most, all open when a file opens; a folded line

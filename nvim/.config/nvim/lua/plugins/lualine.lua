@@ -47,8 +47,8 @@ local function fg(group)
 end
 
 -- Mode colors from the system theme, the same in yazi and starship's prompt: normal in the
--- accent, insert green, visual magenta, command yellow. The rest of the line keeps the
--- colorscheme's look (blocks on the darker background).
+-- accent, insert green, visual magenta, command yellow. The middle has no background of
+-- its own.
 local function mode_theme()
   local theme = require("theme")
   local p = theme.palette
@@ -59,7 +59,7 @@ local function mode_theme()
     return {
       a = { fg = p.bg, bg = color, gui = "bold" },
       b = { fg = color, bg = p.lighter_bg },
-      c = { fg = p.fg, bg = p.dark_bg },
+      c = { fg = p.fg, bg = "NONE" },
     }
   end
   return {
@@ -70,9 +70,9 @@ local function mode_theme()
     replace = mode(p.red),
     terminal = mode(p.green),
     inactive = {
-      a = { fg = p.dark_fg, bg = p.dark_bg },
-      b = { fg = p.dark_fg, bg = p.dark_bg },
-      c = { fg = p.dark_fg, bg = p.dark_bg },
+      a = { fg = p.dark_fg, bg = "NONE" },
+      b = { fg = p.dark_fg, bg = "NONE" },
+      c = { fg = p.dark_fg, bg = "NONE" },
     },
   }
 end

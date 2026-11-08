@@ -49,13 +49,17 @@ local function custom_highlights()
   -- Its choices as plain text without a background, the default one (Enter) in the accent
   set(0, "NoiceFormatConfirm", { fg = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).fg })
   set(0, "NoiceFormatConfirmDefault", { fg = p.accent })
-  -- Lines between splits (shapes in options.lua fillchars), in the file tree's background
-  local tree = vim.api.nvim_get_hl(0, { name = "NeoTreeNormal", link = false }).bg
-  local divider = tree and string.format("#%06x", tree) or p.dark_bg
-  set(0, "WinSeparator", { fg = divider })
-  set(0, "NeoTreeWinSeparator", { fg = divider })
-  -- Trouble in the editor's background, like a file; its cursor line is CursorLine
+  -- No backgrounds of their own: the file tree, the tab line and the status line's middle
+  -- sit on the editor's, divided by thin lines (options.lua fillchars) in muted
   local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
+  for _, group in ipairs({ "NeoTreeNormal", "NeoTreeNormalNC", "NeoTreeEndOfBuffer" }) do
+    local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
+    hl.bg = normal
+    set(0, group, hl)
+  end
+  set(0, "WinSeparator", { fg = p.muted, bg = normal })
+  set(0, "NeoTreeWinSeparator", { fg = p.muted, bg = normal })
+  -- Trouble in the editor's background, like a file; its cursor line is CursorLine
   set(0, "TroubleNormal", { bg = normal })
   set(0, "TroubleNormalNC", { bg = normal })
   -- Indent guides: the current block's in the accent, the rest as the colorscheme draws them
