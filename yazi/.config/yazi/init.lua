@@ -20,6 +20,10 @@ end
 if square then
   sep = { left = "", right = "" }
 end
+-- Boxed panes, in the dividers' color (theme.toml), square with the square shape
+-- (full-border.yazi from yazi-rs/plugins, MIT)
+require("full-border"):setup({ set = square and "plain" or "rounded" })
+
 local select_symbol = "\u{f4a7}"
 local yank_symbol = "\u{f0190}"
 local name_max = 24 -- truncate names longer than this

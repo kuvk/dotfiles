@@ -22,8 +22,8 @@ M.palette = {}
 local function custom_highlights()
   local p = M.palette
   local set = vim.api.nvim_set_hl
-  -- Window borders. The command line, search and the quit confirmation stay in the accent
-  -- below, matching lualine's command mode.
+  -- Window borders in muted, the command line and search popups too; the quit confirmation's
+  -- in the accent below
   for _, group in ipairs({
     "FloatBorder",
     "LazyGitBorder",
@@ -38,6 +38,8 @@ local function custom_highlights()
     "NeoTreeFloatBorder",
     "NoicePopupBorder",
     "NoiceSplitBorder",
+    "NoiceCmdlinePopupBorder",
+    "NoiceCmdlinePopupBorderSearch",
     "NullLsInfoBorder",
   }) do
     set(0, group, { fg = p.muted })
@@ -70,17 +72,6 @@ local function custom_highlights()
   set(0, "@comment.note", { fg = p.cyan, bold = true })
   set(0, "@comment.warning", { fg = p.yellow, bold = true })
   set(0, "@comment.error", { fg = p.red, bold = true })
-  -- Command and search windows (noice.lua)
-  -- Command line and search popups: borders green like lualine's command mode, which both
-  -- are; the icon in the accent, the typed text in the text color
-  for _, group in ipairs({ "Border", "BorderSearch", "Title", "TitleSearch" }) do
-    set(0, "NoiceCmdlinePopup" .. group, { fg = p.green })
-  end
-  for _, group in ipairs({ "NoiceCmdlineIcon", "NoiceCmdlineIconSearch" }) do
-    set(0, group, { fg = p.accent })
-  end
-  local popup = vim.api.nvim_get_hl(0, { name = "NoiceCmdlinePopup", link = false })
-  set(0, "NoiceCmdlinePopup", { fg = p.fg, bg = popup.bg })
   -- Folders in accent, like yazi, eza and ls: neo-tree, the completion menu's folder kind and
   -- everything that uses Directory (file pickers, :e completion, netrw)
   for _, group in ipairs({ "Directory", "NeoTreeDirectoryIcon", "NeoTreeDirectoryName", "BlinkCmpKindFolder", "CmpItemKindFolder" }) do
@@ -101,9 +92,9 @@ local function custom_highlights()
   set(0, "NeoTreeLinkName", { fg = p.cyan, bold = true })
   set(0, "NeoTreeSymbolicLinkTarget", { fg = p.accent })
   set(0, "NeoTreeBrokenLinkTarget", { fg = p.red })
-  -- The "File Explorer" label above neo-tree (bufferline's offset), in accent on the status line
-  local status = vim.api.nvim_get_hl(0, { name = "StatusLine", link = false })
-  set(0, "NeoTreeExplorerLabel", { fg = p.accent, bg = status.bg, bold = true })
+  -- The "Neo Tree" label above neo-tree (bufferline's offset), in the accent; bufferline.lua
+  -- gives it the bar's look
+  set(0, "NeoTreeExplorerLabel", { fg = p.accent, bold = true })
   -- Dashboard: the NEOVIM lettering in the accent, the logo (ascii-dori) in magenta, buttons in
   -- the text color with their keys in the accent
   set(0, "AlphaHeader", { fg = p.accent })

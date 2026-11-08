@@ -1,2 +1,3 @@
-# Catppuccin Latte's mauve as magenta (the theme file has pink for it)
+# Catppuccin Latte's mauve as magenta and its peach as yellow (the theme file has pink and yellow)
 magenta = "#8839ef"
+yellow = "#fe640b"

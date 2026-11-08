@@ -1,13 +1,21 @@
 -- Highlights that differ from bufferline's defaults, from the current theme
 local function custom_highlights()
   local p = require("theme").palette
-  -- the editor's background, with a thin muted line between buffers
+  -- Only the selected buffer has a background; everything else (other buffers, the Neo Tree
+  -- title, the arrows when buffers don't fit) sits on the editor's. A thin muted line runs
+  -- under the whole bar: every part is underlined in muted.
   local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
   if p.muted then
-    vim.api.nvim_set_hl(0, "BufferLineFill", { bg = normal })
-    vim.api.nvim_set_hl(0, "BufferLineSeparator", { fg = p.muted, bg = normal })
-    vim.api.nvim_set_hl(0, "BufferLineSeparatorSelected", { fg = p.muted, bg = normal })
-    vim.api.nvim_set_hl(0, "BufferLineSeparatorVisible", { fg = p.muted, bg = normal })
+    for _, group in ipairs(vim.fn.getcompletion("BufferLine", "highlight")) do
+      local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
+      hl.bg = group:find("Selected") and p.lighter_bg or normal
+      hl.sp, hl.underline = p.muted, true
+      if group:find("^BufferLineSeparator") then
+        hl.fg = normal
+      end
+      vim.api.nvim_set_hl(0, group, hl)
+    end
+    vim.api.nvim_set_hl(0, "NeoTreeExplorerLabel", { fg = p.accent, bg = normal, bold = true, sp = p.muted, underline = true })
   end
   if p.blue then
     vim.api.nvim_set_hl(0, "StatusLine", { fg = p.blue })
