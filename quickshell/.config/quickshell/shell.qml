@@ -14,6 +14,7 @@ import qs.modules.launcher
 import qs.modules.lock
 import qs.modules.network
 import qs.modules.notifications
+import qs.modules.osd
 import qs.modules.powermenu
 import qs.modules.settings
 import qs.modules.transition
@@ -107,6 +108,9 @@ ShellRoot {
     WallpaperBackdrop {}
 
     ThemePicker {}
+
+    // volume, brightness and keyboard light changes
+    OsdPopup {}
 
     // `qs ipc call` commands
     Ipc {}
