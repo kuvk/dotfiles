@@ -32,6 +32,7 @@ hyprshutdown
 hyprpolkitagent
 xdg-desktop-portal-hyprland
 xdg-desktop-portal-gtk
+xorg-xsetroot            # XWayland's default cursor (startup-cursor.lua, theme-set.py)
 
 # Quickshell, and the services it talks to
 quickshell

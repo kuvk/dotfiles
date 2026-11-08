@@ -579,6 +579,17 @@ def apply_cursor(strings: dict) -> None:
     run_quiet(["gsettings", "set", interface, "cursor-size", strings["cursor_size"]])
     if hypr_running():
         run_quiet(["hyprctl", "setcursor", strings["cursor_theme"], strings["cursor_size"]])
+    set_xwayland_cursor(strings["cursor_theme"], strings["cursor_size"])
+
+
+def set_xwayland_cursor(theme: str, size: str) -> None:
+    """XWayland's default arrow, for X11 apps that set no cursor of their own (Parsec).
+    Hyprland sets it once, when XWayland starts, so it doesn't follow `hyprctl setcursor`."""
+    if not os.environ.get("DISPLAY") or not shutil.which("xsetroot"):
+        return
+    env = {**os.environ, "XCURSOR_THEME": theme, "XCURSOR_SIZE": size}
+    subprocess.run(["xsetroot", "-cursor_name", "left_ptr"], env=env, check=False,
+                   stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
 def gtk_font_pt() -> int:

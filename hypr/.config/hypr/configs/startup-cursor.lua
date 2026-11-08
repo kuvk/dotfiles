@@ -41,7 +41,10 @@ function kuvk_cursor_reveal()
   hl.env("KUVK_CURSOR_PENDING", "")
   restore_env()
   local size = os.getenv("XCURSOR_SIZE") or "24"
+  -- xsetroot: XWayland's default arrow, for X11 apps without cursors of their own (Parsec).
+  -- Hyprland gives it the blank theme's when XWayland starts, and setcursor doesn't change it.
   hl.exec_cmd("hyprctl setcursor '" .. real_theme() .. "' " .. size
+    .. "; xsetroot -cursor_name left_ptr >/dev/null 2>&1"
     .. "; hyprctl eval 'hl.config({ cursor = { invisible = false } })'")
 end
 
