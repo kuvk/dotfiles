@@ -19,7 +19,7 @@ wallpapers last until logout.
                                          to load at once (PATH itself if it is), also for the
                                          login screen; prints it and a stamp, tab-separated
   wallpaper.py export-greeter            copy the lock screen's background for the login screen
-  wallpaper.py default [PATH]            first run: PATH (or the bundled wallpaper), unless one is chosen
+  wallpaper.py default [PATH]            first run: PATH (or the theme's background), unless one is chosen
   wallpaper.py restore                   re-apply the saved static wallpapers (autostart)
 """
 
@@ -61,7 +61,8 @@ CURRENT_LINK = STATE_DIR / "current"  # hyprpaper.conf points here
 LOCK_IMAGE = STATE_DIR / "lock.jpg"
 LOCK_INFO = STATE_DIR / "lock.json"
 # Shipped with the dotfiles (theme package); used until another is picked
-DEFAULT_WALLPAPER = HOME / ".config/theme/wallpapers/dori-base.png"
+# the theme's background, drawn by theme-set.py (theme_background)
+THEME_JSON = HOME / ".config/theme/current/quickshell.json"
 CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME", HOME / ".cache")) / "wallpaper-thumbs"
 RUNTIME_DIR = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "wallpaper"
 
@@ -309,18 +310,24 @@ def export_greeter() -> None:
         print(f"wallpaper: could not copy for the login screen: {e}", file=sys.stderr)
 
 
+def theme_background() -> Path | None:
+    try:
+        path = Path(json.loads(THEME_JSON.read_text()).get("background") or "")
+    except (OSError, json.JSONDecodeError):
+        return None
+    return path if path.is_file() else None
+
+
 def use_default(path: Path | None = None) -> None:
-    """The backgrounds folders (and backgrounds.json) if missing, the bundled background in
-    the default one, and with no wallpaper chosen yet (a fresh install) PATH, or else the
-    bundled one, for every monitor; also the lock and login screens' background. Works
-    before Hyprland runs."""
+    """The backgrounds folders (and backgrounds.json) if missing, and with no wallpaper
+    chosen yet (a fresh install) PATH, or else the theme's background, for every monitor;
+    also the lock and login screens' background. Works before Hyprland runs."""
     ensure_dirs()
-    if DEFAULT_WALLPAPER.is_file() and not (DIRS["static"] / DEFAULT_WALLPAPER.name).exists():
-        shutil.copyfile(DEFAULT_WALLPAPER, DIRS["static"] / DEFAULT_WALLPAPER.name)
-    source = path if path and path.is_file() else DEFAULT_WALLPAPER
-    if not CURRENT_LINK.exists() and source.exists():
+    source = path if path and path.is_file() else theme_background()
+    if source is None:
+        return
+    if not CURRENT_LINK.exists():
         dest = source if source.parent == DIRS["static"] else DIRS["static"] / source.name
-        dest.parent.mkdir(parents=True, exist_ok=True)
         if not dest.exists():
             shutil.copyfile(source, dest)
         STATE_DIR.mkdir(parents=True, exist_ok=True)
@@ -330,9 +337,8 @@ def use_default(path: Path | None = None) -> None:
         state["static"] = {"*": str(dest)}
         save_state(state)
     # the lock and login screens' background until the shell sets its own (services/Lock.qml)
-    lock_source = path if path and path.is_file() else DIRS["static"] / DEFAULT_WALLPAPER.name
-    if not LOCK_INFO.exists() and lock_source.is_file():
-        prepare_lock(lock_source)
+    if not LOCK_INFO.exists():
+        prepare_lock(source)
 
 
 # ---------------------------------------------------------------- live

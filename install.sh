@@ -210,11 +210,11 @@ sudo "$dotfiles/sddm/install.sh" >/dev/null
 tmux_theme="$HOME/.tmux/plugins/catppuccin/tmux"
 [[ -d $tmux_theme ]] || git clone -q -b v2.3.2 https://github.com/catppuccin/tmux.git "$tmux_theme"
 "$HOME/.config/scripts/theme-set.py"
-# Backgrounds: ~/.local/share/dotfiles/backgrounds/default (wallpapers, with the bundled one)
-# and /live, and ~/.config/dotfiles/backgrounds.json for more folders. The desktop, lock
-# screen and login screen get the theme's background, which theme-set.py just drew (the logo
-# in accent2 on base, like the boot splash and menu), unless a wallpaper is chosen already;
-# the bundled one if drawing it failed. Both follow the theme from then on.
+# Backgrounds: ~/.local/share/dotfiles/backgrounds/default (wallpapers) and /live, and
+# ~/.config/dotfiles/backgrounds.json for more folders. The desktop, lock screen and login
+# screen get the theme's background, which theme-set.py just drew (the logo in accent2 on
+# base, like the boot splash and menu), unless a wallpaper is chosen already. Both follow
+# the theme from then on.
 wall=$(jq -r '.background // empty' "$HOME/.config/theme/current/quickshell.json" 2>/dev/null) || wall=
 "$HOME/.config/scripts/wallpaper.py" default ${wall:+"$wall"}
 sudo "$HOME/.config/scripts/browser-theme-setup.sh"
