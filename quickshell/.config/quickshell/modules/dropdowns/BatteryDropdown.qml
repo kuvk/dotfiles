@@ -5,8 +5,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// Battery details and power profile (power-profiles-daemon; on ASUS laptops
-// asusd maps these to Quiet / Balanced / Performance).
+// Battery details and power mode (the modes: services/Battery.qml)
 Dropdown {
     id: root
 
@@ -57,14 +56,15 @@ Dropdown {
             text: Battery.watts > 0 ? `${Battery.watts.toFixed(1)} W` : "--"
         }
 
+        // the full charge against when new
         Label {
-            visible: Battery.device?.healthSupported ?? false
+            visible: Battery.health >= 0
             text: "Health"
         }
 
         Value {
-            visible: Battery.device?.healthSupported ?? false
-            text: `${Math.round(Battery.device?.healthPercentage ?? 0)}%`
+            visible: Battery.health >= 0
+            text: `${Math.round(Battery.health)}%`
         }
     }
 
@@ -81,11 +81,7 @@ Dropdown {
         Repeater {
             id: modes
 
-            model: [
-                { label: "Quiet", profile: PowerProfile.PowerSaver, icon: Icons.moon },
-                { label: "Balanced", profile: PowerProfile.Balanced, icon: Icons.sliders },
-                { label: "Performance", profile: PowerProfile.Performance, icon: Icons.g(0xf0e7) }
-            ]
+            model: Battery.powerModes
 
             Chip {
                 required property var modelData

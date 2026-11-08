@@ -15,6 +15,35 @@ Singleton {
     readonly property bool full: device?.state === UPowerDeviceState.FullyCharged
     readonly property real watts: Math.abs(device?.changeRate ?? 0)
 
+    // Health: the battery's full charge against its design capacity. Read from the battery
+    // itself; UPower's combined display device doesn't report it. -1 when unknown.
+    readonly property UPowerDevice battery: {
+        const all = UPower.devices.values;
+        for (let i = 0; i < all.length; i++) {
+            if (all[i].isLaptopBattery)
+                return all[i];
+        }
+        return null;
+    }
+    readonly property real health: battery?.healthSupported ? battery.healthPercentage : -1
+
+    // Power modes (power-profiles-daemon; on ASUS laptops asusd maps them to Quiet /
+    // Balanced / Performance), for the battery dropdown and the OSD
+    readonly property var powerModes: [
+        { label: "Quiet", profile: PowerProfile.PowerSaver, icon: Icons.moon },
+        { label: "Balanced", profile: PowerProfile.Balanced, icon: Icons.sliders },
+        { label: "Performance", profile: PowerProfile.Performance, icon: Icons.bolt }
+    ]
+
+    // the current one (index loop: var arrays don't take .find here)
+    readonly property var powerMode: {
+        for (let i = 0; i < powerModes.length; i++) {
+            if (powerModes[i].profile === PowerProfiles.profile)
+                return powerModes[i];
+        }
+        return powerModes[1];
+    }
+
     readonly property string state: {
         switch (device?.state) {
         case UPowerDeviceState.Charging:

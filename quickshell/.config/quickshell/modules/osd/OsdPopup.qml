@@ -6,9 +6,9 @@ import qs.config
 import qs.components
 import qs.services
 
-// On-screen display for volume, screen brightness and the keyboard light (services/Osd.qml):
-// the icon, a bar and the percentage, at the bottom center of the focused monitor. Clicks go
-// through it.
+// On-screen display (services/Osd.qml says what each one shows): an icon and a bar for a
+// level, or an icon and a name for a state, at the bottom center of the focused monitor.
+// Clicks go through it.
 PanelWindow {
     id: root
 
@@ -49,22 +49,23 @@ PanelWindow {
 
             Icon {
                 Layout.preferredWidth: 20
-                text: Osd.icon
-                color: Osd.muted ? Theme.overlay1 : Theme.accent
+                text: Osd.entry.icon
+                color: Osd.entry.dim ? Theme.overlay1 : Theme.accent
             }
 
-            // the bar
+            // a level: the bar
             Rectangle {
                 Layout.fillWidth: true
+                visible: Osd.entry.level >= 0
                 implicitHeight: 6
                 radius: height / 2
                 color: Theme.surface1
 
                 Rectangle {
-                    width: parent.width * Osd.value
+                    width: parent.width * Math.max(0, Osd.entry.level)
                     height: parent.height
                     radius: parent.radius
-                    color: Osd.muted ? Theme.overlay1 : Theme.accent
+                    color: Osd.entry.dim ? Theme.overlay1 : Theme.accent
 
                     Behavior on width {
                         NumberAnimation {
@@ -75,12 +76,12 @@ PanelWindow {
                 }
             }
 
+            // a state: its name
             StyledText {
-                Layout.preferredWidth: 40
-                horizontalAlignment: Text.AlignRight
-                text: Osd.muted ? "Muted" : `${Math.round(Osd.value * 100)}%`
-                color: Osd.muted ? Theme.overlay1 : Theme.text
-                font.pixelSize: Theme.fontSize - 1
+                Layout.fillWidth: true
+                visible: Osd.entry.level < 0
+                text: Osd.entry.label
+                elide: Text.ElideRight
             }
         }
     }

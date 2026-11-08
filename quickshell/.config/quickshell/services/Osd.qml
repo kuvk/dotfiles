@@ -3,32 +3,66 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Services.UPower
 import qs.config
 
-// What the on-screen display shows (modules/osd/OsdPopup.qml): the volume, the screen's
-// brightness or the keyboard light, whichever changed last, then hides after a moment.
-// Volume comes live from PipeWire. Brightness and the keyboard light are read from sysfs
-// a few times a second: nothing reports their changes, and this catches every source
-// (keys, asusd, ROG Control Center, brightnessctl). Quiet while a panel with its own
-// slider is open.
+// The on-screen display's state (modules/osd/OsdPopup.qml): what changed last, shown for a
+// moment. `kinds` says what each OSD shows; the sources below call show(name) when their
+// value changes.
 Singleton {
     id: root
 
-    property string kind: "" // "volume" | "brightness" | "keyboard"
-    property real value: 0 // 0..1
-    property bool muted: false
+    // Each OSD by name: an icon, then a `level` (0..1, drawn as a bar; `dim` greys it) or a
+    // `label`, and `quiet` while a panel with its own control for it is open. Brightness and
+    // the keyboard light get their level from their source.
+    readonly property var kinds: ({
+            volume: () => ({
+                    icon: Audio.icon,
+                    level: Audio.volume,
+                    dim: Audio.muted,
+                    quiet: Panels.controlCenter || Panels.dropdown === "audio"
+                }),
+            mute: () => ({
+                    icon: Audio.muted ? Icons.volumeMuted : Audio.icon,
+                    label: Audio.muted ? "Muted" : "Sound on",
+                    quiet: Panels.controlCenter || Panels.dropdown === "audio"
+                }),
+            mic: () => ({
+                    icon: Audio.micMuted ? Icons.micMuted : Icons.mic,
+                    label: Audio.micMuted ? "Microphone off" : "Microphone on",
+                    quiet: Panels.dropdown === "audio"
+                }),
+            brightness: level => ({
+                    icon: Icons.sun,
+                    level: level,
+                    quiet: Panels.controlCenter || Panels.displays
+                }),
+            keyboard: level => ({
+                    icon: Icons.keyboard,
+                    level: level
+                }),
+            power: () => ({
+                    icon: Battery.powerMode.icon,
+                    label: Battery.powerMode.label,
+                    quiet: Panels.dropdown === "battery"
+                })
+        })
+
+    // What's on screen: { icon, level (-1: none), label, dim }
+    property var entry: ({ icon: "", level: -1, label: "", dim: false })
     property bool shown: false
 
-    readonly property string icon: kind === "volume" ? Audio.icon : kind === "keyboard" ? Icons.keyboard : Icons.sun
-    readonly property bool quiet: Panels.controlCenter || Panels.dropdown === "audio" || Panels.displays
-
-    function show(newKind: string, newValue: real, newMuted: bool): void {
-        if (quiet)
+    function show(name: string, value: real): void {
+        const e = root.kinds[name](value);
+        if (e.quiet)
             return;
-        kind = newKind;
-        value = Math.max(0, Math.min(1, newValue));
-        muted = newMuted;
-        shown = true;
+        root.entry = {
+            icon: e.icon,
+            level: e.level === undefined ? -1 : Math.max(0, Math.min(1, e.level)),
+            label: e.label ?? "",
+            dim: e.dim ?? false
+        };
+        root.shown = true;
         hide.restart();
     }
 
@@ -39,37 +73,65 @@ Singleton {
         onTriggered: root.shown = false
     }
 
-    // Volume: not at startup, and not when the output device changes (its volume differs)
-    property bool audioSettled: false
+    // ------------------------------------------------ Sources
+
+    // Not at startup, or right after the output or input device changes (its volume and
+    // mute differ): those aren't the user's changes
+    property bool settled: false
 
     Timer {
         id: settle
 
         interval: 1000
         running: true
-        onTriggered: root.audioSettled = true
+        onTriggered: root.settled = true
     }
 
+    function changed(name: string): void {
+        if (root.settled && Audio.ready)
+            root.show(name, 0);
+    }
+
+    // Volume, mute and the microphone: PipeWire, live
     Connections {
         target: Audio
 
         function onSinkChanged(): void {
-            root.audioSettled = false;
+            root.settled = false;
+            settle.restart();
+        }
+
+        function onSourceChanged(): void {
+            root.settled = false;
             settle.restart();
         }
 
         function onVolumeChanged(): void {
-            if (root.audioSettled && Audio.ready)
-                root.show("volume", Audio.volume, Audio.muted);
+            root.changed("volume");
         }
 
         function onMutedChanged(): void {
-            if (root.audioSettled && Audio.ready)
-                root.show("volume", Audio.volume, Audio.muted);
+            root.changed("mute");
+        }
+
+        function onMicMutedChanged(): void {
+            root.changed("mic");
         }
     }
 
-    // Brightness and keyboard light: the first backlight and keyboard LED, if any
+    // Power mode: power-profiles-daemon, which follows the laptop's mode key too
+    Connections {
+        target: PowerProfiles
+
+        function onProfileChanged(): void {
+            if (root.settled)
+                root.show("power", 0);
+        }
+    }
+
+    // Brightness and the keyboard light: the first backlight and keyboard LED, read from
+    // sysfs a few times a second. Nothing reports their changes, and this catches every
+    // source (keys, asusd, ROG Control Center, brightnessctl).
     property string backlight: ""
     property string keyboardLight: ""
 
@@ -101,7 +163,7 @@ Singleton {
         id: level
 
         required property string device
-        required property string levelKind
+        required property string kind
         property int max: 0
         property int last: -1
 
@@ -112,7 +174,7 @@ Singleton {
                 return;
             // the first reading is where it is, not a change
             if (level.last >= 0 && now !== level.last)
-                root.show(level.levelKind, now / level.max, false);
+                root.show(level.kind, now / level.max);
             level.last = now;
         }
 
@@ -126,13 +188,13 @@ Singleton {
         id: screenLevel
 
         device: root.backlight
-        levelKind: "brightness"
+        kind: "brightness"
     }
 
     Level {
         id: keyboardLevel
 
         device: root.keyboardLight
-        levelKind: "keyboard"
+        kind: "keyboard"
     }
 }

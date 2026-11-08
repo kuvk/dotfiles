@@ -7,19 +7,19 @@ import qs.components
 import qs.services
 import qs.modules.notifications
 
-// Volume and brightness sliders (Control Center)
+// Volume and brightness sliders (Control Center), in the accent like the OSD; volume greys
+// out while muted
 ColumnLayout {
     Layout.fillWidth: true
     spacing: 14
 
-    // Sliders
     RowLayout {
         Layout.fillWidth: true
         spacing: 8
 
         IconButton {
             icon: Audio.icon
-            color: Audio.muted ? Theme.overlay1 : Theme.highlight
+            color: Audio.muted ? Theme.overlay1 : Theme.accent
             onClicked: Audio.toggleMute(Audio.sink)
         }
 
@@ -27,7 +27,7 @@ ColumnLayout {
             Layout.fillWidth: true
             value: Audio.volume
             to: 1.2
-            color: Audio.muted ? Theme.overlay0 : Theme.highlight
+            color: Audio.muted ? Theme.overlay0 : Theme.accent
             onMoved: v => Audio.setVolume(Audio.sink, v)
         }
     }
@@ -40,13 +40,13 @@ ColumnLayout {
         Icon {
             Layout.preferredWidth: 30
             text: Icons.sun
-            color: Theme.yellow
+            color: Theme.accent
         }
 
         StyledSlider {
             Layout.fillWidth: true
             value: System.brightness
-            color: Theme.yellow
+            color: Theme.accent
             onMoved: v => System.setBrightness(v)
         }
     }
