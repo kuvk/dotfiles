@@ -198,7 +198,7 @@ GridLayout {
         StyledSlider {
             Layout.fillWidth: true
             value: (brightnessSlider.value ?? 0) / 100
-            color: Theme.yellow
+            color: Theme.accent
             onMoved: v => Displays.setBrightness(panel.current.name, Math.max(1, Math.round(v * 100)))
         }
 

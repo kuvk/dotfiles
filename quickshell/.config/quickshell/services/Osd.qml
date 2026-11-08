@@ -12,9 +12,10 @@ import qs.config
 Singleton {
     id: root
 
-    // Each OSD by name: an icon, then a `level` (0..1, drawn as a bar; `dim` greys it) or a
-    // `label`, and `quiet` while a panel with its own control for it is open. Brightness and
-    // the keyboard light get their level from their source.
+    // Each OSD by name: an icon, then a `level` (0..1, drawn as a bar; `dim` greys it, `steps`
+    // splits it into that many parts) or a `label`, and `quiet` while a panel with its own
+    // control for it is open. Brightness and the keyboard light get their level from their
+    // source.
     readonly property var kinds: ({
             volume: () => ({
                     icon: Audio.icon,
@@ -37,9 +38,11 @@ Singleton {
                     level: level,
                     quiet: Panels.controlCenter || Panels.displays
                 }),
+            // a few fixed levels (3 on the ROG laptop): one part each
             keyboard: level => ({
                     icon: Icons.keyboard,
-                    level: level
+                    level: level,
+                    steps: keyboardLevel.max
                 }),
             power: kernelName => ({
                     icon: Battery.modeFor(kernelName).icon,
@@ -48,8 +51,8 @@ Singleton {
                 })
         })
 
-    // What's on screen: { icon, level (-1: none), label, dim }
-    property var entry: ({ icon: "", level: -1, label: "", dim: false })
+    // What's on screen: { icon, level (-1: none), steps (0: one bar), label, dim }
+    property var entry: ({ icon: "", level: -1, steps: 0, label: "", dim: false })
     property bool shown: false
 
     function show(name: string, value: var): void {
@@ -59,6 +62,7 @@ Singleton {
         root.entry = {
             icon: e.icon,
             level: e.level === undefined ? -1 : Math.max(0, Math.min(1, e.level)),
+            steps: e.steps ?? 0,
             label: e.label ?? "",
             dim: e.dim ?? false
         };
