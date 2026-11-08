@@ -3,8 +3,8 @@ return {
   name = "{{ theme }}",
   cursor_theme = "{{ cursor_theme }}",
   cursor_size = "{{ cursor_size }}",
-  -- The same in every mode: the theme's border gradient, or the accent; others in Omarchy's
-  -- grey, or the theme's own (after Omarchy's hyprland.lua.tpl)
+  -- The same in every mode: the theme's border gradient, or the accent; the others grey, or
+  -- the theme's own
   active_border = {{ hypr_gradient hyprland_active_border accent }},
   inactive_border = {{ hypr_gradient hyprland_inactive_border rgba(595959aa) }},
   -- Quickshell's Settings for normal mode (Appearance, Windows); Work-Game has its own look

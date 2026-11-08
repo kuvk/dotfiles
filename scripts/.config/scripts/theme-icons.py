@@ -42,7 +42,7 @@ def themes() -> list[str]:
 
 
 def palette(name: str) -> dict:
-    """The theme's colors as hyprdori-theme-set works them out (Omarchy's names)."""
+    """The theme's colors as hyprdori-theme-set works them out."""
     loader = importlib.machinery.SourceFileLoader("theme_set", str(Path.home() / ".local/bin/hyprdori-theme-set"))
     module = importlib.util.module_from_spec(importlib.util.spec_from_loader("theme_set", loader))
     loader.exec_module(module)

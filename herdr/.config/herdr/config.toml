@@ -1,7 +1,7 @@
-# herdr, after Omarchy's config/herdr/config.toml (https://github.com/basecamp/omarchy, MIT):
-# tmux session -> herdr workspace, tmux window -> herdr tab, tmux pane -> herdr pane. Keys follow
-# Hyprdori's tmux (prefix Ctrl+S, prefix+H/J/K/L, | and - splits) and Ctrl+H/J/K/L moves across
-# herdr panes and Neovim splits. Colors are the terminal's, so herdr follows the theme with kitty.
+# herdr. After Omarchy's config/herdr/config.toml (https://github.com/basecamp/omarchy, MIT).
+# tmux session -> herdr workspace, tmux window -> herdr tab, tmux pane -> herdr pane. Prefix
+# Ctrl+S, prefix+H/J/K/L between panes, | and - split them, and Ctrl+H/J/K/L moves across herdr
+# panes and Neovim splits. Colors are the terminal's, so herdr follows the theme with kitty.
 onboarding = false
 
 [theme]

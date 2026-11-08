@@ -15,7 +15,7 @@ mapfile -t tracked < <(git ls-files --cached --others --exclude-standard)
 # migrations and this check name the old paths on purpose
 mapfile -t current < <(printf '%s\n' "${tracked[@]}" | grep -vE '^migrations/|^bin/\.local/bin/hyprdori-check$')
 
-# Scripts parse: shell, Python and Lua by their first line or extension
+# Files parse: shell, Python, Lua, TOML and JSON, by their first line or extension
 for file in "${tracked[@]}"; do
     [[ -f $file ]] || continue
     first=$(head -c 64 "$file" 2>/dev/null | tr -d '\0' | head -n1)
@@ -26,6 +26,10 @@ for file in "${tracked[@]}"; do
             python3 -c 'import ast, sys; ast.parse(open(sys.argv[1]).read())' "$file" 2>/dev/null || fail "Python syntax: $file" ;;
         *.lua:*)
             luac -p "$file" 2>/dev/null || [[ $file == *.tpl ]] || fail "Lua syntax: $file" ;;
+        *.toml:*)
+            python3 -c 'import sys, tomllib; tomllib.load(open(sys.argv[1], "rb"))' "$file" 2>/dev/null || fail "TOML syntax: $file" ;;
+        *.json:*)
+            python3 -c 'import json, sys; json.load(open(sys.argv[1]))' "$file" 2>/dev/null || fail "JSON syntax: $file" ;;
     esac
 done
 

@@ -19,7 +19,97 @@ $line_break[╰─ ](muted)$character """
 palette = 'theme'
 command_timeout = 500
 
-# Catppuccin's, in Omarchy's color names, until hyprdori-theme-set writes the theme's
+[fill]
+symbol = " "
+
+[os]
+disabled = false
+style = "accent"
+format = "[ $symbol ]($style)"
+
+[os.symbols]
+Windows = "󰍲"
+Ubuntu = "󰕈"
+SUSE = ""
+Raspbian = "󰐿"
+Mint = "󰣭"
+Macos = ""
+Manjaro = ""
+Linux = "󰌽"
+Gentoo = "󰣨"
+Fedora = "󰣛"
+Alpine = ""
+Amazon = ""
+Android = ""
+Arch = ""
+Artix = "󰣇"
+CentOS = ""
+Debian = "󰣚"
+Redhat = "󱄛"
+RedHatEnterprise = "󱄛"
+
+[username]
+show_always = true
+style_user = "foreground"
+style_root = "red"
+format = '[ $user]($style)'
+
+[hostname]
+ssh_only = true 
+ssh_symbol = "🌐 "
+
+[directory]
+style = "accent"
+format = "[[  ](muted)]($style)[$path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[directory.substitutions]
+"Documents" = "󰈙 "
+"Downloads" = " "
+"Music" = "󰝚 "
+"Pictures" = " "
+"Projects" = "󰲋 "
+"projects" = "󰲋 "
+
+[character]
+disabled = false
+# zsh's vi modes, as in Neovim's lualine: typing (insert) green, normal in the accent, visual
+# magenta; red after a failed command
+success_symbol = '[󰶻](bold fg:green)'
+error_symbol = '[󰶻](bold fg:red)'
+vimcmd_symbol = '[󰶺](bold fg:accent)'
+vimcmd_visual_symbol = '[󰶺](bold fg:magenta)'
+vimcmd_replace_symbol = '[󰶺](bold fg:red)'
+vimcmd_replace_one_symbol = '[󰶺](bold fg:red)'
+
+[git_branch]
+symbol = ""
+format = '[[](muted)]($style)[[ $symbol $branch ](green)]($style)'
+
+[git_status]
+format = '[[($all_status$ahead_behind )](green)]($style)'
+
+[cmd_duration]
+format = "[[](muted)]($style) [$duration]($style) "
+style = "bright_red"
+
+# [python]
+# symbol = " "
+# style = "cyan"
+# format = '[[ ($virtualenv )$symbol ](fg:cyan)]($style)'
+
+[python]
+symbol = " "
+style = "cyan"
+format = "[[](muted)]($style)[[( $virtualenv)](fg:cyan)]($style)[[ $symbol$version ](fg:cyan)]($style)"
+
+[time]
+disabled = false
+time_format = "%R"
+format = '[[](muted)]($style)[[  $time ](magenta)]($style)'
+
+# Catppuccin's defaults, until hyprdori-theme-set writes the theme's
 [palettes.theme]
 background = "#1e1e2e"
 foreground = "#cdd6f4"

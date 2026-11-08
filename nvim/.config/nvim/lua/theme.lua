@@ -1,4 +1,4 @@
--- Follows the system theme from ~/.local/bin/hyprdori-theme-set.
+-- Follows the system theme from hyprdori-theme-set.
 -- theme-set writes ~/.config/theme/current/nvim.lua; running instances
 -- pick up the change through a file watcher.
 local M = {}
@@ -40,7 +40,7 @@ local function custom_highlights()
     "NoiceSplitBorder",
     "NullLsInfoBorder",
   }) do
-    set(0, group, { fg = M.accent2 })
+    set(0, group, { fg = p.muted })
   end
   -- The completion menu without its own background, like the other floating windows
   local menu = vim.api.nvim_get_hl(0, { name = "Pmenu", link = false })
@@ -58,17 +58,17 @@ local function custom_highlights()
   local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
   set(0, "TroubleNormal", { bg = normal })
   set(0, "TroubleNormalNC", { bg = normal })
-  -- Indent guides: the current block's in accent2, the rest as the colorscheme draws them
-  set(0, "IblScope", { fg = M.accent2 })
+  -- Indent guides: the current block's in the accent, the rest as the colorscheme draws them
+  set(0, "IblScope", { fg = p.accent })
   -- Keywords in comments (treesitter's comment parser), as bold text without a background:
-  -- TODO WIP accent; NOTE INFO XXX accent2; WARNING HACK FIX accent3; FIXME BUG ERROR red
+  -- TODO WIP accent; NOTE INFO XXX cyan; WARNING HACK FIX yellow; FIXME BUG ERROR red
   set(0, "@comment.todo", { fg = p.accent, bold = true })
-  set(0, "@comment.note", { fg = M.accent2, bold = true })
-  set(0, "@comment.warning", { fg = M.accent3, bold = true })
+  set(0, "@comment.note", { fg = p.cyan, bold = true })
+  set(0, "@comment.warning", { fg = p.yellow, bold = true })
   set(0, "@comment.error", { fg = p.red, bold = true })
   -- Command and search windows (noice.lua)
   -- Command line and search popups: borders green like lualine's command mode, which both
-  -- are; the icon in accent, the typed text in accent2
+  -- are; the icon in the accent, the typed text in the text color
   for _, group in ipairs({ "Border", "BorderSearch", "Title", "TitleSearch" }) do
     set(0, "NoiceCmdlinePopup" .. group, { fg = p.green })
   end
@@ -76,7 +76,7 @@ local function custom_highlights()
     set(0, group, { fg = p.accent })
   end
   local popup = vim.api.nvim_get_hl(0, { name = "NoiceCmdlinePopup", link = false })
-  set(0, "NoiceCmdlinePopup", { fg = M.accent2, bg = popup.bg })
+  set(0, "NoiceCmdlinePopup", { fg = p.fg, bg = popup.bg })
   -- Folders in accent, like yazi, eza and ls: neo-tree, the completion menu's folder kind and
   -- everything that uses Directory (file pickers, :e completion, netrw)
   for _, group in ipairs({ "Directory", "NeoTreeDirectoryIcon", "NeoTreeDirectoryName", "BlinkCmpKindFolder", "CmpItemKindFolder" }) do
@@ -92,20 +92,20 @@ local function custom_highlights()
     set(0, "CursorLine", line)
     set(0, "NeoTreeCursorLine", { bg = M.cursorline })
   end
-  -- Links like yazi's: icon and name in accent3, the target accent (red when broken)
-  set(0, "NeoTreeLinkIcon", { fg = M.accent3 })
-  set(0, "NeoTreeLinkName", { fg = M.accent3, bold = true })
+  -- Links like yazi's: icon and name in cyan, the target in the accent (red when broken)
+  set(0, "NeoTreeLinkIcon", { fg = p.cyan })
+  set(0, "NeoTreeLinkName", { fg = p.cyan, bold = true })
   set(0, "NeoTreeSymbolicLinkTarget", { fg = p.accent })
   set(0, "NeoTreeBrokenLinkTarget", { fg = p.red })
   -- The "File Explorer" label above neo-tree (bufferline's offset), in accent on the status line
   local status = vim.api.nvim_get_hl(0, { name = "StatusLine", link = false })
   set(0, "NeoTreeExplorerLabel", { fg = p.accent, bg = status.bg, bold = true })
-  -- Dashboard: the NEOVIM lettering in accent, the logo in accent2, buttons in accent3
-  -- with their keys in accent
+  -- Dashboard: the NEOVIM lettering in the accent, the logo (ascii-dori) in magenta, buttons in
+  -- the text color with their keys in the accent
   set(0, "AlphaHeader", { fg = p.accent })
-  set(0, "AlphaButtons", { fg = M.accent3 })
+  set(0, "AlphaButtons", { fg = p.fg })
   set(0, "AlphaShortcut", { fg = p.accent })
-  set(0, "AlphaFooter", { fg = M.accent2 })
+  set(0, "AlphaFooter", { fg = p.magenta })
   -- Diagnostic text at the end of a line, with no background
   for _, level in ipairs({ "Error", "Warn", "Info", "Hint" }) do
     local group = "DiagnosticVirtualText" .. level
@@ -149,8 +149,6 @@ function M.apply()
   end
   M.current = theme.name
   M.palette = theme.aether or {}
-  M.accent2 = theme.accent2 or M.palette.blue
-  M.accent3 = theme.accent3 or M.palette.orange
   M.cursorline = theme.cursorline
   M.icons = theme.icons or { dirs = {}, files = {}, exts = {} }
   apply_devicons()

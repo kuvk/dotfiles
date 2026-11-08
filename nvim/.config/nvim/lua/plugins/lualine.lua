@@ -46,9 +46,9 @@ local function fg(group)
   return hl.fg and { fg = string.format("#%06x", hl.fg) } or nil
 end
 
--- Mode colors from the system theme, the same in yazi and starship's prompt: normal
--- in accent, insert accent3, visual accent2, command green. The rest of the line keeps the
--- colorscheme's look (surface0 blocks on mantle).
+-- Mode colors from the system theme, the same in yazi and starship's prompt: normal in the
+-- accent, insert green, visual magenta, command yellow. The rest of the line keeps the
+-- colorscheme's look (blocks on the darker background).
 local function mode_theme()
   local theme = require("theme")
   local p = theme.palette
@@ -64,11 +64,11 @@ local function mode_theme()
   end
   return {
     normal = mode(p.accent),
-    insert = mode(theme.accent3 or p.orange),
-    visual = mode(theme.accent2 or p.blue),
-    command = mode(p.green),
+    insert = mode(p.green),
+    visual = mode(p.magenta),
+    command = mode(p.yellow),
     replace = mode(p.red),
-    terminal = mode(theme.accent3 or p.orange),
+    terminal = mode(p.green),
     inactive = {
       a = { fg = p.dark_fg, bg = p.dark_bg },
       b = { fg = p.dark_fg, bg = p.dark_bg },

@@ -32,7 +32,7 @@ crust="{{ darker_background }}"
 accent="{{ accent }}"
 accent2="{{ accent }}"
 accent3="{{ accent }}"
-# Omarchy's names
+# The theme's color names
 background="{{ background }}"
 dark_background="{{ dark_background }}"
 darker_background="{{ darker_background }}"

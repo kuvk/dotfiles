@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Switch the system-wide color theme.
 
-Themes are Omarchy's (hyprdori-theme-sync copies them): a colors.toml with the same named
-colors in every theme, and a neovim.lua, in ~/.config/theme/themes/<name>/. Templates in
+Every theme is a colors.toml with the same named colors, and a neovim.lua, in
+~/.config/theme/themes/<name>/ (hyprdori-theme-sync copies them). Templates in
 ~/.config/theme/templates/*.tpl are rendered into ~/.config/theme/current/, which every app
 config points at, and running apps are told to reload. Colors a theme leaves out are worked
-out as Omarchy does, and templates use Omarchy's placeholders (after Omarchy's
-omarchy-theme-color and omarchy-theme-set-templates, https://github.com/basecamp/omarchy, MIT).
+out. After Omarchy's omarchy-theme-color and omarchy-theme-set-templates
+(https://github.com/basecamp/omarchy, MIT).
 
   hyprdori-theme-set <name>     apply a theme
   hyprdori-theme-set            re-apply the current theme (after editing templates)
@@ -98,7 +98,7 @@ FASTFETCH_OUTPUT = HOME / ".config/fastfetch/config.jsonc"
 STARSHIP_SOURCE = HOME / ".config/starship/base.toml"
 STARSHIP_OUTPUT = HOME / ".config/starship.toml"
 
-# Omarchy's named colors, in every theme's colors.toml (missing ones are worked out)
+# The named colors in every theme's colors.toml (missing ones are worked out)
 PALETTE = (
     "background dark_background darker_background lighter_background "
     "foreground dark_foreground light_foreground bright_foreground "
@@ -106,7 +106,7 @@ PALETTE = (
     "red yellow orange green cyan blue magenta brown "
     "bright_red bright_yellow bright_green bright_cyan bright_blue bright_magenta"
 ).split()
-# Older names that themes and templates may still use, as Omarchy accepts them
+# Older names that themes and templates may still use
 LEGACY_PALETTE = {"bg": "background", "dark_bg": "dark_background", "darker_bg": "darker_background",
                   "lighter_bg": "lighter_background", "fg": "foreground", "dark_fg": "dark_foreground",
                   "light_fg": "light_foreground", "bright_fg": "bright_foreground"}
@@ -287,14 +287,14 @@ def icon_theme_for(name: str, mode: str) -> str:
 
 
 def mix(a: str, b: str, amount: float) -> str:
-    """a blended toward b by amount (0..1), as #rrggbb, rounded like Omarchy's mix."""
+    """a blended toward b by amount (0..1), as #rrggbb."""
     ca = [int(a[i:i + 2], 16) for i in (1, 3, 5)]
     cb = [int(b[i:i + 2], 16) for i in (1, 3, 5)]
     return "#" + "".join(f"{int(x * (1 - amount) + y * amount + 0.5):02x}" for x, y in zip(ca, cb))
 
 
 def palette(data: dict) -> tuple[dict, dict]:
-    """A theme's colors with what it leaves out worked out, in Omarchy's order: hex colors,
+    """A theme's colors with what it leaves out worked out: hex colors,
     and the other values (border gradients like "rgba(..) rgba(..) 45deg") apart."""
     raw = {k: str(v) for k, v in data.items() if isinstance(v, str)}
     c = {k: v.lower() for k, v in raw.items() if HEX_RE.match(v)}
@@ -332,7 +332,7 @@ def palette(data: dict) -> tuple[dict, dict]:
 
 
 def shell_slots(c: dict) -> dict:
-    """The shell's color names (its Theme.qml) from Omarchy's, until it reads Omarchy's
+    """The shell's color names (its Theme.qml) from the theme's, until it reads the theme's
     names itself: dim text steps evenly from dark_foreground to foreground, hues by name."""
     fg, dim = c["foreground"], c["dark_foreground"]
     return {
@@ -372,12 +372,13 @@ def accent_override(name: str, colors: dict) -> str | None:
 
 
 def nvim_colorscheme(folder: Path, mode: str) -> str:
-    """The colorscheme the theme's neovim.lua names (Omarchy's LazyVim spec)."""
+    """The colorscheme the theme's neovim.lua names (a LazyVim spec); aether, drawn from the
+    palette, for a theme without one."""
     try:
         match = re.search(r'colorscheme\s*=\s*"([^"]+)"', (folder / "neovim.lua").read_text())
     except OSError:
         match = None
-    return match.group(1) if match else ("catppuccin-latte" if mode == "light" else "catppuccin-mocha")
+    return match.group(1) if match else "aether"
 
 
 def load_theme(name: str) -> dict:
@@ -501,8 +502,8 @@ def render(text: str, theme: dict, source: str) -> str:
     def substitute(match: re.Match) -> str:
         expr = match.group(1).strip()
         words = expr.split()
-        # {{ mix a b 30% }}, mix_strip (no #) and mix_rgb ("r,g,b") as Omarchy has them, and
-        # mix.rgb, mix.hex, mix.ansi like the colors' own formats
+        # {{ mix a b 30% }}, mix_strip (no #), mix_rgb ("r,g,b"), and mix.rgb, mix.hex, mix.ansi
+        # like the colors' own formats
         if words[0].startswith("mix.") and len(words) == 4:
             mixed = substitute(re.match(r"(.*)", "mix " + " ".join(words[1:])))
             return color_format(mixed, words[0][4:], expr)

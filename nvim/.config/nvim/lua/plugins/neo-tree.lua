@@ -8,9 +8,9 @@ return {
   },
   config = function()
     -- Icons like yazi's and eza's (icons.toml through lua/theme.lua): folders by name in accent;
-    -- files from nvim-web-devicons, yazi's generic icon for the rest. Links ([link], accent3):
+    -- files from nvim-web-devicons, yazi's generic icon for the rest. Links ([link], cyan):
     -- a linked folder; a broken link; a working link to a file its file's icon, or the
-    -- generic one in accent3 when it has none
+    -- generic one in cyan when it has none
     local function icon_provider(icon, node)
       local icons = require("theme").icons or {}
       if node.is_link and node.type == "directory" then
@@ -40,7 +40,7 @@ return {
       return icon
     end
 
-    -- Link names in accent3, like yazi and eza
+    -- Link names in cyan, like yazi and eza
     local common = require("neo-tree.sources.common.components")
     local function name(config, node, state)
       local result = common.name(config, node, state)

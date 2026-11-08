@@ -5,6 +5,8 @@ return {
   priority = 1000,
   config = function()
     require("catppuccin").setup({
+      -- the terminal's background shows through, like the other themes' (their neovim.lua)
+      transparent_background = true,
       float = {
         transparent = true,
       },
