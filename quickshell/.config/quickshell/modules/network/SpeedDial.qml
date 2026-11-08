@@ -86,7 +86,7 @@ Item {
         // the whole scale
         ShapePath {
             strokeWidth: dial.arcWidth
-            strokeColor: Theme.alpha(Theme.text, 0.14)
+            strokeColor: Theme.alpha(Theme.foreground, 0.14)
             fillColor: "transparent"
             capStyle: ShapePath.RoundCap
 
@@ -151,7 +151,7 @@ Item {
                 width: parent.major ? 2 : 1
                 height: parent.major ? 10 : 6
                 radius: width / 2
-                color: Theme.alpha(Theme.text, parent.major ? 0.3 : 0.12)
+                color: Theme.alpha(Theme.foreground, parent.major ? 0.3 : 0.12)
             }
         }
     }
@@ -201,7 +201,7 @@ Item {
         StyledText {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Mb/s"
-            color: Theme.subtext0
+            color: Theme.subtext
             font.pixelSize: Theme.fontSize - 1
         }
     }
@@ -211,7 +211,7 @@ Item {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottom: parent.bottom
         text: dial.label
-        color: Theme.subtext0
+        color: Theme.subtext
         font.pixelSize: Theme.fontSize - 1
         font.weight: Font.Bold
         font.letterSpacing: 1.5

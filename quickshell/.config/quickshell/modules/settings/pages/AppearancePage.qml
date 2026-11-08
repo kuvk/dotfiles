@@ -14,49 +14,39 @@ ColumnLayout {
     Layout.fillWidth: true
     spacing: 12
 
-    // Accent and accent2 for the running theme, from its own palette
-    Repeater {
-        model: [
-            { role: "accent", label: "Accent" },
-            { role: "accent2", label: "Second accent" },
-            { role: "accent3", label: "Third accent" }
-        ]
+    // The running theme's accent: its own, or another of its colors (hyprdori-theme-set reads
+    // accentOverrides; older saves hold { accent: name })
+    ColumnLayout {
+        id: accentRow
 
-        ColumnLayout {
-            id: accentRow
+        readonly property var saved: Config.accentOverrides[Theme.theme]
+        readonly property string chosen: typeof saved === "string" ? saved : (saved?.accent ?? "")
 
-            required property var modelData
-            readonly property string chosen: (Config.accentOverrides[Theme.theme] ?? {})[modelData.role] ?? ""
+        function choose(name: string): void {
+            const all = Object.assign({}, Config.accentOverrides);
+            if (name)
+                all[Theme.theme] = name;
+            else
+                delete all[Theme.theme];
+            Config.accentOverrides = all;
+            accentApply.restart();
+        }
 
-            function choose(name: string): void {
-                const all = Object.assign({}, Config.accentOverrides);
-                const mine = Object.assign({}, all[Theme.theme] ?? {});
-                if (name)
-                    mine[accentRow.modelData.role] = name;
-                else
-                    delete mine[accentRow.modelData.role];
-                if (Object.keys(mine).length)
-                    all[Theme.theme] = mine;
-                else
-                    delete all[Theme.theme];
-                Config.accentOverrides = all;
-                accentApply.restart();
-            }
+        Layout.fillWidth: true
+        spacing: 4
 
-            Layout.fillWidth: true
-            spacing: 4
+        // "" is the theme's own
+        ColorDropdown {
+            id: accentPicker
 
-            // "" is the theme's own
-            ColorDropdown {
-                label: accentRow.modelData.label
-                hint: `In ${Theme.themeName}`
-                defaultLabel: "Theme default"
-                // the theme's own color is only known while it's in use
-                defaultColor: accentRow.chosen === "" ? Theme[accentRow.modelData.role] : "transparent"
-                names: catppuccin
-                value: accentRow.chosen
-                onPicked: name => accentRow.choose(name)
-            }
+            label: "Accent"
+            hint: `In ${Theme.themeName}`
+            defaultLabel: "Theme default"
+            // the theme's own color is only known while it's in use
+            defaultColor: accentRow.chosen === "" ? Theme.accent : "transparent"
+            names: palette
+            value: accentRow.chosen
+            onPicked: name => accentRow.choose(name)
         }
     }
 

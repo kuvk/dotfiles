@@ -19,7 +19,7 @@ ColumnLayout {
 
         IconButton {
             icon: Audio.icon
-            color: Audio.muted ? Theme.overlay1 : Theme.accent
+            color: Audio.muted ? Theme.dimText : Theme.accent
             onClicked: Audio.toggleMute(Audio.sink)
         }
 
@@ -27,7 +27,7 @@ ColumnLayout {
             Layout.fillWidth: true
             value: Audio.volume
             to: 1.2
-            color: Audio.muted ? Theme.overlay0 : Theme.accent
+            color: Audio.muted ? Theme.faintText : Theme.accent
             onMoved: v => Audio.setVolume(Audio.sink, v)
         }
     }

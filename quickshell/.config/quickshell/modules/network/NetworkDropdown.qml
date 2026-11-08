@@ -153,7 +153,7 @@ Dropdown {
         id: hero
 
         icon: Network.icon
-        iconColor: Network.restricted ? Theme.red : (Network.type !== "none" ? Theme.highlight : Theme.overlay1)
+        iconColor: Hues.network
         title: {
             if (Network.type === "wifi")
                 return Network.connection;
@@ -172,19 +172,19 @@ Dropdown {
                 return root.phrases[root.phrase].toUpperCase();
             return Network.hasWifi && !Network.wifiEnabled ? "WI-FI IS OFF" : "NOT CONNECTED";
         }
-        statusColor: Network.restricted ? Theme.red : Theme.subtext0
+        statusColor: Network.restricted ? Theme.red : Theme.subtext
 
         IconButton {
             visible: root.canShareWifi
             icon: Icons.qrcode
-            color: Theme.subtext0
+            color: Theme.subtext
             onClicked: Panels.toggleWifiQr()
         }
 
         IconButton {
             visible: (Network.stats.iface ?? "") !== ""
             icon: Icons.speedometer
-            color: Theme.subtext0
+            color: Theme.subtext
             onClicked: Panels.toggleSpeedTest()
         }
 
@@ -229,7 +229,7 @@ Dropdown {
 
         Value {
             text: root.formatPing(Network.ping)
-            color: Network.hasPing && Network.packetLoss > 0 ? Theme.red : Theme.text
+            color: Network.hasPing && Network.packetLoss > 0 ? Theme.red : Theme.foreground
         }
 
         Label {
@@ -238,7 +238,7 @@ Dropdown {
 
         Value {
             text: Network.hasPing ? `${Network.packetLoss}%` : "--"
-            color: Network.hasPing && Network.packetLoss > 0 ? Theme.red : Theme.text
+            color: Network.hasPing && Network.packetLoss > 0 ? Theme.red : Theme.foreground
         }
 
         Label {

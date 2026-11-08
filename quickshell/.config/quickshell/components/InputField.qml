@@ -18,7 +18,7 @@ Rectangle {
     implicitHeight: 34
     radius: Theme.smallRadius
     color: Theme.cardBg
-    border.color: input.activeFocus ? Theme.highlight : "transparent"
+    border.color: input.activeFocus ? Theme.accent : "transparent"
     border.width: Theme.borderWidth
 
     onActiveChanged: if (active) input.forceActiveFocus()
@@ -31,7 +31,7 @@ Rectangle {
         anchors.leftMargin: 10
         anchors.rightMargin: 10
         verticalAlignment: TextInput.AlignVCenter
-        color: Theme.text
+        color: Theme.foreground
         font.family: Theme.font
         font.pixelSize: Theme.fontSize
         echoMode: field.password ? TextInput.Password : TextInput.Normal
@@ -43,7 +43,7 @@ Rectangle {
             anchors.fill: parent
             visible: input.text === ""
             text: field.placeholder
-            color: Theme.overlay1
+            color: Theme.dimText
         }
     }
 }

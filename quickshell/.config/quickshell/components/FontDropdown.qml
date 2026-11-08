@@ -34,7 +34,7 @@ ColumnLayout {
             anchors.fill: parent
             radius: Theme.smallRadius
             color: button.containsMouse && root.enabled ? Theme.hoverBg : Theme.cardBg
-            border.color: root.open ? Theme.highlight : "transparent"
+            border.color: root.open ? Theme.accent : "transparent"
             border.width: Theme.borderWidth
         }
 
@@ -45,7 +45,7 @@ ColumnLayout {
             anchors.right: chevron.left
             anchors.rightMargin: 8
             text: root.installed ? root.value : `${root.value} (not installed)`
-            color: root.installed ? Theme.text : Theme.peach
+            color: root.installed ? Theme.foreground : Theme.orange
             font.family: root.value
             elide: Text.ElideRight
         }
@@ -57,7 +57,7 @@ ColumnLayout {
             anchors.right: parent.right
             anchors.rightMargin: 10
             text: root.open ? Icons.chevronUp : Icons.chevronDown
-            color: Theme.subtext0
+            color: Theme.subtext
         }
     }
 
@@ -96,7 +96,7 @@ ColumnLayout {
                 Rectangle {
                     anchors.fill: parent
                     radius: Theme.smallRadius
-                    color: entry.modelData === root.value ? Theme.alpha(Theme.highlight, 0.2) : entry.containsMouse ? Theme.hoverBg : "transparent"
+                    color: entry.modelData === root.value ? Theme.selectedFill : entry.containsMouse ? Theme.hoverBg : "transparent"
                 }
 
                 StyledText {
@@ -105,7 +105,7 @@ ColumnLayout {
                     anchors.leftMargin: 8
                     width: parent.width - 16
                     text: root.sample ? `${entry.modelData}   ${root.sample}` : entry.modelData
-                    color: entry.modelData === root.value ? Theme.highlight : Theme.text
+                    color: entry.modelData === root.value ? Theme.accent : Theme.foreground
                     font.family: entry.modelData
                     elide: Text.ElideRight
                 }

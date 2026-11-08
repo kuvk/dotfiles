@@ -62,7 +62,7 @@ ColumnLayout {
         Icon {
             visible: row.net.secured && !(row.canForget && item.containsMouse)
             text: Icons.lockOutline
-            color: Theme.overlay1
+            color: Theme.dimText
             font.pixelSize: Theme.iconSize - 2
             width: 26
             height: 30
@@ -103,7 +103,7 @@ ColumnLayout {
         IconButton {
             Layout.alignment: Qt.AlignBottom
             icon: Icons.check
-            color: dropdown.passwordText !== "" && (!row.enterprise || dropdown.identityText !== "") ? Theme.highlight : Theme.overlay1
+            color: dropdown.passwordText !== "" && (!row.enterprise || dropdown.identityText !== "") ? Theme.accent : Theme.dimText
             onClicked: dropdown.submitPassword(row.net)
         }
     }

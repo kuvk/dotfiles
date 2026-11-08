@@ -40,7 +40,7 @@ Item {
 
         Icon {
             text: Icons.chevronLeft
-            color: root.expanded ? Theme.accent : Theme.overlay2
+            color: root.expanded ? Theme.accent : Theme.subtext
             font.pixelSize: Theme.tinyIconSize
         }
     }

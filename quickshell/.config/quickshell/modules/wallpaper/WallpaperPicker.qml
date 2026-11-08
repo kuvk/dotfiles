@@ -187,7 +187,7 @@ PanelWindow {
             return;
         // Settings > Appearance > Wallpaper follows theme: on with the theme's own background
         // (hyprdori-theme-set) on every monitor, off with anything else
-        Config.wallpaperFollowsTheme = kind === "static" && !thisMonitorOnly && item.path === Theme.background;
+        Config.wallpaperFollowsTheme = kind === "static" && !thisMonitorOnly && item.path === Theme.backgroundImage;
         const cmd = [script, "set", kind, item.path];
         if (thisMonitorOnly && screen)
             cmd.push(screen.name);
@@ -375,7 +375,7 @@ PanelWindow {
         id: background
 
         anchors.fill: parent
-        color: Theme.alpha(Theme.crust, Theme.gamemode ? 1 : 0.6)
+        color: Theme.alpha(Theme.darkerBackground, Theme.gamemode ? 1 : 0.6)
         // transparent until the window has its monitor's size and scale
         // (keys still work meanwhile)
         opacity: root.contentRevealed ? reveal.value : 0
@@ -466,13 +466,13 @@ PanelWindow {
                 font.pixelSize: Theme.fontSize + 3
                 font.weight: Font.DemiBold
                 style: Text.Outline
-                styleColor: Theme.alpha(Theme.crust, 0.6)
+                styleColor: Theme.alpha(Theme.darkerBackground, 0.6)
             }
 
             StyledText {
                 Layout.alignment: Qt.AlignHCenter
                 text: `${root.shownItems.length ? root.selected + 1 : 0} / ${root.shownItems.length}   ·   Enter: all monitors   ·   Shift+Enter: this monitor   ·   Tab: ${root.kind === "static" ? "live" : "static"}${root.kind === "live" ? "   ·   Del: stop live" : ""}`
-                color: Theme.subtext0
+                color: Theme.subtext
                 font.pixelSize: Theme.fontSize - 1
             }
         }

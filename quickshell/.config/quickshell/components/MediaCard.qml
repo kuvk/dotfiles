@@ -63,7 +63,7 @@ Card {
             IconButton {
                 size: 24
                 icon: Icons.chevronLeft
-                color: Theme.overlay1
+                color: Theme.dimText
                 onClicked: Media.step(-1)
             }
 
@@ -87,7 +87,7 @@ Card {
                             width: modelData === root.player ? 16 : 6
                             height: 6
                             radius: 3
-                            color: modelData === root.player ? Theme.highlight : Theme.overlay0
+                            color: modelData === root.player ? Theme.accent : Theme.faintText
 
                             Behavior on width {
                                 NumberAnimation {
@@ -102,7 +102,7 @@ Card {
             IconButton {
                 size: 24
                 icon: Icons.chevronRight
-                color: Theme.overlay1
+                color: Theme.dimText
                 onClicked: Media.step(1)
             }
         }
@@ -115,7 +115,7 @@ Card {
                 implicitWidth: 64
                 implicitHeight: 64
                 radius: Theme.smallRadius
-                color: Theme.surface1
+                color: Theme.selection
 
                 Image {
                     id: art
@@ -132,7 +132,7 @@ Card {
                     anchors.centerIn: parent
                     visible: art.status !== Image.Ready
                     text: Media.iconFor(root.player)
-                    color: Theme.overlay1
+                    color: Theme.dimText
                     font.pixelSize: 24
                 }
             }
@@ -151,13 +151,13 @@ Card {
                 StyledText {
                     Layout.fillWidth: true
                     text: root.player?.trackArtist ?? ""
-                    color: Theme.subtext0
+                    color: Theme.subtext
                 }
 
                 StyledText {
                     Layout.fillWidth: true
                     text: root.player?.identity ?? ""
-                    color: Theme.overlay1
+                    color: Theme.dimText
                     font.pixelSize: Theme.fontSize - 2
                 }
             }
@@ -168,7 +168,7 @@ Card {
             Layout.fillWidth: true
             visible: Config.cava
             implicitHeight: 36
-            color: Theme.highlight
+            color: Theme.accent
         }
 
         // Progress: always laid out (hidden when the player reports no
@@ -184,7 +184,7 @@ Card {
                 Layout.fillWidth: true
                 value: root.player?.position ?? 0
                 to: Math.max(1, root.player?.length ?? 1)
-                color: Theme.highlight
+                color: Theme.accent
                 onMoved: v => {
                     if (root.player?.canSeek)
                         root.player.position = v;
@@ -196,7 +196,7 @@ Card {
 
                 StyledText {
                     text: Media.formatTime(root.player?.position ?? 0)
-                    color: Theme.subtext0
+                    color: Theme.subtext
                     font.pixelSize: Theme.fontSize - 2
                 }
 
@@ -206,7 +206,7 @@ Card {
 
                 StyledText {
                     text: Media.formatTime(root.player?.length ?? 0)
-                    color: Theme.subtext0
+                    color: Theme.subtext
                     font.pixelSize: Theme.fontSize - 2
                 }
             }
@@ -225,7 +225,7 @@ Card {
             IconButton {
                 size: 40
                 icon: root.player?.isPlaying ? Icons.pause : Icons.play
-                color: Theme.highlight
+                color: Theme.accent
                 onClicked: root.player.togglePlaying()
             }
 

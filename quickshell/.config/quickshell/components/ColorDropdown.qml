@@ -14,19 +14,19 @@ ColumnLayout {
     property string defaultLabel: ""
     // the default's swatch, when known
     property color defaultColor: "transparent"
-    // the theme's three accents, then every Catppuccin color
-    property var names: ["accent", "accent2", "accent3", ...catppuccin]
-    readonly property var catppuccin: ["rosewater", "flamingo", "pink", "mauve", "red", "maroon", "peach", "yellow", "green", "teal", "sky", "sapphire", "blue", "lavender", "text", "subtext1", "subtext0", "overlay2", "overlay1", "overlay0", "surface2", "surface1", "surface0", "base", "mantle", "crust"]
+    // the theme's accent, then every color the themes name
+    property var names: ["accent", ...palette]
+    readonly property var palette: ["red", "orange", "yellow", "green", "cyan", "blue", "magenta", "brown", "bright_red", "bright_yellow", "bright_green", "bright_cyan", "bright_blue", "bright_magenta", "foreground", "light_foreground", "bright_foreground", "dark_foreground", "muted", "selection", "lighter_background", "background", "dark_background", "darker_background"]
     property bool open: false
     signal picked(string name)
 
     readonly property var entries: defaultLabel ? ["", ...names] : names
 
-    // "subtext1" -> "Subtext 1", "accent2" -> "Accent 2"
+    // "bright_magenta" -> "Bright magenta"
     function title(name: string): string {
         if (name === "")
             return root.defaultLabel;
-        const spaced = name.replace(/(\d+)$/, " $1");
+        const spaced = name.replace(/_/g, " ");
         return spaced[0].toUpperCase() + spaced.slice(1);
     }
 
@@ -50,7 +50,7 @@ ColumnLayout {
                 anchors.fill: parent
                 radius: Theme.smallRadius
                 color: button.containsMouse ? Theme.hoverBg : Theme.cardBg
-                border.color: root.open ? Theme.highlight : "transparent"
+                border.color: root.open ? Theme.accent : "transparent"
                 border.width: Theme.borderWidth
             }
 
@@ -80,7 +80,7 @@ ColumnLayout {
                 anchors.right: parent.right
                 anchors.rightMargin: 10
                 text: root.open ? Icons.chevronUp : Icons.chevronDown
-                color: Theme.subtext0
+                color: Theme.subtext
             }
         }
     }
@@ -120,7 +120,7 @@ ColumnLayout {
                 Rectangle {
                     anchors.fill: parent
                     radius: Theme.smallRadius
-                    color: entry.modelData === root.value ? Theme.alpha(Theme.highlight, 0.2) : entry.containsMouse ? Theme.hoverBg : "transparent"
+                    color: entry.modelData === root.value ? Theme.selectedFill : entry.containsMouse ? Theme.hoverBg : "transparent"
                 }
 
                 Swatch {
@@ -138,7 +138,7 @@ ColumnLayout {
                     anchors.leftMargin: 8
                     anchors.right: parent.right
                     text: root.title(entry.modelData)
-                    color: entry.modelData === root.value ? Theme.highlight : Theme.text
+                    color: entry.modelData === root.value ? Theme.accent : Theme.foreground
                     elide: Text.ElideRight
                 }
             }
@@ -149,7 +149,7 @@ ColumnLayout {
         }
     }
 
-    // A round swatch of Theme[name], outlined so background colors show on the window; the
+    // A round swatch of Theme.named(name), outlined so background colors show on the window; the
     // default choice ("") in defaultColor, else an empty ring
     component Swatch: Rectangle {
         property string name
@@ -157,8 +157,8 @@ ColumnLayout {
         width: 14
         height: 14
         radius: 7
-        color: name === "" ? root.defaultColor : (Theme[name] ?? "transparent")
-        border.color: Theme.overlay0
+        color: name === "" ? root.defaultColor : (Theme.named(name) ?? "transparent")
+        border.color: Theme.faintText
         border.width: 1
     }
 }

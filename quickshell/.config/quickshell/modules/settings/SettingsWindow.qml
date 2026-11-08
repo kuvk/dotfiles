@@ -82,7 +82,7 @@ FloatingWindow {
             Rectangle {
                 Layout.fillHeight: true
                 implicitWidth: 190
-                color: Theme.alpha(Theme.mantle, 0.6)
+                color: Theme.alpha(Theme.darkBackground, 0.6)
 
                 ColumnLayout {
                     anchors.fill: parent
@@ -115,7 +115,7 @@ FloatingWindow {
                             Rectangle {
                                 anchors.fill: parent
                                 radius: Theme.smallRadius
-                                color: entry.current ? Theme.alpha(Theme.highlight, 0.2) : (entry.containsMouse ? Theme.hoverBg : "transparent")
+                                color: entry.current ? Theme.selectedFill : (entry.containsMouse ? Theme.hoverBg : "transparent")
                             }
 
                             Row {
@@ -127,12 +127,12 @@ FloatingWindow {
                                 Icon {
                                     width: 18
                                     text: entry.modelData.icon
-                                    color: entry.current ? Theme.highlight : Theme.subtext0
+                                    color: entry.current ? Theme.accent : Theme.subtext
                                 }
 
                                 StyledText {
                                     text: entry.modelData.label
-                                    color: entry.current ? Theme.highlight : Theme.text
+                                    color: entry.current ? Theme.accent : Theme.foreground
                                 }
                             }
                         }

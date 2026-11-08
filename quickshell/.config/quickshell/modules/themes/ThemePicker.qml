@@ -212,7 +212,7 @@ PanelWindow {
         id: background
 
         anchors.fill: parent
-        color: Theme.alpha(Theme.crust, Theme.gamemode ? 1 : 0.6)
+        color: Theme.alpha(Theme.darkerBackground, Theme.gamemode ? 1 : 0.6)
         opacity: root.contentRevealed ? reveal.value : 0
         focus: root.shown
 
@@ -255,8 +255,8 @@ PanelWindow {
             implicitWidth: 320
             implicitHeight: 34
             radius: height / 2
-            color: Theme.alpha(Theme.base, 0.75)
-            border.color: root.query !== "" ? Theme.highlight : "transparent"
+            color: Theme.alpha(Theme.background, 0.75)
+            border.color: root.query !== "" ? Theme.accent : "transparent"
             border.width: Theme.borderWidth
 
             Row {
@@ -265,12 +265,12 @@ PanelWindow {
 
                 Icon {
                     text: Icons.search
-                    color: root.query !== "" ? Theme.highlight : Theme.overlay1
+                    color: root.query !== "" ? Theme.accent : Theme.dimText
                 }
 
                 StyledText {
                     text: root.query !== "" ? root.query : "Type to search themes"
-                    color: root.query !== "" ? Theme.text : Theme.overlay1
+                    color: root.query !== "" ? Theme.foreground : Theme.dimText
                 }
             }
         }
@@ -332,7 +332,7 @@ PanelWindow {
 
                         Rectangle {
                             anchors.fill: parent
-                            color: Theme.crust
+                            color: Theme.darkerBackground
                             opacity: Math.min(1, Math.abs(slot.d)) * 0.45
                         }
                     }
@@ -344,7 +344,7 @@ PanelWindow {
 
                         ShapePath {
                             fillColor: "transparent"
-                            strokeColor: slot.isSelected ? Theme.accent : Theme.alpha(Theme.crust, 0.9)
+                            strokeColor: slot.isSelected ? Theme.accent : Theme.alpha(Theme.darkerBackground, 0.9)
                             strokeWidth: slot.isSelected ? Math.max(2, Theme.borderWidth) : 1.5
                             startX: slot.sliceLeft + root.skew
                             startY: slot.sliceTop
@@ -404,13 +404,13 @@ PanelWindow {
                 font.pixelSize: Theme.fontSize + 3
                 font.weight: Font.DemiBold
                 style: Text.Outline
-                styleColor: Theme.alpha(Theme.crust, 0.6)
+                styleColor: Theme.alpha(Theme.darkerBackground, 0.6)
             }
 
             StyledText {
                 Layout.alignment: Qt.AlignHCenter
                 text: `${root.shownItems.length ? root.selected + 1 : 0} / ${root.shownItems.length}   ·   Enter: apply   ·   type to search   ·   Esc: close`
-                color: Theme.subtext0
+                color: Theme.subtext
                 font.pixelSize: Theme.fontSize - 1
             }
         }

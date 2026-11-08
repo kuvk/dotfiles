@@ -46,7 +46,7 @@ ColumnLayout {
                     const path = text.trim();
                     if (path === "")
                         return;
-                    const theirs = path === Theme.background;
+                    const theirs = path === Theme.backgroundImage;
                     Config.lockFollowsTheme = theirs;
                     Config.lockImage = theirs ? "" : path;
                 }

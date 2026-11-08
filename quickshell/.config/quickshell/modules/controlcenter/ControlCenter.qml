@@ -104,7 +104,7 @@ PanelWindow {
                 // under it; the time and date on the right
                 Hero {
                     icon: Icons.sliders
-                    iconColor: Notifs.dnd ? Theme.mauve : Theme.highlight
+                    iconColor: Hues.notifications
                     title: "Control Center"
                     status: Notifs.dnd ? "DO NOT DISTURB" : (Notifs.count > 0 ? `${Notifs.count} NOTIFICATION${Notifs.count === 1 ? "" : "S"}` : "NO NOTIFICATIONS")
 

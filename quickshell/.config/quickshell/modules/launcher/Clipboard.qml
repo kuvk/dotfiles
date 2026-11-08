@@ -125,7 +125,7 @@ PanelWindow {
                 Layout.fillWidth: true
                 implicitHeight: 48
                 radius: Theme.smallRadius
-                color: Theme.alpha(Theme.surface0, 0.8)
+                color: Theme.alpha(Theme.lighterBackground, 0.8)
 
                 RowLayout {
                     anchors.fill: parent
@@ -135,7 +135,7 @@ PanelWindow {
 
                     Icon {
                         text: Icons.search
-                        color: Theme.accent2
+                        color: Theme.accent
                         font.pixelSize: 16
                     }
 
@@ -143,7 +143,7 @@ PanelWindow {
                         id: search
 
                         Layout.fillWidth: true
-                        color: Theme.text
+                        color: Theme.foreground
                         font.family: Theme.font
                         font.pixelSize: 16
                         clip: true
@@ -181,7 +181,7 @@ PanelWindow {
                             verticalAlignment: Text.AlignVCenter
                             visible: search.text === ""
                             text: root.entries.length > 0 ? "Search clipboard…" : "Clipboard history is empty"
-                            color: Theme.surface2
+                            color: Theme.muted
                             font.pixelSize: 16
                         }
                     }
@@ -201,7 +201,7 @@ PanelWindow {
 
                 highlight: Rectangle {
                     radius: Theme.smallRadius
-                    color: Theme.alpha(Theme.surface0, 0.8)
+                    color: Theme.alpha(Theme.lighterBackground, 0.8)
                 }
 
                 ScrollBar {
@@ -230,7 +230,7 @@ PanelWindow {
                         text: entry.modelData.preview
                         textFormat: Text.PlainText
                         maximumLineCount: 1
-                        color: entry.ListView.isCurrentItem ? Theme.highlight : Theme.text
+                        color: entry.ListView.isCurrentItem ? Theme.accent : Theme.foreground
                         elide: Text.ElideRight
                     }
                 }

@@ -9,5 +9,5 @@ Rectangle {
     Layout.topMargin: 2
     Layout.bottomMargin: 2
     implicitHeight: 1
-    color: Theme.surface1
+    color: Theme.selection
 }

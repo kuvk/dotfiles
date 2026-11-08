@@ -24,7 +24,7 @@ FloatingWindow {
     // Editable copy of Displays.info
     property var mons: []
     property var workspaces: ({})
-    property int textSize: 13
+    property int textSize: 12
     property string primary: ""
     property int selected: 0
     property bool dirty: false
@@ -36,7 +36,7 @@ FloatingWindow {
         const s = Displays.info;
         mons = (s.monitors ?? []).map(m => Object.assign({}, m));
         workspaces = Object.assign({}, s.workspaces ?? {});
-        textSize = s.text_size ?? 13;
+        textSize = s.text_size ?? 12;
         primary = s.primary ?? "";
         selected = Math.min(selected, Math.max(0, mons.length - 1));
         dirty = false;
@@ -264,7 +264,7 @@ FloatingWindow {
                     anchors.verticalCenter: parent.verticalCenter
                     visible: Displays.busy
                     text: "Applying…"
-                    color: Theme.subtext0
+                    color: Theme.subtext
                 }
 
                 CloseButton {
@@ -287,7 +287,7 @@ FloatingWindow {
             Rectangle {
                 Layout.fillWidth: true
                 implicitHeight: 1
-                color: Theme.surface1
+                color: Theme.selection
             }
 
             TextSize {
@@ -301,7 +301,7 @@ FloatingWindow {
                 StyledText {
                     Layout.fillWidth: true
                     text: "Saved for this combination of monitors"
-                    color: Theme.overlay1
+                    color: Theme.dimText
                     font.pixelSize: Theme.fontSize - 2
                 }
 

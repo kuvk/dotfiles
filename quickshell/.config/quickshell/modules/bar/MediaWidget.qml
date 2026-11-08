@@ -27,12 +27,12 @@ BarButton {
         visible: !Config.cava
         // a waveform while playing, an outlined note when paused
         text: Media.active?.isPlaying ? Icons.waveform : Icons.musicOutline
-        color: Media.active?.isPlaying ? Theme.sky : Theme.overlay2
+        color: Media.active?.isPlaying ? Theme.brightCyan : Theme.subtext
     }
 
     StyledText {
         width: Math.min(implicitWidth, 260)
         text: Media.label
-        color: Media.active?.isPlaying ? Theme.sky : Theme.overlay2
+        color: Media.active?.isPlaying ? Theme.brightCyan : Theme.subtext
     }
 }

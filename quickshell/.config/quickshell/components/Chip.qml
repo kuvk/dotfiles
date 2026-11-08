@@ -22,7 +22,7 @@ MouseArea {
     Rectangle {
         anchors.fill: parent
         radius: Theme.smallRadius
-        color: chip.current ? Theme.alpha(Theme.highlight, chip.containsMouse ? 0.35 : 0.25) : (chip.containsMouse ? Theme.hoverBg : Theme.cardBg)
+        color: chip.current ? Theme.selectedFill : (chip.containsMouse ? Theme.hoverBg : Theme.cardBg)
 
         Behavior on color {
             ColorAnimation {
@@ -37,7 +37,7 @@ MouseArea {
         anchors.bottomMargin: 2
         visible: chip.icon !== ""
         text: chip.icon
-        color: chip.current ? Theme.highlight : Theme.subtext0
+        color: chip.current ? Theme.accent : Theme.subtext
     }
 
     StyledText {
@@ -47,7 +47,7 @@ MouseArea {
         anchors.verticalCenter: parent.verticalCenter
         anchors.verticalCenterOffset: chip.icon !== "" ? 9 : 0
         text: chip.text
-        color: chip.current ? Theme.highlight : Theme.text
+        color: chip.current ? Theme.accent : Theme.foreground
         font.pixelSize: Theme.fontSize - 1
         font.weight: Font.DemiBold
     }

@@ -31,7 +31,7 @@ Row {
 
             Icon {
                 text: ws.current ? Icons.workspaceActive : Icons.workspace
-                color: ws.current || ws.containsMouse ? Theme.accent : (ws.modelData.urgent ? Theme.red : Theme.overlay1)
+                color: ws.current || ws.containsMouse ? Theme.accent : (ws.modelData.urgent ? Theme.red : Theme.dimText)
                 font.pixelSize: Theme.smallIconSize
             }
         }

@@ -5,7 +5,7 @@ MouseArea {
     id: root
 
     property alias icon: label.text
-    property color color: Theme.text
+    property color color: Theme.foreground
     property int size: 30
 
     implicitWidth: size

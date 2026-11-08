@@ -16,14 +16,14 @@ MouseArea {
     Rectangle {
         anchors.fill: parent
         radius: Theme.smallRadius
-        color: root.primary ? (root.containsMouse ? Qt.lighter(Theme.highlight, 1.1) : Theme.highlight) : (root.containsMouse ? Theme.surface1 : Theme.surface0)
+        color: root.primary ? (root.containsMouse ? Qt.lighter(Theme.accent, 1.1) : Theme.accent) : (root.containsMouse ? Theme.selection : Theme.lighterBackground)
     }
 
     StyledText {
         id: label
 
         anchors.centerIn: parent
-        color: root.primary ? Theme.base : Theme.text
+        color: root.primary ? Theme.background : Theme.foreground
         font.weight: Font.DemiBold
     }
 }

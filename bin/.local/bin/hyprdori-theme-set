@@ -335,8 +335,8 @@ def palette(data: dict) -> tuple[dict, dict]:
 
 
 def shell_slots(c: dict) -> dict:
-    """The shell's color names (its Theme.qml) from the theme's, until it reads the theme's
-    names itself: dim text steps evenly from dark_foreground to foreground, hues by name."""
+    """Colors by the names Settings > Lock Screen saved before (base, mauve, ...), for the
+    login screen; dim text steps evenly from dark_foreground to foreground."""
     fg, dim = c["foreground"], c["dark_foreground"]
     return {
         "base": c["background"], "mantle": c["dark_background"], "crust": c["darker_background"],
@@ -632,7 +632,7 @@ def render_quickshell(theme: dict) -> None:
         "name": theme["strings"]["theme_name"],
         "mode": theme["strings"]["mode"],
         "icons": icons_dir(theme["strings"]["theme"]),
-        "colors": theme["colors"] | shell_slots(theme["colors"]),
+        "colors": theme["colors"],
         # the lock screen shows it unless another image is chosen (Settings > Lock Screen)
         "background": str(background) if background else "",
     }
@@ -711,14 +711,14 @@ def set_xwayland_cursor(theme: str, size: str) -> None:
 
 def gtk_font_pt() -> int:
     """GTK's font size in points for Displays > Text size (px, kept by hyprdori-monitors):
-    13 px is 10 pt. Set as the font size rather than GTK's text-scaling-factor, which
+    12 px is 11 pt, as GTK's own size. Set as the font size rather than GTK's text-scaling-factor, which
     Electron apps on Wayland (Obsidian, Mullvad) apply to their content without resizing
     the window, leaving an empty strip."""
     try:
-        size = int(json.loads((HOME / ".config/hypr/monitors.json").read_text()).get("text_size", 13))
+        size = int(json.loads((HOME / ".config/hypr/monitors.json").read_text()).get("text_size", 12))
     except (OSError, ValueError, TypeError, AttributeError):
-        size = 13
-    return max(6, round(10 * size / 13))
+        size = 12
+    return max(6, round(11 * size / 12))
 
 
 def apply_fonts(strings: dict) -> None:
@@ -867,17 +867,17 @@ def themes_json() -> str:
         except (ValueError, tomllib.TOMLDecodeError) as e:
             print(e, file=sys.stderr)
             continue
-        c = theme["colors"] | shell_slots(theme["colors"])
+        c = theme["colors"]
         result.append({
             "theme": name,
             "name": theme["strings"]["theme_name"],
             "mode": theme["strings"]["mode"],
             "current": name == current,
-            "swatches": [c["base"], c["text"], c["accent"], c["accent2"], c["red"], c["green"], c["yellow"], c["mauve"]],
             # for the theme carousel's palette preview cards
             "colors": {k: c[k] for k in (
-                "base", "mantle", "crust", "surface0", "surface1", "overlay0", "overlay1", "text", "subtext0",
-                "accent", "accent2", "accent3", "red", "peach", "yellow", "green", "teal", "blue", "mauve", "pink",
+                "background", "dark_background", "darker_background", "lighter_background", "selection",
+                "dark_foreground", "foreground", "accent", "red", "orange", "yellow", "green", "cyan", "blue",
+                "magenta", "bright_magenta",
             )},
         })
     return json.dumps(result)

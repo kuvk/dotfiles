@@ -39,7 +39,7 @@ ColumnLayout {
             implicitHeight: 34
             radius: Theme.smallRadius
             color: Theme.cardBg
-            border.color: keep.activeFocus ? Theme.highlight : "transparent"
+            border.color: keep.activeFocus ? Theme.accent : "transparent"
             border.width: Theme.borderWidth
 
             TextInput {
@@ -49,7 +49,7 @@ ColumnLayout {
                 anchors.leftMargin: 10
                 anchors.rightMargin: 10
                 verticalAlignment: TextInput.AlignVCenter
-                color: Theme.text
+                color: Theme.foreground
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSize
                 clip: true

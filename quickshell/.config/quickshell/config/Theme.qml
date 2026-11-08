@@ -4,68 +4,78 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Colors come from ~/.config/theme/current/quickshell.json, written by
-// ~/.local/bin/hyprdori-theme-set. The file is watched, so switching themes
-// recolors the shell live. Defaults below are Catppuccin Mocha.
+// The current theme's colors (~/.config/theme/current/quickshell.json, written by
+// hyprdori-theme-set and watched, so a switch recolors the shell live), the states every
+// control draws with, and sizes. Defaults below are Catppuccin's.
+//
+// Chrome is neutral: surfaces and controls are the text color at a low opacity (idle,
+// hover, selected). Color means something: the accent for selected text and focus, each bar
+// item in its own hue (Hues.qml), red for errors. After Omarchy's shell Style and Color
+// (https://github.com/basecamp/omarchy, MIT).
 Singleton {
     id: root
 
     property var colors: ({})
-    property string theme: "catppuccin-mocha"
-    property string themeName: "Catppuccin Mocha"
+    property string theme: "catppuccin"
+    property string themeName: "Catppuccin"
     property string mode: "dark"
     // power menu icons for this theme (theme-icons.py), "" = use glyphs
     property string iconsDir: ""
-    // the theme's own background (hyprdori-theme-set): the wallpaper and lock screen while they follow the theme
-    property string background: ""
+    // the theme's own background image (hyprdori-theme-set): the wallpaper and lock screen while they follow the theme
+    property string backgroundImage: ""
     // Set by hypr-gamemode.sh over IPC: opaque surfaces, square corners, no animations
     property bool gamemode: false
 
-    readonly property color rosewater: colors.rosewater ?? "#f5e0dc"
-    readonly property color flamingo: colors.flamingo ?? "#f2cdcd"
-    readonly property color pink: colors.pink ?? "#f5c2e7"
-    readonly property color mauve: colors.mauve ?? "#cba6f7"
+    // The theme's colors
+    readonly property color background: colors.background ?? "#1e1e2e"
+    readonly property color darkBackground: colors.dark_background ?? "#161622"
+    readonly property color darkerBackground: colors.darker_background ?? "#101019"
+    readonly property color lighterBackground: colors.lighter_background ?? "#313244"
+    readonly property color foreground: colors.foreground ?? "#cdd6f4"
+    readonly property color darkForeground: colors.dark_foreground ?? "#6c7086"
+    readonly property color lightForeground: colors.light_foreground ?? "#bac2de"
+    readonly property color brightForeground: colors.bright_foreground ?? "#cdd6f4"
+    readonly property color accent: colors.accent ?? "#89b4fa"
+    readonly property color selection: colors.selection ?? "#45475a"
+    readonly property color muted: colors.muted ?? "#585b70"
     readonly property color red: colors.red ?? "#f38ba8"
-    readonly property color maroon: colors.maroon ?? "#eba0ac"
-    readonly property color peach: colors.peach ?? "#fab387"
-    readonly property color yellow: colors.yellow ?? "#f9e2af"
+    readonly property color yellow: colors.yellow ?? "#fab387"
+    readonly property color orange: colors.orange ?? "#f6b6ab"
     readonly property color green: colors.green ?? "#a6e3a1"
-    readonly property color teal: colors.teal ?? "#94e2d5"
-    readonly property color sky: colors.sky ?? "#89dceb"
-    readonly property color sapphire: colors.sapphire ?? "#74c7ec"
+    readonly property color cyan: colors.cyan ?? "#94e2d5"
     readonly property color blue: colors.blue ?? "#89b4fa"
-    readonly property color lavender: colors.lavender ?? "#b4befe"
-    readonly property color text: colors.text ?? "#cdd6f4"
-    readonly property color subtext1: colors.subtext1 ?? "#bac2de"
-    readonly property color subtext0: colors.subtext0 ?? "#a6adc8"
-    readonly property color overlay2: colors.overlay2 ?? "#9399b2"
-    readonly property color overlay1: colors.overlay1 ?? "#7f849c"
-    readonly property color overlay0: colors.overlay0 ?? "#6c7086"
-    readonly property color surface2: colors.surface2 ?? "#585b70"
-    readonly property color surface1: colors.surface1 ?? "#45475a"
-    readonly property color surface0: colors.surface0 ?? "#313244"
-    readonly property color base: colors.base ?? "#1e1e2e"
-    readonly property color mantle: colors.mantle ?? "#181825"
-    readonly property color crust: colors.crust ?? "#11111b"
-    readonly property color accent: colors.accent ?? peach
-    readonly property color accent2: colors.accent2 ?? blue
-    readonly property color accent3: colors.accent3 ?? peach
-    // Highlights inside dropdowns, launchers and tooltips; their borders use accent
-    readonly property color highlight: accent2
+    readonly property color magenta: colors.magenta ?? "#cba6f7"
+    readonly property color brown: colors.brown ?? "#7b5b55"
+    readonly property color brightRed: colors.bright_red ?? "#f38ba8"
+    readonly property color brightYellow: colors.bright_yellow ?? "#f9e2af"
+    readonly property color brightGreen: colors.bright_green ?? "#a6e3a1"
+    readonly property color brightCyan: colors.bright_cyan ?? "#94e2d5"
+    readonly property color brightBlue: colors.bright_blue ?? "#89b4fa"
+    readonly property color brightMagenta: colors.bright_magenta ?? "#f5c2e7"
+
+    // Text: secondary (captions, values) and dim (hints, things that are off)
+    readonly property color subtext: mix(foreground, background, 0.25)
+    readonly property color dimText: mix(foreground, background, 0.5)
+    readonly property color faintText: mix(foreground, background, 0.65)
+
+    // States: the text color at a low opacity, the same for every control
+    readonly property color idleFill: alpha(foreground, 0.04)
+    readonly property color hoverFill: alpha(foreground, 0.08)
+    readonly property color selectedFill: alpha(foreground, 0.18)
+    readonly property color idleBorder: alpha(foreground, 0.4)
 
     // Surfaces. Gamemode turns blur off in Hyprland, so everything goes opaque.
-    readonly property color barBg: alpha(base, gamemode ? 1 : Config.barOpacity)
-    readonly property color panelBg: alpha(base, gamemode ? 1 : Config.panelOpacity)
-    readonly property color cardBg: alpha(surface0, gamemode ? 1 : 0.6)
-    readonly property color hoverBg: surface0
+    readonly property color barBg: alpha(background, gamemode ? 1 : Config.barOpacity)
+    readonly property color panelBg: alpha(background, gamemode ? 1 : Config.panelOpacity)
+    readonly property color cardBg: idleFill
+    readonly property color hoverBg: hoverFill
+    // popups and dropdowns are framed in the accent, as Hyprland frames the focused window
     readonly property color border: accent
     readonly property int borderWidth: Config.borderWidth
 
-    // Metrics
-    // Settings > Fonts. Text: the display font, or the Nerd Font with
-    // "Nerd Fonts only". Icons: Symbols Nerd Font, or the Nerd Font's
-    // proportional ("Propo") variant: in the monospaced variants wide icons
-    // spill out of their cell and sit off-center in buttons.
+    // Fonts. Settings > Fonts. Text: the display font, or the Nerd Font with "Nerd Fonts only".
+    // Icons: Symbols Nerd Font, or the Nerd Font's proportional ("Propo") variant: in the
+    // monospaced variants wide icons spill out of their cell and sit off-center in buttons.
     readonly property string nerdFamily: (Config.nerdFont || "JetBrainsMono Nerd Font").replace(/ (Mono|Propo)$/, "")
     readonly property string font: Config.nerdFontOnly ? (Config.nerdFont || nerdFamily) : (Config.displayFont || "SF Pro Display")
     readonly property string iconFont: {
@@ -75,14 +85,22 @@ Singleton {
         return Qt.fontFamilies().includes(propo) ? propo : nerdFamily;
     }
     readonly property string monoFont: Config.nerdFont || "JetBrainsMono Nerd Font"
-    // Text size in px from the Displays panel (~/.config/hypr/monitors.json)
-    property int textSize: 13
+
+    // Text size in px from Displays (~/.config/hypr/monitors.json): the body text, 12 by
+    // default. The other sizes scale with it as Omarchy's do (12: caption 10, title 14,
+    // heading 16, icons 14).
+    property int textSize: 12
+    readonly property real textScale: textSize / 12
     readonly property int fontSize: textSize
-    readonly property int iconSize: textSize + 1
-    // Bar: workspace dots one size down, the tray's arrow two
+    readonly property int captionSize: Math.round(10 * textScale)
+    readonly property int smallSize: Math.round(11 * textScale)
+    readonly property int titleSize: Math.round(14 * textScale)
+    readonly property int headingSize: Math.round(16 * textScale)
+    readonly property int iconSize: Math.round(14 * textScale)
+    // Bar: workspace dots 1 px under the text size, the tray's arrow 2
     readonly property int smallIconSize: textSize - 1
     readonly property int tinyIconSize: textSize - 2
-    readonly property int barHeight: Math.max(34, Math.round(textSize * 2.6))
+    readonly property int barHeight: Math.max(30, Math.round(textSize * 2.6))
     // Floating bar (Settings > Bar): its own margin on the left, right and
     // top (the gap below it is Hyprland's outer gap); 0 for the full-width bar
     readonly property int barMargin: Config.barFloating ? Config.barMargin : 0
@@ -96,6 +114,28 @@ Singleton {
 
     function alpha(c: color, a: real): color {
         return Qt.rgba(c.r, c.g, c.b, a);
+    }
+
+    // a blended toward b by amount (0..1)
+    function mix(a: color, b: color, amount: real): color {
+        return Qt.rgba(a.r + (b.r - a.r) * amount, a.g + (b.g - a.g) * amount, a.b + (b.b - a.b) * amount, 1);
+    }
+
+    // A color by its name in the themes (accent, magenta, ...); older names saved in
+    // Settings (mauve, peach, ...) find the color that took their place
+    readonly property var formerNames: ({
+            base: "background", mantle: "darkBackground", crust: "darkerBackground",
+            surface0: "lighterBackground", surface1: "selection", surface2: "muted",
+            overlay0: "faintText", overlay1: "dimText", overlay2: "subtext", subtext0: "subtext", subtext1: "subtext",
+            text: "foreground", mauve: "magenta", pink: "brightMagenta", peach: "orange", teal: "cyan",
+            sky: "brightCyan", sapphire: "cyan", lavender: "brightBlue", maroon: "brightRed",
+            rosewater: "brightRed", flamingo: "red", accent2: "accent", accent3: "accent"
+        })
+
+    function named(name: string): color {
+        const key = formerNames[name] ?? name.replace(/_(\w)/g, (m, c) => c.toUpperCase());
+        const value = root[key];
+        return value !== undefined && value !== null ? value : root.foreground;
     }
 
     function reload(): void {
@@ -116,7 +156,7 @@ Singleton {
                 root.themeName = data.name ?? root.themeName;
                 root.mode = data.mode ?? "dark";
                 root.iconsDir = data.icons ?? "";
-                root.background = data.background ?? "";
+                root.backgroundImage = data.background ?? "";
             } catch (e) {
                 console.warn("Theme: could not parse", path, e);
             }
@@ -130,8 +170,7 @@ Singleton {
         onFileChanged: reload()
         onLoaded: {
             try {
-                const d = JSON.parse(text());
-                root.textSize = d.text_size ?? (d.text_scale ? Math.round(13 * d.text_scale) : 13);
+                root.textSize = JSON.parse(text()).text_size ?? 12;
             } catch (e) {}
         }
     }

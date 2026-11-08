@@ -42,7 +42,7 @@ Item {
         layer.effect: MultiEffect {
             // tinted: halfway to the accent; monochrome: fully recolored
             colorization: root.mode === "tinted" ? 0.5 : 1
-            colorizationColor: root.mode === "tinted" ? Theme.highlight : Theme.subtext1
+            colorizationColor: root.mode === "tinted" ? Theme.accent : Theme.subtext
         }
     }
 }

@@ -65,7 +65,7 @@ Loader {
 
                 Rectangle {
                     anchors.fill: parent
-                    color: Theme.surface0
+                    color: Theme.lighterBackground
                 }
 
                 Image {
@@ -82,7 +82,7 @@ Loader {
                     anchors.centerIn: parent
                     visible: !slot.modelData.thumb && picker.kind === "live"
                     text: Icons.play
-                    color: Theme.overlay1
+                    color: Theme.dimText
                     font.pixelSize: 28
                 }
             }
@@ -90,7 +90,7 @@ Loader {
             // dim the slices
             Rectangle {
                 anchors.fill: parent
-                color: Theme.crust
+                color: Theme.darkerBackground
                 opacity: Math.min(1, Math.abs(slot.d)) * 0.45
             }
         }
@@ -102,7 +102,7 @@ Loader {
 
             ShapePath {
                 fillColor: "transparent"
-                strokeColor: slot.isSelected ? Theme.accent : Theme.alpha(Theme.crust, 0.9)
+                strokeColor: slot.isSelected ? Theme.accent : Theme.alpha(Theme.darkerBackground, 0.9)
                 // also smooths the clip's hard slanted edge
                 strokeWidth: slot.isSelected ? Math.max(2, Theme.borderWidth) : 1.5
                 startX: slot.sliceLeft + picker.skew

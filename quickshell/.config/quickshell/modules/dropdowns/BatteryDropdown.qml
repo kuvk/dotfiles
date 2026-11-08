@@ -29,7 +29,7 @@ Dropdown {
 
     Hero {
         icon: Battery.icon
-        iconColor: Battery.color
+        iconColor: Hues.battery
         title: `${Math.round(Battery.percent * 100)}%`
         status: Battery.state.toUpperCase()
     }

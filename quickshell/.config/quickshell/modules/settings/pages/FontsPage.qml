@@ -39,7 +39,7 @@ ColumnLayout {
             Icon {
                 anchors.verticalCenter: parent.verticalCenter
                 text: Distro.logo
-                color: Theme.accent2
+                color: Theme.accent
                 font.pixelSize: 17
             }
 
@@ -57,7 +57,7 @@ ColumnLayout {
 
                     anchors.verticalCenter: parent.verticalCenter
                     text: modelData
-                    color: Theme.subtext1
+                    color: Theme.subtext
                 }
             }
         }
@@ -66,7 +66,7 @@ ColumnLayout {
     StyledText {
         Layout.fillWidth: true
         text: "Everywhere but terminals. Reopen apps to apply."
-        color: Theme.overlay1
+        color: Theme.dimText
         font.pixelSize: Theme.fontSize - 1
         wrapMode: Text.Wrap
     }

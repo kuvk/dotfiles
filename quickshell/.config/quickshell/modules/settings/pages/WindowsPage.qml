@@ -29,7 +29,7 @@ ColumnLayout {
 
     StyledText {
         text: "Inner: between windows. Outer: to the screen edge."
-        color: Theme.overlay1
+        color: Theme.dimText
         wrapMode: Text.Wrap
         Layout.fillWidth: true
     }

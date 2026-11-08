@@ -10,7 +10,7 @@ Singleton {
     id: root
 
     // Appearance: colors, corners, cursor, icons, opacity, blur, animations
-    // per theme: { "catppuccin-mocha": { accent: "mauve" } }, read by hyprdori-theme-set
+    // per theme, another of its colors as the accent: { "catppuccin": "magenta" }, read by hyprdori-theme-set
     property alias accentOverrides: adapter.accentOverrides
     // the theme's background on the desktop, redrawn on theme change; set by the wallpaper picker
     property alias wallpaperFollowsTheme: adapter.wallpaperFollowsTheme
@@ -65,7 +65,7 @@ Singleton {
     property alias notificationShadow: adapter.notificationShadow
 
     // Lock Screen: colors are theme color names; they also go to the login screen (hyprdori-theme-set --login)
-    // the background: the theme's own (Theme.background) until an image is chosen
+    // the background: the theme's own (Theme.backgroundImage) until an image is chosen
     property alias lockFollowsTheme: adapter.lockFollowsTheme
     property alias lockImage: adapter.lockImage
     property alias lockClock: adapter.lockClock
@@ -209,7 +209,7 @@ Singleton {
             // The settings, by Settings page, with their built-in defaults (defaults.json overrides them)
 
             // Appearance
-            property var accentOverrides: ({"gruvbox": {"accent": "blue", "accent2": "peach", "accent3": "mauve"}, "hackerman": {"accent": "sapphire", "accent2": "mauve", "accent3": "peach"}, "nord": {"accent": "sapphire", "accent2": "mauve", "accent3": "peach"}})
+            property var accentOverrides: ({})
             property bool wallpaperFollowsTheme: true
             property int radius: 6
             property string cursorTheme: "Adwaita"

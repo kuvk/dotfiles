@@ -30,7 +30,7 @@ RowLayout {
             Layout.fillWidth: true
             visible: text !== ""
             text: root.enabled ? root.hint : "Not used in Work and Game modes"
-            color: Theme.overlay1
+            color: Theme.dimText
             font.pixelSize: Theme.fontSize - 2
         }
     }

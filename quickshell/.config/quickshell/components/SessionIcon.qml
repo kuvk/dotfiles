@@ -30,7 +30,7 @@ Item {
         anchors.centerIn: parent
         visible: image.status !== Image.Ready
         text: root.entry.icon
-        color: Theme[root.entry.color]
+        color: Theme.named(root.entry.color)
         font.pixelSize: root.size
     }
 }

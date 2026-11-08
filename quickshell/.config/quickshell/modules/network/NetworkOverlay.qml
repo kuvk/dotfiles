@@ -43,7 +43,7 @@ PanelWindow {
 
     Rectangle {
         anchors.fill: parent
-        color: Theme.alpha(Theme.crust, Theme.gamemode ? 1 : 0.6)
+        color: Theme.alpha(Theme.darkerBackground, Theme.gamemode ? 1 : 0.6)
         opacity: root.reveal
 
         MouseArea {

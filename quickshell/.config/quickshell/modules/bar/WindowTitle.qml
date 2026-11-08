@@ -45,6 +45,6 @@ Row {
         width: Math.min(implicitWidth, 220)
         text: root.shellWindow ? (root.toplevel?.title ?? "") : (root.entry?.name || root.toplevel?.appId || root.toplevel?.title || "")
         // the clock's color
-        color: Theme.text
+        color: Theme.foreground
     }
 }

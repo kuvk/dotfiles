@@ -95,7 +95,7 @@ NetworkOverlay {
         Layout.alignment: Qt.AlignHCenter
         Layout.maximumWidth: 320
         text: (root.qr.ssid || Network.connection || "Wi-Fi").toUpperCase()
-        color: Theme.subtext0
+        color: Theme.subtext
         font.pixelSize: Theme.fontSize - 1
         font.weight: Font.Bold
         font.letterSpacing: 2
@@ -138,7 +138,7 @@ NetworkOverlay {
         Layout.alignment: Qt.AlignHCenter
         visible: root.loading
         text: "Making the QR code…"
-        color: Theme.subtext0
+        color: Theme.subtext
     }
 
     StyledText {
@@ -155,7 +155,7 @@ NetworkOverlay {
         Layout.alignment: Qt.AlignHCenter
         visible: canvas.visible
         text: "Scan to join this network"
-        color: Theme.subtext0
+        color: Theme.subtext
     }
 
     StyledText {
@@ -163,7 +163,7 @@ NetworkOverlay {
         Layout.maximumWidth: 320
         visible: canvas.visible && root.qr.security !== "nopass"
         text: root.passwordError || (root.passwordShown ? root.password : "Show password")
-        color: root.passwordError ? Theme.red : (root.passwordShown ? Theme.text : Theme.highlight)
+        color: root.passwordError ? Theme.red : (root.passwordShown ? Theme.foreground : Theme.accent)
         wrapMode: Text.WrapAnywhere
         horizontalAlignment: Text.AlignHCenter
 

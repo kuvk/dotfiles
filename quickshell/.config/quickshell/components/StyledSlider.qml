@@ -7,7 +7,7 @@ Item {
 
     property real value: 0
     property real to: 1
-    property color color: Theme.highlight
+    property color color: Theme.accent
     signal moved(real value)
 
     implicitHeight: 18
@@ -24,7 +24,7 @@ Item {
         width: parent.width
         height: 6
         radius: 3
-        color: Theme.surface1
+        color: Theme.selection
 
         Rectangle {
             width: Math.min(1, root.value / root.to) * parent.width
@@ -41,7 +41,7 @@ Item {
         height: 14
         radius: 7
         color: root.color
-        border.color: Theme.base
+        border.color: Theme.background
         border.width: 2
     }
 

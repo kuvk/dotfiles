@@ -53,7 +53,7 @@ ColumnLayout {
             implicitHeight: 34
             radius: Theme.smallRadius
             color: Theme.cardBg
-            border.color: location.activeFocus ? Theme.highlight : "transparent"
+            border.color: location.activeFocus ? Theme.accent : "transparent"
             border.width: Theme.borderWidth
 
             TextInput {
@@ -63,7 +63,7 @@ ColumnLayout {
                 anchors.leftMargin: 10
                 anchors.rightMargin: 10
                 verticalAlignment: TextInput.AlignVCenter
-                color: Theme.text
+                color: Theme.foreground
                 font.family: Theme.font
                 font.pixelSize: Theme.fontSize
                 clip: true
@@ -74,7 +74,7 @@ ColumnLayout {
                     anchors.fill: parent
                     visible: location.text === "" && !location.activeFocus
                     text: "Automatic"
-                    color: Theme.overlay1
+                    color: Theme.dimText
                 }
             }
         }
@@ -94,7 +94,7 @@ ColumnLayout {
         Layout.topMargin: 8
         Layout.fillWidth: true
         text: "Modules for each bar, in their order on it."
-        color: Theme.overlay1
+        color: Theme.dimText
         wrapMode: Text.Wrap
     }
 
@@ -107,21 +107,21 @@ ColumnLayout {
         StyledText {
             Layout.fillWidth: true
             text: "Module"
-            color: Theme.subtext0
+            color: Theme.subtext
             font.weight: Font.DemiBold
         }
 
         StyledText {
             Layout.alignment: Qt.AlignHCenter
             text: "Primary"
-            color: Theme.subtext0
+            color: Theme.subtext
             font.weight: Font.DemiBold
         }
 
         StyledText {
             Layout.alignment: Qt.AlignHCenter
             text: "Others"
-            color: Theme.subtext0
+            color: Theme.subtext
             font.weight: Font.DemiBold
         }
 
@@ -136,7 +136,7 @@ ColumnLayout {
                 Layout.column: 0
                 Layout.fillWidth: true
                 text: modelData.label
-                color: Theme.text
+                color: Theme.foreground
             }
         }
 

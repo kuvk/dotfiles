@@ -82,17 +82,6 @@ Singleton {
 
     readonly property string icon: full ? Icons.batteryFull : Icons.batteryLevels[Math.round(percent * 10)] + (charging ? Icons.batteryCharging : "")
 
-    readonly property color color: {
-        if (charging || full)
-            return Theme.sapphire;
-        if (percent <= 0.15)
-            return Theme.red;
-        if (percent <= 0.4)
-            return Theme.peach;
-        if (percent <= 0.6)
-            return Theme.yellow;
-        return Theme.green;
-    }
 
     readonly property string summary: [`${Math.round(percent * 100)}%`, state, timeLeft].filter(s => s).join(" · ")
 }

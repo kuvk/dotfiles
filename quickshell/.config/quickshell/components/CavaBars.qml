@@ -10,7 +10,7 @@ Item {
     property int count: Cava.bars
     property real spacing: 3
     property real minHeight: 3
-    property color color: Theme.sky
+    property color color: Theme.brightCyan
 
     readonly property real barWidth: Math.max(1, (width - spacing * (count - 1)) / count)
 

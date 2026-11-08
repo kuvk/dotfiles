@@ -61,7 +61,7 @@ Scope {
                 id: background
 
                 anchors.fill: parent
-                color: Theme.alpha(Theme.crust, Theme.gamemode ? 1 : 0.6)
+                color: Theme.alpha(Theme.darkerBackground, Theme.gamemode ? 1 : 0.6)
                 opacity: root.reveal
                 focus: root.shown && win.main
 
@@ -136,8 +136,8 @@ Scope {
 
                                 anchors.fill: parent
                                 radius: Theme.radius * 2
-                                color: button.selected ? Theme.alpha(Theme.surface1, Theme.gamemode ? 1 : 0.9) : Theme.alpha(Theme.surface0, Theme.gamemode ? 1 : 0.75)
-                                border.color: button.selected ? Theme[button.modelData.color] : "transparent"
+                                color: button.selected ? Theme.alpha(Theme.selection, Theme.gamemode ? 1 : 0.9) : Theme.alpha(Theme.lighterBackground, Theme.gamemode ? 1 : 0.75)
+                                border.color: button.selected ? Theme.named(button.modelData.color) : "transparent"
                                 border.width: Theme.borderWidth
 
                                 // tight shadow: small offset, soft edge

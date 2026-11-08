@@ -41,7 +41,7 @@ RowLayout {
             Icon {
                 anchors.centerIn: parent
                 text: button.modelData.icon
-                color: button.containsMouse ? Theme.highlight : Theme.subtext0
+                color: button.containsMouse ? Theme.accent : Theme.subtext
             }
         }
     }

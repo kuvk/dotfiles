@@ -1,21 +1,5 @@
 {
-  "accentOverrides": {
-    "gruvbox": {
-      "accent": "blue",
-      "accent2": "peach",
-      "accent3": "mauve"
-    },
-    "hackerman": {
-      "accent": "sapphire",
-      "accent2": "mauve",
-      "accent3": "peach"
-    },
-    "nord": {
-      "accent": "sapphire",
-      "accent2": "mauve",
-      "accent3": "peach"
-    }
-  },
+  "accentOverrides": {},
   "activeOpacity": 0.98,
   "animations": true,
   "barFloating": false,

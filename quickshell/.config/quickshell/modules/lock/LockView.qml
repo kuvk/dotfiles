@@ -29,7 +29,7 @@ Item {
     property date now: new Date()
 
     function tint(name: string): color {
-        return Theme[name] ?? Theme.text;
+        return Theme.named(name) ?? Theme.foreground;
     }
 
     function takeFocus(): void {

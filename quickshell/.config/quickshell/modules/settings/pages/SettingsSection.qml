@@ -47,7 +47,7 @@ ColumnLayout {
                 Layout.fillWidth: true
                 visible: text !== ""
                 text: section.hint
-                color: Theme.overlay1
+                color: Theme.dimText
                 font.pixelSize: Theme.fontSize - 2
                 elide: Text.ElideMiddle
             }
@@ -78,7 +78,7 @@ ColumnLayout {
             Icon {
                 anchors.centerIn: parent
                 text: section.open ? Icons.chevronUp : Icons.chevronDown
-                color: Theme.subtext0
+                color: Theme.subtext
             }
         }
     }

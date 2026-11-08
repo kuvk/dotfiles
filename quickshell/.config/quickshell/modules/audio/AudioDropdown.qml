@@ -14,7 +14,7 @@ Dropdown {
 
     Hero {
         icon: Audio.icon
-        iconColor: Audio.muted ? Theme.overlay1 : Theme.highlight
+        iconColor: Hues.audio
         title: Audio.sink ? Audio.nodeName(Audio.sink) : "No output"
         status: Audio.muted ? "MUTED" : `VOLUME ${Math.round(Audio.volume * 100)}%`
     }

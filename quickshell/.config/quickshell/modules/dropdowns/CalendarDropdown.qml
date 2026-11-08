@@ -71,7 +71,7 @@ Dropdown {
         StyledText {
             Layout.fillWidth: true
             text: Qt.formatDate(new Date(root.year, root.month, 1), "MMMM yyyy")
-            color: Theme.highlight
+            color: Theme.accent
             font.weight: Font.Bold
             font.pixelSize: Theme.fontSize + 2
             horizontalAlignment: Text.AlignHCenter
@@ -111,7 +111,7 @@ Dropdown {
                 Layout.fillWidth: true
                 Layout.preferredWidth: 1
                 text: Qt.locale().dayName(modelData, Locale.ShortFormat)
-                color: modelData === 0 || modelData === 6 ? Theme.red : Theme.accent2
+                color: modelData === 0 || modelData === 6 ? Theme.red : Theme.accent
                 font.weight: Font.DemiBold
                 font.pixelSize: Theme.fontSize + 1
                 horizontalAlignment: Text.AlignHCenter
@@ -122,7 +122,7 @@ Dropdown {
             Layout.fillWidth: true
             Layout.preferredWidth: 1
             text: "W"
-            color: Theme.overlay1
+            color: Theme.dimText
             horizontalAlignment: Text.AlignHCenter
         }
 
@@ -154,7 +154,7 @@ Dropdown {
                         width: 34
                         height: 34
                         radius: 17
-                        color: Theme.highlight
+                        color: Theme.accent
                         visible: cell.isToday
                     }
 
@@ -165,12 +165,12 @@ Dropdown {
                         font.weight: cell.isToday ? Font.Bold : Font.Normal
                         color: {
                             if (cell.isWeek)
-                                return Theme.overlay1;
+                                return Theme.dimText;
                             if (cell.isToday)
-                                return Theme.base;
+                                return Theme.background;
                             if (!cell.inMonth)
-                                return Theme.surface2;
-                            return cell.weekend ? Theme.red : Theme.text;
+                                return Theme.muted;
+                            return cell.weekend ? Theme.red : Theme.foreground;
                         }
                     }
                 }

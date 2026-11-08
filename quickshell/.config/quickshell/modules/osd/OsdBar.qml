@@ -11,13 +11,13 @@ Rectangle {
 
     implicitHeight: 6
     radius: Theme.radius > 0 ? height / 2 : 0
-    color: Theme.surface1
+    color: Theme.selection
 
     Rectangle {
         width: bar.width * bar.fill
         height: bar.height
         radius: bar.radius
-        color: Osd.entry.dim ? Theme.overlay1 : Theme.accent
+        color: Osd.entry.dim ? Theme.dimText : Theme.accent
 
         Behavior on width {
             NumberAnimation {

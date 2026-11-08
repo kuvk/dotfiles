@@ -14,7 +14,7 @@ Dropdown {
 
     Hero {
         icon: !Bluetooth.enabled ? Icons.bluetoothOff : (Bluetooth.connected.length > 0 ? Icons.bluetoothConnected : Icons.bluetooth)
-        iconColor: Bluetooth.enabled ? Theme.highlight : Theme.overlay1
+        iconColor: Hues.bluetooth
         title: Bluetooth.connected.length > 0 ? Bluetooth.connected.map(d => d.name).join(", ") : "Bluetooth"
         status: {
             if (!Bluetooth.available)
@@ -29,7 +29,7 @@ Dropdown {
         IconButton {
             visible: Bluetooth.enabled
             icon: Icons.refresh
-            color: Bluetooth.discovering ? Theme.highlight : Theme.subtext0
+            color: Bluetooth.discovering ? Theme.accent : Theme.subtext
             onClicked: Bluetooth.setDiscovering(!Bluetooth.discovering)
         }
 

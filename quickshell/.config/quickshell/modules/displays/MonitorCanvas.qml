@@ -32,7 +32,7 @@ Rectangle {
     Layout.fillWidth: true
     implicitHeight: 230
     radius: Theme.smallRadius
-    color: Theme.alpha(Theme.crust, 0.6)
+    color: Theme.alpha(Theme.darkerBackground, 0.6)
 
     Repeater {
         model: panel.mons
@@ -56,8 +56,8 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: 2
                 radius: 6
-                color: tile.index === panel.selected ? Theme.alpha(Theme.highlight, 0.3) : Theme.surface0
-                border.color: tile.index === panel.selected ? Theme.highlight : Theme.surface2
+                color: tile.index === panel.selected ? Theme.selectedFill : Theme.lighterBackground
+                border.color: tile.index === panel.selected ? Theme.accent : Theme.muted
                 border.width: 2
 
                 ColumnLayout {
@@ -68,13 +68,13 @@ Rectangle {
                         Layout.alignment: Qt.AlignHCenter
                         text: tile.modelData.name
                         font.weight: Font.Bold
-                        color: tile.index === panel.selected ? Theme.highlight : Theme.text
+                        color: tile.index === panel.selected ? Theme.accent : Theme.foreground
                     }
 
                     StyledText {
                         Layout.alignment: Qt.AlignHCenter
                         text: `${Math.round(tile.modelData.width)}×${Math.round(tile.modelData.height)}`
-                        color: Theme.subtext0
+                        color: Theme.subtext
                         font.pixelSize: Theme.fontSize - 2
                     }
                 }
@@ -115,7 +115,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.bottomMargin: 6
         text: "Drag to arrange"
-        color: Theme.overlay0
+        color: Theme.faintText
         font.pixelSize: Theme.fontSize - 2
     }
 }

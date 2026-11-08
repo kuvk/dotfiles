@@ -72,7 +72,7 @@ PanelWindow {
             Icon {
                 Layout.preferredWidth: root.iconWidth
                 text: Osd.entry.icon
-                color: Osd.entry.dim ? Theme.overlay1 : Theme.accent
+                color: Osd.entry.dim ? Theme.dimText : Theme.accent
             }
 
             // a level: one bar, or one per step (the keyboard light) with an equal gap between
@@ -98,7 +98,7 @@ PanelWindow {
             StyledText {
                 visible: Osd.entry.level < 0
                 text: Osd.entry.label
-                color: Osd.entry.dim ? Theme.overlay1 : Theme.text
+                color: Osd.entry.dim ? Theme.dimText : Theme.foreground
                 elide: Text.ElideRight
             }
         }

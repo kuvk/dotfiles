@@ -40,8 +40,8 @@ ColumnLayout {
                 Rectangle {
                     anchors.fill: parent
                     radius: Theme.radius
-                    color: tab.current ? Theme.alpha(Theme.highlight, 0.25) : Theme.alpha(Theme.base, 0.6)
-                    border.color: tab.current ? Theme.highlight : "transparent"
+                    color: tab.current ? Theme.selectedFill : Theme.alpha(Theme.background, 0.6)
+                    border.color: tab.current ? Theme.accent : "transparent"
                     border.width: Theme.borderWidth
                 }
 
@@ -50,7 +50,7 @@ ColumnLayout {
 
                     anchors.centerIn: parent
                     text: tab.modelData.label
-                    color: tab.current ? Theme.highlight : Theme.subtext0
+                    color: tab.current ? Theme.accent : Theme.subtext
                     font.weight: Font.DemiBold
                 }
             }
@@ -62,8 +62,8 @@ ColumnLayout {
         implicitWidth: 320
         implicitHeight: 34
         radius: height / 2
-        color: Theme.alpha(Theme.base, 0.75)
-        border.color: picker.query !== "" ? Theme.highlight : "transparent"
+        color: Theme.alpha(Theme.background, 0.75)
+        border.color: picker.query !== "" ? Theme.accent : "transparent"
         border.width: Theme.borderWidth
 
         Row {
@@ -72,12 +72,12 @@ ColumnLayout {
 
             Icon {
                 text: Icons.search
-                color: picker.query !== "" ? Theme.highlight : Theme.overlay1
+                color: picker.query !== "" ? Theme.accent : Theme.dimText
             }
 
             StyledText {
                 text: picker.query !== "" ? picker.query : "Type to search"
-                color: picker.query !== "" ? Theme.text : Theme.overlay1
+                color: picker.query !== "" ? Theme.foreground : Theme.dimText
             }
         }
     }

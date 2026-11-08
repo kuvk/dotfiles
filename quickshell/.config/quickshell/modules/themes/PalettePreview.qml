@@ -2,17 +2,17 @@ import QtQuick
 import qs.config
 
 // A theme's palette as bars stacked top to bottom (theme carousel card):
-// backgrounds, text, the two accents, then the colors.
+// backgrounds, text, the accent, then the colors.
 Rectangle {
     id: root
 
     property var colors: ({})
     property string title: ""
 
-    readonly property var slots: ["base", "mantle", "surface0", "surface1", "overlay1", "text", "accent", "accent2", "red", "peach", "yellow", "green", "teal", "blue", "mauve", "pink"]
+    readonly property var slots: ["background", "dark_background", "lighter_background", "selection", "dark_foreground", "foreground", "accent", "red", "orange", "yellow", "green", "cyan", "blue", "magenta", "bright_magenta"]
     readonly property real gap: Math.max(1, height * 0.006)
 
-    color: colors.crust ?? "#000000"
+    color: colors.darker_background ?? "#000000"
 
     Column {
         anchors.fill: parent

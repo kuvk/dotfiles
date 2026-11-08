@@ -31,7 +31,7 @@ Flow {
             Rectangle {
                 anchors.fill: parent
                 radius: height / 2
-                color: chip.index === panel.selected ? Theme.highlight : Theme.cardBg
+                color: chip.index === panel.selected ? Theme.accent : Theme.cardBg
             }
 
             StyledText {
@@ -39,7 +39,7 @@ Flow {
 
                 anchors.centerIn: parent
                 text: chip.modelData.name + (!chip.modelData.enabled ? " (off)" : chip.modelData.lid_closed ? " (lid closed)" : "")
-                color: chip.index === panel.selected ? Theme.base : (chip.modelData.enabled && !chip.modelData.lid_closed ? Theme.text : Theme.overlay1)
+                color: chip.index === panel.selected ? Theme.background : (chip.modelData.enabled && !chip.modelData.lid_closed ? Theme.foreground : Theme.dimText)
             }
         }
     }

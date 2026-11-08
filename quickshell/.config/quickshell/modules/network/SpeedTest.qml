@@ -67,7 +67,7 @@ NetworkOverlay {
     StyledText {
         Layout.alignment: Qt.AlignHCenter
         text: (Network.connection || "Speed test").toUpperCase()
-        color: Theme.subtext0
+        color: Theme.subtext
         font.pixelSize: Theme.fontSize - 1
         font.weight: Font.Bold
         font.letterSpacing: 2
@@ -101,7 +101,7 @@ NetworkOverlay {
     StyledText {
         Layout.alignment: Qt.AlignHCenter
         text: root.speed.ping !== undefined ? `PING ${root.speed.ping} ms   ·   JITTER ${root.speed.jitter} ms` : "MEASURING PING…"
-        color: Theme.subtext0
+        color: Theme.subtext
         font.pixelSize: Theme.fontSize - 1
         font.weight: Font.Bold
         font.letterSpacing: 1.2

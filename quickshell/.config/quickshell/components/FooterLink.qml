@@ -18,7 +18,7 @@ Item {
 
         anchors.right: parent.right
         width: Math.min(implicitWidth, parent.width)
-        color: area.containsMouse ? Qt.lighter(Theme.highlight, 1.15) : Theme.highlight
+        color: area.containsMouse ? Qt.lighter(Theme.accent, 1.15) : Theme.accent
         font.pixelSize: Theme.fontSize - 1
         elide: Text.ElideLeft
 

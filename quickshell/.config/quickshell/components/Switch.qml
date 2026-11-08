@@ -15,7 +15,7 @@ MouseArea {
     Rectangle {
         anchors.fill: parent
         radius: height / 2
-        color: root.checked ? Theme.highlight : Theme.surface1
+        color: root.checked ? Theme.accent : Theme.selection
 
         Rectangle {
             x: root.checked ? parent.width - width - 3 : 3
@@ -23,7 +23,7 @@ MouseArea {
             width: parent.height - 6
             height: width
             radius: width / 2
-            color: root.checked ? Theme.base : Theme.overlay2
+            color: root.checked ? Theme.background : Theme.subtext
 
             Behavior on x {
                 NumberAnimation {

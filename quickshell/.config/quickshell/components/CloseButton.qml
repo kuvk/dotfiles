@@ -17,7 +17,7 @@ MouseArea {
     Icon {
         anchors.centerIn: parent
         text: Icons.close
-        color: root.containsMouse ? Theme.accent : Theme.subtext0
+        color: root.containsMouse ? Theme.accent : Theme.subtext
 
         Behavior on color {
             ColorAnimation {

@@ -69,6 +69,11 @@ for name in names:
 PY
 )
 
+# The shell names colors as the themes do
+while IFS= read -r line; do
+    fail "old color name: $line"
+done < <(git grep -n -E 'Theme\.(highlight|accent2|accent3|text|subtext[01]|overlay[012]|surface[012]|base|mantle|crust|mauve|peach|teal|sky|sapphire|lavender|maroon|pink|rosewater|flamingo)\b' -- 'quickshell/*.qml' 2>/dev/null)
+
 # Old names: the project is hyprdori (github.com/kuvk/... is the account and stays)
 while IFS= read -r line; do
     fail "old name: $line"

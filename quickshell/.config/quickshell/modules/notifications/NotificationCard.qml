@@ -64,7 +64,7 @@ Item {
         anchors.fill: parent
         implicitHeight: layout.implicitHeight + 24
         radius: Theme.radius
-        color: root.popup ? Theme.panelBg : root.solid ? Qt.tint(Theme.base, Theme.cardBg) : Theme.cardBg
+        color: root.popup ? Theme.panelBg : root.solid ? Qt.tint(Theme.background, Theme.cardBg) : Theme.cardBg
         // On screen: an accent outline (Settings > Notifications > Border); critical ones,
         // anywhere, a red one
         border.width: root.critical || (root.popup && Config.notificationBorder) ? Theme.borderWidth : 0
@@ -98,7 +98,7 @@ Item {
             height: 2
             radius: card.radius > 0 ? height / 2 : 0
             width: (parent.width - 2 * card.radius) * remaining
-            color: Theme.highlight
+            color: Theme.accent
             opacity: 0.8
 
             NumberAnimation on remaining {
@@ -144,7 +144,7 @@ Item {
                     Layout.preferredHeight: 40
                     visible: text !== ""
                     text: Notifs.appGlyphs[root.appName] ?? ""
-                    color: Theme.highlight
+                    color: Theme.accent
                     font.pixelSize: 26
                 }
 
@@ -169,14 +169,14 @@ Item {
                             Layout.fillWidth: true
                             visible: root.showAppName
                             text: root.appName
-                            color: root.critical ? Theme.red : Theme.highlight
+                            color: root.critical ? Theme.red : Theme.accent
                             font.pixelSize: Theme.fontSize - 2
                             font.weight: Font.DemiBold
                         }
 
                         StyledText {
                             text: Notifs.relativeTime(root.notification, Time.date)
-                            color: Theme.overlay1
+                            color: Theme.dimText
                             font.pixelSize: Theme.fontSize - 2
                         }
                     }
@@ -198,7 +198,7 @@ Item {
                         visible: text !== ""
                         text: root.body
                         textFormat: Text.StyledText
-                        color: Theme.subtext1
+                        color: Theme.subtext
                         // one size below the title; a hint from the shell's scripts (keys, an
                         // Update to run: category x-hyprdori.hint) one more
                         font.pixelSize: root.notification.hints?.category === "x-hyprdori.hint" ? Theme.fontSize - 2 : Theme.fontSize - 1
@@ -212,7 +212,7 @@ Item {
                     Layout.alignment: Qt.AlignTop
                     visible: !root.showAppName
                     text: Notifs.relativeTime(root.notification, Time.date)
-                    color: Theme.overlay1
+                    color: Theme.dimText
                     font.pixelSize: Theme.fontSize - 2
                 }
             }
@@ -223,8 +223,8 @@ Item {
                 visible: root.replying
                 implicitHeight: 34
                 radius: Theme.smallRadius
-                color: Theme.surface0
-                border.color: replyInput.activeFocus ? Theme.highlight : "transparent"
+                color: Theme.lighterBackground
+                border.color: replyInput.activeFocus ? Theme.accent : "transparent"
 
                 TextInput {
                     id: replyInput
@@ -233,7 +233,7 @@ Item {
                     anchors.leftMargin: 10
                     anchors.rightMargin: 10
                     verticalAlignment: TextInput.AlignVCenter
-                    color: Theme.text
+                    color: Theme.foreground
                     font.family: Theme.font
                     font.pixelSize: Theme.fontSize - 1
                     clip: true
@@ -251,7 +251,7 @@ Item {
                         anchors.fill: parent
                         visible: replyInput.text === ""
                         text: root.notification.inlineReplyPlaceholder || "Reply"
-                        color: Theme.overlay1
+                        color: Theme.dimText
                     }
                 }
             }
@@ -281,7 +281,7 @@ Item {
                     Rectangle {
                         anchors.fill: parent
                         radius: Theme.smallRadius
-                        color: replyButton.containsMouse || root.replying ? Theme.surface1 : Theme.surface0
+                        color: replyButton.containsMouse || root.replying ? Theme.selection : Theme.lighterBackground
                     }
 
                     StyledText {
@@ -315,7 +315,7 @@ Item {
                         Rectangle {
                             anchors.fill: parent
                             radius: Theme.smallRadius
-                            color: action.containsMouse ? Theme.surface1 : Theme.surface0
+                            color: action.containsMouse ? Theme.selection : Theme.lighterBackground
                         }
 
                         StyledText {

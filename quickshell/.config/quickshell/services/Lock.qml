@@ -34,14 +34,14 @@ Singleton {
     // The monitor with the clock and password: the one focused when locking
     property string mainScreen: ""
 
-    // The background: the theme's own (Theme.background, hyprdori-theme-set) unless the user chose an
+    // The background: the theme's own (Theme.backgroundImage, hyprdori-theme-set) unless the user chose an
     // image in Settings > Lock Screen (the theme's when that can't be read). Whenever it
     // changes, `hyprdori-wallpaper lock` makes it ready to load at once (a copy scaled to the
     // largest screen when it's bigger, also given to the login screen), so locking never
     // waits for a large picture and nothing stays loaded while unlocked.
     // an image that couldn't be read; choosing another one tries again
     property string failedImage: ""
-    readonly property string backgroundPath: !Config.lockFollowsTheme && Config.lockImage !== "" && Config.lockImage !== failedImage ? Config.lockImage : Theme.background
+    readonly property string backgroundPath: !Config.lockFollowsTheme && Config.lockImage !== "" && Config.lockImage !== failedImage ? Config.lockImage : Theme.backgroundImage
     // file://path?v=stamp of the file to show
     property string background: ""
 

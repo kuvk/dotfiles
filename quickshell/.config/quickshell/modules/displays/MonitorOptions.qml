@@ -21,7 +21,7 @@ GridLayout {
         Layout.columnSpan: 2
         Layout.fillWidth: true
         text: panel.current ? (panel.current.description || panel.current.name) : ""
-        color: Theme.subtext0
+        color: Theme.subtext
     }
 
     StyledText {
@@ -41,7 +41,7 @@ GridLayout {
         StyledText {
             visible: !!panel.current?.lid_closed
             text: "Off while the lid is closed"
-            color: Theme.overlay1
+            color: Theme.dimText
             font.pixelSize: Theme.fontSize - 2
         }
     }
@@ -63,7 +63,7 @@ GridLayout {
 
         StyledText {
             text: "Gets the first workspaces with Default"
-            color: Theme.overlay1
+            color: Theme.dimText
             font.pixelSize: Theme.fontSize - 2
         }
     }
@@ -106,7 +106,7 @@ GridLayout {
 
         StyledText {
             text: "May blink when it switches"
-            color: Theme.overlay1
+            color: Theme.dimText
             font.pixelSize: Theme.fontSize - 2
         }
     }
@@ -141,7 +141,7 @@ GridLayout {
         StyledText {
             text: "Smoother gradients"
             visible: (panel.current?.bitdepth ?? 10) === 10
-            color: Theme.overlay1
+            color: Theme.dimText
             font.pixelSize: Theme.fontSize - 2
         }
     }
@@ -149,6 +149,7 @@ GridLayout {
     StyledText {
         text: "Brightness"
         visible: brightnessSlider.visible
+        opacity: brightnessSlider.opacity
     }
 
     RowLayout {
@@ -157,7 +158,12 @@ GridLayout {
         readonly property var value: panel.current ? Displays.brightness[panel.current.name] : undefined
 
         Layout.fillWidth: true
-        visible: !!panel.current?.enabled && value !== undefined && value !== null
+        // Reading the brightness takes a moment after opening: the row keeps its place
+        // meanwhile (invisible), so the window opens at its final size. Hidden for a monitor
+        // without a brightness control (null).
+        visible: !!panel.current?.enabled && value !== null
+        opacity: value === undefined ? 0 : 1
+        enabled: value !== undefined
         spacing: 10
 
         StyledSlider {
@@ -170,7 +176,7 @@ GridLayout {
         StyledText {
             Layout.preferredWidth: 40
             text: `${brightnessSlider.value ?? 0}%`
-            color: Theme.subtext0
+            color: Theme.subtext
         }
     }
 
@@ -204,16 +210,16 @@ GridLayout {
                     Rectangle {
                         anchors.fill: parent
                         radius: Theme.smallRadius
-                        color: wsChip.mine ? Theme.highlight : (wsChip.containsMouse ? Theme.hoverBg : Theme.cardBg)
+                        color: wsChip.mine ? Theme.accent : (wsChip.containsMouse ? Theme.hoverBg : Theme.cardBg)
                         // assigned to another monitor
-                        border.color: !wsChip.mine && wsChip.owner !== "" ? Theme.surface2 : "transparent"
+                        border.color: !wsChip.mine && wsChip.owner !== "" ? Theme.muted : "transparent"
                         border.width: Theme.borderWidth
                     }
 
                     StyledText {
                         anchors.centerIn: parent
                         text: wsChip.ws
-                        color: wsChip.mine ? Theme.base : (wsChip.owner !== "" ? Theme.overlay0 : Theme.subtext0)
+                        color: wsChip.mine ? Theme.background : (wsChip.owner !== "" ? Theme.faintText : Theme.subtext)
                         font.weight: wsChip.mine ? Font.Bold : Font.Normal
                     }
                 }
@@ -227,7 +233,7 @@ GridLayout {
 
         StyledText {
             text: "Click to assign or unassign. Outlined: on another monitor."
-            color: Theme.overlay1
+            color: Theme.dimText
             font.pixelSize: Theme.fontSize - 2
         }
     }

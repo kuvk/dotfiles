@@ -27,7 +27,7 @@ Item {
         radius: width / 2
         height: Math.max(24, root.flick.visibleArea.heightRatio * root.height)
         y: Math.min(root.height - height, root.flick.visibleArea.yPosition * root.height)
-        color: Theme.overlay1
+        color: Theme.dimText
         opacity: root.active ? 0.8 : 0.3
 
         Behavior on opacity {

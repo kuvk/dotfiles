@@ -32,7 +32,7 @@ screen even in SDR, and some screens (the Samsung Odyssey G50F) reconnect on it.
 Color depth: 10-bit by default where the screen takes it (its EDID: the color depth, or an
 HDMI screen's deep color flags), else 8.
 
-Text size is in px (9-20, default 13), like Omarchy's display text size: it
+Text size is in px (9-20, default 12), like Omarchy's display text size: it
 sets the shell font, GTK's font size (hyprdori-theme-set --text-size) and kitty's
 font size.
 """
@@ -69,9 +69,11 @@ PROFILE_VERSION = 2
 VRR_MODES = (0, 1, 2, 3)  # off, always, fullscreen, games and video
 COLOR_MODES = ("srgb", "edid")
 
-TEXT_SIZE_DEFAULT = 13  # px, for a setup with no saved size
-TEXT_SIZE_BASE = 13  # px that GTK's scaling factor 1 and kitty.conf's font size correspond to
-KITTY_FONT_DEFAULT = 11  # pt in kitty.conf, matching 13 px
+# Text size anchors, as Omarchy's: 12 px is the shell's body text, a 9 pt kitty font and an
+# 11 pt GTK font
+TEXT_SIZE_DEFAULT = 12  # px, for a setup with no saved size
+TEXT_SIZE_BASE = 12
+KITTY_FONT_DEFAULT = 9  # pt at 12 px
 KITTY_TEXT_SIZE_FILE = HOME / ".config/kitty/text-size.conf"
 
 # Descriptions shared by several connected monitors (same model, no serial);
@@ -400,7 +402,7 @@ def profile_text_size(profile: dict) -> int:
 
 
 def apply_text_size(size: int) -> None:
-    """GTK and kitty font sizes for a text size in px (13 = default). hyprdori-theme-set reads
+    """GTK and kitty font sizes for a text size in px (12 = default). hyprdori-theme-set reads
     the size from monitors.json and sets GTK's font in points."""
     if THEME_SET.exists():
         run([str(THEME_SET), "--text-size"])

@@ -85,7 +85,7 @@ PanelWindow {
 
             Icon {
                 text: Distro.logo
-                color: launcherButton.containsMouse || (Panels.appMenu && Panels.overlayScreen === barWindow.screen) ? Theme.accent2 : Theme.accent
+                color: Hues.launcher
                 font.pixelSize: Theme.iconSize
             }
         }
@@ -115,7 +115,7 @@ PanelWindow {
 
         StyledText {
             text: Qt.formatDateTime(Time.date, Config.clockFormat)
-            color: Theme.text
+            color: Theme.foreground
             font.weight: Font.DemiBold
         }
     }
@@ -129,7 +129,7 @@ PanelWindow {
 
         StyledText {
             text: Hypr.layout
-            color: Theme.text
+            color: Theme.foreground
             font.weight: Font.DemiBold
         }
     }
@@ -146,12 +146,12 @@ PanelWindow {
 
         Icon {
             text: Weather.icon
-            color: Theme.yellow
+            color: Hues.weather
         }
 
         StyledText {
             text: `${Weather.temp}°`
-            color: Theme.subtext1
+            color: Theme.subtext
         }
     }
 
@@ -188,7 +188,7 @@ PanelWindow {
 
             Icon {
                 text: Icons.coffee
-                color: System.stayAwake ? Theme.peach : Theme.overlay1
+                color: Hues.stayAwake
             }
         }
 
@@ -200,7 +200,7 @@ PanelWindow {
 
             Icon {
                 text: Icons.rocket
-                color: System.mode === "game" ? Theme.accent3 : System.mode === "work" ? Theme.mauve : Theme.overlay1
+                color: Hues.mode
             }
         }
 
@@ -215,7 +215,7 @@ PanelWindow {
 
             Icon {
                 text: Audio.icon
-                color: Audio.color
+                color: Hues.audio
             }
         }
 
@@ -229,7 +229,7 @@ PanelWindow {
 
             Icon {
                 text: !Bluetooth.enabled ? Icons.bluetoothOff : (Bluetooth.connected.length > 0 ? Icons.bluetoothConnected : Icons.bluetooth)
-                color: !Bluetooth.enabled ? Theme.overlay1 : (Bluetooth.connected.length > 0 ? Theme.blue : Theme.sky)
+                color: Hues.bluetooth
             }
         }
 
@@ -244,7 +244,7 @@ PanelWindow {
             Icon {
                 text: Network.icon
                 // disabled color when Wi-Fi is off, like Bluetooth
-                color: Network.type !== "none" ? Theme.blue : (Network.wifiEnabled ? Theme.mauve : Theme.overlay1)
+                color: Hues.network
             }
         }
 
@@ -258,7 +258,7 @@ PanelWindow {
 
             Icon {
                 text: Battery.icon
-                color: Battery.color
+                color: Hues.battery
             }
         }
 
@@ -270,7 +270,7 @@ PanelWindow {
 
             Icon {
                 text: Icons.display
-                color: Theme.teal
+                color: Hues.system
             }
         }
 
@@ -282,7 +282,7 @@ PanelWindow {
 
             Icon {
                 text: Icons.sliders
-                color: Notifs.dnd ? Theme.mauve : Theme.blue
+                color: Hues.notifications
 
                 // Unread notifications
                 Rectangle {
@@ -307,7 +307,7 @@ PanelWindow {
 
             Icon {
                 text: Icons.power
-                color: Theme.red
+                color: Hues.power
             }
         }
     }

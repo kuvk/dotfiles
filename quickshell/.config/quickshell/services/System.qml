@@ -139,9 +139,9 @@ Singleton {
     // menu shortcut, `color` a Theme color name.
     readonly property var sessionActions: [
         { id: "lock", label: "Lock", icon: Icons.lock, key: "l", color: "green" },
-        { id: "suspend", label: "Sleep", icon: Icons.bed, key: "u", color: "peach" },
-        { id: "logout", label: "Log out", icon: Icons.signOut, key: "e", color: "teal" },
-        { id: "reboot", label: "Reboot", icon: Icons.reboot, key: "r", color: "mauve" },
+        { id: "suspend", label: "Sleep", icon: Icons.bed, key: "u", color: "orange" },
+        { id: "logout", label: "Log out", icon: Icons.signOut, key: "e", color: "cyan" },
+        { id: "reboot", label: "Reboot", icon: Icons.reboot, key: "r", color: "magenta" },
         { id: "shutdown", label: "Shut down", icon: Icons.power, key: "s", color: "red" }
     ]
 

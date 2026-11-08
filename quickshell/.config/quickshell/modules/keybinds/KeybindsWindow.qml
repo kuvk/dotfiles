@@ -283,7 +283,7 @@ FloatingWindow {
                 implicitHeight: 34
                 radius: Theme.smallRadius
                 color: Theme.cardBg
-                border.color: root.query !== "" ? Theme.highlight : "transparent"
+                border.color: root.query !== "" ? Theme.accent : "transparent"
                 border.width: Theme.borderWidth
 
                 Row {
@@ -295,13 +295,13 @@ FloatingWindow {
                     Icon {
                         anchors.verticalCenter: parent.verticalCenter
                         text: Icons.search
-                        color: root.query !== "" ? Theme.highlight : Theme.overlay1
+                        color: root.query !== "" ? Theme.accent : Theme.dimText
                     }
 
                     StyledText {
                         anchors.verticalCenter: parent.verticalCenter
                         text: root.query !== "" ? root.query : "Type to filter"
-                        color: root.query !== "" ? Theme.text : Theme.overlay1
+                        color: root.query !== "" ? Theme.foreground : Theme.dimText
                     }
                 }
             }
@@ -355,7 +355,7 @@ FloatingWindow {
 
                                     StyledText {
                                         text: section.modelData.section
-                                        color: Theme.highlight
+                                        color: Theme.accent
                                         font.weight: Font.Bold
                                     }
 
@@ -385,7 +385,7 @@ FloatingWindow {
                                                         height: 22
                                                         radius: Theme.smallRadius
                                                         color: Theme.cardBg
-                                                        border.color: Theme.alpha(Theme.overlay0, 0.6)
+                                                        border.color: Theme.alpha(Theme.faintText, 0.6)
                                                         border.width: 1
 
                                                         StyledText {
@@ -393,7 +393,7 @@ FloatingWindow {
 
                                                             anchors.centerIn: parent
                                                             text: parent.modelData
-                                                            color: Theme.text
+                                                            color: Theme.foreground
                                                             font.pixelSize: Theme.fontSize - 1
                                                             font.weight: Font.DemiBold
                                                         }
@@ -408,7 +408,7 @@ FloatingWindow {
                                                 width: parent.width - x
                                                 anchors.verticalCenter: caps.verticalCenter
                                                 text: bind.modelData.desc
-                                                color: Theme.subtext1
+                                                color: Theme.subtext
                                                 elide: Text.ElideRight
                                             }
                                         }

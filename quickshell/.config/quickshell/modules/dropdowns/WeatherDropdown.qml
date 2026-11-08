@@ -15,7 +15,7 @@ Dropdown {
 
     Hero {
         icon: Weather.ready ? Weather.icon : Icons.weatherSunny
-        iconColor: Weather.ready ? Theme.yellow : Theme.overlay1
+        iconColor: Hues.weather
         title: Weather.ready ? `${Weather.temp}${Weather.unit}` : "Weather"
         status: Weather.ready ? Weather.description.toUpperCase() : "WEATHER UNAVAILABLE"
     }

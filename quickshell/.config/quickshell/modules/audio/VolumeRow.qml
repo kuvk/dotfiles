@@ -18,7 +18,7 @@ RowLayout {
 
     IconButton {
         icon: root.icon
-        color: root.node?.audio?.muted ? Theme.overlay1 : Theme.highlight
+        color: root.node?.audio?.muted ? Theme.dimText : Theme.accent
         onClicked: Audio.toggleMute(root.node)
     }
 
@@ -26,7 +26,7 @@ RowLayout {
         Layout.fillWidth: true
         value: root.node?.audio?.volume ?? 0
         to: 1.2
-        color: root.node?.audio?.muted ? Theme.overlay0 : Theme.highlight
+        color: root.node?.audio?.muted ? Theme.faintText : Theme.accent
         onMoved: v => Audio.setVolume(root.node, v)
     }
 }

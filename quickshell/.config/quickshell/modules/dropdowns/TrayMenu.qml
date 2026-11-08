@@ -56,7 +56,7 @@ Dropdown {
                         anchors.centerIn: parent
                         width: parent.width - 8
                         height: 1
-                        color: Theme.surface1
+                        color: Theme.selection
                     }
                 }
             }
@@ -98,7 +98,7 @@ Dropdown {
                             Layout.preferredWidth: 14
                             visible: entry.modelData.buttonType !== QsMenuButtonType.None
                             text: entry.modelData.checkState === Qt.Checked ? Icons.check : ""
-                            color: Theme.highlight
+                            color: Theme.accent
                             font.pixelSize: 11
                         }
 
@@ -117,7 +117,7 @@ Dropdown {
                         Icon {
                             visible: entry.modelData.hasChildren
                             text: Icons.chevronRight
-                            color: Theme.overlay1
+                            color: Theme.dimText
                             font.pixelSize: 10
                         }
                     }

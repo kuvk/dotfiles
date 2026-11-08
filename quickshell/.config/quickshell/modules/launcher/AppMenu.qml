@@ -105,7 +105,7 @@ PanelWindow {
                 Rectangle {
                     Layout.fillHeight: true
                     implicitWidth: 190
-                    color: Theme.alpha(Theme.mantle, 0.6)
+                    color: Theme.alpha(Theme.darkBackground, 0.6)
                     topLeftRadius: Theme.radius
                     bottomLeftRadius: Theme.radius
 
@@ -153,7 +153,7 @@ PanelWindow {
                             Rectangle {
                                 anchors.fill: parent
                                 radius: Theme.smallRadius
-                                color: groupEntry.current ? Theme.alpha(Theme.highlight, 0.2) : groupEntry.containsMouse ? Theme.hoverBg : "transparent"
+                                color: groupEntry.current ? Theme.selectedFill : groupEntry.containsMouse ? Theme.hoverBg : "transparent"
                             }
 
                             RowLayout {
@@ -165,13 +165,13 @@ PanelWindow {
                                 Icon {
                                     Layout.preferredWidth: 18
                                     text: groupEntry.modelData.icon
-                                    color: groupEntry.current ? Theme.highlight : Theme.subtext0
+                                    color: groupEntry.current ? Theme.accent : Theme.subtext
                                 }
 
                                 StyledText {
                                     Layout.fillWidth: true
                                     text: groupEntry.modelData.label
-                                    color: groupEntry.current ? Theme.highlight : Theme.text
+                                    color: groupEntry.current ? Theme.accent : Theme.foreground
                                     font.weight: groupEntry.current ? Font.DemiBold : Font.Normal
                                     elide: Text.ElideRight
                                 }
@@ -202,7 +202,7 @@ PanelWindow {
                         Layout.fillWidth: true
                         implicitHeight: 38
                         radius: Theme.smallRadius
-                        color: Theme.alpha(Theme.surface0, 0.8)
+                        color: Theme.alpha(Theme.lighterBackground, 0.8)
 
                         RowLayout {
                             anchors.fill: parent
@@ -212,14 +212,14 @@ PanelWindow {
 
                             Icon {
                                 text: Icons.search
-                                color: Theme.accent2
+                                color: Theme.accent
                             }
 
                             TextInput {
                                 id: filter
 
                                 Layout.fillWidth: true
-                                color: Theme.text
+                                color: Theme.foreground
                                 font.family: Theme.font
                                 font.pixelSize: Theme.fontSize + 1
                                 clip: true
@@ -253,7 +253,7 @@ PanelWindow {
                                     verticalAlignment: Text.AlignVCenter
                                     visible: filter.text === ""
                                     text: `Filter ${Apps.menuGroups.find(g => g.id === root.group)?.label ?? ""}…`
-                                    color: Theme.surface2
+                                    color: Theme.muted
                                 }
                             }
                         }
@@ -272,7 +272,7 @@ PanelWindow {
 
                         highlight: Rectangle {
                             radius: Theme.smallRadius
-                            color: Theme.alpha(Theme.surface0, 0.8)
+                            color: Theme.alpha(Theme.lighterBackground, 0.8)
                         }
 
                         delegate: MouseArea {
@@ -306,7 +306,7 @@ PanelWindow {
                                     StyledText {
                                         Layout.fillWidth: true
                                         text: entry.modelData.name
-                                        color: entry.ListView.isCurrentItem ? Theme.highlight : Theme.text
+                                        color: entry.ListView.isCurrentItem ? Theme.accent : Theme.foreground
                                         elide: Text.ElideRight
                                     }
 
@@ -314,7 +314,7 @@ PanelWindow {
                                         Layout.fillWidth: true
                                         visible: text !== ""
                                         text: entry.modelData.genericName || entry.modelData.comment || ""
-                                        color: Theme.overlay1
+                                        color: Theme.dimText
                                         font.pixelSize: Theme.fontSize - 2
                                         elide: Text.ElideRight
                                     }
@@ -331,7 +331,7 @@ PanelWindow {
                             anchors.centerIn: parent
                             visible: root.results.length === 0
                             text: "No apps"
-                            color: Theme.overlay1
+                            color: Theme.dimText
                         }
                     }
                 }

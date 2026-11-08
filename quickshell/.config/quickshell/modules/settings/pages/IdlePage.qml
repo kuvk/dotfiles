@@ -17,7 +17,7 @@ ColumnLayout {
     StyledText {
         Layout.fillWidth: true
         text: "Minutes without input. Stay Awake and playing media hold both off."
-        color: Theme.subtext0
+        color: Theme.subtext
         wrapMode: Text.Wrap
     }
 

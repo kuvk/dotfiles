@@ -37,7 +37,7 @@ ColumnLayout {
 
                 anchors.centerIn: parent
                 text: `${Icons.clearAll}  Clear`
-                color: clearButton.containsMouse ? Theme.accent2 : Theme.subtext0
+                color: clearButton.containsMouse ? Theme.accent : Theme.subtext
             }
         }
     }
@@ -99,7 +99,7 @@ ColumnLayout {
                     Icon {
                         visible: text !== ""
                         text: Notifs.appGlyphs[group.modelData.app] ?? ""
-                        color: Theme.highlight
+                        color: Theme.accent
                     }
 
                     IconImage {
@@ -111,13 +111,13 @@ ColumnLayout {
                     StyledText {
                         Layout.fillWidth: true
                         text: group.modelData.app
-                        color: Theme.highlight
+                        color: Theme.accent
                         font.weight: Font.DemiBold
                     }
 
                     StyledText {
                         text: group.modelData.list.length
-                        color: Theme.overlay1
+                        color: Theme.dimText
                         font.pixelSize: Theme.fontSize - 1
                     }
 
@@ -126,14 +126,14 @@ ColumnLayout {
                         size: 24
                         visible: group.modelData.list.length > 1
                         icon: group.stacked ? Icons.chevronDown : Icons.chevronUp
-                        color: Theme.overlay1
+                        color: Theme.dimText
                         onClicked: group.toggleStack()
                     }
 
                     IconButton {
                         size: 24
                         icon: Icons.trash
-                        color: Theme.overlay1
+                        color: Theme.dimText
                         onClicked: Notifs.clearGroup(group.modelData.app)
                     }
                 }
@@ -242,7 +242,7 @@ ColumnLayout {
                     Layout.alignment: Qt.AlignHCenter
                     visible: !group.stacked && group.modelData.list.length > 3
                     text: group.open ? "Show less" : `Show ${group.modelData.list.length - 3} more`
-                    color: Theme.subtext0
+                    color: Theme.subtext
                     font.pixelSize: Theme.fontSize - 1
 
                     MouseArea {
@@ -262,7 +262,7 @@ ColumnLayout {
             anchors.centerIn: parent
             visible: notifList.count === 0
             text: `${Icons.bell}  No notifications`
-            color: Theme.overlay1
+            color: Theme.dimText
         }
     }
 }

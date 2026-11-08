@@ -9,10 +9,10 @@ RowLayout {
     id: hero
 
     property string icon
-    property color iconColor: Theme.highlight
+    property color iconColor: Theme.accent
     property string title
     property string status
-    property color statusColor: Theme.subtext0
+    property color statusColor: Theme.subtext
     // for a dropdown that animates its status line (the network's phrases)
     readonly property alias statusItem: statusLabel
     default property alias controls: controlsRow.data

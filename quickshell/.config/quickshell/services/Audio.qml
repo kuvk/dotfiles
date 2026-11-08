@@ -36,16 +36,6 @@ Singleton {
         return Icons.volumeHigh;
     }
 
-    // Bar icon color: muted disabled (like Bluetooth off), quiet mauve, medium blue, loud green
-    readonly property color color: {
-        if (muted)
-            return Theme.overlay1;
-        if (volume <= 0.3)
-            return Theme.mauve;
-        if (volume <= 0.6)
-            return Theme.blue;
-        return Theme.green;
-    }
 
     function setVolume(node: PwNode, value: real): void {
         if (!node?.ready || !node.audio)
