@@ -60,39 +60,21 @@ PanelWindow {
                 color: Osd.entry.dim ? Theme.overlay1 : Theme.accent
             }
 
-            // a level: the bar
-            Rectangle {
+            // a level: one bar, or one per step (the keyboard light) with an equal gap between
+            RowLayout {
                 Layout.fillWidth: true
                 visible: Osd.entry.level >= 0
-                implicitHeight: 6
-                radius: height / 2
-                color: Theme.surface1
+                spacing: 6
 
-                Rectangle {
-                    width: parent.width * Math.max(0, Osd.entry.level)
-                    height: parent.height
-                    radius: parent.radius
-                    color: Osd.entry.dim ? Theme.overlay1 : Theme.accent
-
-                    Behavior on width {
-                        NumberAnimation {
-                            duration: Theme.animDuration
-                            easing.type: Easing.OutCubic
-                        }
-                    }
-                }
-
-                // a level in steps (the keyboard light): a 2 px line between the parts
                 Repeater {
-                    model: Osd.entry.steps > 1 ? Osd.entry.steps - 1 : 0
+                    model: Osd.entry.steps > 1 ? Osd.entry.steps : 1
 
-                    Rectangle {
+                    OsdBar {
                         required property int index
 
-                        x: Math.round(parent.width * (index + 1) / Osd.entry.steps - width / 2)
-                        width: 2
-                        height: parent.height
-                        color: Theme.panelBg
+                        Layout.fillWidth: true
+                        // this bar's share of the level
+                        fill: Osd.entry.steps > 1 ? Math.max(0, Math.min(1, Osd.entry.level * Osd.entry.steps - index)) : Math.max(0, Osd.entry.level)
                     }
                 }
             }
