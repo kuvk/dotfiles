@@ -82,15 +82,15 @@ PanelWindow {
                     }
                 }
 
-                // a level in steps (the keyboard light): a 1 px line between the parts
+                // a level in steps (the keyboard light): a 2 px line between the parts
                 Repeater {
                     model: Osd.entry.steps > 1 ? Osd.entry.steps - 1 : 0
 
                     Rectangle {
                         required property int index
 
-                        x: Math.round(parent.width * (index + 1) / Osd.entry.steps)
-                        width: 1
+                        x: Math.round(parent.width * (index + 1) / Osd.entry.steps - width / 2)
+                        width: 2
                         height: parent.height
                         color: Theme.panelBg
                     }
