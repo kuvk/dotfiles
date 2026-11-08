@@ -54,6 +54,9 @@ Singleton {
                 })
         })
 
+    // Every label a state can show above, so all states get the width of the widest
+    readonly property var labels: ["Muted", "Sound on", "Microphone off", "Microphone on", ...Battery.powerModes.map(m => m.label)]
+
     // What's on screen: { icon, level (-1: none), steps (0: one bar), label, dim }
     property var entry: ({ icon: "", level: -1, steps: 0, label: "", dim: false })
     property bool shown: false

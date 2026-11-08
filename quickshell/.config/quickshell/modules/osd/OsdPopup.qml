@@ -19,8 +19,16 @@ PanelWindow {
     // 10% of the screen's height above its bottom edge
     margins.bottom: Math.round((screen?.height ?? 1080) * 0.1)
     exclusionMode: ExclusionMode.Ignore
-    // the same for every OSD; a state's icon and name centered in it
-    implicitWidth: 320
+    // A level: room for the bar. A state: as wide as the widest state (Osd.labels) at the
+    // current text size, so they all match; its icon and name centered.
+    implicitWidth: Osd.entry.level >= 0 ? 320 : stateWidth
+    readonly property int stateWidth: {
+        // advanceWidth() alone doesn't update when the font changes
+        labelMetrics.font;
+        const widest = Math.max(...Osd.labels.map(l => labelMetrics.advanceWidth(l)));
+        return Math.ceil(iconWidth + row.spacing + widest) + 2 * padding;
+    }
+    readonly property int iconWidth: 20
     implicitHeight: 52
     mask: Region {}
     WlrLayershell.namespace: "quickshell-osd"
@@ -29,6 +37,13 @@ PanelWindow {
 
     // space between the edge and the content
     readonly property int padding: 16
+
+    FontMetrics {
+        id: labelMetrics
+
+        font.family: Theme.font
+        font.pixelSize: Theme.fontSize
+    }
 
     Reveal {
         id: reveal
@@ -55,7 +70,7 @@ PanelWindow {
             spacing: 12
 
             Icon {
-                Layout.preferredWidth: 20
+                Layout.preferredWidth: root.iconWidth
                 text: Osd.entry.icon
                 color: Osd.entry.dim ? Theme.overlay1 : Theme.accent
             }
