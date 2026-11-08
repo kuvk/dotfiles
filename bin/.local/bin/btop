@@ -1,0 +1,30 @@
+#!/bin/sh
+# btop without the NVIDIA card while it sleeps (hybrid laptops): btop's NVIDIA support (NVML)
+# wakes the card, and it stays on as long as btop runs. With the card asleep, btop runs on a
+# copy of its config without nvidia in shown_gpus; settings changed in that session are
+# copied back afterwards, shown_gpus as it was. With the card awake (in use, or on AC with
+# nvidia-hybrid) it runs as usual. Reading runtime_status doesn't wake the card.
+real=/usr/bin/btop
+conf="${XDG_CONFIG_HOME:-$HOME/.config}/btop/btop.conf"
+
+asleep=false
+for dev in /sys/bus/pci/devices/*; do
+    [ "$(cat "$dev/vendor" 2>/dev/null)" = 0x10de ] || continue
+    case "$(cat "$dev/class" 2>/dev/null)" in
+        0x0300* | 0x0302*) [ "$(cat "$dev/power/runtime_status" 2>/dev/null)" = suspended ] && asleep=true ;;
+    esac
+done
+
+if ! $asleep || ! grep -q '^shown_gpus = ".*nvidia' "$conf" 2>/dev/null; then
+    exec "$real" "$@"
+fi
+
+copy="${XDG_RUNTIME_DIR:-/tmp}/btop-without-nvidia.conf"
+shown=$(grep '^shown_gpus = ' "$conf")
+sed -E '/^shown_gpus = /{s/nvidia ?//; s/ +"$/"/}' "$conf" >"$copy"
+"$real" -c "$copy" "$@"
+status=$?
+# back into the real config (written through its link into the dotfiles)
+sed "s|^shown_gpus = .*|$shown|" "$copy" >"$copy.new" && cat "$copy.new" >"$conf"
+rm -f "$copy" "$copy.new"
+exit $status

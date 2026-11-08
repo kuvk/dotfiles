@@ -48,6 +48,14 @@ hl.env("XDG_SESSION_TYPE", "wayland")
 hl.env("XDG_SESSION_DESKTOP", "Hyprland")
 hl.env("CLUTTER_BACKEND", "wayland")
 
+-- ~/.local/bin first, for apps started from the shell and keybindings too (the dotfiles'
+-- bin/ wrappers, like btop's); once, though the config runs again on every reload
+local local_bin = os.getenv("HOME") .. "/.local/bin"
+local path = os.getenv("PATH") or "/usr/local/bin:/usr/bin"
+if not (":" .. path .. ":"):find(":" .. local_bin .. ":", 1, true) then
+  hl.env("PATH", local_bin .. ":" .. path)
+end
+
 hl.env("XDG_CONFIG_HOME", os.getenv("HOME") .. "/.config")
 hl.env("XDG_CACHE_HOME", os.getenv("HOME") .. "/.cache")
 hl.env("XDG_DATA_HOME", os.getenv("HOME") .. "/.local/share")
