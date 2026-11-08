@@ -16,14 +16,19 @@ PanelWindow {
     visible: reveal.value > 0
     color: "transparent"
     anchors.bottom: true
-    margins.bottom: 80
+    // 10% of the screen's height above its bottom edge
+    margins.bottom: Math.round((screen?.height ?? 1080) * 0.1)
     exclusionMode: ExclusionMode.Ignore
-    implicitWidth: 320
+    // a level: a fixed width for the bar; a state: as wide as its icon and name
+    implicitWidth: Osd.entry.level >= 0 ? 320 : row.implicitWidth + 2 * padding
     implicitHeight: 52
     mask: Region {}
     WlrLayershell.namespace: "quickshell-osd"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+
+    // space between the edge and the content
+    readonly property int padding: 16
 
     Reveal {
         id: reveal
@@ -42,9 +47,11 @@ PanelWindow {
         border.width: Theme.borderWidth
 
         RowLayout {
+            id: row
+
             anchors.fill: parent
-            anchors.leftMargin: 16
-            anchors.rightMargin: 16
+            anchors.leftMargin: root.padding
+            anchors.rightMargin: root.padding
             spacing: 12
 
             Icon {
@@ -78,7 +85,6 @@ PanelWindow {
 
             // a state: its name
             StyledText {
-                Layout.fillWidth: true
                 visible: Osd.entry.level < 0
                 text: Osd.entry.label
                 elide: Text.ElideRight
