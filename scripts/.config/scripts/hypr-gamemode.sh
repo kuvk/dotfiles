@@ -26,14 +26,14 @@ KB_OPTIONS=$(sed -n 's/^ *kb_options = "\([^"]*\)".*/\1/p' "$INPUT" | head -n1)
 GAME_KB_LAYOUT="us"
 GAME_KB_OPTIONS="ctrl:nocaps"
 
-# Border colors follow the current theme
+# Border colors follow the current theme: active in the accent, inactive in overlay1
 accent="fab387"
-accent2="89b4fa"
+overlay1="7f849c"
 if [[ -f "$HOME/.config/theme/current/colors.sh" ]]; then
     # shellcheck source=/dev/null
     . "$HOME/.config/theme/current/colors.sh"
     accent="${accent#\#}"
-    accent2="${accent2#\#}"
+    overlay1="${overlay1#\#}"
 fi
 
 # notify TITLE [BODY]
@@ -69,7 +69,7 @@ hl.config({
         border_size = 2,
         col = {
             active_border = 'rgb($accent)',
-            inactive_border = 'rgba(${accent2}e6)',
+            inactive_border = 'rgba(${overlay1}ee)',
         },
     },
 })
@@ -89,7 +89,7 @@ hl.config({
         border_size = 2,
         col = {
             active_border = 'rgb($accent)',
-            inactive_border = 'rgba(${accent2}e6)',
+            inactive_border = 'rgba(${overlay1}ee)',
         },
     },
 })

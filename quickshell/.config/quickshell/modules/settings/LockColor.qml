@@ -16,12 +16,8 @@ ColumnLayout {
     Layout.fillWidth: true
     spacing: 4
 
-    StyledText {
-        text: lockColor.label
-    }
-
-    ColorChoice {
-        Layout.fillWidth: true
+    ColorDropdown {
+        label: lockColor.label
         value: Config[lockColor.key]
         onPicked: name => {
             Config[lockColor.key] = name;

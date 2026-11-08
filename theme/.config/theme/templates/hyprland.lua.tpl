@@ -3,9 +3,9 @@ return {
   name = "{{ theme }}",
   cursor_theme = "{{ cursor_theme }}",
   cursor_size = "{{ cursor_size }}",
-  -- The same in every mode: the active window's border in full color, the others see-through
+  -- The same in every mode: the active window's border in the accent, the others in overlay1
   active_border = "rgb({{ accent.hex }})",
-  inactive_border = "rgba({{ accent2.hex }}ee)",
+  inactive_border = "rgba({{ overlay1.hex }}ee)",
   -- Quickshell's Settings for normal mode (Appearance, Windows); Work-Game has its own look
   -- (hypr-gamemode.sh). The shell also applies changes at once (services/Hypr.qml).
   gaps_in = {{ hypr_gaps_in }},
