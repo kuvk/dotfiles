@@ -1,0 +1,173 @@
+import QtQuick
+import QtQuick.Layouts
+import Quickshell
+import Quickshell.Io
+import qs.config
+import qs.components
+import qs.services
+
+// Settings > Bar
+ColumnLayout {
+    // the Settings window: its helpers (clamp, cycle, minutesText, ...) and shared state
+    required property var settings
+
+    Layout.fillWidth: true
+    spacing: 12
+
+    SettingRow {
+        label: "Floating bar"
+        hint: "Off: full width, square"
+
+        Switch {
+            checked: Config.barFloating
+            onToggled: Config.barFloating = !Config.barFloating
+        }
+    }
+
+    SettingRow {
+        visible: Config.barFloating
+        label: "Bar margin"
+        hint: "Space around the floating bar"
+
+        Stepper {
+            text: `${Config.barMargin} px`
+            onStep: d => Config.barMargin = settings.clamp(Config.barMargin + d * 2, 0, 40)
+        }
+    }
+
+    SettingRow {
+        label: "Clock"
+
+        Stepper {
+            text: Qt.formatDateTime(Time.date, Config.clockFormat)
+            onStep: d => Config.clockFormat = settings.cycle(settings.clockFormats, Config.clockFormat, d)
+        }
+    }
+
+    SettingRow {
+        label: "Weather location"
+        hint: "Empty: detect from IP"
+
+        Rectangle {
+            implicitWidth: 220
+            implicitHeight: 34
+            radius: Theme.smallRadius
+            color: Theme.cardBg
+            border.color: location.activeFocus ? Theme.highlight : "transparent"
+            border.width: Theme.borderWidth
+
+            TextInput {
+                id: location
+
+                anchors.fill: parent
+                anchors.leftMargin: 10
+                anchors.rightMargin: 10
+                verticalAlignment: TextInput.AlignVCenter
+                color: Theme.text
+                font.family: Theme.font
+                font.pixelSize: Theme.fontSize
+                clip: true
+                text: Config.weatherLocation
+                onEditingFinished: Config.weatherLocation = text.trim()
+
+                StyledText {
+                    anchors.fill: parent
+                    visible: location.text === "" && !location.activeFocus
+                    text: "Automatic"
+                    color: Theme.overlay1
+                }
+            }
+        }
+    }
+
+    SettingRow {
+        label: "Temperature unit"
+
+        TextButton {
+            text: Config.weatherFahrenheit ? "°F" : "°C"
+            onClicked: Config.weatherFahrenheit = !Config.weatherFahrenheit
+        }
+    }
+
+    // Modules per bar: the primary monitor's and the others'
+    StyledText {
+        Layout.topMargin: 8
+        Layout.fillWidth: true
+        text: "Modules for each bar, in their order on it."
+        color: Theme.overlay1
+        wrapMode: Text.Wrap
+    }
+
+    GridLayout {
+        Layout.fillWidth: true
+        columns: 3
+        columnSpacing: 16
+        rowSpacing: 8
+
+        StyledText {
+            Layout.fillWidth: true
+            text: "Module"
+            color: Theme.subtext0
+            font.weight: Font.DemiBold
+        }
+
+        StyledText {
+            Layout.alignment: Qt.AlignHCenter
+            text: "Primary"
+            color: Theme.subtext0
+            font.weight: Font.DemiBold
+        }
+
+        StyledText {
+            Layout.alignment: Qt.AlignHCenter
+            text: "Others"
+            color: Theme.subtext0
+            font.weight: Font.DemiBold
+        }
+
+        Repeater {
+            model: Config.barModules
+
+            StyledText {
+                required property var modelData
+                required property int index
+
+                Layout.row: index + 1
+                Layout.column: 0
+                Layout.fillWidth: true
+                text: modelData.label
+                color: Theme.text
+            }
+        }
+
+        Repeater {
+            model: Config.barModules
+
+            Switch {
+                required property var modelData
+                required property int index
+
+                Layout.row: index + 1
+                Layout.column: 1
+                Layout.alignment: Qt.AlignHCenter
+                checked: Config.barShows(true, modelData.id)
+                onToggled: Config.setBarModule(true, modelData.id, !checked)
+            }
+        }
+
+        Repeater {
+            model: Config.barModules
+
+            Switch {
+                required property var modelData
+                required property int index
+
+                Layout.row: index + 1
+                Layout.column: 2
+                Layout.alignment: Qt.AlignHCenter
+                checked: Config.barShows(false, modelData.id)
+                onToggled: Config.setBarModule(false, modelData.id, !checked)
+            }
+        }
+    }
+}
