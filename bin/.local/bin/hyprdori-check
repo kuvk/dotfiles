@@ -29,6 +29,41 @@ for file in "${tracked[@]}"; do
     esac
 done
 
+# Every theme renders every template (in memory; nothing is written)
+while IFS= read -r line; do
+    fail "theme: $line"
+done < <(python3 - "$hyprdori" <<'PY'
+import importlib.machinery, importlib.util, sys
+from pathlib import Path
+root = Path(sys.argv[1])
+loader = importlib.machinery.SourceFileLoader("theme_set", str(root / "bin/.local/bin/hyprdori-theme-set"))
+spec = importlib.util.spec_from_loader("theme_set", loader)
+ts = importlib.util.module_from_spec(spec)
+loader.exec_module(ts)
+ts.THEMES_DIR = root / "theme/.config/theme/themes"
+templates = sorted((root / "theme/.config/theme/templates").glob("*.tpl"))
+templates.append(root / "fastfetch/.config/fastfetch/base.jsonc")
+names = sorted(p.parent.name for p in ts.THEMES_DIR.glob("*/colors.toml"))
+if not names:
+    print("no themes")
+for name in names:
+    try:
+        theme = ts.load_theme(name)
+    except Exception as e:
+        print(f"{name}: {e}")
+        continue
+    for tpl in templates:
+        try:
+            out = ts.render(tpl.read_text(), theme, tpl.name)
+        except Exception as e:
+            print(f"{name}: {e}")
+            continue
+        left = ts.PLACEHOLDER_RE.search(out)
+        if left:
+            print(f"{name}: {tpl.name}: unfilled {left.group(0)}")
+PY
+)
+
 # Old names: the project is hyprdori (github.com/kuvk/... is the account and stays)
 while IFS= read -r line; do
     fail "old name: $line"

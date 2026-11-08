@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Installs Limine on the ESP and writes its menu: one entry per kernel in /efi/arch
 # (mkinitcpio's presets put kernels and images there), styled like the boot splash:
-# the fastfetch logo in accent2 above an "Arch Linux" tree of kernels in accent.
+# the fastfetch logo in magenta above an "Arch Linux" tree of kernels in accent.
 # Run it again after a Limine update, a new kernel, or to change colors.
 #
 #   sudo limine/install.sh             the current theme's colors, accents included
@@ -48,7 +48,7 @@ fi
 # The current theme's slots, or Catppuccin Mocha before hyprdori-theme-set has run
 base="#1e1e2e" surface1="#45475a" surface2="#585b70" text="#cdd6f4" subtext1="#bac2de"
 subtext0="#a6adc8" overlay1="#7f849c" red="#f38ba8" green="#a6e3a1" yellow="#f9e2af"
-blue="#89b4fa" pink="#f5c2e7" teal="#94e2d5" mauve="#cba6f7" accent="#fab387" accent2="#89b4fa"
+blue="#89b4fa" pink="#f5c2e7" teal="#94e2d5" mauve="#cba6f7" accent="#89b4fa" accent2="#89b4fa" magenta="#f5c2e7"
 colors="$home/.config/theme/current/colors.sh"
 if [[ -r $colors ]]; then
     # shellcheck source=/dev/null
@@ -107,7 +107,7 @@ wallpaper() {
     logo_text="$home/.config/theme/logo/ascii-dori"
     [[ -r $logo_text ]] || { echo "No logo at $logo_text" >&2; exit 1; }
     # drawn like kitty draws it, in 12px rows (24 on large screens), by Hyprdori's logo-render.py
-    "$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$accent2" --cell-height $((12 * scale)) --out "$build/logo.png"
+    "$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$magenta" --cell-height $((12 * scale)) --out "$build/logo.png"
     lw=$(magick identify -format %w "$build/logo.png"); lh=$(magick identify -format %h "$build/logo.png")
     top=$(((res_h / cell_h - ${#found[@]} - 1) / 2 * cell_h))
     # Limine's centering (menu.c): each line is its tree marks plus " name ", the widest

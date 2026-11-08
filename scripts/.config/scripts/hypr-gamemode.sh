@@ -26,15 +26,10 @@ KB_OPTIONS=$(sed -n 's/^ *kb_options = "\([^"]*\)".*/\1/p' "$INPUT" | head -n1)
 GAME_KB_LAYOUT="us"
 GAME_KB_OPTIONS="ctrl:nocaps"
 
-# Border colors follow the current theme: active in the accent, inactive in overlay1
-accent="fab387"
-overlay1="7f849c"
-if [[ -f "$HOME/.config/theme/current/colors.sh" ]]; then
-    # shellcheck source=/dev/null
-    . "$HOME/.config/theme/current/colors.sh"
-    accent="${accent#\#}"
-    overlay1="${overlay1#\#}"
-fi
+# Border colors follow the current theme (its generated theme.lua, as general.lua reads it)
+borders="package.loaded['configs.generated.theme'] = nil
+local ok, theme = pcall(require, 'configs.generated.theme')
+local borders = ok and { active_border = theme.active_border, inactive_border = theme.inactive_border } or nil"
 
 # notify TITLE [BODY]
 notify() {
@@ -55,7 +50,7 @@ current_mode() {
 
 style_on() {
     # every window opaque: there's no blur behind them
-    hyprctl eval "
+    hyprctl eval "$borders
 hl.config({
     animations = { enabled = false },
     decoration = {
@@ -67,10 +62,7 @@ hl.config({
     },
     general = {
         border_size = 2,
-        col = {
-            active_border = 'rgb($accent)',
-            inactive_border = 'rgba(${overlay1}ee)',
-        },
+        col = borders,
     },
 })
 " || true
@@ -80,17 +72,14 @@ hl.config({
 style_off() {
     # decoration.lua again (opacity, shadow, blur), so its values live in one place; the
     # shell then sets the corners and blur from Settings (services/Hypr.qml)
-    hyprctl eval "
+    hyprctl eval "$borders
 package.loaded['configs.decoration'] = nil
 require('configs.decoration')
 hl.config({
     animations = { enabled = true },
     general = {
         border_size = 2,
-        col = {
-            active_border = 'rgb($accent)',
-            inactive_border = 'rgba(${overlay1}ee)',
-        },
+        col = borders,
     },
 })
 " || true

@@ -3,7 +3,7 @@
 
 Recolors the SVGs in ~/.config/theme/icons/source/ (wlogout's icons) with the
 theme's palette and writes them to ~/.config/theme/icons/<theme>/. Quickshell
-uses the current theme's folder, or catppuccin-mocha's when a theme has none.
+uses the current theme's folder, or Catppuccin's when a theme has none.
 Run it after adding or changing a theme.
 
   theme-icons.py              all themes
@@ -15,6 +15,8 @@ from __future__ import annotations
 
 import re
 import sys
+import importlib.machinery
+import importlib.util
 import tomllib
 from pathlib import Path
 
@@ -26,9 +28,9 @@ SOURCE_DIR = ICONS_DIR / "source"
 # Same colors as the power menu borders (services/System.qml sessionActions)
 ICON_COLORS = {
     "lock": "green",
-    "suspend": "peach",
-    "logout": "teal",
-    "reboot": "mauve",
+    "suspend": "orange",
+    "logout": "cyan",
+    "reboot": "magenta",
     "shutdown": "red",
     "hibernate": "blue",
 }
@@ -39,15 +41,23 @@ def themes() -> list[str]:
     return sorted(p.parent.name for p in THEMES_DIR.glob("*/colors.toml"))
 
 
-def generate(name: str) -> None:
+def palette(name: str) -> dict:
+    """The theme's colors as hyprdori-theme-set works them out (Omarchy's names)."""
+    loader = importlib.machinery.SourceFileLoader("theme_set", str(Path.home() / ".local/bin/hyprdori-theme-set"))
+    module = importlib.util.module_from_spec(importlib.util.spec_from_loader("theme_set", loader))
+    loader.exec_module(module)
     with (THEMES_DIR / name / "colors.toml").open("rb") as f:
-        colors = tomllib.load(f).get("colors", {})
+        return module.palette(tomllib.load(f))[0]
+
+
+def generate(name: str) -> None:
+    colors = palette(name)
     out = ICONS_DIR / name
     out.mkdir(parents=True, exist_ok=True)
     for icon, slot in ICON_COLORS.items():
         color = colors.get(slot, "")
         if not HEX_RE.match(color):
-            raise ValueError(f"{name}: colors.{slot} must be a #rrggbb value")
+            raise ValueError(f"{name}: no {slot} color")
         svg = (SOURCE_DIR / f"{icon}.svg").read_text()
         # the paths have no fill of their own, so the root fill colors them
         svg = svg.replace("<svg ", f'<svg fill="{color.lower()}" ', 1)

@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+"""Copies Omarchy's themes into Hyprdori's theme folder, as they are: each theme's
+colors.toml, neovim.lua, icons.theme, keyboard.rgb and shell.lock.toml, and Omarchy's
+licence. Not their backgrounds (about 160 MB); Hyprdori draws each theme's own.
+Says which themes are new, changed or gone, and asks before copying.
+
+  hyprdori-theme-sync              from ~/.src/omarchy
+  hyprdori-theme-sync PATH         from an Omarchy checkout elsewhere
+  hyprdori-theme-sync --yes [PATH] without asking
+
+Themes are Omarchy's (https://github.com/basecamp/omarchy, MIT).
+"""
+
+import filecmp
+import shutil
+import sys
+from pathlib import Path
+
+FILES = ("colors.toml", "neovim.lua", "icons.theme", "keyboard.rgb", "shell.lock.toml")
+HYPRDORI = Path(__file__).resolve().parents[3]
+TARGET = HYPRDORI / "theme/.config/theme/themes"
+
+
+def theme_files(folder: Path) -> dict[str, Path]:
+    return {name: folder / name for name in FILES if (folder / name).is_file()}
+
+
+def differs(source: Path, target: Path) -> bool:
+    ours, theirs = theme_files(target), theme_files(source)
+    if ours.keys() != theirs.keys():
+        return True
+    return any(not filecmp.cmp(theirs[n], ours[n], shallow=False) for n in theirs)
+
+
+def main(argv: list[str]) -> int:
+    ask = "--yes" not in argv
+    args = [a for a in argv if a != "--yes"]
+    if args and args[0] in ("-h", "--help"):
+        print(__doc__.strip())
+        return 0
+    omarchy = Path(args[0]).expanduser() if args else Path.home() / ".src/omarchy"
+    themes = omarchy / "themes"
+    if not (themes / "catppuccin" / "colors.toml").is_file():
+        print(f"No Omarchy themes in {themes}", file=sys.stderr)
+        return 1
+
+    theirs = {p.parent.name: p.parent for p in themes.glob("*/colors.toml")}
+    ours = {p.parent.name: p.parent for p in TARGET.glob("*/colors.toml")}
+    new = sorted(theirs.keys() - ours.keys())
+    gone = sorted(ours.keys() - theirs.keys())
+    changed = sorted(n for n in theirs.keys() & ours.keys() if differs(theirs[n], ours[n]))
+    for label, names in (("New", new), ("Changed", changed), ("Not in Omarchy (removed)", gone)):
+        if names:
+            print(f"{label}: {', '.join(names)}")
+    if not (new or changed or gone):
+        print("Up to date with Omarchy.")
+        return 0
+    if ask and input("Copy? [y/N] ").strip().lower() != "y":
+        return 1
+
+    for name in gone:
+        shutil.rmtree(ours[name])
+    for name in new + changed:
+        folder = TARGET / name
+        if folder.exists():
+            shutil.rmtree(folder)
+        folder.mkdir(parents=True)
+        for file_name, source in theme_files(theirs[name]).items():
+            shutil.copy2(source, folder / file_name)
+    if (omarchy / "LICENSE").is_file():
+        shutil.copy2(omarchy / "LICENSE", TARGET / "LICENSE-omarchy")
+    print(f"Copied {len(new) + len(changed)} theme(s). Apply one with hyprdori-theme-set NAME.")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv[1:]))

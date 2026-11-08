@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Switch the system-wide color theme.
 
-Every theme is a single colors.toml in ~/.config/theme/themes/<name>/.
-Templates in ~/.config/theme/templates/*.tpl are rendered into
-~/.config/theme/current/, which every app config points at, and running
-apps are told to reload.
+Themes are Omarchy's (hyprdori-theme-sync copies them): a colors.toml with the same named
+colors in every theme, and a neovim.lua, in ~/.config/theme/themes/<name>/. Templates in
+~/.config/theme/templates/*.tpl are rendered into ~/.config/theme/current/, which every app
+config points at, and running apps are told to reload. Colors a theme leaves out are worked
+out as Omarchy does, and templates use Omarchy's placeholders (after Omarchy's
+omarchy-theme-color and omarchy-theme-set-templates, https://github.com/basecamp/omarchy, MIT).
 
   hyprdori-theme-set <name>     apply a theme
   hyprdori-theme-set            re-apply the current theme (after editing templates)
@@ -53,7 +55,7 @@ TEMPLATES_DIR = THEME_DIR / "templates"
 CURRENT_DIR = THEME_DIR / "current"
 ICONS_DIR = THEME_DIR / "icons"
 STATE_FILE = CURRENT_DIR / "theme"
-DEFAULT_THEME = "catppuccin-mocha"
+DEFAULT_THEME = "catppuccin"
 
 # Rendered files that also need a copy somewhere an app can find them
 EXTRA_DESTINATIONS = {
@@ -70,7 +72,6 @@ EXTRA_DESTINATIONS = {
         HOME / ".tmux/plugins/tmux/themes/catppuccin_current_tmux.conf",
     ],
     "cliamp.toml": HOME / ".config/cliamp/themes/system.toml",
-    "herdr-config.toml": HOME / ".config/herdr/config.toml",
     # eza's icons, the same as yazi's (theme/eza-icons.py writes the template)
     "eza-theme.yml": HOME / ".config/eza/theme.yml",
     # GTK adds these to whatever theme is set
@@ -97,15 +98,20 @@ FASTFETCH_OUTPUT = HOME / ".config/fastfetch/config.jsonc"
 STARSHIP_SOURCE = HOME / ".config/starship/base.toml"
 STARSHIP_OUTPUT = HOME / ".config/starship.toml"
 
-SLOTS = (
-    "rosewater flamingo pink mauve red maroon peach yellow green teal sky "
-    "sapphire blue lavender text subtext1 subtext0 overlay2 overlay1 overlay0 "
-    "surface2 surface1 surface0 base mantle crust"
+# Omarchy's named colors, in every theme's colors.toml (missing ones are worked out)
+PALETTE = (
+    "background dark_background darker_background lighter_background "
+    "foreground dark_foreground light_foreground bright_foreground "
+    "accent selection muted "
+    "red yellow orange green cyan blue magenta brown "
+    "bright_red bright_yellow bright_green bright_cyan bright_blue bright_magenta"
 ).split()
-# selection_*: selected text in every app. selection_fg defaults to the accent, or
-# to the text color in themes where the accent can't be read on selection_bg.
-ROLES = {"accent": "peach", "accent2": "blue", "accent3": "peach", "selection_bg": "surface1"}
-MIN_SELECTION_CONTRAST = 3.0
+# Older names that themes and templates may still use, as Omarchy accepts them
+LEGACY_PALETTE = {"bg": "background", "dark_bg": "dark_background", "darker_bg": "darker_background",
+                  "lighter_bg": "lighter_background", "fg": "foreground", "dark_fg": "dark_foreground",
+                  "light_fg": "light_foreground", "bright_fg": "bright_foreground"}
+ANSI = ("background red green yellow blue magenta cyan foreground "
+        "muted bright_red bright_green bright_yellow bright_blue bright_magenta bright_cyan bright_foreground").split()
 CURSOR_DIRS = (HOME / ".icons", HOME / ".local/share/icons", Path("/usr/share/icons"))
 
 HINTINGS = ("none", "slight", "medium", "full")
@@ -115,7 +121,8 @@ ANTIALIASINGS = ("none", "grayscale", "rgba")
 SETTINGS_OVERRIDE: dict = {}
 
 HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
-PLACEHOLDER_RE = re.compile(r"\{\{\s*([\w.]+)\s*\}\}")
+# {{ name }}, {{ name.hex }}, {{ mix a b 30% }}: words on one line (Vim's {{{ folds aren't)
+PLACEHOLDER_RE = re.compile(r"\{\{[ \t]*([A-Za-z_][\w.]*(?:[ \t]+[^{}\s]+)*)[ \t]*\}\}")
 
 
 def notify(body: str) -> None:
@@ -165,14 +172,14 @@ ICONS_FILE = THEME_DIR / "icons.toml"
 
 def icon_strings(colors: dict) -> dict:
     """icons.toml as yazi [icon] lines and a Lua table for Neovim, in this theme's colors:
-    folders accent, links accent3, files and extensions in their own color (a theme color
+    folders accent, links cyan, files and extensions in their own color (a theme color
     name or #hex)."""
     try:
         icons = tomllib.loads(ICONS_FILE.read_text())
     except (OSError, tomllib.TOMLDecodeError) as e:
         print(f"theme-set: {ICONS_FILE}: {e}", file=sys.stderr)
         icons = {}
-    color = lambda c: colors.get(c, c if HEX_RE.match(c or "") else colors["text"])
+    color = lambda c: colors.get(c, c if HEX_RE.match(c or "") else colors["foreground"])
     toml = lambda v: json.dumps(v, ensure_ascii=False)
     dirs = [(n, d["icon"]) for d in icons.get("dir", []) for n in d.get("names", [])]
     files = [(n, f["icon"], color(f.get("color", "text"))) for f in icons.get("file", []) for n in f.get("names", [])]
@@ -192,13 +199,6 @@ def icon_strings(colors: dict) -> dict:
         + f", link_dir = {lua(link.get('dir', chr(0xe5ff)))}, link_file = {lua(link.get('file', chr(0xf15b)))}"
         + f", link_broken = {lua(link.get('broken', chr(0xf086f)))} }}",
     }
-
-
-def blend(a: str, b: str, amount: float) -> str:
-    """b mixed into a by amount (0..1), as #rrggbb."""
-    ca = [int(a[i:i + 2], 16) for i in (1, 3, 5)]
-    cb = [int(b[i:i + 2], 16) for i in (1, 3, 5)]
-    return "#" + "".join(f"{round(x + (y - x) * amount):02x}" for x, y in zip(ca, cb))
 
 
 def shell_settings() -> dict:
@@ -232,7 +232,7 @@ def shell_settings() -> dict:
         "lockPowerOpacity": 85,
         "lockPowerIconColor": "accent2",
         "lockPowerOutlineColor": "accent",
-        "accentOverrides": {"gruvbox": {"accent": "blue", "accent2": "peach", "accent3": "mauve"}, "hackerman": {"accent": "sapphire", "accent2": "mauve", "accent3": "peach"}, "nord": {"accent": "sapphire", "accent2": "mauve", "accent3": "peach"}},
+        "accentOverrides": {},
         "lockInputOpacity": 65,
         "cursorTheme": "Adwaita",
         "cursorSize": 24,
@@ -286,64 +286,117 @@ def icon_theme_for(name: str, mode: str) -> str:
     return variant if variant in icon_themes() else name
 
 
+def mix(a: str, b: str, amount: float) -> str:
+    """a blended toward b by amount (0..1), as #rrggbb, rounded like Omarchy's mix."""
+    ca = [int(a[i:i + 2], 16) for i in (1, 3, 5)]
+    cb = [int(b[i:i + 2], 16) for i in (1, 3, 5)]
+    return "#" + "".join(f"{int(x * (1 - amount) + y * amount + 0.5):02x}" for x, y in zip(ca, cb))
+
+
+def palette(data: dict) -> tuple[dict, dict]:
+    """A theme's colors with what it leaves out worked out, in Omarchy's order: hex colors,
+    and the other values (border gradients like "rgba(..) rgba(..) 45deg") apart."""
+    raw = {k: str(v) for k, v in data.items() if isinstance(v, str)}
+    c = {k: v.lower() for k, v in raw.items() if HEX_RE.match(v)}
+    specs = {k: v for k, v in raw.items() if not HEX_RE.match(v) and k not in ("mode", "theme_type")}
+    for short, long in LEGACY_PALETTE.items():
+        c.setdefault(long, c.get(short, ""))
+    for i, name in enumerate(("red", "green", "yellow", "blue", "magenta", "cyan")):
+        c.setdefault(name, c.get(f"color{i + 1}", ""))
+    for i, name in enumerate(("bright_red", "bright_green", "bright_yellow", "bright_blue", "bright_magenta", "bright_cyan")):
+        c.setdefault(name, c.get(f"color{i + 9}", ""))
+    c = {k: v for k, v in c.items() if v}
+    c.setdefault("background", c.get("color0", "#1e1e2e"))
+    c.setdefault("foreground", c.get("color7", "#cdd6f4"))
+    c.setdefault("light_foreground", c.get("color7", c["foreground"]))
+    c.setdefault("bright_foreground", c.get("color15", c["foreground"]))
+    c.setdefault("lighter_background", c.get("color0", c["background"]))
+    c.setdefault("dark_foreground", c.get("color8", c["foreground"]))
+    c.setdefault("muted", c.get("color8", c["dark_foreground"]))
+    c.setdefault("selection", c.get("selection_background", c.get("color8", c["background"])))
+    c.setdefault("selection_background", c["selection"])
+    c.setdefault("selection_foreground", c["bright_foreground"])
+    for hue in ("red", "green", "yellow", "blue", "magenta", "cyan"):
+        c.setdefault(hue, c["foreground"])
+    c.setdefault("orange", c["yellow"])
+    c.setdefault("brown", mix(c["orange"], "#000000", 0.5))
+    c.setdefault("dark_background", mix(c["background"], "#000000", 0.25))
+    c.setdefault("darker_background", mix(c["background"], "#000000", 0.5))
+    for hue in ("red", "yellow", "green", "cyan", "blue", "magenta"):
+        c.setdefault(f"bright_{hue}", mix(c[hue], "#ffffff", 0.2))
+    c.setdefault("accent", c["blue"])
+    c["cursor"] = c["bright_foreground"]
+    for i, name in enumerate(ANSI):
+        c[f"color{i}"] = c[name]
+    return c, specs
+
+
+def shell_slots(c: dict) -> dict:
+    """The shell's color names (its Theme.qml) from Omarchy's, until it reads Omarchy's
+    names itself: dim text steps evenly from dark_foreground to foreground, hues by name."""
+    fg, dim = c["foreground"], c["dark_foreground"]
+    return {
+        "base": c["background"], "mantle": c["dark_background"], "crust": c["darker_background"],
+        "surface0": c["lighter_background"], "surface1": c["selection"], "surface2": c["muted"],
+        "overlay0": dim, "overlay1": mix(dim, fg, 0.2), "overlay2": mix(dim, fg, 0.4),
+        "subtext0": mix(dim, fg, 0.6), "subtext1": mix(dim, fg, 0.8), "text": fg,
+        "red": c["red"], "maroon": c["bright_red"], "peach": c["orange"], "yellow": c["yellow"],
+        "green": c["green"], "teal": c["cyan"], "sky": c["bright_cyan"], "sapphire": mix(c["blue"], c["cyan"], 0.5),
+        "blue": c["blue"], "lavender": c["bright_blue"], "mauve": c["magenta"], "pink": c["bright_magenta"],
+        "flamingo": mix(c["red"], fg, 0.5), "rosewater": mix(c["bright_red"], c["bright_foreground"], 0.6),
+        "accent": c["accent"], "accent2": c["accent"], "accent3": c["orange"],
+        "selection_bg": c["selection_background"], "selection_fg": c["selection_foreground"],
+    }
+
+
+def theme_mode(data: dict, colors: dict) -> str:
+    mode = data.get("mode") or data.get("theme_type")
+    if mode in ("dark", "light"):
+        return mode
+    bg = colors["background"]
+    return "light" if sum(int(bg[i:i + 2], 16) for i in (1, 3, 5)) > 382 else "dark"
+
+
+def accent_override(name: str, colors: dict) -> str | None:
+    """Settings > Appearance > Accent: one of this theme's colors (or a #hex) instead of
+    its own accent; none is the theme's."""
+    chosen = shell_settings().get("accentOverrides", {})
+    value = chosen.get(name) if isinstance(chosen, dict) else None
+    if isinstance(value, dict):  # saved by the shell's older Settings: {accent: name}
+        value = value.get("accent")
+    if isinstance(value, str):
+        if HEX_RE.match(value):
+            return value.lower()
+        return colors.get(value) or shell_slots(colors).get(value)
+    return None
+
+
+def nvim_colorscheme(folder: Path, mode: str) -> str:
+    """The colorscheme the theme's neovim.lua names (Omarchy's LazyVim spec)."""
+    try:
+        match = re.search(r'colorscheme\s*=\s*"([^"]+)"', (folder / "neovim.lua").read_text())
+    except OSError:
+        match = None
+    return match.group(1) if match else ("catppuccin-latte" if mode == "light" else "catppuccin-mocha")
+
+
 def load_theme(name: str) -> dict:
     path = THEMES_DIR / name / "colors.toml"
     with path.open("rb") as f:
         data = tomllib.load(f)
-
-    raw = dict(data.get("colors", {}))
-    # Settings > Appearance > Accent: another slot of this theme's palette
-    chosen = shell_settings().get("accentOverrides", {})
-    chosen = chosen.get(name, {}) if isinstance(chosen, dict) else {}
-    for role in ("accent", "accent2", "accent3"):
-        if chosen.get(role) in SLOTS:
-            raw[role] = chosen[role]
-    colors: dict[str, str] = {}
-    for slot in SLOTS:
-        value = raw.get(slot)
-        if not isinstance(value, str) or not HEX_RE.match(value):
-            raise ValueError(f"{path}: colors.{slot} must be a #rrggbb value")
-        colors[slot] = value.lower()
-
-    # Roles and terminal entries may name a slot instead of a hex value
-    def resolve(value: str, key: str) -> str:
-        if HEX_RE.match(value):
-            return value.lower()
-        if value in colors:
-            return colors[value]
-        raise ValueError(f"{path}: {key} = {value!r} is neither a hex color nor a slot")
-
-    for role, default in ROLES.items():
-        colors[role] = resolve(raw.get(role, default), f"colors.{role}")
-    readable = contrast(colors["accent"], colors["selection_bg"]) >= MIN_SELECTION_CONTRAST
-    colors["selection_fg"] = resolve(raw.get("selection_fg", "accent" if readable else "text"), "colors.selection_fg")
-
-    terminal_defaults = {
-        "color0": "surface1", "color8": "surface2",
-        "color1": "red", "color9": "red",
-        "color2": "green", "color10": "green",
-        "color3": "yellow", "color11": "yellow",
-        "color4": "blue", "color12": "blue",
-        "color5": "mauve", "color13": "mauve",
-        "color6": "teal", "color14": "teal",
-        "color7": "subtext1", "color15": "subtext0",
-        "cursor": "rosewater",
-        "selection_fg": "base", "selection_bg": "rosewater",
-    }
-    terminal_raw = data.get("terminal", {})
-    for key, default in terminal_defaults.items():
-        colors[f"term_{key}"] = resolve(terminal_raw.get(key, default), f"terminal.{key}")
-
-    mode = data.get("mode", "dark")
-    if mode not in ("dark", "light"):
-        raise ValueError(f"{path}: mode must be 'dark' or 'light'")
+    colors, specs = palette(data)
+    colors["accent"] = accent_override(name, colors) or colors["accent"]
+    mode = theme_mode(data, colors)
 
     shell = shell_settings()
+    lock = shell_slots(colors)  # Settings > Lock Screen names its colors this way
     hinting, antialiasing = shell["fontHinting"], shell["fontAntialiasing"]
     strings = {
         "theme": name,
-        "theme_name": data.get("name", name),
+        "theme_name": data.get("name") or name.replace("-", " ").title(),
         "mode": mode,
+        "theme_type": mode,
+        "nvim_colorscheme": nvim_colorscheme(path.parent, mode),
         "cursor_theme": shell["cursorTheme"],
         "cursor_size": str(shell["cursorSize"]),
         "display_font": shell["displayFont"],
@@ -355,7 +408,7 @@ def load_theme(name: str) -> dict:
         "gtk_font_pt": str(gtk_font_pt()),
         # the cursor line in Neovim's neo-tree (Catppuccin's: surface0 64% over base); yazi's
         # hover highlight uses it too
-        "cursorline": blend(colors["base"], colors["surface0"], 0.64),
+        "cursorline": mix(colors["background"], colors["lighter_background"], 0.64),
         # yazi's hover highlight ends: rounded caps, or full blocks. yazi draws these in the
         # highlight's color (a space would come out in the background's), so either way the
         # bar starts one character before the icon.
@@ -377,27 +430,27 @@ def load_theme(name: str) -> dict:
         "hypr_inactive_opacity": f"{float(shell['inactiveOpacity']):g}",
         "hypr_blur": "true" if shell["blur"] else "false",
         # the login screen uses the lock screen's colors
-        "login_clock": colors.get(shell["lockClockColor"], colors["text"]),
-        "login_date": colors.get(shell["lockClockColor"], colors["text"]),  # one color for both
-        "login_avatar": colors.get(shell["lockAvatarColor"], colors["text"]),
-        "login_boxOutline": colors.get(shell["lockBoxOutlineColor"], colors["text"]),
-        "login_box": colors.get(shell["lockBoxColor"], colors["text"]),
-        "login_inputOutline": colors.get(shell["lockInputOutlineColor"], colors["text"]),
-        "login_input": colors.get(shell["lockInputColor"], colors["text"]),
-        "login_dots": colors.get(shell["lockDotsColor"], colors["text"]),
-        "login_user": colors.get(shell["lockUserColor"], colors["text"]),
-        "login_text": colors.get(shell["lockTextColor"], colors["text"]),
-        "login_check": colors.get(shell["lockCheckColor"], colors["text"]),
-        "login_fail": colors.get(shell["lockFailColor"], colors["text"]),
-        "login_caps": colors.get(shell["lockCapsColor"], colors["text"]),
+        "login_clock": lock.get(shell["lockClockColor"], lock["text"]),
+        "login_date": lock.get(shell["lockClockColor"], lock["text"]),  # one color for both
+        "login_avatar": lock.get(shell["lockAvatarColor"], lock["text"]),
+        "login_boxOutline": lock.get(shell["lockBoxOutlineColor"], lock["text"]),
+        "login_box": lock.get(shell["lockBoxColor"], lock["text"]),
+        "login_inputOutline": lock.get(shell["lockInputOutlineColor"], lock["text"]),
+        "login_input": lock.get(shell["lockInputColor"], lock["text"]),
+        "login_dots": lock.get(shell["lockDotsColor"], lock["text"]),
+        "login_user": lock.get(shell["lockUserColor"], lock["text"]),
+        "login_text": lock.get(shell["lockTextColor"], lock["text"]),
+        "login_check": lock.get(shell["lockCheckColor"], lock["text"]),
+        "login_fail": lock.get(shell["lockFailColor"], lock["text"]),
+        "login_caps": lock.get(shell["lockCapsColor"], lock["text"]),
         "login_box_opacity": str(shell["lockBoxOpacity"] / 100),
         "login_show_box": "true" if shell["lockBox"] else "false",
         "login_show_clock": "true" if shell["lockClock"] else "false",
         "login_show_avatar": "true" if shell["lockAvatar"] else "false",
-        "login_power_bg": colors.get(shell["lockPowerColor"], colors["base"]),
+        "login_power_bg": lock.get(shell["lockPowerColor"], lock["base"]),
         "login_power_opacity": str(shell["lockPowerOpacity"] / 100),
-        "login_power_icon": colors.get(shell["lockPowerIconColor"], colors["text"]),
-        "login_power_outline": colors.get(shell["lockPowerOutlineColor"], colors["text"]),
+        "login_power_icon": lock.get(shell["lockPowerIconColor"], lock["text"]),
+        "login_power_outline": lock.get(shell["lockPowerOutlineColor"], lock["text"]),
         "login_input_opacity": str(shell["lockInputOpacity"] / 100),
         "icon_theme": icon_theme_for(shell["iconTheme"], mode),
         "prefer_dark": "0" if mode == "light" else "1",
@@ -406,34 +459,88 @@ def load_theme(name: str) -> dict:
         "gtk_theme": ("adw-gtk3" if Path("/usr/share/themes/adw-gtk3").is_dir() else "Adwaita")
         + ("" if mode == "light" else "-dark"),
     }
-    for key, value in data.get("apps", {}).items():
-        strings[key] = str(value)
     strings.update(icon_strings(colors))  # icons.toml: folder, file and link icons
 
-    return {"colors": colors, "strings": strings, "dir": path.parent}
+    return {"colors": colors, "specs": specs, "strings": strings, "dir": path.parent}
+
+
+def gradient(spec: str, colors: dict) -> tuple[list[str], str]:
+    """A border spec ("rgba(..) rgba(..) 45deg", or a color name) as its colors and angle."""
+    parts, angle = [], ""
+    for part in spec.split():
+        if re.fullmatch(r"-?\d+(\.\d+)?deg", part):
+            angle = part[:-3]
+        else:
+            parts.append(colors.get(part, part))
+    return parts, angle
+
+
+def theme_ref(ref: str, fallback: str, theme: dict) -> str:
+    """A theme value by name (a border gradient or a color), else the fallback (a name or
+    a literal value)."""
+    values = theme["specs"] | theme["colors"]
+    return values.get(ref) or values.get(fallback) or fallback or ref
 
 
 def render(text: str, theme: dict, source: str) -> str:
     colors, strings = theme["colors"], theme["strings"]
 
-    def substitute(match: re.Match) -> str:
-        key = match.group(1)
-        name, _, fmt = key.partition(".")
-        if name in colors:
-            value = colors[name]
-            if fmt == "":
-                return value
-            if fmt == "hex":
-                return value[1:]
-            if fmt == "rgb":
-                return ", ".join(str(int(value[i : i + 2], 16)) for i in (1, 3, 5))
-            if fmt == "ansi":  # 24-bit SGR foreground code, e.g. for fastfetch
-                return "38;2;" + ";".join(str(int(value[i : i + 2], 16)) for i in (1, 3, 5))
-            if fmt == "ansi_bg":  # the same as a background
-                return "48;2;" + ";".join(str(int(value[i : i + 2], 16)) for i in (1, 3, 5))
-        elif name in strings and fmt == "":
-            return strings[name]
+    def color_format(value: str, fmt: str, key: str) -> str:
+        if fmt == "":
+            return value
+        if fmt in ("hex", "strip"):
+            return value[1:]
+        if fmt == "rgb":
+            return ", ".join(str(int(value[i : i + 2], 16)) for i in (1, 3, 5))
+        if fmt == "ansi":  # 24-bit SGR foreground code, e.g. for fastfetch
+            return "38;2;" + ";".join(str(int(value[i : i + 2], 16)) for i in (1, 3, 5))
+        if fmt == "ansi_bg":  # the same as a background
+            return "48;2;" + ";".join(str(int(value[i : i + 2], 16)) for i in (1, 3, 5))
         raise KeyError(f"{source}: unknown placeholder {{{{ {key} }}}}")
+
+    def substitute(match: re.Match) -> str:
+        expr = match.group(1).strip()
+        words = expr.split()
+        # {{ mix a b 30% }}, mix_strip (no #) and mix_rgb ("r,g,b") as Omarchy has them, and
+        # mix.rgb, mix.hex, mix.ansi like the colors' own formats
+        if words[0].startswith("mix.") and len(words) == 4:
+            mixed = substitute(re.match(r"(.*)", "mix " + " ".join(words[1:])))
+            return color_format(mixed, words[0][4:], expr)
+        if words[0] in ("mix", "mix_strip", "mix_rgb") and len(words) == 4:
+            start, end = (colors.get(w, w if HEX_RE.match(w) else None) for w in words[1:3])
+            if not start or not end:
+                raise KeyError(f"{source}: unknown color in {{{{ {expr} }}}}")
+            amount = float(words[3].rstrip("%"))
+            mixed = mix(start, end, amount / 100 if words[3].endswith("%") or amount > 1 else amount)
+            if words[0] == "mix_strip":
+                return mixed[1:]
+            if words[0] == "mix_rgb":
+                return ",".join(str(int(mixed[i : i + 2], 16)) for i in (1, 3, 5))
+            return mixed
+        # {{ hypr_gradient key fallback }}: a Hyprland Lua color or gradient
+        if words[0] in ("hypr_gradient", "shell_gradient", "gradient_start") and len(words) in (2, 3):
+            parts, angle = gradient(theme_ref(words[1], words[2] if len(words) == 3 else "", theme), colors)
+            if words[0] == "gradient_start":
+                first = parts[0] if parts else ""
+                found = re.fullmatch(r"(?i)rgba?\(([0-9a-f]{6})[0-9a-f]{0,2}\)", first)
+                return "#" + found.group(1).lower() if found else first
+            if words[0] == "shell_gradient":
+                return " ".join(parts) + (f" {angle}deg" if angle else "")
+            if len(parts) == 1:
+                return json.dumps(parts[0])
+            body = "{ colors = { " + ", ".join(json.dumps(c) for c in parts) + " }"
+            return body + (f", angle = {angle} }}" if angle else " }")
+        if len(words) == 1:
+            name, _, fmt = expr.partition(".")
+            if fmt == "" and name.endswith("_strip") and name[:-6] in colors:
+                return colors[name[:-6]][1:]
+            if name in colors:
+                return color_format(colors[name], fmt, expr)
+            if name in strings and fmt == "":
+                return strings[name]
+            if name in theme["specs"] and fmt == "":
+                return theme["specs"][name]
+        raise KeyError(f"{source}: unknown placeholder {{{{ {expr} }}}}")
 
     return PLACEHOLDER_RE.sub(substitute, text)
 
@@ -471,11 +578,13 @@ def render_starship(theme: dict) -> None:
     if not STARSHIP_SOURCE.exists():
         return
     base = re.sub(r"^palette\s*=.*$", "palette = 'theme'", STARSHIP_SOURCE.read_text(), count=1, flags=re.M)
+    # base.toml's own palette is the fallback; the theme's replaces it
+    base = re.sub(r"\n# [^\n]*\n\[palettes\.theme\][\s\S]*$", "\n", base)
     # square corners in Work-Game or with the corner radius at 0 (--shape)
     if current_shape() == "square":
         base = base.replace("╭", "┌").replace("╰", "└")
-    palette = "\n# Generated by theme-set\n[palettes.theme]\n" + "".join(
-        f'{slot} = "{theme["colors"][slot]}"\n' for slot in [*SLOTS, *ROLES]
+    palette = "\n[palettes.theme]\n" + "".join(
+        f'{name} = "{value}"\n' for name, value in theme["colors"].items() if not name.startswith("color")
     )
     header = "# Generated by hyprdori-theme-set from ~/.config/starship/base.toml; edit that file\n"
     write_if_changed(STARSHIP_OUTPUT, header + base.rstrip() + "\n" + palette)
@@ -484,25 +593,25 @@ def render_starship(theme: dict) -> None:
 def icons_dir(name: str) -> str:
     """Power menu icons from theme-icons.py, or Catppuccin's for a theme
     that has none yet."""
-    for candidate in (name, "catppuccin-mocha"):
+    for candidate in (name, "catppuccin"):
         if (ICONS_DIR / candidate / "lock.svg").is_file():
             return str(ICONS_DIR / candidate)
     return ""
 
 
 def theme_background(theme: dict) -> Path | None:
-    """This theme's own background: the logo in accent2 on base (hyprdori-logo-wallpaper), drawn
+    """This theme's own background: the logo in magenta on the background (hyprdori-logo-wallpaper), drawn
     once per theme and colors into ~/.local/share/hyprdori/backgrounds/default. The wallpaper
     and the lock screen show it while they follow the theme (Settings)."""
     colors, name = theme["colors"], theme["strings"]["theme"]
     folder = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "hyprdori/backgrounds/default"
-    path = folder / f"dori-theme-{name}-{colors['accent2'][1:]}-on-{colors['base'][1:]}.png"
+    path = folder / f"dori-theme-{name}-{colors['magenta'][1:]}-on-{colors['background'][1:]}.png"
     if path.exists():
         return path
     folder.mkdir(parents=True, exist_ok=True)
     for old in folder.glob(f"dori-theme-{name}-*.png"):  # this theme in older colors
         old.unlink(missing_ok=True)
-    run_quiet([str(HOME / ".local/bin/hyprdori-logo-wallpaper"), "--bg", colors["base"], "--fg", colors["accent2"],
+    run_quiet([str(HOME / ".local/bin/hyprdori-logo-wallpaper"), "--bg", colors["background"], "--fg", colors["magenta"],
                "--size", "30", "--output", str(path)])
     return path if path.exists() else None
 
@@ -515,7 +624,7 @@ def render_quickshell(theme: dict) -> None:
         "name": theme["strings"]["theme_name"],
         "mode": theme["strings"]["mode"],
         "icons": icons_dir(theme["strings"]["theme"]),
-        "colors": {k: v for k, v in theme["colors"].items() if not k.startswith("term_")},
+        "colors": theme["colors"] | shell_slots(theme["colors"]),
         # the lock screen shows it unless another image is chosen (Settings > Lock Screen)
         "background": str(background) if background else "",
     }
@@ -639,12 +748,11 @@ def reload_apps(theme: dict) -> None:
     run_quiet(["qs", "ipc", "call", "theme", "reload"])
 
     if hypr_running():
-        # Same in every mode (hyprland.lua.tpl): active in the accent, inactive in overlay1
-        active = f"rgb({colors['accent'][1:]})"
-        inactive = f"rgba({colors['overlay1'][1:]}ee)"
+        # The borders from the generated theme.lua (hyprland.lua.tpl), in every mode
         run_quiet([
             "hyprctl", "eval",
-            f"hl.config({{ general = {{ col = {{ active_border = '{active}', inactive_border = '{inactive}' }} }} }})",
+            "package.loaded['configs.generated.theme'] = nil; local ok, t = pcall(require, 'configs.generated.theme'); "
+            "if ok then hl.config({ general = { col = { active_border = t.active_border, inactive_border = t.inactive_border } } }) end",
         ])
 
     run_quiet(["pkill", "-USR1", "-x", "kitty"])
@@ -663,16 +771,11 @@ def reload_apps(theme: dict) -> None:
     if "cliamp.toml" in theme.get("changed", ()) and shutil.which("cliamp") and (HOME / ".config/cliamp/cliamp.sock").exists():
         run_quiet(["cliamp", "theme", "system"])
 
-    # ~/.local/bin isn't on PATH when the shell's theme picker runs this
-    herdr = shutil.which("herdr") or str(HOME / ".local/bin/herdr")
-    if "herdr-config.toml" in theme.get("changed", ()) and os.access(herdr, os.X_OK):
-        run_quiet([herdr, "server", "reload-config"])
-
     # file dialogs: the portal reads gtk.css only when it starts
     if "gtk.css" in theme.get("changed", ()):
         run_quiet(["systemctl", "--user", "try-restart", "xdg-desktop-portal-gtk.service"])
 
-    browsers(colors["base"])
+    browsers(colors["background"])
 
     set_gtk_theme(strings)
 
@@ -756,7 +859,7 @@ def themes_json() -> str:
         except (ValueError, tomllib.TOMLDecodeError) as e:
             print(e, file=sys.stderr)
             continue
-        c = theme["colors"]
+        c = theme["colors"] | shell_slots(theme["colors"])
         result.append({
             "theme": name,
             "name": theme["strings"]["theme_name"],

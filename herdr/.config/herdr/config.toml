@@ -1,0 +1,108 @@
+# herdr, after Omarchy's config/herdr/config.toml (https://github.com/basecamp/omarchy, MIT):
+# tmux session -> herdr workspace, tmux window -> herdr tab, tmux pane -> herdr pane. Keys follow
+# Hyprdori's tmux (prefix Ctrl+S, prefix+H/J/K/L, | and - splits) and Ctrl+H/J/K/L moves across
+# herdr panes and Neovim splits. Colors are the terminal's, so herdr follows the theme with kitty.
+onboarding = false
+
+[theme]
+name = "terminal"
+
+[theme.custom]
+# The tab bar sits on the terminal's own background, like tmux's bg=default; the active tab's
+# text is dark on the accent
+panel_bg = "reset"
+surface_dim = "black"
+
+[terminal]
+default_shell = "/bin/zsh"
+# a split, tab or workspace starts in the pane's folder
+new_cwd = "follow"
+
+[keys]
+prefix = "ctrl+s"
+
+# Config and help
+reload_config = "prefix+q"
+help = "prefix+?"
+detach = "prefix+d"
+
+# Copy mode, as tmux's prefix+v
+copy_mode = ["prefix+v", "prefix+["]
+
+# Panes: | side by side, - one above the other
+split_vertical = ["prefix+|", "alt+shift+enter"]
+split_horizontal = ["prefix+minus", "alt+enter"]
+close_pane = ["prefix+x", "alt+esc"]
+zoom = "prefix+z"
+last_pane = "prefix+;"
+
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+
+resize_mode = "prefix+r"
+resize_pane_left = "prefix+shift+h"
+resize_pane_down = "prefix+shift+j"
+resize_pane_up = "prefix+shift+k"
+resize_pane_right = "prefix+shift+l"
+
+rename_pane = "prefix+shift+o"
+
+# Windows -> tabs
+new_tab = "prefix+c"
+rename_tab = "prefix+comma"
+close_tab = "prefix+&"
+switch_tab = ["prefix+1..9", "alt+1..9"]
+previous_tab = ["prefix+p", "alt+left"]
+next_tab = ["prefix+n", "alt+right"]
+move_tab_previous = "alt+shift+left"
+move_tab_next = "alt+shift+right"
+
+# Sessions -> workspaces
+new_workspace = "prefix+shift+c"
+rename_workspace = "prefix+shift+r"
+close_workspace = "prefix+shift+d"
+previous_workspace = ["prefix+shift+p", "alt+up"]
+next_workspace = ["prefix+shift+n", "alt+down"]
+
+# Ctrl+H/J/K/L: the vim-herdr-navigation plugin, like vim-tmux-navigator in tmux
+[[keys.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "vim-herdr-navigation.left"
+description = "navigate left"
+
+[[keys.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "vim-herdr-navigation.down"
+description = "navigate down"
+
+[[keys.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "vim-herdr-navigation.up"
+description = "navigate up"
+
+[[keys.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "vim-herdr-navigation.right"
+description = "navigate right"
+
+[ui]
+accent = "blue"
+# single-line dividers between panes and no outer frame, no scrollbar column, like tmux
+pane_gaps = false
+pane_outer_borders = false
+pane_scrollbars = false
+confirm_close = false
+prompt_new_tab_name = false
+mouse_capture = true
+tab_bar_right = [{ type = "zoom" }, { type = "hostname" }]
+# what Hyprland shows as the window title
+window_title = "{hostname}: {workspace}"
+
+[ui.sound.agents]
+claude = "on"

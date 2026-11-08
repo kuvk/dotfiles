@@ -74,7 +74,7 @@ icon = "󰨜"
 [[dir]]
 names = ["SERIES", "Series", "series", "SHOWS", "Shows", "shows"]
 icon = "󰟴"
-# Links, in accent3 (eza draws its own, these match it): a linked folder; a working link to a
+# Links, in the theme's cyan (eza draws its own, these match it): a linked folder; a working link to a
 # file without an icon of its own (one with an icon shows that icon in its color); a broken link.
 [link]
 dir = "\ue5ff"
@@ -92,12 +92,12 @@ icon = "\uebc8"
 color = "#14ba19"
 
 # Files by exact name or by extension, on top of the programs' own icons. color: a theme color
-# (accent, accent2, accent3, red, green, ...) or "#rrggbb". For example:
+# (accent, red, green, cyan, magenta, ... as in the themes' colors.toml) or "#rrggbb". For example:
 #
 # [[file]]
 # names = ["Makefile", "makefile"]
 # icon = "\ue779"
-# color = "accent2"
+# color = "magenta"
 #
 # [[ext]]
 # names = ["kdbx"]

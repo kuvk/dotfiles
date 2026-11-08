@@ -44,7 +44,7 @@ fi
 
 # The current theme's slots, or Catppuccin Mocha before hyprdori-theme-set has run
 base="#1e1e2e" surface0="#313244" text="#cdd6f4" subtext0="#a6adc8" mauve="#cba6f7"
-accent="#fab387" accent2="#89b4fa"
+accent="#89b4fa" accent2="#89b4fa" magenta="#f5c2e7"
 colors="$home/.config/theme/current/colors.sh"
 if [[ -r $colors ]]; then
     # shellcheck source=/dev/null
@@ -64,11 +64,11 @@ rgb() { awk -v r=$((16#${1:1:2})) -v g=$((16#${1:3:2})) -v b=$((16#${1:5:2})) 'B
 build=$(mktemp -d)
 trap 'rm -rf "$build"' EXIT
 
-# Images: the logo in accent2; the password field in surface0 with an accent outline, dots in
+# Images: the logo in magenta; the password field in surface0 with an accent outline, dots in
 # accent2, the progress bar in accent; the hint under the field in subtext0 (accent2, then accent after wrong
 # passwords); the farewell line in accent2, large, alone on the screen
 # The logo drawn like kitty draws it, in 24px rows (scripts/.config/scripts/logo-render.py)
-"$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$accent2" --cell-height 24 --out "$build/logo.png"
+"$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$magenta" --cell-height 24 --out "$build/logo.png"
 # The password field and progress bar are as wide as the logo; the field is a box with the
 # windows' corners (Hyprland's rounding) and a 2 px outline, like the lock and login screens'
 ew=$(magick identify -format %w "$build/logo.png")

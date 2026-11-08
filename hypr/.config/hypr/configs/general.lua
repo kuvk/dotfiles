@@ -2,7 +2,7 @@
 -- generated/theme.lua by ~/.local/bin/hyprdori-theme-set. Missing there: these.
 local ok, theme = pcall(require, "configs.generated.theme")
 if not ok then
-  theme = { active_border = "rgb(fab387)", inactive_border = "rgba(7f849cee)" }
+  theme = { active_border = "rgb(89b4fa)", inactive_border = "rgba(595959aa)" }
 end
 
 hl.config({

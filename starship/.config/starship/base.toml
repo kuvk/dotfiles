@@ -3,7 +3,7 @@ add_newline = false
 # scan_timeout = 100
 
 format = """
-[╭─](accent3)\
+[╭─](muted)\
 $os\
 $username\
 $hostname\
@@ -14,126 +14,22 @@ $git_status\
 $fill\
 $python\
 $cmd_duration\
-$line_break[╰─ ](accent3)$character """
+$line_break[╰─ ](muted)$character """
 
-palette = 'catppuccin_mocha'
+palette = 'theme'
 command_timeout = 500
 
-[palettes.catppuccin_mocha]
-rosewater = "#f5e0dc"
-flamingo = "#f2cdcd"
-pink = "#f5c2e7"
-mauve = "#cba6f7"
+# Catppuccin's, in Omarchy's color names, until hyprdori-theme-set writes the theme's
+[palettes.theme]
+background = "#1e1e2e"
+foreground = "#cdd6f4"
+muted = "#585b70"
+accent = "#89b4fa"
 red = "#f38ba8"
-maroon = "#eba0ac"
-peach = "#fab387"
-accent3 = "#fab387"
-yellow = "#f9e2af"
+bright_red = "#f38ba8"
 green = "#a6e3a1"
-teal = "#94e2d5"
-sky = "#89dceb"
-sapphire = "#74c7ec"
+yellow = "#f9e2af"
+orange = "#f6b6ab"
 blue = "#89b4fa"
-lavender = "#b4befe"
-text = "#cdd6f4"
-subtext1 = "#bac2de"
-subtext0 = "#a6adc8"
-overlay2 = "#9399b2"
-overlay1 = "#7f849c"
-overlay0 = "#6c7086"
-surface2 = "#585b70"
-surface1 = "#45475a"
-surface0 = "#313244"
-base = "#1e1e2e"
-mantle = "#181825"
-crust = "#11111b"
-
-[fill]
-symbol = " "
-
-[os]
-disabled = false
-style = "accent"
-format = "[ $symbol ]($style)"
-
-[os.symbols]
-Windows = "󰍲"
-Ubuntu = "󰕈"
-SUSE = ""
-Raspbian = "󰐿"
-Mint = "󰣭"
-Macos = ""
-Manjaro = ""
-Linux = "󰌽"
-Gentoo = "󰣨"
-Fedora = "󰣛"
-Alpine = ""
-Amazon = ""
-Android = ""
-Arch = ""
-Artix = "󰣇"
-CentOS = ""
-Debian = "󰣚"
-Redhat = "󱄛"
-RedHatEnterprise = "󱄛"
-
-[username]
-show_always = true
-style_user = "accent2"
-style_root = "red"
-format = '[ $user]($style)'
-
-[hostname]
-ssh_only = true 
-ssh_symbol = "🌐 "
-
-[directory]
-style = "accent"
-format = "[[  ](accent3)]($style)[$path ]($style)"
-truncation_length = 3
-truncation_symbol = "…/"
-
-[directory.substitutions]
-"Documents" = "󰈙 "
-"Downloads" = " "
-"Music" = "󰝚 "
-"Pictures" = " "
-"Projects" = "󰲋 "
-"projects" = "󰲋 "
-
-[character]
-disabled = false
-# zsh's vi modes in the same colors as Neovim's lualine: typing (insert) accent3, normal
-# accent, visual accent2; red after a failed command
-success_symbol = '[󰶻](bold fg:accent)'
-error_symbol = '[󰶻](bold fg:red)'
-vimcmd_symbol = '[󰶺](bold fg:accent)'
-vimcmd_visual_symbol = '[󰶺](bold fg:accent2)'
-vimcmd_replace_symbol = '[󰶺](bold fg:red)'
-vimcmd_replace_one_symbol = '[󰶺](bold fg:red)'
-
-[git_branch]
-symbol = ""
-format = '[[](accent3)]($style)[[ $symbol $branch ](green)]($style)'
-
-[git_status]
-format = '[[($all_status$ahead_behind )](green)]($style)'
-
-[cmd_duration]
-format = "[[](accent3)]($style) [$duration]($style) "
-style = "maroon"
-
-# [python]
-# symbol = " "
-# style = "teal"
-# format = '[[ ($virtualenv )$symbol ](fg:teal)]($style)'
-
-[python]
-symbol = " "
-style = "teal"
-format = "[[](accent3)]($style)[[( $virtualenv)](fg:teal)]($style)[[ $symbol$version ](fg:teal)]($style)"
-
-[time]
-disabled = false
-time_format = "%R"
-format = '[[](accent3)]($style)[[  $time ](mauve)]($style)'
+magenta = "#f5c2e7"
+cyan = "#94e2d5"

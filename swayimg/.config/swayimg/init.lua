@@ -18,12 +18,12 @@
 
 local THEME = os.getenv("HOME") .. "/.config/theme/current/swayimg.lua"
 
--- catppuccin-mocha, used until theme-set has written the theme file
+-- Catppuccin, used until hyprdori-theme-set has written the theme file
 local fallback = {
   base = 0xff1e1e2e, mantle = 0xff181825, crust = 0xff11111b,
   surface0 = 0xff313244, surface1 = 0xff45475a, surface2 = 0xff585b70,
   overlay1 = 0xff7f849c, text = 0xffcdd6f4, subtext0 = 0xffa6adc8,
-  accent = 0xfffab387, accent2 = 0xff89b4fa, overlay_bg = 0xcc181825,
+  accent = 0xff89b4fa, overlay_bg = 0xcc181825,
 }
 
 local function apply_theme()
@@ -38,7 +38,7 @@ local function apply_theme()
 
   swayimg.viewer.set_window_background(c.base)
   swayimg.viewer.set_image_chessboard(16, c.surface0, c.surface1)
-  swayimg.viewer.mark_color = c.accent2
+  swayimg.viewer.mark_color = c.accent
   swayimg.slideshow.set_window_background(c.base)
 
   swayimg.gallery.window_color = c.base
