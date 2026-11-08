@@ -12,9 +12,9 @@ import qs.config
 Singleton {
     id: root
 
-    // Each OSD by name: an icon, then a `level` (0..1, drawn as a bar; `dim` greys it, `steps`
-    // splits it into that many parts) or a `label`, and `quiet` while a panel with its own
-    // control for it is open. Brightness and the keyboard light get their level from their
+    // Each OSD by name: an icon, then a `level` (0..1, drawn as a bar; `steps` splits it into
+    // that many parts) or a `label`; `dim` greys it all while it's off (muted, a light at 0),
+    // and `quiet` while a panel with its own control for it is open. Brightness and the keyboard light get their level from their
     // source.
     readonly property var kinds: ({
             volume: () => ({
@@ -26,11 +26,13 @@ Singleton {
             mute: () => ({
                     icon: Audio.muted ? Icons.volumeMuted : Audio.icon,
                     label: Audio.muted ? "Muted" : "Sound on",
+                    dim: Audio.muted,
                     quiet: Panels.controlCenter || Panels.dropdown === "audio"
                 }),
             mic: () => ({
                     icon: Audio.micMuted ? Icons.micMuted : Icons.mic,
                     label: Audio.micMuted ? "Microphone off" : "Microphone on",
+                    dim: Audio.micMuted,
                     quiet: Panels.dropdown === "audio"
                 }),
             brightness: level => ({
@@ -42,7 +44,8 @@ Singleton {
             keyboard: level => ({
                     icon: Icons.keyboard,
                     level: level,
-                    steps: keyboardLevel.max
+                    steps: keyboardLevel.max,
+                    dim: level === 0
                 }),
             power: kernelName => ({
                     icon: Battery.modeFor(kernelName).icon,

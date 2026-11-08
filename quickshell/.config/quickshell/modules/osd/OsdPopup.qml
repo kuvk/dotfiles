@@ -19,8 +19,8 @@ PanelWindow {
     // 10% of the screen's height above its bottom edge
     margins.bottom: Math.round((screen?.height ?? 1080) * 0.1)
     exclusionMode: ExclusionMode.Ignore
-    // a level: a fixed width for the bar; a state: as wide as its icon and name
-    implicitWidth: Osd.entry.level >= 0 ? 320 : row.implicitWidth + 2 * padding
+    // the same for every OSD; a state's icon and name centered in it
+    implicitWidth: 320
     implicitHeight: 52
     mask: Region {}
     WlrLayershell.namespace: "quickshell-osd"
@@ -49,9 +49,9 @@ PanelWindow {
         RowLayout {
             id: row
 
-            anchors.fill: parent
-            anchors.leftMargin: root.padding
-            anchors.rightMargin: root.padding
+            // a level: across the box, inside the padding; a state: its own width, centered
+            anchors.centerIn: parent
+            width: Osd.entry.level >= 0 ? parent.width - 2 * root.padding : implicitWidth
             spacing: 12
 
             Icon {
@@ -83,6 +83,7 @@ PanelWindow {
             StyledText {
                 visible: Osd.entry.level < 0
                 text: Osd.entry.label
+                color: Osd.entry.dim ? Theme.overlay1 : Theme.text
                 elide: Text.ElideRight
             }
         }
