@@ -9,53 +9,112 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    // Look
+    // Appearance: colors, corners, cursor, icons, opacity, blur, animations
+    // per theme: { "catppuccin-mocha": { accent: "mauve" } }, read by theme-set.py
+    property alias accentOverrides: adapter.accentOverrides
+    // the theme's background on the desktop, redrawn on theme change; set by the wallpaper picker
+    property alias wallpaperFollowsTheme: adapter.wallpaperFollowsTheme
     property alias radius: adapter.radius
+    // read by scripts/theme-set.py, like the fonts and colors
     property alias cursorTheme: adapter.cursorTheme
     property alias cursorSize: adapter.cursorSize
     property alias iconTheme: adapter.iconTheme
-    property alias nightlightSchedule: adapter.nightlightSchedule
-    property alias nightlightStart: adapter.nightlightStart
-    property alias nightlightEnd: adapter.nightlightEnd
-    property alias nightlightTemperature: adapter.nightlightTemperature
+    property alias borderWidth: adapter.borderWidth
+    property alias barOpacity: adapter.barOpacity
+    property alias panelOpacity: adapter.panelOpacity
+    // Hyprland windows in normal mode; fullscreen ones stay opaque
+    property alias activeOpacity: adapter.activeOpacity
+    property alias inactiveOpacity: adapter.inactiveOpacity
+    // Hyprland's blur in normal mode (Work-Game has none); services/Hypr.qml
+    property alias blur: adapter.blur
+    property alias animations: adapter.animations
+
+    // Fonts
+    property alias nerdFont: adapter.nerdFont
+    property alias displayFont: adapter.displayFont
+    property alias nerdFontOnly: adapter.nerdFontOnly
+    property alias nerdSymbols: adapter.nerdSymbols
+    property alias fontHinting: adapter.fontHinting
+    property alias fontAntialiasing: adapter.fontAntialiasing
+
+    // Bar
+    // margins around the bar and rounded corners
+    property alias barFloating: adapter.barFloating
+    property alias barMargin: adapter.barMargin
+    property alias clockFormat: adapter.clockFormat
+    // empty: detect from IP (wttr.in)
+    property alias weatherLocation: adapter.weatherLocation
+    property alias weatherFahrenheit: adapter.weatherFahrenheit
+    // bar modules hidden on the primary monitor's bar and on the others
+    property alias barHiddenPrimary: adapter.barHiddenPrimary
+    property alias barHiddenOthers: adapter.barHiddenOthers
+
+    // Windows
+    property alias windowButtons: adapter.windowButtons
+    // Hyprland's window gaps, normal and in Work-Game
+    property alias gapsIn: adapter.gapsIn
+    property alias gapsOut: adapter.gapsOut
+    property alias gameGapsIn: adapter.gameGapsIn
+    property alias gameGapsOut: adapter.gameGapsOut
+
+    // Notifications
+    // seconds a popup stays up; critical ones stay until closed
+    property alias notificationTimeout: adapter.notificationTimeout
+    // on-screen notifications: an accent outline, and a shadow
+    property alias notificationBorder: adapter.notificationBorder
+    property alias notificationShadow: adapter.notificationShadow
+
+    // Lock Screen: colors are theme color names; they also go to the login screen (theme-set.py --login)
+    // the background: the theme's own (Theme.background) until an image is chosen
     property alias lockFollowsTheme: adapter.lockFollowsTheme
     property alias lockImage: adapter.lockImage
+    property alias lockClock: adapter.lockClock
     property alias lockClockColor: adapter.lockClockColor
+    property alias lockAvatar: adapter.lockAvatar
     property alias lockAvatarColor: adapter.lockAvatarColor
+    property alias lockBox: adapter.lockBox
     property alias lockBoxOutlineColor: adapter.lockBoxOutlineColor
     property alias lockBoxColor: adapter.lockBoxColor
+    // percent, like the other opacities here
+    property alias lockBoxOpacity: adapter.lockBoxOpacity
     property alias lockInputOutlineColor: adapter.lockInputOutlineColor
     property alias lockInputColor: adapter.lockInputColor
+    property alias lockInputOpacity: adapter.lockInputOpacity
+    property alias lockDotsColor: adapter.lockDotsColor
     property alias lockUserColor: adapter.lockUserColor
+    property alias lockTextColor: adapter.lockTextColor
     property alias lockCheckColor: adapter.lockCheckColor
     property alias lockFailColor: adapter.lockFailColor
     property alias lockCapsColor: adapter.lockCapsColor
-    property alias lockBoxOpacity: adapter.lockBoxOpacity
-    property alias lockBox: adapter.lockBox
-    property alias lockClock: adapter.lockClock
-    property alias lockAvatar: adapter.lockAvatar
+    // the login screen's power buttons
     property alias lockPowerColor: adapter.lockPowerColor
     property alias lockPowerOpacity: adapter.lockPowerOpacity
     property alias lockPowerIconColor: adapter.lockPowerIconColor
     property alias lockPowerOutlineColor: adapter.lockPowerOutlineColor
-    property alias accentOverrides: adapter.accentOverrides
-    property alias wallpaperFollowsTheme: adapter.wallpaperFollowsTheme
-    property alias lockInputOpacity: adapter.lockInputOpacity
-    property alias lockDotsColor: adapter.lockDotsColor
-    property alias lockTextColor: adapter.lockTextColor
-    property alias borderWidth: adapter.borderWidth
-    property alias barOpacity: adapter.barOpacity
-    // Floating bar: margins around it and rounded corners
-    property alias barFloating: adapter.barFloating
-    property alias barMargin: adapter.barMargin
-    property alias panelOpacity: adapter.panelOpacity
-    property alias animations: adapter.animations
 
-    // Bar
-    property alias clockFormat: adapter.clockFormat
-    // Bar modules hidden on the primary monitor's bar and on the others
-    property alias barHiddenPrimary: adapter.barHiddenPrimary
-    property alias barHiddenOthers: adapter.barHiddenOthers
+    // Idle: minutes until the screen locks and the machine sleeps, 0 is never; *Battery on battery (services/Idle.qml)
+    property alias idleLock: adapter.idleLock
+    property alias idleSuspend: adapter.idleSuspend
+    property alias idleLockBattery: adapter.idleLockBattery
+    property alias idleSuspendBattery: adapter.idleSuspendBattery
+
+    // Night Light
+    property alias nightlightSchedule: adapter.nightlightSchedule
+    // the schedule may cross midnight
+    property alias nightlightStart: adapter.nightlightStart
+    property alias nightlightEnd: adapter.nightlightEnd
+    // kelvin, read by scripts/nightlight-toggle.sh
+    property alias nightlightTemperature: adapter.nightlightTemperature
+
+    // Tray & Player
+    property alias trayMonochrome: adapter.trayMonochrome
+    property alias trayTint: adapter.trayTint
+    // tray apps whose icon colors carry meaning (the ROG dGPU state) stay original when
+    // monochrome or tinted; comma separated
+    property alias trayKeepColors: adapter.trayKeepColors
+    property alias cava: adapter.cava
+    property alias cavaBars: adapter.cavaBars
+
     // In the bar's order, left to right
     readonly property var barModules: [
         { id: "launcher", label: "App launcher" },
@@ -91,134 +150,20 @@ Singleton {
             barHiddenOthers = list;
     }
 
-    // Weather: empty location means "detect from IP" (wttr.in)
-    property alias weatherLocation: adapter.weatherLocation
-    property alias weatherFahrenheit: adapter.weatherFahrenheit
+    // How often the weather refreshes
     readonly property int weatherInterval: 30 * 60 * 1000
 
-    // Notifications: seconds a popup stays up (critical ones stay until closed)
-    property alias notificationTimeout: adapter.notificationTimeout
-    property alias notificationBorder: adapter.notificationBorder
-    property alias notificationShadow: adapter.notificationShadow
-
-    // Lock screen
-
-    // Tray and player
-    property alias trayMonochrome: adapter.trayMonochrome
-    property alias trayTint: adapter.trayTint
-    property alias trayKeepColors: adapter.trayKeepColors
-    property alias cava: adapter.cava
-    property alias cavaBars: adapter.cavaBars
-
-    // Idle (services/Idle.qml): minutes until the screen locks and the machine sleeps; 0 is
-    // never. The *Battery ones apply on battery.
-    property alias idleLock: adapter.idleLock
-    property alias idleSuspend: adapter.idleSuspend
-    property alias idleLockBattery: adapter.idleLockBattery
-    property alias idleSuspendBattery: adapter.idleSuspendBattery
-
-    // Window gaps (Hyprland), normal and in Work-Game
-    // Fonts (Settings > Fonts): a Nerd Font, a display font for text, and
-    // whether text uses the Nerd Font too and icons come from Symbols Nerd Font
-    property alias nerdFont: adapter.nerdFont
-    property alias displayFont: adapter.displayFont
-    property alias nerdFontOnly: adapter.nerdFontOnly
-    property alias fontHinting: adapter.fontHinting
-    property alias fontAntialiasing: adapter.fontAntialiasing
-    property alias nerdSymbols: adapter.nerdSymbols
-    property alias windowButtons: adapter.windowButtons
-    property alias blur: adapter.blur
-    property alias activeOpacity: adapter.activeOpacity
-    property alias inactiveOpacity: adapter.inactiveOpacity
-    property alias gapsIn: adapter.gapsIn
-    property alias gapsOut: adapter.gapsOut
-    property alias gameGapsIn: adapter.gameGapsIn
-    property alias gameGapsOut: adapter.gameGapsOut
-
-    // Lock screen colors, as theme color names (green, blue, accent, ...)
-
+    // Reset (and a first start): defaults.json, saved with "Save as defaults", written in one
+    // go (setting values one at a time saves after each, and the reload that causes can undo
+    // the later ones). Without it the settings keep their starting values below.
     function reset(): void {
-        // Saved with "Save as defaults", written in one go: setting values one at a
-        // time saves after each, and the reload that causes can undo the later ones
         try {
             const saved = JSON.parse(defaultsFile.text());
             saved.version = root.version;
             settingsFile.setText(JSON.stringify(saved, null, 2) + "\n");
-            return;
         } catch (e) {
-            console.warn("Config: no usable defaults.json, using the built-in defaults", e);
+            console.warn("Config: no usable defaults.json; keeping the built-in defaults", e);
         }
-        adapter.radius = 6;
-        adapter.borderWidth = 2;
-        adapter.barOpacity = 0.95;
-        adapter.barFloating = false;
-        adapter.barMargin = 6;
-        adapter.panelOpacity = 0.95;
-        adapter.animations = true;
-        adapter.blur = true;
-        adapter.activeOpacity = 0.98;
-        adapter.inactiveOpacity = 0.95;
-        adapter.cursorTheme = "Adwaita";
-        adapter.cursorSize = 24;
-        adapter.iconTheme = "Papirus";
-        adapter.nightlightSchedule = false;
-        adapter.nightlightStart = "20:00";
-        adapter.nightlightEnd = "07:00";
-        adapter.nightlightTemperature = 4300;
-        adapter.lockFollowsTheme = true;
-        adapter.lockImage = "";
-        adapter.lockClockColor = "accent2";
-        adapter.lockAvatarColor = "accent";
-        adapter.lockBoxOutlineColor = "accent";
-        adapter.lockBoxColor = "base";
-        adapter.lockInputOutlineColor = "accent";
-        adapter.lockInputColor = "base";
-        adapter.lockUserColor = "accent";
-        adapter.lockCheckColor = "accent";
-        adapter.lockFailColor = "red";
-        adapter.lockCapsColor = "peach";
-        adapter.lockBoxOpacity = 90;
-        adapter.lockBox = false;
-        adapter.lockClock = false;
-        adapter.lockAvatar = true;
-        adapter.lockPowerColor = "base";
-        adapter.lockPowerOpacity = 85;
-        adapter.lockPowerIconColor = "accent2";
-        adapter.lockPowerOutlineColor = "accent";
-        adapter.accentOverrides = {"gruvbox": {"accent": "blue", "accent2": "peach", "accent3": "mauve"}, "hackerman": {"accent": "sapphire", "accent2": "mauve", "accent3": "peach"}, "nord": {"accent": "sapphire", "accent2": "mauve", "accent3": "peach"}};
-        adapter.wallpaperFollowsTheme = true;
-        adapter.lockInputOpacity = 65;
-        adapter.lockDotsColor = "accent2";
-        adapter.lockTextColor = "text";
-        adapter.clockFormat = "dddd HH:mm";
-        adapter.barHiddenPrimary = ["displays"];
-        adapter.barHiddenOthers = ["displays"];
-        adapter.weatherLocation = "";
-        adapter.weatherFahrenheit = false;
-        adapter.notificationTimeout = 5;
-        adapter.notificationBorder = true;
-        adapter.notificationShadow = true;
-        adapter.trayMonochrome = false;
-        adapter.trayTint = false;
-        adapter.trayKeepColors = "";
-        adapter.cava = true;
-        adapter.cavaBars = 40;
-        adapter.nerdFont = "JetBrainsMono Nerd Font";
-        adapter.displayFont = "SF Pro Display";
-        adapter.nerdFontOnly = true;
-        adapter.fontHinting = "slight";
-        adapter.fontAntialiasing = "rgba";
-        adapter.nerdSymbols = true;
-        adapter.windowButtons = false;
-        adapter.gapsIn = 5;
-        adapter.gapsOut = 10;
-        adapter.gameGapsIn = 5;
-        adapter.gameGapsOut = 10;
-        adapter.idleLock = 5;
-        adapter.idleSuspend = 20;
-        adapter.idleLockBattery = 3;
-        adapter.idleSuspendBattery = 10;
-        adapter.version = root.version;
     }
 
     // Current settings become what Reset (and a first start) applies
@@ -261,88 +206,95 @@ Singleton {
             id: adapter
 
             property int version: 0
+            // The settings, by Settings page, with their built-in defaults (defaults.json overrides them)
+
+            // Appearance
+            property var accentOverrides: ({"gruvbox": {"accent": "blue", "accent2": "peach", "accent3": "mauve"}, "hackerman": {"accent": "sapphire", "accent2": "mauve", "accent3": "peach"}, "nord": {"accent": "sapphire", "accent2": "mauve", "accent3": "peach"}})
+            property bool wallpaperFollowsTheme: true
             property int radius: 6
-            // read by scripts/theme-set.py
             property string cursorTheme: "Adwaita"
             property int cursorSize: 24
             property string iconTheme: "Papirus"
-            property bool nightlightSchedule: false
-            property string nightlightStart: "20:00" // the schedule may cross midnight
-            property string nightlightEnd: "07:00"
-            property int nightlightTemperature: 4300 // kelvin, read by scripts/nightlight-toggle.sh
-            // the lock screen (modules/lock); the colors also go to the login screen (theme-set.py)
-            // the background: the theme's own (Theme.background) until an image is chosen
-            property bool lockFollowsTheme: true
-            property string lockImage: ""
-            // theme color names
-            property string lockClockColor: "accent2"
-            property string lockAvatarColor: "accent"
-            property string lockBoxOutlineColor: "accent"
-            property string lockBoxColor: "base"
-            property string lockInputOutlineColor: "accent"
-            property string lockInputColor: "base"
-            property string lockUserColor: "accent"
-            property string lockCheckColor: "accent"
-            property string lockFailColor: "red"
-            property string lockCapsColor: "peach"
-            property int lockBoxOpacity: 90 // percent
-            // per theme: { "catppuccin-mocha": { accent: "mauve", accent2: "blue" } }, read by theme-set.py
-            property var accentOverrides: ({"gruvbox": {"accent": "blue", "accent2": "peach", "accent3": "mauve"}, "hackerman": {"accent": "sapphire", "accent2": "mauve", "accent3": "peach"}, "nord": {"accent": "sapphire", "accent2": "mauve", "accent3": "peach"}})
-            // the logo wallpaper in the theme's colors, redrawn on theme change (theme-set.py)
-            property bool wallpaperFollowsTheme: true
-            property bool lockClock: false // clock and date, one color (lockClockColor)
-            property bool lockAvatar: true
-            // the login screen's power buttons, apart from the box
-            property string lockPowerColor: "base"
-            property int lockPowerOpacity: 85 // percent
-            property string lockPowerIconColor: "accent2"
-            property string lockPowerOutlineColor: "accent"
-            property bool lockBox: false // the card behind the avatar and password (lock and login screens)
-            property int lockInputOpacity: 65 // percent
-            property string lockDotsColor: "accent2"
-            property string lockTextColor: "text"
             property int borderWidth: 2
             property real barOpacity: 0.95
-            property bool barFloating: false
-            property int barMargin: 6
             property real panelOpacity: 0.95
-            property bool animations: true
-            // blur behind windows and the shell in normal mode (Work-Game has none); services/Hypr.qml
-            property bool blur: true
-            // Hyprland windows in normal mode (fullscreen ones stay opaque, Work-Game makes all opaque)
             property real activeOpacity: 0.98
             property real inactiveOpacity: 0.95
-            property string clockFormat: "dddd HH:mm"
-            property var barHiddenPrimary: ["displays"]
-            property var barHiddenOthers: ["displays"]
-            property string weatherLocation: ""
-            property bool weatherFahrenheit: false
-            property int notificationTimeout: 5
-            // on-screen notifications: an accent outline, and a shadow
-            property bool notificationBorder: true
-            property bool notificationShadow: true
-            property bool trayMonochrome: false
-            property bool trayTint: false
-            // tray apps whose icon colors carry meaning (e.g. the ROG dGPU
-            // state) and stay original in monochrome/tinted mode; comma separated
-            property string trayKeepColors: ""
-            property bool cava: true
-            property int cavaBars: 40
+            property bool blur: true
+            property bool animations: true
+
+            // Fonts
             property string nerdFont: "JetBrainsMono Nerd Font"
             property string displayFont: "SF Pro Display"
             property bool nerdFontOnly: true
+            property bool nerdSymbols: true
             property string fontHinting: "slight"
             property string fontAntialiasing: "rgba"
-            property bool nerdSymbols: true
+
+            // Bar
+            property bool barFloating: false
+            property int barMargin: 6
+            property string clockFormat: "dddd HH:mm"
+            property string weatherLocation: ""
+            property bool weatherFahrenheit: false
+            property var barHiddenPrimary: ["displays"]
+            property var barHiddenOthers: ["displays"]
+
+            // Windows
             property bool windowButtons: false
             property int gapsIn: 5
             property int gapsOut: 10
             property int gameGapsIn: 5
             property int gameGapsOut: 10
+
+            // Notifications
+            property int notificationTimeout: 5
+            property bool notificationBorder: true
+            property bool notificationShadow: true
+
+            // Lock Screen
+            property bool lockFollowsTheme: true
+            property string lockImage: ""
+            property bool lockClock: false
+            property string lockClockColor: "accent2"
+            property bool lockAvatar: true
+            property string lockAvatarColor: "accent"
+            property bool lockBox: false
+            property string lockBoxOutlineColor: "accent"
+            property string lockBoxColor: "base"
+            property int lockBoxOpacity: 90
+            property string lockInputOutlineColor: "accent"
+            property string lockInputColor: "base"
+            property int lockInputOpacity: 65
+            property string lockDotsColor: "accent2"
+            property string lockUserColor: "accent"
+            property string lockTextColor: "text"
+            property string lockCheckColor: "accent"
+            property string lockFailColor: "red"
+            property string lockCapsColor: "peach"
+            property string lockPowerColor: "base"
+            property int lockPowerOpacity: 85
+            property string lockPowerIconColor: "accent2"
+            property string lockPowerOutlineColor: "accent"
+
+            // Idle
             property int idleLock: 5
             property int idleSuspend: 20
             property int idleLockBattery: 3
             property int idleSuspendBattery: 10
+
+            // Night Light
+            property bool nightlightSchedule: false
+            property string nightlightStart: "20:00"
+            property string nightlightEnd: "07:00"
+            property int nightlightTemperature: 4300
+
+            // Tray & Player
+            property bool trayMonochrome: false
+            property bool trayTint: false
+            property string trayKeepColors: ""
+            property bool cava: true
+            property int cavaBars: 40
         }
     }
 }
