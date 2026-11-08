@@ -28,12 +28,22 @@ Singleton {
     readonly property real health: battery?.healthSupported ? battery.healthPercentage : -1
 
     // Power modes (power-profiles-daemon; on ASUS laptops asusd maps them to Quiet /
-    // Balanced / Performance), for the battery dropdown and the OSD
+    // Balanced / Performance), for the battery dropdown and the OSD. `kernel`: the names in
+    // /sys/firmware/acpi/platform_profile.
     readonly property var powerModes: [
-        { label: "Quiet", profile: PowerProfile.PowerSaver, icon: Icons.moon },
-        { label: "Balanced", profile: PowerProfile.Balanced, icon: Icons.sliders },
-        { label: "Performance", profile: PowerProfile.Performance, icon: Icons.bolt }
+        { label: "Quiet", profile: PowerProfile.PowerSaver, kernel: ["quiet", "low-power"], icon: Icons.moon },
+        { label: "Balanced", profile: PowerProfile.Balanced, kernel: ["balanced"], icon: Icons.sliders },
+        { label: "Performance", profile: PowerProfile.Performance, kernel: ["performance"], icon: Icons.bolt }
     ]
+
+    // The mode with this kernel name, or the current one
+    function modeFor(kernelName: string): var {
+        for (let i = 0; i < powerModes.length; i++) {
+            if (powerModes[i].kernel.includes(kernelName))
+                return powerModes[i];
+        }
+        return powerMode;
+    }
 
     // the current one (index loop: var arrays don't take .find here)
     readonly property var powerMode: {

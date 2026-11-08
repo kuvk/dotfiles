@@ -41,9 +41,9 @@ Singleton {
                     icon: Icons.keyboard,
                     level: level
                 }),
-            power: () => ({
-                    icon: Battery.powerMode.icon,
-                    label: Battery.powerMode.label,
+            power: kernelName => ({
+                    icon: Battery.modeFor(kernelName).icon,
+                    label: Battery.modeFor(kernelName).label,
                     quiet: Panels.dropdown === "battery"
                 })
         })
@@ -52,7 +52,7 @@ Singleton {
     property var entry: ({ icon: "", level: -1, label: "", dim: false })
     property bool shown: false
 
-    function show(name: string, value: real): void {
+    function show(name: string, value: var): void {
         const e = root.kinds[name](value);
         if (e.quiet)
             return;
@@ -119,13 +119,16 @@ Singleton {
         }
     }
 
-    // Power mode: power-profiles-daemon, which follows the laptop's mode key too
+    // Power mode: the kernel's platform_profile where there is one (below): it changes at
+    // once, whoever changes it (the mode key, asusd on plugging in or out, the dropdown),
+    // while power-profiles-daemon follows a second or more later. Elsewhere the daemon.
     Connections {
         target: PowerProfiles
+        enabled: root.platformProfile === ""
 
         function onProfileChanged(): void {
             if (root.settled)
-                root.show("power", 0);
+                root.show("power", "");
         }
     }
 
@@ -134,28 +137,47 @@ Singleton {
     // source (keys, asusd, ROG Control Center, brightnessctl).
     property string backlight: ""
     property string keyboardLight: ""
+    property string platformProfile: ""
 
     Process {
         running: true
-        command: ["sh", "-c", "ls -d /sys/class/backlight/* 2>/dev/null | head -n1; echo; ls -d /sys/class/leds/*kbd_backlight 2>/dev/null | head -n1"]
+        command: ["sh", "-c", "ls -d /sys/class/backlight/* 2>/dev/null | head -n1; echo; ls -d /sys/class/leds/*kbd_backlight 2>/dev/null | head -n1; echo; ls /sys/firmware/acpi/platform_profile 2>/dev/null"]
         stdout: StdioCollector {
             onStreamFinished: {
-                const [backlight, keyboard] = text.split("\n\n").map(s => s.trim());
+                const [backlight, keyboard, profile] = text.split("\n\n").map(s => s.trim());
                 root.backlight = backlight ?? "";
                 root.keyboardLight = keyboard ?? "";
+                root.platformProfile = profile ?? "";
             }
         }
     }
 
     Timer {
         interval: 300
-        running: root.backlight !== "" || root.keyboardLight !== ""
+        running: root.backlight !== "" || root.keyboardLight !== "" || root.platformProfile !== ""
         repeat: true
         onTriggered: {
             if (root.backlight)
                 screenLevel.reload();
             if (root.keyboardLight)
                 keyboardLevel.reload();
+            if (root.platformProfile)
+                profileFile.reload();
+        }
+    }
+
+    // the first reading is where it is, not a change
+    FileView {
+        id: profileFile
+
+        property string last: ""
+
+        path: root.platformProfile
+        onLoaded: {
+            const now = text().trim();
+            if (profileFile.last !== "" && now !== profileFile.last)
+                root.show("power", now);
+            profileFile.last = now;
         }
     }
 
