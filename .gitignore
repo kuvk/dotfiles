@@ -20,7 +20,7 @@ generated/
 shaders/
 bookmarks
 
-# ---------------------------------------------------------------- theme output (theme-set.py)
+# ---------------------------------------------------------------- theme output (hyprdori-theme-set)
 theme/.config/theme/current/
 kitty/.config/kitty/text-size.conf
 bat/.config/bat/themes/Current.tmTheme
@@ -45,7 +45,7 @@ yazi/.config/yazi/package.toml
 lazygit/.config/lazygit/state.yml
 # kitty's theme kitten
 kitty/.config/kitty/current-theme.conf
-# Hyprland monitor profiles (hypr-monitors.py), per machine
+# Hyprland monitor profiles (hyprdori-monitors), per machine
 hypr/.config/hypr/monitors.json
 # cliamp keeps playlists, history and its socket next to the config
 cliamp/.config/cliamp/*

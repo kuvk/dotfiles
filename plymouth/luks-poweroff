@@ -15,7 +15,7 @@ DefaultDependencies=no
 [Service]
 Type=oneshot
 # The splash script takes this message as its cue for the farewell line
-ExecStart=-/usr/bin/plymouth display-message --text=kuvk-farewell
+ExecStart=-/usr/bin/plymouth display-message --text=hyprdori-farewell
 ExecStart=/usr/bin/sleep 2
 ExecStart=/usr/bin/systemctl --no-block poweroff
 EOF

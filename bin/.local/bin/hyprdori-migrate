@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Runs the migrations in Hyprdori's migrations/ that haven't run on this machine yet, oldest
+# first: one-time changes an update needs, like moving a renamed folder. Done ones are listed
+# in ~/.local/state/hyprdori/migrations/. After Omarchy's migrations.
+#
+#   hyprdori-migrate               run the new ones (hyprdori-update does)
+#   hyprdori-migrate --mark-done   count them all as done (a fresh install, install.sh)
+set -uo pipefail
+
+hyprdori=$(cd "$(dirname "$(readlink -f "$0")")/../../.." && pwd)
+done_dir=${XDG_STATE_HOME:-$HOME/.local/state}/hyprdori/migrations
+mkdir -p "$done_dir"
+
+shopt -s nullglob
+for migration in "$hyprdori"/migrations/*.sh; do
+    name=$(basename "$migration")
+    [[ -e $done_dir/$name ]] && continue
+    if [[ ${1:-} == --mark-done ]]; then
+        touch "$done_dir/$name"
+        continue
+    fi
+    printf '\e[1;34m==> Migration %s\e[0m\n' "$name"
+    if HYPRDORI_PATH=$hyprdori bash "$migration"; then
+        touch "$done_dir/$name"
+    else
+        printf '\e[33mMigration %s failed; it runs again next time.\e[0m\n' "$name"
+        exit 1
+    fi
+done

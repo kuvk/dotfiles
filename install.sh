@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
-# Sets up these dotfiles on a fresh Arch install. Run it as the user, not root (it asks for sudo) after
+# Sets up Hyprdori on a fresh Arch install. Run it as the user, not root (it asks for sudo) after
 # the first boot, from a console or any session, with the network up:
 #
-#   git clone https://github.com/kuvk/dotfiles ~/dotfiles && ~/dotfiles/install.sh
+#   git clone https://github.com/kuvk/hyprdori ~/hyprdori && ~/hyprdori/install.sh
 #
 # Expects what the Arch install leaves: base, linux-firmware, microcode, a user with sudo,
 # the ESP mounted at /efi, and for encrypted drives the systemd initramfs (the systemd and
 # sd-encrypt hooks, rd.luks.name= in the kernel options). Safe to run again: each step skips
 # what's already done.
 #
-# Steps: pacman.conf (multilib, the g14 repo on ASUS laptops), mirrors (reflector), dotfiles
-# (stow; files in the way go to ~/.dotfiles-backup), packages (packages/*.txt by detected
+# Steps: pacman.conf (multilib, the g14 repo on ASUS laptops), mirrors (reflector), config links
+# (stow; files in the way go to ~/.hyprdori-backup), packages (packages/*.txt by detected
 # hardware), Flatpak, services, zsh and its plugins, the theme, then boot: initramfs and kernel options,
 # Plymouth, Limine. The login screen (SDDM) comes with the theme.
 set -euo pipefail
 
-dotfiles=$(dirname "$(readlink -f "$0")")
-not_stowed=(limine nvidia-hybrid packages plymouth sddm)
+hyprdori=$(dirname "$(readlink -f "$0")")
+not_stowed=(limine migrations nvidia-hybrid packages plymouth sddm)
 
 step() { printf '\n\e[1;34m==> %s\e[0m\n' "$1"; }
 note() { printf '\e[33m%s\e[0m\n' "$1"; }
@@ -28,7 +28,7 @@ ask() {
     [[ ${answer:-$2} =~ ^[yY] ]]
 }
 # Package names from a list: comments and blank lines dropped
-list() { sed 's/#.*//; s/[[:space:]]//g; /^$/d' "$dotfiles/packages/$1.txt"; }
+list() { sed 's/#.*//; s/[[:space:]]//g; /^$/d' "$hyprdori/packages/$1.txt"; }
 
 # --- Checks -------------------------------------------------------------------------------------
 ((EUID != 0)) || { echo "Run this as yourself, not root: it asks for sudo when needed." >&2; exit 1; }
@@ -114,31 +114,33 @@ EOF
 fi
 sudo systemctl enable --now reflector.timer
 
-# --- Dotfiles -----------------------------------------------------------------------------------------
-step "Dotfiles"
+# --- Links --------------------------------------------------------------------------------------------
+step "Links"
 sudo pacman -Syu --needed --noconfirm base-devel git stow
-backup="$HOME/.dotfiles-backup/$(date +%F_%H-%M-%S)"
+backup="$HOME/.hyprdori-backup/$(date +%F_%H-%M-%S)"
 packages=()
-for dir in "$dotfiles"/*/; do
+for dir in "$hyprdori"/*/; do
     name=$(basename "$dir")
     [[ " ${not_stowed[*]} " == *" $name "* ]] || packages+=("$name")
 done
-# Files where a link should go, which aren't links into the dotfiles already, move aside
+# Files where a link should go, which aren't links into Hyprdori already, move aside
 moved=0
 for name in "${packages[@]}"; do
     while IFS= read -r -d '' file; do
-        rel=${file#"$dotfiles/$name/"}
+        rel=${file#"$hyprdori/$name/"}
         target="$HOME/$rel"
         [[ -e $target || -L $target ]] || continue
         [[ $(readlink -f "$target") == "$file" ]] && continue
         mkdir -p "$backup/$(dirname "$rel")"
         mv "$target" "$backup/$rel"
         moved=$((moved + 1))
-    done < <(find "$dotfiles/$name" \( -type f -o -type l \) -print0)
+    done < <(find "$hyprdori/$name" \( -type f -o -type l \) -print0)
 done
 ((moved)) && note "Moved $moved file(s) that were in the way to $backup"
-stow -d "$dotfiles" -t "$HOME" --restow "${packages[@]}"
+stow -d "$hyprdori" -t "$HOME" --restow "${packages[@]}"
 echo "Linked: ${packages[*]}"
+# A fresh install has nothing to migrate: hyprdori-update runs only migrations added later
+"$hyprdori/bin/.local/bin/hyprdori-migrate" --mark-done
 
 # --- Packages -------------------------------------------------------------------------------------------
 step "Packages"
@@ -169,7 +171,7 @@ if [[ " ${groups[*]} " == *" nvidia "* ]]; then
     # Hybrid laptop (NVIDIA next to the built-in GPU): the NVIDIA card stays powered on AC, so
     # plugging a monitor into its ports doesn't have to wake it
     if $laptop && ((${#gpus[@]} >= 2)); then
-        sudo "$dotfiles/nvidia-hybrid/install.sh" >/dev/null || note "Couldn't install the NVIDIA AC power rule"
+        sudo "$hyprdori/nvidia-hybrid/install.sh" >/dev/null || note "Couldn't install the NVIDIA AC power rule"
     fi
 fi
 [[ " ${groups[*]} " == *" desktop "* ]] && services+=(coolercontrold)
@@ -203,20 +205,20 @@ fi
 "$HOME/.config/scripts/install-zsh-plugins.py"
 
 step "Theme"
-# The login screen first: theme-set.py writes its colors to the folder this makes
-sudo "$dotfiles/sddm/install.sh" >/dev/null
-# tmux's theme plugin (.tmux.conf would clone it on first start), so theme-set.py can write
+# The login screen first: hyprdori-theme-set writes its colors to the folder this makes
+sudo "$hyprdori/sddm/install.sh" >/dev/null
+# tmux's theme plugin (.tmux.conf would clone it on first start), so hyprdori-theme-set can write
 # the theme's colors into it now
 tmux_theme="$HOME/.tmux/plugins/catppuccin/tmux"
 [[ -d $tmux_theme ]] || git clone -q -b v2.3.2 https://github.com/catppuccin/tmux.git "$tmux_theme"
-"$HOME/.config/scripts/theme-set.py"
-# Backgrounds: ~/.local/share/dotfiles/backgrounds/default (wallpapers) and /live, and
-# ~/.config/dotfiles/backgrounds.json for more folders. The desktop, lock screen and login
-# screen get the theme's background, which theme-set.py just drew (the logo in accent2 on
+"$HOME/.local/bin/hyprdori-theme-set"
+# Backgrounds: ~/.local/share/hyprdori/backgrounds/default (wallpapers) and /live, and
+# ~/.config/hyprdori/backgrounds.json for more folders. The desktop, lock screen and login
+# screen get the theme's background, which hyprdori-theme-set just drew (the logo in accent2 on
 # base, like the boot splash and menu), unless a wallpaper is chosen already. Both follow
 # the theme from then on.
 wall=$(jq -r '.background // empty' "$HOME/.config/theme/current/quickshell.json" 2>/dev/null) || wall=
-"$HOME/.config/scripts/wallpaper.py" default ${wall:+"$wall"}
+"$HOME/.local/bin/hyprdori-wallpaper" default ${wall:+"$wall"}
 sudo "$HOME/.config/scripts/browser-theme-setup.sh"
 
 # --- Boot: initramfs, kernel options, splash, menu -------------------------------------------------------------
@@ -289,15 +291,15 @@ EOF
     echo "Kernel options: $cmdline"
 
     # Plymouth builds the initramfs, Limine then finds the kernels in /efi/arch
-    sudo "$dotfiles/plymouth/install.sh" --theme
-    sudo "$dotfiles/limine/install.sh" --theme
+    sudo "$hyprdori/plymouth/install.sh" --theme
+    sudo "$hyprdori/limine/install.sh" --theme
 fi
 
 step "Done"
 cat <<MSG
 Reboot. After the first login, from the desktop:
 
-  ~/.config/scripts/hypr-monitors.py export-greeter   the login screen's monitor layout
+  ~/.local/bin/hyprdori-monitors export-greeter   the login screen's monitor layout
 
 Backups of what this changed: /etc/pacman.conf.bak, /etc/mkinitcpio.conf.bak, the presets'
 .bak files and /etc/pacman.d/mirrorlist.bak.

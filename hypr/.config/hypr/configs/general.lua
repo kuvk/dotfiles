@@ -1,5 +1,5 @@
 -- Border colors follow the theme, gaps are Quickshell's Settings (Windows); both written to
--- generated/theme.lua by ~/.config/scripts/theme-set.py. Missing there: these.
+-- generated/theme.lua by ~/.local/bin/hyprdori-theme-set. Missing there: these.
 local ok, theme = pcall(require, "configs.generated.theme")
 if not ok then
   theme = { active_border = "rgb(fab387)", inactive_border = "rgba(7f849cee)" }
@@ -42,12 +42,12 @@ hl.config({
     initial_workspace_tracking = 0,
     -- the shell's lock screen takes the lock over after a reload or a crash restart
     allow_session_lock_restore = true,
-    -- Variable refresh rate is set per monitor in Displays (hypr-monitors.py); off elsewhere
+    -- Variable refresh rate is set per monitor in Displays (hyprdori-monitors); off elsewhere
     vrr = 0,
   },
 
   -- No switching to HDR for fullscreen HDR content (no HDR at all: the monitor rules have
-  -- supports_hdr = -1, see hypr-monitors.py)
+  -- supports_hdr = -1, see hyprdori-monitors)
   render = {
     cm_auto_hdr = 0,
   },

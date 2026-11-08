@@ -200,8 +200,8 @@ Item {
                         textFormat: Text.StyledText
                         color: Theme.subtext1
                         // one size below the title; a hint from the shell's scripts (keys, an
-                        // Update to run: category x-kuvk.hint) one more
-                        font.pixelSize: root.notification.hints?.category === "x-kuvk.hint" ? Theme.fontSize - 2 : Theme.fontSize - 1
+                        // Update to run: category x-hyprdori.hint) one more
+                        font.pixelSize: root.notification.hints?.category === "x-hyprdori.hint" ? Theme.fontSize - 2 : Theme.fontSize - 1
                         wrapMode: Text.Wrap
                         maximumLineCount: root.popup ? 4 : 8
                         onLinkActivated: link => Qt.openUrlExternally(link)

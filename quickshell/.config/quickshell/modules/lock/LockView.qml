@@ -6,7 +6,7 @@ import qs.services
 
 // What the lock screen shows on one screen: the background, and on the main screen the
 // clock and date top right and the avatar and password in a centered card. Laid out like
-// the login screen (sddm/kuvk/Main.qml), with the colors from Settings > Lock Screen.
+// the login screen (sddm/hyprdori/Main.qml), with the colors from Settings > Lock Screen.
 // Keys typed on any screen go to the password: Hyprland gives the keyboard to one of the
 // lock surfaces, not always the main one.
 Item {
@@ -71,7 +71,7 @@ Item {
     Component.onCompleted: Qt.callLater(takeFocus)
 
     // The theme's background, or the chosen image (Settings > Lock Screen; services/Lock.qml).
-    // Already no larger than the largest screen (wallpaper.py lock), so it loads at once,
+    // Already no larger than the largest screen (hyprdori-wallpaper lock), so it loads at once,
     // before the lock is up; decoded once for every screen (Qt's image cache).
     Image {
         anchors.fill: parent

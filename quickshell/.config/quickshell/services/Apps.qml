@@ -41,7 +41,7 @@ Singleton {
     }
 
     // Image source for a desktop entry's Icon=: a theme icon name, or a file
-    // path (web apps from webapp.py)
+    // path (web apps from hyprdori-webapp)
     function iconSource(icon: string, fallback: string): string {
         if (icon && icon.startsWith("/"))
             return "file://" + icon;

@@ -39,7 +39,7 @@ ColumnLayout {
             id: lockImagePicker
 
             command: ["zenity", "--file-selection", "--title=Lock screen background",
-                `--filename=${Quickshell.env("HOME")}/.local/share/dotfiles/backgrounds/default/`,
+                `--filename=${Quickshell.env("HOME")}/.local/share/hyprdori/backgrounds/default/`,
                 "--file-filter=Images | *.png *.jpg *.jpeg *.webp"]
             stdout: StdioCollector {
                 onStreamFinished: {
@@ -55,7 +55,7 @@ ColumnLayout {
     }
 
     // Each part of the lock screen, and the login screen's power buttons.
-    // Colors also go to the login screen (theme-set.py --login).
+    // Colors also go to the login screen (hyprdori-theme-set --login).
     SettingsSection {
         title: "Clock and date"
         hint: "Top right, on the lock and login screens"
@@ -158,7 +158,7 @@ ColumnLayout {
         id: loginApply
 
         interval: 800
-        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--login"])
+        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--login"])
     }
 
     TextButton {

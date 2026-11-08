@@ -3,7 +3,7 @@
 # cursor or prompt; any key closes it, and running this again while it's open closes it too.
 # The text is kitty's, so it can be selected and copied. After Omarchy's About window
 # (omarchy-launch-about, github.com/basecamp/omarchy, MIT). Floated and centered by a
-# Hyprland rule (rules.lua, class kuvk-sysinfo).
+# Hyprland rule (rules.lua, class hyprdori-sysinfo).
 #
 # The window is fitted from inside, where fastfetch sees the terminal it draws in (run from
 # the shell it lays out differently): its output is measured in cells, and the window is
@@ -11,8 +11,8 @@
 # right), from the cell size kitty reports. The size that fit is remembered and set as a
 # window rule before the next launch, so the window opens at it.
 
-class=kuvk-sysinfo
-fit_file=${XDG_STATE_HOME:-$HOME/.local/state}/kuvk-shell/sysinfo.fit
+class=hyprdori-sysinfo
+fit_file=${XDG_STATE_HOME:-$HOME/.local/state}/hyprdori/sysinfo.fit
 
 # The same on every side: kitty's padding around the output (pt, so 4/3 px at scale 1)
 padding_pt=12
@@ -63,8 +63,8 @@ print(max(width.values(), default=60) + (left or 0), max(width, default=20) + 1)
 # The window rule that opens it at the remembered size; without a size, only the old one goes
 size_rule() {
     local rule=""
-    (($# == 2)) && rule="kuvk_sysinfo_size = hl.window_rule({ match = { class = \"^$class\$\" }, size = { $1, $2 } })"
-    hyprctl eval "if kuvk_sysinfo_size then kuvk_sysinfo_size:set_enabled(false) end; kuvk_sysinfo_size = nil; $rule" >/dev/null 2>&1
+    (($# == 2)) && rule="hyprdori_sysinfo_size = hl.window_rule({ match = { class = \"^$class\$\" }, size = { $1, $2 } })"
+    hyprctl eval "if hyprdori_sysinfo_size then hyprdori_sysinfo_size:set_enabled(false) end; hyprdori_sysinfo_size = nil; $rule" >/dev/null 2>&1
 }
 
 # Hyprland animates a resize and kitty reflows at every step: wait for the grid to hold still

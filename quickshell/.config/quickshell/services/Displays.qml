@@ -4,12 +4,12 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// Monitor profiles through ~/.config/scripts/hypr-monitors.py: layout, modes,
+// Monitor profiles through ~/.local/bin/hyprdori-monitors: layout, modes,
 // scale, workspaces, text size and brightness (backlight or DDC/CI).
 Singleton {
     id: root
 
-    readonly property string script: Quickshell.env("HOME") + "/.config/scripts/hypr-monitors.py"
+    readonly property string script: Quickshell.env("HOME") + "/.local/bin/hyprdori-monitors"
 
     property var info: ({ monitors: [], workspaces: {}, text_scale: 1 })
     property var brightness: ({}) // monitor name -> percent, or null if not controllable
@@ -55,7 +55,7 @@ Singleton {
         }
     }
 
-    // Hyprland runs `hypr-monitors.py hotplug` itself when monitors change
+    // Hyprland runs `hyprdori-monitors hotplug` itself when monitors change
     // (configs/autostart.lua); just refresh what the panel shows.
     Connections {
         target: Quickshell
@@ -81,7 +81,7 @@ Singleton {
                 try {
                     root.info = JSON.parse(text);
                 } catch (e) {
-                    console.warn("Displays: bad state from hypr-monitors.py", e);
+                    console.warn("Displays: bad state from hyprdori-monitors", e);
                 }
             }
         }
@@ -104,7 +104,7 @@ Singleton {
         id: applyProc
 
         stderr: StdioCollector {
-            onStreamFinished: if (text.trim()) console.warn("hypr-monitors.py:", text.trim())
+            onStreamFinished: if (text.trim()) console.warn("hyprdori-monitors:", text.trim())
         }
         onExited: {
             root.busy = false;

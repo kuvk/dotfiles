@@ -1,4 +1,4 @@
--- Monitors (written by ~/.config/scripts/hypr-monitors.py; missing on a fresh install)
+-- Monitors (written by ~/.local/bin/hyprdori-monitors; missing on a fresh install)
 if not pcall(require, "configs.generated.monitors") then
   hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto", supports_hdr = -1 })
 end
@@ -19,7 +19,7 @@ require("configs.animations")
 require("configs.rules")
 
 -- Single window (SUPER+SHIFT+S, ~/.config/scripts/hypr-single-window.sh): on while the flag exists
-local single = io.open(os.getenv("HOME") .. "/.local/state/kuvk-shell/single-window")
+local single = io.open(os.getenv("HOME") .. "/.local/state/hyprdori/single-window")
 if single then
   single:close()
   require("configs.single-window")

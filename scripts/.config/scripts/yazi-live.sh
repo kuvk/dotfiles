@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # yazi that follows theme changes. yazi can't reload its theme while running,
-# so theme-set.py asks every yazi started through here to quit (it remembers
+# so hyprdori-theme-set asks every yazi started through here to quit (it remembers
 # its folder) and this starts it again in the same folder, in the same window.
 #
 #   yazi-live.sh [yazi args]     use instead of `yazi` (SUPER+E, the `y` shell function)
@@ -12,7 +12,7 @@ mkdir -p "$dir"
 id=$$
 cwd_file="$dir/$id.cwd"
 restart="$dir/$id.restart"
-# theme-set.py finds running instances by these files
+# hyprdori-theme-set finds running instances by these files
 : >"$dir/$id.client"
 trap 'rm -f "$dir/$id".*' EXIT
 

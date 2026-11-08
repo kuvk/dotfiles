@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One-time setup so theme-set.py can color Chromium and Brave (Settings >
+# One-time setup so hyprdori-theme-set can color Chromium and Brave (Settings >
 # Appearance > Theme must be "Classic"). The color
 # goes into the browsers' managed policy (BrowserThemeColor). Those folders
 # belong to root, so this installs a small root-owned helper that only accepts
@@ -9,7 +9,7 @@
 #   sudo ~/.config/scripts/browser-theme-setup.sh            install
 #   sudo ~/.config/scripts/browser-theme-setup.sh --unlock   drop the color policy for
 #        now, e.g. to switch Appearance > Theme to Classic; the next theme
-#        switch (or theme-set.py) puts it back
+#        switch (or hyprdori-theme-set) puts it back
 #   sudo ~/.config/scripts/browser-theme-setup.sh --remove   undo everything
 set -euo pipefail
 
@@ -34,7 +34,7 @@ if [[ ${1:-} == --unlock ]]; then
 Theme policy removed. Now:
   1. Restart the browser (close every window).
   2. Settings > Appearance > Theme: choose "Classic" (not GTK or QT).
-  3. Close the browser, then run ~/.config/scripts/theme-set.py to color it again.
+  3. Close the browser, then run ~/.local/bin/hyprdori-theme-set to color it again.
 MSG
     exit 0
 fi
@@ -68,7 +68,7 @@ chmod 0755 "$HELPER"
 
 rule="$user ALL=(root) NOPASSWD: $HELPER [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]"
 tmp=$(mktemp)
-printf '# Lets theme-set.py write the browser theme color (browser-theme-setup.sh)\n%s\n' "$rule" >"$tmp"
+printf '# Lets hyprdori-theme-set write the browser theme color (browser-theme-setup.sh)\n%s\n' "$rule" >"$tmp"
 if visudo -cf "$tmp" >/dev/null; then
     install -m 0440 -o root -g root -T "$tmp" "$SUDOERS"
     rm -f "$tmp"
@@ -78,4 +78,4 @@ else
     exit 1
 fi
 
-echo "Done. Switch theme once (or run ~/.config/scripts/theme-set.py) to apply the color."
+echo "Done. Switch theme once (or run ~/.local/bin/hyprdori-theme-set) to apply the color."

@@ -5,7 +5,7 @@ import Quickshell
 import Quickshell.Io
 
 // Colors come from ~/.config/theme/current/quickshell.json, written by
-// ~/.config/scripts/theme-set.py. The file is watched, so switching themes
+// ~/.local/bin/hyprdori-theme-set. The file is watched, so switching themes
 // recolors the shell live. Defaults below are Catppuccin Mocha.
 Singleton {
     id: root
@@ -16,7 +16,7 @@ Singleton {
     property string mode: "dark"
     // power menu icons for this theme (theme-icons.py), "" = use glyphs
     property string iconsDir: ""
-    // the theme's own background (theme-set.py): the wallpaper and lock screen while they follow the theme
+    // the theme's own background (hyprdori-theme-set): the wallpaper and lock screen while they follow the theme
     property string background: ""
     // Set by hypr-gamemode.sh over IPC: opaque surfaces, square corners, no animations
     property bool gamemode: false
@@ -121,7 +121,7 @@ Singleton {
                 console.warn("Theme: could not parse", path, e);
             }
         }
-        onLoadFailed: err => console.warn("Theme: no generated theme yet, run theme-set.py")
+        onLoadFailed: err => console.warn("Theme: no generated theme yet, run hyprdori-theme-set")
     }
 
     FileView {

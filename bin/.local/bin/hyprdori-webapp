@@ -3,11 +3,11 @@
 address bar, no extension icons) with a launcher entry and an icon, so it
 shows up in the search launcher and the app menu (Internet).
 
-  webapp.py                                  ask for name, URL and icon
-  webapp.py install NAME URL [ICON]          create (or update) a web app
-  webapp.py list                             installed web apps
-  webapp.py remove NAME                      remove one
-  webapp.py launch URL                       open URL as a web app (used by the entries)
+  hyprdori-webapp                                  ask for name, URL and icon
+  hyprdori-webapp install NAME URL [ICON]          create (or update) a web app
+  hyprdori-webapp list                             installed web apps
+  hyprdori-webapp remove NAME                      remove one
+  hyprdori-webapp launch URL                       open URL as a web app (used by the entries)
 
 ICON is optional: a PNG URL, a local image file, or a name from
 https://dashboardicons.com (e.g. "whatsapp"). Without one, the app's name is
@@ -34,7 +34,8 @@ DATA = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share"))
 APPS_DIR = DATA / "applications"
 ICON_DIR = DATA / "icons/hicolor/256x256/apps"
 PREFIX = "webapp-"
-SELF = Path(__file__).resolve()
+# what the entries run: the command, wherever Hyprdori is
+SELF = Path.home() / ".local/bin/hyprdori-webapp"
 
 DASHBOARD_ICONS = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/{}.png"
 FAVICON = "https://www.google.com/s2/favicons?domain={}&sz=256"
@@ -167,7 +168,7 @@ def remove(name: str) -> None:
             (ICON_DIR / f"{entry.stem}.png").unlink(missing_ok=True)
             print(f"Removed {app_name}")
             return
-    raise SystemExit(f"No web app named {name!r} (see: webapp.py list)")
+    raise SystemExit(f"No web app named {name!r} (see: hyprdori-webapp list)")
 
 
 def launch(url: str) -> None:

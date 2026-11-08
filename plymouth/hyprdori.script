@@ -1,4 +1,4 @@
-# kuvk Plymouth theme. Adapted from Omarchy's (https://github.com/basecamp/omarchy, MIT,
+# Hyprdori's Plymouth theme. Adapted from Omarchy's (https://github.com/basecamp/omarchy, MIT,
 # Copyright (c) David Heinemeier Hansson). install.sh fills in the @COLORS@ and draws the images.
 
 Window.SetBackgroundTopColor(@BG_RGB@);
@@ -334,9 +334,9 @@ fun show_farewell() {
   hint.sprite.SetOpacity(1);
 }
 
-# luks-poweroff sends "kuvk-farewell" when the drives didn't unlock
+# luks-poweroff sends "hyprdori-farewell" when the drives didn't unlock
 fun display_message_callback(text) {
-  if (text == "kuvk-farewell") {
+  if (text == "hyprdori-farewell") {
     show_farewell();
     return;
   }

@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# Installs the kuvk boot splash: the fastfetch logo, a password field for the encrypted
+# Installs Hyprdori's boot splash: the fastfetch logo, a password field for the encrypted
 # drives and a progress bar after it. Plymouth reads it from the initramfs, so this
 # rebuilds the initramfs; run it again to change colors.
 #
 #   sudo plymouth/install.sh               the current theme's colors, accents included
-#                                          (theme-set.py; Catppuccin Mocha before it has run)
+#                                          (hyprdori-theme-set; Catppuccin Mocha before it has run)
 #   sudo plymouth/install.sh --theme       the same, but stop if there's no theme yet
 #   plymouth/install.sh --preview FILE     draw the password step to an image, without installing
 #   plymouth/install.sh --preview-progress FILE   the same for the progress bar (at 60%)
@@ -42,7 +42,7 @@ else
     home=$HOME
 fi
 
-# The current theme's slots, or Catppuccin Mocha before theme-set.py has run
+# The current theme's slots, or Catppuccin Mocha before hyprdori-theme-set has run
 base="#1e1e2e" surface0="#313244" text="#cdd6f4" subtext0="#a6adc8" mauve="#cba6f7"
 accent="#fab387" accent2="#89b4fa"
 colors="$home/.config/theme/current/colors.sh"
@@ -50,7 +50,7 @@ if [[ -r $colors ]]; then
     # shellcheck source=/dev/null
     . "$colors"
 elif $use_theme; then
-    echo "No $colors; run theme-set.py first" >&2
+    echo "No $colors; run hyprdori-theme-set first" >&2
     exit 1
 fi
 
@@ -85,8 +85,8 @@ magick -size "${ew}x10" xc:none -fill "$accent" -draw "roundrectangle 0,0 $((ew 
 encrypted=0
 grep -qE '^HOOKS=.*\b(sd-)?encrypt\b' /etc/mkinitcpio.conf && encrypted=1
 sed -e "s/@BG_RGB@/$(rgb "$base")/" -e "s/@TEXT_RGB@/$(rgb "$subtext0")/" -e "s/@ENCRYPTED@/$encrypted/" \
-    "$here/kuvk.script" >"$build/kuvk.script"
-sed -e "s/@BG@/${base#\#}/" "$here/kuvk.plymouth" >"$build/kuvk.plymouth"
+    "$here/hyprdori.script" >"$build/hyprdori.script"
+sed -e "s/@BG@/${base#\#}/" "$here/hyprdori.plymouth" >"$build/hyprdori.plymouth"
 
 if [[ $mode == preview-farewell ]]; then
     # 1920x1080: the line alone, centered
@@ -120,12 +120,12 @@ if [[ $mode == preview* ]]; then
     exit 0
 fi
 
-theme=/usr/share/plymouth/themes/kuvk
+theme=/usr/share/plymouth/themes/hyprdori
 install -d -m 0755 "$theme"
 install -m 0644 "$build"/* "$theme"/
 install -D -m 0644 "$here/luks-poweroff" /etc/initcpio/install/luks-poweroff
 if ! grep -q '^HOOKS=.*\bluks-poweroff\b' /etc/mkinitcpio.conf; then
     sed -i '/^HOOKS=/s/\bsd-encrypt\b/sd-encrypt luks-poweroff/' /etc/mkinitcpio.conf
 fi
-plymouth-set-default-theme -R kuvk
+plymouth-set-default-theme -R hyprdori
 echo "Installed. The boot splash shows at the next boot."

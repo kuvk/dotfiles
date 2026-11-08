@@ -12,14 +12,14 @@
 # Asks for the password in a terminal (sudo) or, started from the desktop, in the polkit
 # dialog (pkexec). Plymouth rebuilds every initramfs, which takes a while.
 #
-# What they were last built from is kept as a checksum in /var/lib/kuvk-shell/boot-theme:
+# What they were last built from is kept as a checksum in /var/lib/hyprdori/boot-theme:
 # the theme's colors, the logo and the installers themselves.
 set -euo pipefail
 
 self=$(readlink -f "$0")
 scripts=$(dirname "$self")
-dotfiles=$(cd "$scripts/../../.." && pwd)
-stamp=/var/lib/kuvk-shell/boot-theme
+hyprdori=$(cd "$scripts/../../.." && pwd)
+stamp=/var/lib/hyprdori/boot-theme
 
 note() { printf '%s\n' "$1"; command -v notify-send >/dev/null && [[ ! -t 1 ]] && notify-send -a "Boot screens" "$1" 2>/dev/null; true; }
 
@@ -27,7 +27,7 @@ note() { printf '%s\n' "$1"; command -v notify-send >/dev/null && [[ ! -t 1 ]] &
 fingerprint() {
     local home=$1
     cat "$home/.config/theme/current/colors.sh" "$home/.config/theme/logo/ascii-dori" \
-        "$dotfiles"/plymouth/* "$dotfiles/limine/install.sh" "$scripts/logo-render.py" 2>/dev/null |
+        "$hyprdori"/plymouth/* "$hyprdori/limine/install.sh" "$scripts/logo-render.py" 2>/dev/null |
         sha256sum | cut -d' ' -f1
 }
 
@@ -36,13 +36,13 @@ if [[ ${1:-} == --as-root ]]; then
     user=${2:?user}
     home=$(getent passwd "$user" | cut -d: -f6)
     export SUDO_USER=$user
-    "$dotfiles/plymouth/install.sh"
-    # Limine with the options it was installed with (update.sh does the same)
+    "$hyprdori/plymouth/install.sh"
+    # Limine with the options it was installed with (hyprdori-update does the same)
     options=()
     if [[ -r /efi/EFI/limine/limine.conf ]]; then
         read -ra options <<<"$(sed -n 's/^# Options: //p' /efi/EFI/limine/limine.conf)"
     fi
-    "$dotfiles/limine/install.sh" "${options[@]}"
+    "$hyprdori/limine/install.sh" "${options[@]}"
     if [[ -d ${stamp%/*} ]]; then
         fingerprint "$home" >"$stamp"
         chown "$user" "$stamp"

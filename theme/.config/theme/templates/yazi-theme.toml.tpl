@@ -192,7 +192,7 @@ rules = [
 # Folders in accent and links in accent3; every file keeps yazi's own icon and color (its
 # defaults come from nvim-web-devicons, like Neovim's). eza shows the same ones
 # (templates/eza-theme.yml.tpl, written by eza-icons.py).
-# From icons.toml (theme-set.py fills these in): folders by name in accent, and any file
+# From icons.toml (hyprdori-theme-set fills these in): folders by name in accent, and any file
 # names and extensions listed there
 dirs = [
 {{ yazi_icon_dirs }}

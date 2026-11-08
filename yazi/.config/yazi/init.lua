@@ -3,7 +3,7 @@
 -- (counts, date, permissions), then a secondary block (percent) flowing into
 -- a bold position bubble. Rounded separators only between blocks, none inside
 -- them. Based on yaziline (llanosrocas/yaziline.yazi, MIT), built in so no
--- plugin is needed. Colors come from theme.toml (theme-set.py).
+-- plugin is needed. Colors come from theme.toml (hyprdori-theme-set).
 
 -- Nerd Font glyphs by code point, so editors can't mangle them
 local sep = {

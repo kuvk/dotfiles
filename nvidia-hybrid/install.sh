@@ -10,12 +10,12 @@ set -euo pipefail
 [[ $EUID -eq 0 ]] || { echo "Run with sudo." >&2; exit 1; }
 
 here=$(cd "$(dirname "$0")" && pwd)
-script=/usr/local/lib/kuvk/nvidia-ac-power
+script=/usr/local/lib/hyprdori/nvidia-ac-power
 rules=/etc/udev/rules.d/90-nvidia-ac-power.rules
 
 if [[ ${1:-} == --remove ]]; then
     rm -f "$rules" "$script"
-    rmdir --ignore-fail-on-non-empty /usr/local/lib/kuvk 2>/dev/null || true
+    rmdir --ignore-fail-on-non-empty /usr/local/lib/hyprdori 2>/dev/null || true
     udevadm control --reload
     # runtime PM again, as 80-nvidia-pm.rules sets it
     for device in /sys/bus/pci/devices/*; do

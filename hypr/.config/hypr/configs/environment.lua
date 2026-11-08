@@ -35,7 +35,7 @@ hl.env("QT_SCALE_FACTOR", "1")
 hl.env("QT_QPA_PLATFORM", "wayland;xcb")
 hl.env("QT_QPA_PLATFORMTHEME", "qt5ct")
 hl.env("QT_WAYLAND_DISABLE_WINDOWDECORATION", "1")
--- Chosen in Settings > Appearance (theme-set.py writes it)
+-- Chosen in Settings > Appearance (hyprdori-theme-set writes it)
 local has_theme, theme = pcall(require, "configs.generated.theme")
 hl.env("XCURSOR_THEME", has_theme and theme.cursor_theme or "Adwaita")
 hl.env("XCURSOR_SIZE", has_theme and theme.cursor_size or "24")
@@ -48,8 +48,19 @@ hl.env("XDG_SESSION_TYPE", "wayland")
 hl.env("XDG_SESSION_DESKTOP", "Hyprland")
 hl.env("CLUTTER_BACKEND", "wayland")
 
--- ~/.local/bin first, for apps started from the shell and keybindings too (the dotfiles'
--- bin/ wrappers, like btop's); once, though the config runs again on every reload
+-- Where Hyprdori is (the repo ~/.config/hypr links into), for scripts and terminals
+local repo = io.popen("readlink -f " .. os.getenv("HOME") .. "/.config/hypr")
+if repo then
+  local hypr_dir = repo:read("l") or ""
+  repo:close()
+  local root = hypr_dir:match("^(.*)/hypr/%.config/hypr$")
+  if root then
+    hl.env("HYPRDORI_PATH", root)
+  end
+end
+
+-- ~/.local/bin first, for apps started from the shell and keybindings too (Hyprdori's
+-- commands, hyprdori-*); once, though the config runs again on every reload
 local local_bin = os.getenv("HOME") .. "/.local/bin"
 local path = os.getenv("PATH") or "/usr/local/bin:/usr/bin"
 if not (":" .. path .. ":"):find(":" .. local_bin .. ":", 1, true) then

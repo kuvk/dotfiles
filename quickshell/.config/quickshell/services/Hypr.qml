@@ -22,7 +22,7 @@ Singleton {
         dispatch(Hyprland.usingLua ? `hl.dsp.focus({ workspace = ${id} })` : `workspace ${id}`);
     }
 
-    // Window gaps, corners, opacity and blur from Settings, at once; theme-set.py --hypr
+    // Window gaps, corners, opacity and blur from Settings, at once; hyprdori-theme-set --hypr
     // writes them to Hyprland's generated theme.lua as well, so it starts with them.
     // Work-Game has its own gaps; its square corners, opaque windows and no blur come from
     // hypr-gamemode.sh, which a config reload undoes, so it runs again then (restyle).
@@ -45,7 +45,7 @@ Singleton {
         id: saveDelay
 
         interval: 1000
-        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--hypr"])
+        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--hypr"])
     }
 
     Timer {

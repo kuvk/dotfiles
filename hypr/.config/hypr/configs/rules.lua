@@ -53,7 +53,7 @@ hl.window_rule({
 -- System Information (scripts/sysinfo.sh): fastfetch in kitty, at the size kitty opens with
 hl.window_rule({
   name = "sysinfo",
-  match = { class = "^kuvk-sysinfo$" },
+  match = { class = "^hyprdori-sysinfo$" },
   float = true,
   center = true,
 })

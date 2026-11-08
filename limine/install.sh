@@ -5,7 +5,7 @@
 # Run it again after a Limine update, a new kernel, or to change colors.
 #
 #   sudo limine/install.sh             the current theme's colors, accents included
-#                                      (theme-set.py; Catppuccin Mocha before it has run)
+#                                      (hyprdori-theme-set; Catppuccin Mocha before it has run)
 #   sudo limine/install.sh --theme     the same, but stop if there's no theme yet
 #   limine/install.sh --print          print the config instead, without installing
 #   limine/install.sh --preview FILE   draw the wallpaper (the logo, no menu text) to FILE
@@ -22,7 +22,7 @@ kernels=/efi/arch
 mode=install
 use_theme=false
 resolution=
-options="$*"  # kept in limine.conf, so update.sh can run this again the same way
+options="$*"  # kept in limine.conf, so hyprdori-update can run this again the same way
 while (($#)); do
     case $1 in
         --theme) use_theme=true ;;
@@ -45,7 +45,7 @@ else
     home=$HOME
 fi
 
-# The current theme's slots, or Catppuccin Mocha before theme-set.py has run
+# The current theme's slots, or Catppuccin Mocha before hyprdori-theme-set has run
 base="#1e1e2e" surface1="#45475a" surface2="#585b70" text="#cdd6f4" subtext1="#bac2de"
 subtext0="#a6adc8" overlay1="#7f849c" red="#f38ba8" green="#a6e3a1" yellow="#f9e2af"
 blue="#89b4fa" pink="#f5c2e7" teal="#94e2d5" mauve="#cba6f7" accent="#fab387" accent2="#89b4fa"
@@ -54,7 +54,7 @@ if [[ -r $colors ]]; then
     # shellcheck source=/dev/null
     . "$colors"
 elif $use_theme; then
-    echo "No $colors; run theme-set.py first" >&2
+    echo "No $colors; run hyprdori-theme-set first" >&2
     exit 1
 fi
 hex() { local c; for c; do printf '%s;' "${c#\#}"; done | sed 's/;$//'; }
@@ -106,7 +106,7 @@ wallpaper() {
     local logo_text lw lh top k line max_len=0 cols prefix center
     logo_text="$home/.config/theme/logo/ascii-dori"
     [[ -r $logo_text ]] || { echo "No logo at $logo_text" >&2; exit 1; }
-    # drawn like kitty draws it, in 12px rows (24 on large screens), by the dotfiles' logo-render.py
+    # drawn like kitty draws it, in 12px rows (24 on large screens), by Hyprdori's logo-render.py
     "$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$accent2" --cell-height $((12 * scale)) --out "$build/logo.png"
     lw=$(magick identify -format %w "$build/logo.png"); lh=$(magick identify -format %h "$build/logo.png")
     top=$(((res_h / cell_h - ${#found[@]} - 1) / 2 * cell_h))
@@ -122,7 +122,7 @@ wallpaper() {
 
 config() {
     cat <<EOF
-# Written by limine/install.sh in the dotfiles; edit that and run it again.
+# Written by limine/install.sh in Hyprdori; edit that and run it again.
 # Options: $options
 timeout: 3
 default_entry: 2

@@ -1,5 +1,5 @@
 # cliamp settings (https://github.com/bjarneo/cliamp, docs/configuration.md)
-# The colors come from the system theme: theme-set.py writes
+# The colors come from the system theme: hyprdori-theme-set writes
 # ~/.config/cliamp/themes/system.toml.
 theme = "system"
 

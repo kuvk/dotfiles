@@ -3,10 +3,10 @@
 -- Every GPU, the order left to aquamarine: AQ_DRM_DEVICES with only the boot display's GPU
 -- would leave the other GPU's monitors dark.
 
--- The session's cursor from Settings (theme-set.py writes it), if the greeter can read that theme.
+-- The session's cursor from Settings (hyprdori-theme-set writes it), if the greeter can read that theme.
 -- Read as data, as below.
 local cursor_theme, cursor_size = "Adwaita", "24"
-local cursor = io.open("/var/lib/kuvk-shell/cursor.conf")
+local cursor = io.open("/var/lib/hyprdori/cursor.conf")
 if cursor then
   local name, size = (cursor:read("l") or ""):match("^([%w%._-]+)\t(%d+)$")
   cursor:close()
@@ -24,11 +24,11 @@ hl.env("XCURSOR_SIZE", cursor_size)
 -- most; shown from Lua itself, so the login screen is never left without one.
 local blank = "/usr/share/sddm/hypr/cursors"
 hl.env("XCURSOR_PATH", blank .. ":/usr/share/icons:/usr/share/pixmaps")
-local blank_file = io.open(blank .. "/kuvk-startup/cursors/left_ptr")
+local blank_file = io.open(blank .. "/hyprdori-startup/cursors/left_ptr")
 if blank_file then
   blank_file:close()
 end
-hl.env("XCURSOR_THEME", blank_file and "kuvk-startup" or cursor_theme)
+hl.env("XCURSOR_THEME", blank_file and "hyprdori-startup" or cursor_theme)
 hl.config({ cursor = { invisible = true } })
 
 local revealed = false
@@ -84,13 +84,13 @@ hl.config({
   debug = { enable_stdout_logs = true },
 })
 
--- No HDR (supports_hdr = -1), as in the session (hypr-monitors.py): Hyprland would send HDR
+-- No HDR (supports_hdr = -1), as in the session (hyprdori-monitors): Hyprland would send HDR
 -- metadata to an HDR screen even in SDR, and some screens reconnect on it.
 hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "1", supports_hdr = -1 })
 
--- The session's monitor layout (hypr-monitors.py writes it). The file is the user's to write and
+-- The session's monitor layout (hyprdori-monitors writes it). The file is the user's to write and
 -- this runs as the greeter's user, so it's only read as data, never run.
-local layout = io.open("/var/lib/kuvk-shell/monitors.conf")
+local layout = io.open("/var/lib/hyprdori/monitors.conf")
 if layout then
   for line in layout:lines() do
     local output, scale, position, transform = line:match("^([^\t]+)\t([%d.]+)\t([^\t]+)\t(%d+)$")

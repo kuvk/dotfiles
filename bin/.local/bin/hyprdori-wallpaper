@@ -2,25 +2,25 @@
 """Wallpapers and live (video) wallpapers, used by the Quickshell carousel, and the lock
 screen's background.
 
-Static wallpapers live in ~/.local/share/dotfiles/backgrounds/default (the themes' own
-backgrounds too, drawn by theme-set.py) and are shown with hyprpaper. Live wallpapers live
-in ~/.local/share/dotfiles/backgrounds/live and play with mpvpaper, one process per
-monitor. More folders for either go in ~/.config/dotfiles/backgrounds.json:
+Static wallpapers live in ~/.local/share/hyprdori/backgrounds/default (the themes' own
+backgrounds too, drawn by hyprdori-theme-set) and are shown with hyprpaper. Live wallpapers live
+in ~/.local/share/hyprdori/backgrounds/live and play with mpvpaper, one process per
+monitor. More folders for either go in ~/.config/hyprdori/backgrounds.json:
   {"static": ["~/Pictures/Wallpapers"], "live": ["~/Videos/Wallpapers"]}
 (created with empty lists if missing). The static choice is restored at login; live
 wallpapers last until logout.
 
-  wallpaper.py list static|live          JSON list for the picker
-  wallpaper.py thumbs static|live        create missing thumbnails
-  wallpaper.py set static|live PATH [MONITOR]   apply (all monitors if none)
-  wallpaper.py stop [MONITOR]            stop live wallpapers
-  wallpaper.py pause [on|off]            pause/resume live wallpapers (toggles without on|off)
-  wallpaper.py lock PATH                 the lock screen's background: a copy small enough
+  hyprdori-wallpaper list static|live          JSON list for the picker
+  hyprdori-wallpaper thumbs static|live        create missing thumbnails
+  hyprdori-wallpaper set static|live PATH [MONITOR]   apply (all monitors if none)
+  hyprdori-wallpaper stop [MONITOR]            stop live wallpapers
+  hyprdori-wallpaper pause [on|off]            pause/resume live wallpapers (toggles without on|off)
+  hyprdori-wallpaper lock PATH                 the lock screen's background: a copy small enough
                                          to load at once (PATH itself if it is), also for the
                                          login screen; prints it and a stamp, tab-separated
-  wallpaper.py export-greeter            copy the lock screen's background for the login screen
-  wallpaper.py default [PATH]            first run: PATH (or the theme's background), unless one is chosen
-  wallpaper.py restore                   re-apply the saved static wallpapers (autostart)
+  hyprdori-wallpaper export-greeter            copy the lock screen's background for the login screen
+  hyprdori-wallpaper default [PATH]            first run: PATH (or the theme's background), unless one is chosen
+  hyprdori-wallpaper restore                   re-apply the saved static wallpapers (autostart)
 """
 
 from __future__ import annotations
@@ -39,29 +39,29 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 HOME = Path.home()
-BACKGROUNDS = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "dotfiles/backgrounds"
+BACKGROUNDS = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "hyprdori/backgrounds"
 DIRS = {
     "static": BACKGROUNDS / "default",
     "live": BACKGROUNDS / "live",
 }
 # More folders to list, per kind (edited by hand)
-EXTRA_DIRS_FILE = HOME / ".config/dotfiles/backgrounds.json"
+EXTRA_DIRS_FILE = HOME / ".config/hyprdori/backgrounds.json"
 EXTS = {
     "static": {".jpg", ".jpeg", ".png", ".webp"},
     "live": {".mp4", ".webm", ".mkv", ".mov"},
 }
-# convert-live-wallpapers.py keeps its originals here; don't list them
+# hyprdori-convert-live-wallpapers keeps its originals here; don't list them
 SKIP_DIRS = {"source"}
 
 STATE_DIR = Path(os.environ.get("XDG_STATE_HOME", HOME / ".local/state")) / "wallpaper"
 STATE_FILE = STATE_DIR / "state.json"
-GREETER_DIR = Path("/var/lib/kuvk-shell")  # only exists after sddm/install.sh
+GREETER_DIR = Path("/var/lib/hyprdori")  # only exists after sddm/install.sh
 CURRENT_LINK = STATE_DIR / "current"  # hyprpaper.conf points here
 # The lock screen's background, ready to load (see prepare_lock), and what it was made from
 LOCK_IMAGE = STATE_DIR / "lock.jpg"
 LOCK_INFO = STATE_DIR / "lock.json"
-# Shipped with the dotfiles (theme package); used until another is picked
-# the theme's background, drawn by theme-set.py (theme_background)
+# Shipped with Hyprdori (theme package); used until another is picked
+# the theme's background, drawn by hyprdori-theme-set (theme_background)
 THEME_JSON = HOME / ".config/theme/current/quickshell.json"
 CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME", HOME / ".cache")) / "wallpaper-thumbs"
 RUNTIME_DIR = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "wallpaper"

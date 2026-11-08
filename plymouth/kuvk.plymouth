@@ -1,9 +1,0 @@
-[Plymouth Theme]
-Name=kuvk
-Description=Boot splash for kuvk-shell: the fastfetch logo, a password field and a progress bar
-ModuleName=script
-
-[script]
-ImageDir=/usr/share/plymouth/themes/kuvk
-ScriptFile=/usr/share/plymouth/themes/kuvk/kuvk.script
-ConsoleLogBackgroundColor=0x@BG@

@@ -22,7 +22,7 @@ ColumnLayout {
             checked: Config.windowButtons
             onToggled: {
                 Config.windowButtons = !Config.windowButtons;
-                Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--window-buttons", Config.windowButtons ? "on" : "off"]);
+                Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--window-buttons", Config.windowButtons ? "on" : "off"]);
             }
         }
     }

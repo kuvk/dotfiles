@@ -159,6 +159,6 @@ ColumnLayout {
         id: fontApply
 
         interval: 400
-        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--fonts", Config.nerdFont, Config.displayFont, Config.nerdFontOnly ? "on" : "off", Config.fontHinting, Config.fontAntialiasing])
+        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--fonts", Config.nerdFont, Config.displayFont, Config.nerdFontOnly ? "on" : "off", Config.fontHinting, Config.fontAntialiasing])
     }
 }

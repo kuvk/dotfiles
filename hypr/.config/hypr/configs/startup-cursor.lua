@@ -1,11 +1,11 @@
 -- No cursor until the desktop is up, after Omarchy's default/hypr/startup-cursor.lua:
 -- Hyprland's first frames come before the cursor theme and the monitors' scales are set.
--- At a cold start it gets a blank cursor theme (../cursors/kuvk-startup, one transparent
+-- At a cold start it gets a blank cursor theme (../cursors/hyprdori-startup, one transparent
 -- pixel, so nothing shows before the pointer is hidden) and a hidden pointer. The shell
--- reveals it once it is up (shell.qml calls kuvk_cursor_reveal), or after 15 s.
+-- reveals it once it is up (shell.qml calls hyprdori_cursor_reveal), or after 15 s.
 --
 -- Lua globals don't survive a config reload, so whether the cursor is still hidden is kept
--- in the compositor's environment (KUVK_CURSOR_PENDING), and this file sets the reveal up
+-- in the compositor's environment (HYPRDORI_CURSOR_PENDING), and this file sets the reveal up
 -- again on every load. Runs after environment.lua, which sets XCURSOR_THEME and XCURSOR_SIZE.
 
 local home = os.getenv("HOME")
@@ -24,7 +24,7 @@ local function real_path()
 end
 
 local function real_theme()
-  local theme = os.getenv("KUVK_CURSOR_THEME") or ""
+  local theme = os.getenv("HYPRDORI_CURSOR_THEME") or ""
   return theme ~= "" and theme or "Adwaita"
 end
 
@@ -34,11 +34,11 @@ local function restore_env()
   hl.env("XCURSOR_THEME", real_theme())
 end
 
-function kuvk_cursor_reveal()
-  if os.getenv("KUVK_CURSOR_PENDING") ~= "1" then
+function hyprdori_cursor_reveal()
+  if os.getenv("HYPRDORI_CURSOR_PENDING") ~= "1" then
     return
   end
-  hl.env("KUVK_CURSOR_PENDING", "")
+  hl.env("HYPRDORI_CURSOR_PENDING", "")
   restore_env()
   local size = os.getenv("XCURSOR_SIZE") or "24"
   -- xsetroot: XWayland's default arrow, for X11 apps without cursors of their own (Parsec).
@@ -49,18 +49,18 @@ function kuvk_cursor_reveal()
 end
 
 -- A cold start: no monitors yet (a reload always has some)
-if #hl.get_monitors() == 0 and os.getenv("KUVK_CURSOR_PENDING") ~= "1" then
-  hl.env("KUVK_CURSOR_PENDING", "1")
-  hl.env("KUVK_CURSOR_THEME", os.getenv("XCURSOR_THEME") or "Adwaita")
+if #hl.get_monitors() == 0 and os.getenv("HYPRDORI_CURSOR_PENDING") ~= "1" then
+  hl.env("HYPRDORI_CURSOR_PENDING", "1")
+  hl.env("HYPRDORI_CURSOR_THEME", os.getenv("XCURSOR_THEME") or "Adwaita")
   hl.env("XCURSOR_PATH", blank_dir .. ":" .. real_path())
-  hl.env("XCURSOR_THEME", "kuvk-startup")
+  hl.env("XCURSOR_THEME", "hyprdori-startup")
 
   -- before autostart.lua's handler starts anything
   hl.on("hyprland.start", restore_env)
 end
 
-if os.getenv("KUVK_CURSOR_PENDING") == "1" then
+if os.getenv("HYPRDORI_CURSOR_PENDING") == "1" then
   -- a reload while hidden resets this, and drops the timer
   hl.config({ cursor = { invisible = true } })
-  hl.timer(kuvk_cursor_reveal, { timeout = 15000, type = "oneshot" })
+  hl.timer(hyprdori_cursor_reveal, { timeout = 15000, type = "oneshot" })
 end

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Writes templates/eza-theme.yml.tpl, eza's icons, from yazi's: yazi's own icons for the
 installed version (its preset theme from GitHub) with icons.toml on top (folders by name in
-accent, any file names and extensions listed there). theme-set.py then renders it to
+accent, any file names and extensions listed there). hyprdori-theme-set then renders it to
 ~/.config/eza/theme.yml, so eza and yazi show the same icons. Run it again after a yazi update
 or a change to icons.toml.
 

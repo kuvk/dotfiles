@@ -11,9 +11,9 @@ import qs.services
 
 // Wallpaper carousel: the selected wallpaper is a large slanted
 // card in the middle, the others are narrow slanted slices to the left and
-// right. Same picker for static (~/.local/share/dotfiles/backgrounds/default) and live
-// (backgrounds/live) wallpapers, plus the folders in ~/.config/dotfiles/backgrounds.json
-// (wallpaper.py); Tab switches between them.
+// right. Same picker for static (~/.local/share/hyprdori/backgrounds/default) and live
+// (backgrounds/live) wallpapers, plus the folders in ~/.config/hyprdori/backgrounds.json
+// (hyprdori-wallpaper); Tab switches between them.
 //
 // ←/→ or scroll: move   type: search   Enter: all monitors
 // Shift+Enter: this monitor   Tab: static/live   Delete: stop live   Esc: close
@@ -24,7 +24,7 @@ PanelWindow {
     // For bindings only. Code that runs when `kind` changes must test `kind`
     // itself: in onKindChanged this binding still holds its previous value.
     readonly property bool shown: kind !== ""
-    readonly property string script: Quickshell.env("HOME") + "/.config/scripts/wallpaper.py"
+    readonly property string script: Quickshell.env("HOME") + "/.local/bin/hyprdori-wallpaper"
 
     property var items: []
     property string query: ""
@@ -186,7 +186,7 @@ PanelWindow {
         if (!item)
             return;
         // Settings > Appearance > Wallpaper follows theme: on with the theme's own background
-        // (theme-set.py) on every monitor, off with anything else
+        // (hyprdori-theme-set) on every monitor, off with anything else
         Config.wallpaperFollowsTheme = kind === "static" && !thisMonitorOnly && item.path === Theme.background;
         const cmd = [script, "set", kind, item.path];
         if (thisMonitorOnly && screen)
@@ -295,7 +295,7 @@ PanelWindow {
         shown: root.shown
     }
 
-    // `wallpaper.py list KIND`. The result is read when the process exits,
+    // `hyprdori-wallpaper list KIND`. The result is read when the process exits,
     // so a run that was stopped (or crashed) is never taken for an empty
     // folder; failures are retried with growing delays and logged.
     Process {
@@ -458,7 +458,7 @@ PanelWindow {
                     if (root.loading && root.items.length === 0)
                         return "Loading…";
                     if (root.items.length === 0)
-                        return `No ${root.kind === "live" ? "live " : ""}wallpapers. Add folders in ~/.config/dotfiles/backgrounds.json`;
+                        return `No ${root.kind === "live" ? "live " : ""}wallpapers. Add folders in ~/.config/hyprdori/backgrounds.json`;
                     if (root.shownItems.length === 0)
                         return `No match for "${root.query}"`;
                     return root.shownItems[root.selected]?.name ?? "";

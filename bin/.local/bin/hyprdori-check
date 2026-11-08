@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Checks Hyprdori before a commit: every script parses, and no old names are left.
+# Prints what's wrong and exits 1, or says all is well. Takes a few seconds; nothing runs
+# in the background.
+#
+#   hyprdori-check
+set -uo pipefail
+
+hyprdori=$(cd "$(dirname "$(readlink -f "$0")")/../../.." && pwd)
+cd "$hyprdori" || exit 1
+failed=0
+fail() { printf '\e[31m%s\e[0m\n' "$1"; failed=1; }
+
+mapfile -t tracked < <(git ls-files --cached --others --exclude-standard)
+
+# Scripts parse: shell, Python and Lua by their first line or extension
+for file in "${tracked[@]}"; do
+    [[ -f $file ]] || continue
+    first=$(head -c 64 "$file" 2>/dev/null | tr -d '\0' | head -n1)
+    case "$file:$first" in
+        *.sh:* | *:'#!/usr/bin/env bash'* | *:'#!/bin/bash'* | *:'#!/bin/sh'*)
+            bash -n "$file" 2>/dev/null || fail "shell syntax: $file" ;;
+        *.py:* | *:'#!/usr/bin/env python3'*)
+            python3 -c 'import ast, sys; ast.parse(open(sys.argv[1]).read())' "$file" 2>/dev/null || fail "Python syntax: $file" ;;
+        *.lua:*)
+            luac -p "$file" 2>/dev/null || [[ $file == *.tpl ]] || fail "Lua syntax: $file" ;;
+    esac
+done
+
+# Old names: the project is hyprdori (github.com/kuvk/... is the account and stays)
+while IFS= read -r line; do
+    fail "old name: $line"
+done < <(git grep -n -I -i -E 'kuvk' -- "${tracked[@]}" 2>/dev/null | grep -v -E 'github\.com/kuvk/')
+while IFS= read -r line; do
+    fail "old path: $line"
+done < <(git grep -n -I -E '(\.config/scripts/(theme-set|wallpaper|hypr-monitors|webapp|update|sysmaintenance|logo-wallpaper|convert-live-wallpapers)\.(py|sh))|share/dotfiles|config/dotfiles' -- "${tracked[@]}" 2>/dev/null)
+
+if ((failed)); then
+    exit 1
+fi
+echo "All well."

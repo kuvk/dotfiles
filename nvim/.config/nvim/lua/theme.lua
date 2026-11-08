@@ -1,4 +1,4 @@
--- Follows the system theme from ~/.config/scripts/theme-set.py.
+-- Follows the system theme from ~/.local/bin/hyprdori-theme-set.
 -- theme-set writes ~/.config/theme/current/nvim.lua; running instances
 -- pick up the change through a file watcher.
 local M = {}
@@ -85,7 +85,7 @@ local function custom_highlights()
   set(0, "NeoTreeRootName", { fg = p.accent, bold = true })
   -- Files without an icon of their own in text, as in yazi and eza
   set(0, "NeoTreeFileIcon", { fg = p.fg })
-  -- One cursor line everywhere: the editor, neo-tree, and yazi's hover highlight (theme-set.py)
+  -- One cursor line everywhere: the editor, neo-tree, and yazi's hover highlight (hyprdori-theme-set)
   if M.cursorline then
     local line = vim.api.nvim_get_hl(0, { name = "CursorLine", link = false })
     line.bg = M.cursorline
@@ -125,7 +125,7 @@ local function apply_devicons()
   local overrides = {}
   for _, kind in ipairs({ "files", "exts" }) do
     for name, icon in pairs(M.icons[kind] or {}) do
-      overrides[name] = { icon = icon[1], color = icon[2], name = "Kuvk" .. name:gsub("%W", "_") }
+      overrides[name] = { icon = icon[1], color = icon[2], name = "Hyprdori" .. name:gsub("%W", "_") }
     end
   end
   if next(overrides) then

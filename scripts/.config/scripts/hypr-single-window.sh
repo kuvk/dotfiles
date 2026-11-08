@@ -8,7 +8,7 @@
 #   hypr-single-window.sh on|off
 set -euo pipefail
 
-FLAG="$HOME/.local/state/kuvk-shell/single-window"
+FLAG="$HOME/.local/state/hyprdori/single-window"
 
 notify() {
     command -v notify-send >/dev/null 2>&1 || return 0

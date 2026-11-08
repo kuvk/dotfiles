@@ -34,9 +34,9 @@ Singleton {
     // The monitor with the clock and password: the one focused when locking
     property string mainScreen: ""
 
-    // The background: the theme's own (Theme.background, theme-set.py) unless the user chose an
+    // The background: the theme's own (Theme.background, hyprdori-theme-set) unless the user chose an
     // image in Settings > Lock Screen (the theme's when that can't be read). Whenever it
-    // changes, `wallpaper.py lock` makes it ready to load at once (a copy scaled to the
+    // changes, `hyprdori-wallpaper lock` makes it ready to load at once (a copy scaled to the
     // largest screen when it's bigger, also given to the login screen), so locking never
     // waits for a large picture and nothing stays loaded while unlocked.
     // an image that couldn't be read; choosing another one tries again
@@ -115,7 +115,7 @@ Singleton {
         // asked again while running
         property bool again: false
 
-        command: [Quickshell.env("HOME") + "/.config/scripts/wallpaper.py", "lock", path]
+        command: [Quickshell.env("HOME") + "/.local/bin/hyprdori-wallpaper", "lock", path]
         stdout: StdioCollector {
             onStreamFinished: {
                 const [file, stamp] = text.trim().split("\t");

@@ -10,12 +10,12 @@ Singleton {
     id: root
 
     // Appearance: colors, corners, cursor, icons, opacity, blur, animations
-    // per theme: { "catppuccin-mocha": { accent: "mauve" } }, read by theme-set.py
+    // per theme: { "catppuccin-mocha": { accent: "mauve" } }, read by hyprdori-theme-set
     property alias accentOverrides: adapter.accentOverrides
     // the theme's background on the desktop, redrawn on theme change; set by the wallpaper picker
     property alias wallpaperFollowsTheme: adapter.wallpaperFollowsTheme
     property alias radius: adapter.radius
-    // read by scripts/theme-set.py, like the fonts and colors
+    // read by hyprdori-theme-set, like the fonts and colors
     property alias cursorTheme: adapter.cursorTheme
     property alias cursorSize: adapter.cursorSize
     property alias iconTheme: adapter.iconTheme
@@ -64,7 +64,7 @@ Singleton {
     property alias notificationBorder: adapter.notificationBorder
     property alias notificationShadow: adapter.notificationShadow
 
-    // Lock Screen: colors are theme color names; they also go to the login screen (theme-set.py --login)
+    // Lock Screen: colors are theme color names; they also go to the login screen (hyprdori-theme-set --login)
     // the background: the theme's own (Theme.background) until an image is chosen
     property alias lockFollowsTheme: adapter.lockFollowsTheme
     property alias lockImage: adapter.lockImage

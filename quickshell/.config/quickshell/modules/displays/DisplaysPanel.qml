@@ -7,7 +7,7 @@ import qs.services
 
 // Display settings: drag monitors to arrange them (they snap edge to edge),
 // pick resolution and scale, turn monitors on/off, assign workspaces, set
-// brightness and text size. Changes are saved per setup by hypr-monitors.py.
+// brightness and text size. Changes are saved per setup by hyprdori-monitors.
 FloatingWindow {
     id: root
 

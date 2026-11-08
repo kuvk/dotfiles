@@ -5,8 +5,8 @@ from pathlib import Path
 
 HOME = Path(os.path.expanduser("~"))
 
-# Originals go in ~/.local/share/dotfiles/backgrounds/live/source (the picker skips that folder)
-LIVE_DIR = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "dotfiles/backgrounds/live"
+# Originals go in ~/.local/share/hyprdori/backgrounds/live/source (the picker skips that folder)
+LIVE_DIR = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "hyprdori/backgrounds/live"
 SRC_DIR = Path(os.environ.get("LIVE_WALLPAPER_SRC", str(LIVE_DIR / "source"))).expanduser()
 OUT_DIR = Path(os.environ.get("LIVE_WALLPAPER_OUT", str(LIVE_DIR))).expanduser()
 

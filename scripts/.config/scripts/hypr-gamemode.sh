@@ -17,7 +17,7 @@ set -euo pipefail
 
 FLAG="/tmp/hypr-gamemode"
 
-HYPR_MON="$HOME/.config/scripts/hypr-monitors.py"
+HYPR_MON="$HOME/.local/bin/hyprdori-monitors"
 
 # Keyboard: the usual layouts and options, read from input.lua, and Work-Game's
 INPUT="$HOME/.config/hypr/configs/input.lua"
@@ -39,8 +39,8 @@ fi
 # notify TITLE [BODY]
 notify() {
     command -v notify-send >/dev/null 2>&1 || return 0
-    # the body is a key hint: the shell shows it smaller (x-kuvk.hint)
-    notify-send -a "Work-Game" -i input-gaming -c x-kuvk.hint "$@"
+    # the body is a key hint: the shell shows it smaller (x-hyprdori.hint)
+    notify-send -a "Work-Game" -i input-gaming -c x-hyprdori.hint "$@"
 }
 
 current_mode() {
@@ -74,7 +74,7 @@ hl.config({
     },
 })
 " || true
-    "$HOME/.config/scripts/wallpaper.py" pause on 2>/dev/null || true
+    "$HOME/.local/bin/hyprdori-wallpaper" pause on 2>/dev/null || true
 }
 
 style_off() {
@@ -94,7 +94,7 @@ hl.config({
     },
 })
 " || true
-    "$HOME/.config/scripts/wallpaper.py" pause off 2>/dev/null || true
+    "$HOME/.local/bin/hyprdori-wallpaper" pause off 2>/dev/null || true
 }
 
 keyboard() {

@@ -4,7 +4,7 @@ draws it in a terminal: every character on a grid of cells twice as tall as wide
 2x4 dots and block characters (▄ ▌ ▙ ...) as exact rectangles filling their cell. Font glyphs
 for these don't fit the cell exactly, so text renderers leave seams and overlap rows; drawn
 as shapes the logo is sharp at any size and the same everywhere: the wallpaper
-(logo-wallpaper.py), the boot splash (plymouth/install.sh) and the boot menu
+(hyprdori-logo-wallpaper), the boot splash (plymouth/install.sh) and the boot menu
 (limine/install.sh), like fastfetch in kitty and the System Information window.
 
   logo-render.py --color '#cba6f7' --cell-height 24 --out logo.png

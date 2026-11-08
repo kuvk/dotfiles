@@ -18,7 +18,7 @@ PanelWindow {
     id: root
 
     readonly property bool shown: Panels.themes
-    readonly property string themeSet: Quickshell.env("HOME") + "/.config/scripts/theme-set.py"
+    readonly property string themeSet: Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set"
 
     property var items: []
     property string query: ""
@@ -190,7 +190,7 @@ PanelWindow {
             try {
                 root.useList(JSON.parse(listOut.text));
             } catch (e) {
-                console.warn("Themes: bad list from theme-set.py", e);
+                console.warn("Themes: bad list from hyprdori-theme-set", e);
             }
         }
     }

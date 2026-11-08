@@ -5,7 +5,7 @@ import QtQuick.Window
 import SddmComponents
 
 // Login screen in the look of the lock screen (quickshell/.config/quickshell/modules/lock/LockView.qml):
-// its background (the lock screen's, from wallpaper.py), clock top right, avatar and password in a
+// its background (the lock screen's, from hyprdori-wallpaper), clock top right, avatar and password in a
 // centered card. The card and controls show on the monitor with the keyboard, which follows the
 // mouse.
 Rectangle {

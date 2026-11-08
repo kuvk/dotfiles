@@ -24,7 +24,7 @@ shown=$(grep '^shown_gpus = ' "$conf")
 sed -E '/^shown_gpus = /{s/nvidia ?//; s/ +"$/"/}' "$conf" >"$copy"
 "$real" -c "$copy" "$@"
 status=$?
-# back into the real config (written through its link into the dotfiles)
+# back into the real config (written through its link into Hyprdori)
 sed "s|^shown_gpus = .*|$shown|" "$copy" >"$copy.new" && cat "$copy.new" >"$conf"
 rm -f "$copy" "$copy.new"
 exit $status

@@ -56,7 +56,7 @@ hl.bind(mainMod .. " + SHIFT + V", hl.dsp.exec_cmd(clipboard)) -- Clipboard hist
 hl.bind(mainMod .. " + F", hl.dsp.window.fullscreen()) -- Fullscreen
 hl.bind(mainMod .. " + S", hl.dsp.layout("togglesplit")) -- Toggle split direction
 hl.bind(mainMod .. " + SHIFT + S", hl.dsp.exec_cmd(singleWindow)) -- Single window: a lone window keeps its shape, on / off
-hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("~/.config/scripts/hypr-monitors.py")) -- Re-apply the monitor profile
+hl.bind(mainMod .. " + equal", hl.dsp.exec_cmd("~/.local/bin/hyprdori-monitors")) -- Re-apply the monitor profile
 hl.bind(mainMod .. " + G", hl.dsp.exec_cmd(gamemode .. " work")) -- Work-Game: Work mode on / off
 hl.bind(mainMod .. " + CONTROL + G", hl.dsp.exec_cmd(gamemode .. " game")) -- Work-Game: Game mode on / off
 hl.bind(mainMod .. " + CONTROL + N", hl.dsp.exec_cmd(nightlight)) -- Night light
@@ -69,8 +69,8 @@ hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd("hyprshot -m region -o ~/Pictures/Scree
 
 -- Wallpapers
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc call wallpaper toggle")) -- Wallpaper picker (Tab: live wallpapers)
-hl.bind(mainMod .. " + CONTROL + W", hl.dsp.exec_cmd("~/.config/scripts/wallpaper.py stop")) -- Stop live wallpapers
-hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("~/.config/scripts/wallpaper.py pause")) -- Pause / resume live wallpapers
+hl.bind(mainMod .. " + CONTROL + W", hl.dsp.exec_cmd("~/.local/bin/hyprdori-wallpaper stop")) -- Stop live wallpapers
+hl.bind(mainMod .. " + SHIFT + W", hl.dsp.exec_cmd("~/.local/bin/hyprdori-wallpaper pause")) -- Pause / resume live wallpapers
 
 -- Focus and Movement
 --> mainMod + h / j / k / l | Focus left / down / up / right
@@ -119,4 +119,4 @@ hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), player_opts) -- 
 -- lid closed: lock, or with an external monitor the laptop's screen off; opened: back on
 -- (not listed in the keybindings)
 hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("~/.config/scripts/lid-close.sh"), { locked = true })
-hl.bind("switch:off:Lid Switch", hl.dsp.exec_cmd("~/.config/scripts/hypr-monitors.py lid"), { locked = true })
+hl.bind("switch:off:Lid Switch", hl.dsp.exec_cmd("~/.local/bin/hyprdori-monitors lid"), { locked = true })

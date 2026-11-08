@@ -1,4 +1,4 @@
-# Icons for yazi, eza and Neovim (neo-tree, nvim-web-devicons). theme-set.py applies this file on
+# Icons for yazi, eza and Neovim (neo-tree, nvim-web-devicons). hyprdori-theme-set applies this file on
 # every theme change; eza also needs `~/.config/theme/eza-icons.py` after a change here.
 #
 # Anything not listed keeps each program's own icons (yazi's and Neovim's both come from

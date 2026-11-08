@@ -1,7 +1,7 @@
 -- ~/.config/swayimg/init.lua (swayimg 5.x)
 --
 -- Colors follow the system theme (~/.config/theme/current/swayimg.lua, written
--- by theme-set.py, which also tells running swayimg windows to reload them).
+-- by hyprdori-theme-set, which also tells running swayimg windows to reload them).
 -- swayimg's own defaults stay; the bindings below are added on top.
 --
 -- Viewer                               Gallery (Enter switches)
@@ -146,7 +146,7 @@ swayimg.gallery.on_key("i", toggle_info)
 swayimg.gallery.on_key("q", function() swayimg.exit() end)
 
 --------------------------------------------------------------------------------
--- Theme switches (theme-set.py sends SIGUSR1)
+-- Theme switches (hyprdori-theme-set sends SIGUSR1)
 --------------------------------------------------------------------------------
 for _, mode in ipairs({ swayimg.viewer, swayimg.slideshow, swayimg.gallery }) do
   mode.on_signal("USR1", apply_theme)

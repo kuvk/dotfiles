@@ -3,9 +3,9 @@
 #
 #   sudo sddm/install.sh     install or update; the previous config goes to *.bak
 #
-# /var/lib/kuvk-shell is the user's to write and readable by the greeter, which can't read the
-# home folder: theme-set.py keeps theme.conf there, wallpaper.py the lock screen's background, and
-# hypr-monitors.py each monitor's scale.
+# /var/lib/hyprdori is the user's to write and readable by the greeter, which can't read the
+# home folder: hyprdori-theme-set keeps theme.conf there, hyprdori-wallpaper the lock screen's background, and
+# hyprdori-monitors each monitor's scale.
 set -euo pipefail
 
 if ((EUID != 0)) || [[ -z ${SUDO_USER:-} || $SUDO_USER == root ]]; then
@@ -15,22 +15,21 @@ fi
 
 here=$(dirname "$(readlink -f "$0")")
 home=$(getent passwd "$SUDO_USER" | cut -d: -f6)
-shared=/var/lib/kuvk-shell
-theme=/usr/share/sddm/themes/kuvk
+shared=/var/lib/hyprdori
+theme=/usr/share/sddm/themes/hyprdori
 
 install -d -m 0755 -o "$SUDO_USER" "$shared"
 
-rm -rf /usr/share/sddm/themes/kuvk-shell
 install -d -m 0755 "$theme"
-install -m 0644 "$here"/kuvk/* "$theme"/
+install -m 0644 "$here"/hyprdori/* "$theme"/
 ln -sfn "$shared/theme.conf" "$theme/theme.conf.user"
 
 install -d -m 0755 /usr/share/sddm/hypr
 [[ -f /usr/share/sddm/hypr/hyprland.lua ]] && cp -n /usr/share/sddm/hypr/hyprland.lua /usr/share/sddm/hypr/hyprland.lua.bak
 install -m 0644 "$here/hyprland.lua" /usr/share/sddm/hypr/hyprland.lua
 # the blank cursor it starts with (the session's, hypr/.config/hypr/cursors)
-install -D -m 0644 "$here/../hypr/.config/hypr/cursors/kuvk-startup/index.theme" /usr/share/sddm/hypr/cursors/kuvk-startup/index.theme
-install -D -m 0644 "$here/../hypr/.config/hypr/cursors/kuvk-startup/cursors/left_ptr" /usr/share/sddm/hypr/cursors/kuvk-startup/cursors/left_ptr
+install -D -m 0644 "$here/../hypr/.config/hypr/cursors/hyprdori-startup/index.theme" /usr/share/sddm/hypr/cursors/hyprdori-startup/index.theme
+install -D -m 0644 "$here/../hypr/.config/hypr/cursors/hyprdori-startup/cursors/left_ptr" /usr/share/sddm/hypr/cursors/hyprdori-startup/cursors/left_ptr
 
 [[ -f /etc/sddm.conf ]] && cp -n /etc/sddm.conf /etc/sddm.conf.bak
 install -m 0644 "$here/sddm.conf" /etc/sddm.conf
@@ -42,8 +41,8 @@ install -m 0644 "$here/sddm.conf" /etc/sddm.conf
 cat <<MSG
 Installed. It takes effect at your next logout. Now run these without sudo, from your session:
 
-  ~/.config/scripts/theme-set.py
-  ~/.config/scripts/wallpaper.py export-greeter
-  ~/.config/scripts/hypr-monitors.py export-greeter
+  ~/.local/bin/hyprdori-theme-set
+  ~/.local/bin/hyprdori-wallpaper export-greeter
+  ~/.local/bin/hyprdori-monitors export-greeter
 
 MSG

@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Periodic housekeeping (monthly-ish). Shows what each step would free and asks first.
 #
-#   sysmaintenance.sh             clean up
-#   sysmaintenance.sh --upgrade   run update.sh first
+#   hyprdori-maintenance             clean up
+#   hyprdori-maintenance --upgrade   run hyprdori-update first
 #
 # Leaves alone what is rebuilt anyway at a cost: browser and shader caches (games stutter while
 # shaders rebuild), Spotify's cache, Python versions in ~/.pyenv.
@@ -13,7 +13,6 @@ JOURNAL_KEEP="2weeks"   # journald: time (2weeks) or size (500M)
 LOGS_KEEP=10            # this script's own logs
 AUR_KEEP=(davinci-resolve)  # AUR folders never cleaned: hand-downloaded sources live there
 
-scripts=$(dirname "$(readlink -f "$0")")
 log_dir="$HOME/.local/var/log"
 mkdir -p "$log_dir"
 log_file="$log_dir/sysmaintenance-$(date +%F_%H-%M-%S).log"
@@ -33,7 +32,7 @@ size() { du -sh "$@" 2>/dev/null | tail -1 | cut -f1; }
 echo "Maintenance started $(date)"
 
 if $upgrade; then
-    "$scripts/update.sh"
+    "$HOME/.local/bin/hyprdori-update"
 fi
 
 # --- pacman's package cache -------------------------------------------------------------------

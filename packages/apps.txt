@@ -1,4 +1,4 @@
-# Apps with window rules in hypr/.config/hypr/configs/rules.lua. Optional: the dotfiles work
+# Apps with window rules in hypr/.config/hypr/configs/rules.lua. Optional: Hyprdori works
 # without them. "# AUR" marks AUR packages. Installed by hand: DaVinci Resolve (its PKGBUILD
 # needs editing) and Frame Checker (github.com/kuvk/frame-checker).
 chromium

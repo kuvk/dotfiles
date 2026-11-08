@@ -5,9 +5,9 @@ Colors are theme color names from the current theme (base, accent, accent2, mauv
 or hex values (#1e1e2e). --bg, --fg and --size take comma-separated lists, and every
 combination is drawn, so one run can make a set to pick from.
 
-  logo-wallpaper.py                                   accent2 on base, 30% high
-  logo-wallpaper.py --fg accent,accent2,mauve --size 20,30,45
-  logo-wallpaper.py --bg '#000000' --fg red --res 3840x2160 --output-dir ~/tmp
+  hyprdori-logo-wallpaper                                   accent2 on base, 30% high
+  hyprdori-logo-wallpaper --fg accent,accent2,mauve --size 20,30,45
+  hyprdori-logo-wallpaper --bg '#000000' --fg red --res 3840x2160 --output-dir ~/tmp
 
 Options:
   --bg COLORS          background (default: base)
@@ -15,10 +15,10 @@ Options:
   --size PERCENTS      logo height as a share of the screen height (default: 30)
   --res WxH            image size (default: the highest resolution any connected monitor
                        has, else 2560x1440; works from a console too)
-  --output-dir DIR     where the images go (default: ~/.local/share/dotfiles/backgrounds/
+  --output-dir DIR     where the images go (default: ~/.local/share/hyprdori/backgrounds/
                        default, which the wallpaper picker lists)
   --logo FILE          another text logo (default: ~/.config/theme/logo/ascii-dori)
-  --output FILE        one file at this path instead (one color and size only; theme-set.py
+  --output FILE        one file at this path instead (one color and size only; hyprdori-theme-set
                        uses it for the wallpaper that follows the theme)
 
 Files are named dori-FG-on-BG-SIZE.png (hex colors without the #); an existing file
@@ -41,8 +41,8 @@ from pathlib import Path
 HOME = Path.home()
 THEME_COLORS = HOME / ".config/theme/current/quickshell.json"
 DEFAULT_LOGO = HOME / ".config/theme/logo/ascii-dori"
-DEFAULT_DIR = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "dotfiles/backgrounds/default"
-RENDER = Path(__file__).resolve().with_name("logo-render.py")
+DEFAULT_DIR = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "hyprdori/backgrounds/default"
+RENDER = HOME / ".config/scripts/logo-render.py"
 HEX_RE = re.compile(r"^#?[0-9a-fA-F]{6}$")
 
 

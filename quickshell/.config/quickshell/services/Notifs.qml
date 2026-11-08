@@ -38,7 +38,7 @@ Singleton {
                 n.dismiss();
     }
 
-    // Web apps (webapp.py) notify as their browser ("Brave"), with the site
+    // Web apps (hyprdori-webapp) notify as their browser ("Brave"), with the site
     // ("web.whatsapp.com", sometimes as a link) on the body's first line.
     // That site names the web app, whose name and icon are shown instead,
     // and the line is dropped. Sites without a web app stay as they are.
@@ -62,7 +62,7 @@ Singleton {
         return webAppOf(n)?.icon || n.appIcon;
     }
 
-    // Shell glyphs for the dotfiles' own scripts, matching the bar and Control
+    // Shell glyphs for Hyprdori's own scripts, matching the bar and Control
     // Center. Add a script here by its notify-send -a name.
     readonly property var appGlyphs: ({
             "Work-Game": Icons.rocket,
@@ -116,7 +116,7 @@ Singleton {
         bodyImagesSupported: true
         imageSupported: true
         persistenceSupported: true
-        // kept in Notification.hints: the shell's scripts mark key hints as x-kuvk.hint
+        // kept in Notification.hints: the shell's scripts mark key hints as x-hyprdori.hint
         extraHints: ["category"]
 
         onNotification: n => {

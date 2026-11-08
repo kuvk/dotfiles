@@ -26,7 +26,7 @@ ShellRoot {
     readonly property bool squareCorners: Theme.radius === 0
 
     function applyShape(): void {
-        Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--shape", squareCorners ? "square" : "rounded"]);
+        Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--shape", squareCorners ? "square" : "rounded"]);
     }
 
     onSquareCornersChanged: applyShape()
@@ -41,7 +41,7 @@ ShellRoot {
         id: cursorReveal
 
         interval: 300
-        onTriggered: Quickshell.execDetached(["hyprctl", "eval", "if kuvk_cursor_reveal then kuvk_cursor_reveal() end"])
+        onTriggered: Quickshell.execDetached(["hyprctl", "eval", "if hyprdori_cursor_reveal then hyprdori_cursor_reveal() end"])
     }
 
     // Idle lock and sleep, with the times from Settings for the power source in use

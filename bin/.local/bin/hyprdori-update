@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # Updates everything: pacman and AUR packages (paru shows Arch news first), Flatpak apps, the
-# Limine menu when Limine or the kernels changed, Neovim plugins and Mason tools, spicetify.
-# Then lists new .pacnew files and says when a reboot is needed.
+# Limine menu when Limine or the kernels changed, Neovim plugins and Mason tools, spicetify, and
+# Hyprdori's new migrations (hyprdori-migrate). Then lists new .pacnew files and says when a
+# reboot is needed.
 #
-#   update.sh           all of it, asking before each package transaction
-#   update.sh --yes     no questions from paru, pacman or flatpak
+#   hyprdori-update           all of it, asking before each package transaction
+#   hyprdori-update --yes     no questions from paru, pacman or flatpak
 set -uo pipefail
 
-dotfiles=$(cd "$(dirname "$(readlink -f "$0")")/../../.." && pwd)
+hyprdori=$(cd "$(dirname "$(readlink -f "$0")")/../../.." && pwd)
 yes=false
 [[ ${1:-} == --yes || ${1:-} == -y ]] && yes=true
 
@@ -40,7 +41,7 @@ if [[ -r $conf ]]; then
     if ((${#reasons[@]})); then
         echo "Rewriting the menu (${reasons[*]})"
         read -ra options <<<"$(sed -n 's/^# Options: //p' "$conf")"
-        sudo "$dotfiles/limine/install.sh" "${options[@]}"
+        sudo "$hyprdori/limine/install.sh" "${options[@]}"
     else
         echo "Up to date."
     fi
@@ -91,6 +92,10 @@ if command -v spicetify >/dev/null && ! pgrep -x spotify >/dev/null; then
         echo "Applied."
     fi
 fi
+
+# --- Hyprdori's one-time changes since the last update --------------------------------------
+step "Migrations"
+"$hyprdori/bin/.local/bin/hyprdori-migrate" || note "A migration failed; hyprdori-update tries it again."
 
 # --- What's left to do by hand ----------------------------------------------------------------
 step "Done"

@@ -1,5 +1,5 @@
 // Inspired by Catnap
-// Colors from the system theme: theme-set.py renders this file into
+// Colors from the system theme: hyprdori-theme-set renders this file into
 // ~/.config/fastfetch/config.jsonc (a theme slot name plus ".ansi" in double
 // braces is its 24-bit color code).
 // Edit this file, not config.jsonc.

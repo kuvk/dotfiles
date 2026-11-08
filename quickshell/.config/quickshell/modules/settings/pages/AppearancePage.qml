@@ -81,7 +81,7 @@ ColumnLayout {
         id: followApply
 
         interval: 800
-        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--follow-wallpaper"])
+        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--follow-wallpaper"])
     }
 
     // Long enough for Config to save the choice; then the whole theme again
@@ -89,7 +89,7 @@ ColumnLayout {
         id: accentApply
 
         interval: 800
-        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py"])
+        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set"])
     }
 
     SettingRow {
@@ -145,12 +145,12 @@ ColumnLayout {
         id: iconApply
 
         interval: 400
-        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--icons", Config.iconTheme])
+        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--icons", Config.iconTheme])
     }
 
     Process {
         running: true
-        command: [Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--icon-themes"]
+        command: [Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--icon-themes"]
         stdout: StdioCollector {
             onStreamFinished: settings.iconThemes = JSON.parse(text)
         }
@@ -161,12 +161,12 @@ ColumnLayout {
         id: cursorApply
 
         interval: 400
-        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--cursor", Config.cursorTheme, String(Config.cursorSize)])
+        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--cursor", Config.cursorTheme, String(Config.cursorSize)])
     }
 
     Process {
         running: true
-        command: [Quickshell.env("HOME") + "/.config/scripts/theme-set.py", "--cursors"]
+        command: [Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--cursors"]
         stdout: StdioCollector {
             onStreamFinished: settings.cursorThemes = JSON.parse(text)
         }
