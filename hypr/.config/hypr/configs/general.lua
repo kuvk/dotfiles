@@ -25,6 +25,7 @@ hl.config({
     force_split = 2,
   },
 
+
   binds = {
     workspace_back_and_forth = false,
     allow_workspace_cycles = true,
@@ -45,7 +46,13 @@ hl.config({
     vrr = 0,
   },
 
-  -- Hyprland's own lines in hyprland.log (in RAM, $XDG_RUNTIME_DIR/hypr/), for bug reports
+  -- No switching to HDR for fullscreen HDR content (no HDR at all: the monitor rules have
+  -- supports_hdr = -1, see hypr-monitors.py)
+  render = {
+    cm_auto_hdr = 0,
+  },
+
+  -- Hyprland
   debug = {
     disable_logs = false,
   },

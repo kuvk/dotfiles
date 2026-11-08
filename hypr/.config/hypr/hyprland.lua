@@ -1,6 +1,6 @@
 -- Monitors (written by ~/.config/scripts/hypr-monitors.py; missing on a fresh install)
 if not pcall(require, "configs.generated.monitors") then
-  hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto" })
+  hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto", supports_hdr = -1 })
 end
 
 -- Input

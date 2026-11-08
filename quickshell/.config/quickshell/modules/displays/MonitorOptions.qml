@@ -5,7 +5,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// The selected monitor: on/off, mode, scale, rotation, variable refresh, colors, depth, HDR, brightness, workspaces (Displays)
+// The selected monitor: on/off, mode, scale, rotation, variable refresh, colors, depth, brightness, workspaces (Displays)
 // Selected monitor
 GridLayout {
     // the Displays panel: its monitors, selection and actions
@@ -118,7 +118,7 @@ GridLayout {
     Stepper {
         enabled: panel.current?.enabled ?? false
         text: panel.current ? (panel.colorNames[panel.current.cm] ?? panel.current.cm) : ""
-        onStep: delta => panel.update(panel.selected, { cm: panel.cycle(panel.colorModes(panel.current), panel.current.cm, delta) })
+        onStep: delta => panel.update(panel.selected, { cm: panel.cycle(panel.colorModes, panel.current.cm, delta) })
     }
 
     StyledText {
@@ -126,11 +126,11 @@ GridLayout {
         visible: depthRow.visible
     }
 
-    // Screens that take 10-bit (their EDID); HDR always runs in 10-bit
+    // Screens that take 10-bit (their EDID)
     RowLayout {
         id: depthRow
 
-        visible: !!panel.current?.enabled && (panel.current?.max_bitdepth ?? 8) >= 10 && !panel.currentHdr
+        visible: !!panel.current?.enabled && (panel.current?.max_bitdepth ?? 8) >= 10
         spacing: 10
 
         Stepper {
@@ -139,46 +139,11 @@ GridLayout {
         }
 
         StyledText {
-            text: (panel.current?.bitdepth ?? 10) === 10 ? "Smoother gradients" : (panel.current?.hdr_capable ? "HDR in 8 bits" : "")
-            visible: text !== ""
+            text: "Smoother gradients"
+            visible: (panel.current?.bitdepth ?? 10) === 10
             color: Theme.overlay1
             font.pixelSize: Theme.fontSize - 2
         }
-    }
-
-    StyledText {
-        text: "Auto HDR"
-        visible: autoHdrRow.visible
-    }
-
-    // HDR screens not set to HDR: HDR while a fullscreen app shows HDR content
-    RowLayout {
-        id: autoHdrRow
-
-        visible: !!panel.current?.enabled && !!panel.current?.hdr_capable && !panel.currentHdr
-        spacing: 10
-
-        Switch {
-            checked: panel.current?.autohdr ?? true
-            onToggled: panel.update(panel.selected, { autohdr: !(panel.current?.autohdr ?? true) })
-        }
-
-        StyledText {
-            text: panel.current?.autohdr ?? true ? "HDR in fullscreen; may blink" : "Always SDR"
-            color: Theme.overlay1
-            font.pixelSize: Theme.fontSize - 2
-        }
-    }
-
-    StyledText {
-        text: "SDR brightness"
-        visible: panel.currentHdr
-    }
-
-    Stepper {
-        visible: panel.currentHdr
-        text: panel.current ? `${Math.round((panel.current.sdrbrightness ?? 1) * 100)}%  (non-HDR content in HDR)` : ""
-        onStep: delta => panel.update(panel.selected, { sdrbrightness: Math.max(0.5, Math.min(2, Math.round(((panel.current.sdrbrightness ?? 1) + delta * 0.1) * 10) / 10)) })
     }
 
     StyledText {

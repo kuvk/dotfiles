@@ -67,12 +67,26 @@ hl.config({
   --     tap_to_click = true,
   --   },
   -- },
+  cursor = {
+    -- no_hardware_cursors = 1,
+    -- XCursor themes only: otherwise Hyprland starts with the first hyprcursor theme it
+    -- finds, as Adwaita isn't one, until autostart sets the cursor
+    -- enable_hyprcursor = false,
+    -- hide_on_key_press = true,
+    -- warp_on_change_workspace = 1,
+  },
   animations = {
     enabled = false,
   },
+  render = {
+    cm_auto_hdr = 0,
+  },
+  debug = { enable_stdout_logs = true },
 })
 
-hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "1" })
+-- No HDR (supports_hdr = -1), as in the session (hypr-monitors.py): Hyprland would send HDR
+-- metadata to an HDR screen even in SDR, and some screens reconnect on it.
+hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "1", supports_hdr = -1 })
 
 -- The session's monitor layout (hypr-monitors.py writes it). The file is the user's to write and
 -- this runs as the greeter's user, so it's only read as data, never run.
@@ -89,6 +103,7 @@ if layout then
         position = position,
         scale = scale,
         transform = tonumber(transform),
+        supports_hdr = -1,
       })
     end
   end

@@ -17,15 +17,9 @@ FloatingWindow {
     readonly property var vrrNames: ["Off", "Always", "Fullscreen", "Games and video"]
     readonly property var colorNames: ({
             srgb: "sRGB",
-            edid: "Built-in",
-            hdr: "HDR",
-            hdredid: "HDR, built-in"
+            edid: "Built-in"
         })
-    readonly property bool currentHdr: root.current !== null && (root.current.cm === "hdr" || root.current.cm === "hdredid")
-
-    function colorModes(m: var): var {
-        return m.hdr_capable ? ["srgb", "edid", "hdr", "hdredid"] : ["srgb", "edid"];
-    }
+    readonly property var colorModes: ["srgb", "edid"]
 
     // Editable copy of Displays.info
     property var mons: []
@@ -210,7 +204,7 @@ FloatingWindow {
 
     function applyChanges(): void {
         Displays.apply({
-            monitors: mons.map(m => ({ id: m.id, enabled: m.enabled, mode: m.mode, x: m.x, y: m.y, scale: m.scale, transform: m.transform, vrr: m.vrr, cm: m.cm, sdrbrightness: m.sdrbrightness, autohdr: m.autohdr, bitdepth: m.bitdepth })),
+            monitors: mons.map(m => ({ id: m.id, enabled: m.enabled, mode: m.mode, x: m.x, y: m.y, scale: m.scale, transform: m.transform, vrr: m.vrr, cm: m.cm, bitdepth: m.bitdepth })),
             workspaces: workspaces,
             text_size: textSize,
             primary: primary
