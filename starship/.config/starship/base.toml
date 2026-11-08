@@ -50,7 +50,7 @@ RedHatEnterprise = "󱄛"
 
 [username]
 show_always = true
-style_user = "foreground"
+style_user = "magenta"
 style_root = "red"
 format = '[ $user]($style)'
 

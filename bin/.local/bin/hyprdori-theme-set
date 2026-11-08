@@ -51,6 +51,9 @@ from pathlib import Path
 HOME = Path.home()
 THEME_DIR = HOME / ".config/theme"
 THEMES_DIR = THEME_DIR / "themes"
+# Hyprdori's changes to a theme's colors (overrides/<name>.toml), kept apart so syncing the
+# themes doesn't touch them
+OVERRIDES_DIR = THEME_DIR / "overrides"
 TEMPLATES_DIR = THEME_DIR / "templates"
 CURRENT_DIR = THEME_DIR / "current"
 ICONS_DIR = THEME_DIR / "icons"
@@ -385,6 +388,10 @@ def load_theme(name: str) -> dict:
     path = THEMES_DIR / name / "colors.toml"
     with path.open("rb") as f:
         data = tomllib.load(f)
+    override = OVERRIDES_DIR / f"{name}.toml"
+    if override.is_file():
+        with override.open("rb") as f:
+            data |= tomllib.load(f)
     colors, specs = palette(data)
     colors["accent"] = accent_override(name, colors) or colors["accent"]
     mode = theme_mode(data, colors)

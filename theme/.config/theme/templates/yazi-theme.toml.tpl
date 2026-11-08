@@ -27,7 +27,7 @@ count_selected = { fg = "{{ background }}", bg = "{{ yellow }}" }
 
 # Border: the dividers between columns
 border_symbol = "│"
-border_style  = { fg = "{{ mix dark_foreground foreground 20% }}" }
+border_style  = { fg = "{{ muted }}" }
 
 # : }}}
 

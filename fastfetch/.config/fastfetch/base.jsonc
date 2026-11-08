@@ -16,14 +16,14 @@
 			"bottom": 2,
     },
     "color": {
-      "1": "{{ accent.ansi }}",
+      "1": "{{ magenta.ansi }}",
     },
   },
   "display": {
     "separator": " ",
     "color": {
-      "keys": "{{ mix.ansi dark_foreground foreground 20% }}",
-      "output": "{{ accent.ansi }}",
+      "keys": "{{ dark_foreground.ansi }}",
+      "output": "{{ foreground.ansi }}",
     },
   },
   "modules": [

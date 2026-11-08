@@ -45,6 +45,7 @@ spec = importlib.util.spec_from_loader("theme_set", loader)
 ts = importlib.util.module_from_spec(spec)
 loader.exec_module(ts)
 ts.THEMES_DIR = root / "theme/.config/theme/themes"
+ts.OVERRIDES_DIR = root / "theme/.config/theme/overrides"
 templates = sorted((root / "theme/.config/theme/templates").glob("*.tpl"))
 templates.append(root / "fastfetch/.config/fastfetch/base.jsonc")
 names = sorted(p.parent.name for p in ts.THEMES_DIR.glob("*/colors.toml"))
