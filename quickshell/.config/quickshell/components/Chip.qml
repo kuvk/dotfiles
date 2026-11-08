@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.config
-import qs.components
 import qs.services
 
 // A choice in a row of them (DNS, Wi-Fi band, power mode); a Repeater's delegate. Styled

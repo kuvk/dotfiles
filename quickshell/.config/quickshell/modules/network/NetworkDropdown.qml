@@ -4,8 +4,6 @@ import Quickshell
 import qs.config
 import qs.components
 import qs.services
-import qs.modules.dropdowns.common
-import qs.modules.dropdowns.network
 
 // Network: the connection with its live stats, the Wi-Fi band, DNS, VPNs, wired ports and
 // the Wi-Fi networks (connected, known, other), with buttons for the Wi-Fi QR code and the

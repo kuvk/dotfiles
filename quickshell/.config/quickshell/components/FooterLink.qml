@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.config
-import qs.components
 import qs.services
 
 // The line at the bottom of a dropdown, on the right: opens the full app (or refreshes)

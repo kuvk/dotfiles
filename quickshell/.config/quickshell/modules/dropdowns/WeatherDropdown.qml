@@ -3,7 +3,6 @@ import QtQuick.Layouts
 import qs.config
 import qs.components
 import qs.services
-import qs.modules.dropdowns.common
 
 // Weather from wttr.in: now, a few details, and the days ahead
 Dropdown {

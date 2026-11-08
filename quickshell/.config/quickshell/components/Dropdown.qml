@@ -4,7 +4,6 @@ import Quickshell
 import Quickshell.Hyprland
 import Quickshell.Wayland
 import qs.config
-import qs.components
 import qs.services
 
 // Dropdown that drops out from under the bar and settles a few pixels below

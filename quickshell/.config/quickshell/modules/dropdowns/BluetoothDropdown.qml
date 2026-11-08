@@ -4,7 +4,6 @@ import Quickshell.Bluetooth as BT
 import qs.config
 import qs.components
 import qs.services
-import qs.modules.dropdowns.common
 
 // Bluetooth: on or off, searching while open, and the devices (connected and paired first)
 Dropdown {

@@ -8,7 +8,6 @@ import qs.config
 import qs.components
 import qs.services
 import qs.modules.notifications
-import qs.modules.dropdowns.common
 
 // Control Center: quick toggles, sliders, media, notifications and session buttons
 PanelWindow {

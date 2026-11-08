@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.config
-import qs.components
 import qs.services
 
 // The top of a dropdown, after the network one: a large icon, a bold title, a status line

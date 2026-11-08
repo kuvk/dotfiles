@@ -4,8 +4,6 @@ import Quickshell.Services.Pipewire
 import qs.config
 import qs.components
 import qs.services
-import qs.modules.dropdowns.common
-import qs.modules.dropdowns.audio
 
 // Sound: the output and input volume, the devices to choose from, and each app's volume
 Dropdown {

@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.config
-import qs.components
 import qs.services
 
 // A line between sections of a dropdown

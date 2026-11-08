@@ -4,7 +4,6 @@ import Quickshell.Services.UPower
 import qs.config
 import qs.components
 import qs.services
-import qs.modules.dropdowns.common
 
 // Battery details and power profile (power-profiles-daemon; on ASUS laptops
 // asusd maps these to Quiet / Balanced / Performance).

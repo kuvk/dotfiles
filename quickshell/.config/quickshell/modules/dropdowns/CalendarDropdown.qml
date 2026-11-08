@@ -3,7 +3,6 @@ import QtQuick.Layouts
 import qs.config
 import qs.components
 import qs.services
-import qs.modules.dropdowns.common
 
 // Month view with ISO week numbers.
 // Scroll or use the arrows to change month, click the title to go back to today.

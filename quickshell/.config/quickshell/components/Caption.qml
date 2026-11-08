@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.config
-import qs.components
 import qs.services
 
 // Small capitals over a section of a dropdown

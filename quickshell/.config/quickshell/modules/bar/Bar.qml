@@ -6,6 +6,8 @@ import qs.config
 import qs.components
 import qs.services
 import qs.modules.dropdowns
+import qs.modules.audio
+import qs.modules.network
 
 PanelWindow {
     id: barWindow
