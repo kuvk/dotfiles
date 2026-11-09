@@ -15,11 +15,13 @@ ColumnLayout {
     Layout.fillWidth: true
     spacing: 12
 
+    // once the choice is saved (Config writes it on change), which hyprdori-theme-set reads
     Timer {
         id: followApply
 
-        interval: 800
-        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--follow-wallpaper"])
+        interval: 150
+        // the theme's background again with the switch's animation, as the wallpaper picker's
+        onTriggered: SwitchFx.run([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--follow-wallpaper"], 1, 250)
     }
 
     // Long enough for Config to save the choice; then the whole theme again

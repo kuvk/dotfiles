@@ -16,8 +16,10 @@ Singleton {
     // "idle" | "capture" | "run" | "reveal"
     property string phase: "idle"
     property int screensReady: 0
-    property int settleMs: 300
+    property int settleMs: 250
     readonly property int revealMs: 900
+    // a picker's fade out (Theme.animDuration) and a frame: the capture mustn't catch it
+    readonly property int pickerClosed: Theme.animDuration + 40
 
     // `delayMs`: let a closing picker fade out before the capture.
     // `settle`: wait after the command so the new look has been drawn.

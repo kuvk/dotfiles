@@ -192,8 +192,8 @@ PanelWindow {
         if (thisMonitorOnly && screen)
             cmd.push(screen.name);
         Panels.wallpapers = "";
-        // wait for the picker to fade out; live wallpapers need a moment to start playing
-        SwitchFx.run(cmd, Theme.animDuration + 250, kind === "live" ? 1200 : 400);
+        // after the picker has faded out; live wallpapers need a moment to start playing
+        SwitchFx.run(cmd, SwitchFx.pickerClosed, kind === "live" ? 1200 : 250);
     }
 
     // Size of the visible slice at fractional distance `d` from the selection

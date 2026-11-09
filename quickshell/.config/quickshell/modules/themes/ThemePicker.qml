@@ -122,7 +122,7 @@ PanelWindow {
             return;
         Panels.themes = false;
         // after the picker has faded out
-        SwitchFx.run([themeSet, item.theme], Theme.animDuration + 250, 500);
+        SwitchFx.run([themeSet, item.theme], SwitchFx.pickerClosed, 250);
     }
 
     function lerp(a: real, b: real, t: real): real {

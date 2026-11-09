@@ -735,9 +735,9 @@ def set_gtk_theme(strings: dict) -> None:
     run_quiet(["gsettings", "set", interface, "color-scheme", f"prefer-{strings['mode']}"])
 
 
-def reload_apps(theme: dict) -> None:
-    colors, strings = theme["colors"], theme["strings"]
-
+def reload_visible(theme: dict) -> None:
+    """What a theme switch shows at once: the shell, Hyprland's borders and kitty. The
+    animated switch (the shell's SwitchFx) waits for these and the wallpaper, then reveals."""
     # quickshell and neovim watch their generated files; poke quickshell anyway
     # in case the watch was lost when the file was replaced
     run_quiet(["qs", "ipc", "call", "theme", "reload"])
@@ -751,6 +751,13 @@ def reload_apps(theme: dict) -> None:
         ])
 
     run_quiet(["pkill", "-USR1", "-x", "kitty"])
+
+
+def reload_apps(theme: dict) -> None:
+    """The rest, after the switch is shown (in the background): the other apps, GTK,
+    browsers and the theme's own wallpaper."""
+    colors, strings = theme["colors"], theme["strings"]
+
     run_quiet(["pkill", "-USR2", "-x", "btop"])
     run_quiet(["pkill", "-USR2", "-x", "cava"])  # reload colors
     run_quiet(["pkill", "-USR1", "-x", "swayimg"])  # re-reads current/swayimg.lua
@@ -1018,15 +1025,23 @@ def main(argv: list[str]) -> int:
         notify(f"Failed to apply {name}: {e}")
         return 1
 
-    reload_apps(theme)
+    reload_visible(theme)
     follow_wallpaper(theme)
+    # The rest goes on in the background, so the switch shows as soon as the above is done
+    if os.fork() > 0:
+        return 0
+    os.setsid()
+    devnull = os.open(os.devnull, os.O_RDWR)
+    for fd in (0, 1, 2):
+        os.dup2(devnull, fd)
+    reload_apps(theme)
     # A switch, or new colors (an accent from Settings): the boot screens follow only when
     # their installers run, which the notification offers
     if argv:
         notify_switch(f"Switched to {theme['strings']['theme_name']}")
     elif colors_file.read_text() != before:
         notify_switch("Theme colors changed")
-    return 0
+    os._exit(0)
 
 
 if __name__ == "__main__":
