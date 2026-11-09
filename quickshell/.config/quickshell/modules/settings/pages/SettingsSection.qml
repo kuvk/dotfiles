@@ -3,8 +3,9 @@ import QtQuick.Layouts
 import qs.config
 import qs.components
 
-// A subheader in a Settings page, in the accent, with its hint below and, centered beside
-// both on the right, one of:
+// A section in a Settings page: a divider above it (none for a page's first), its heading in
+// capitals in the text color (as a dropdown's section, a step above its options' labels), its
+// hint below if any and, centered beside both on the right, one of:
 // - a switch, with `key` (a Config bool): it shows and hides the options under it;
 // - `controls` (buttons and the like), when there is nothing under it to fold;
 // - an arrow that folds and unfolds the options under it, folded at first;
@@ -28,6 +29,11 @@ ColumnLayout {
     Layout.topMargin: 8
     spacing: 12
 
+    // between sections, as in dropdowns
+    Separator {
+        visible: section.title !== "" && section.parent && section.parent.children[0] !== section
+    }
+
     // no title: no header, the options show as they are
     RowLayout {
         Layout.fillWidth: true
@@ -38,11 +44,11 @@ ColumnLayout {
             Layout.fillWidth: true
             spacing: 0
 
-            StyledText {
+            Caption {
                 Layout.fillWidth: true
                 text: section.title
-                color: Theme.accent
-                font.weight: Font.Bold
+                color: Theme.foreground
+                font.pixelSize: Theme.fontSize
             }
 
             StyledText {

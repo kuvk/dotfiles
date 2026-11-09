@@ -172,8 +172,9 @@ FloatingWindow {
                 Layout.margins: 16
                 spacing: 12
 
+                // the page's name is in the sidebar; here only the close button, with window buttons on
                 SectionHeader {
-                    title: root.sections.find(s => s.id === root.section)?.label ?? ""
+                    visible: Config.windowButtons
 
                     CloseButton {
                         onClicked: Panels.settings = false

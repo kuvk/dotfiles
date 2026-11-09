@@ -594,18 +594,18 @@ def icons_dir(name: str) -> str:
 
 
 def theme_background(theme: dict) -> Path | None:
-    """This theme's own background: the logo in magenta on the background (hyprdori-logo-wallpaper), drawn
+    """This theme's own background: the logo in magenta on the dark background (hyprdori-logo-wallpaper), drawn
     once per theme and colors into ~/.local/share/hyprdori/backgrounds/default. The wallpaper
     and the lock screen show it while they follow the theme (Settings)."""
     colors, name = theme["colors"], theme["strings"]["theme"]
     folder = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "hyprdori/backgrounds/default"
-    path = folder / f"dori-theme-{name}-{colors['magenta'][1:]}-on-{colors['background'][1:]}.png"
+    path = folder / f"dori-theme-{name}-{colors['magenta'][1:]}-on-{colors['dark_background'][1:]}.png"
     if path.exists():
         return path
     folder.mkdir(parents=True, exist_ok=True)
     for old in folder.glob(f"dori-theme-{name}-*.png"):  # this theme in older colors
         old.unlink(missing_ok=True)
-    run_quiet([str(HOME / ".local/bin/hyprdori-logo-wallpaper"), "--bg", colors["background"], "--fg", colors["magenta"],
+    run_quiet([str(HOME / ".local/bin/hyprdori-logo-wallpaper"), "--bg", colors["dark_background"], "--fg", colors["magenta"],
                "--size", "30", "--output", str(path)])
     return path if path.exists() else None
 

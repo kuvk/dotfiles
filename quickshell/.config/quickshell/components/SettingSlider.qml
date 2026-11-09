@@ -29,10 +29,12 @@ ColumnLayout {
         value: root.valueText
     }
 
+    // the fill shows the value itself (90% fills 90% whatever the lowest allowed), and stops
+    // at `from`
     SliderRow {
-        value: root.value - root.from
-        to: root.to - root.from
-        onMoved: v => root.changed(Math.round((root.from + v) * 1000) / 1000)
+        value: root.value
+        to: root.to
+        onMoved: v => root.changed(Math.round(Math.max(root.from, v) * 1000) / 1000)
     }
 
     Caption {

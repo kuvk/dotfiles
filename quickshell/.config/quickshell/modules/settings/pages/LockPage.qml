@@ -73,7 +73,6 @@ ColumnLayout {
     // The boot splash draws its field when it's built: theme-boot.sh, which the button runs
     SettingRow {
         label: "Rounded corners"
-        hint: "The password field on the lock, login and boot screens, and the login screen's buttons"
 
         Switch {
             checked: Config.lockRounded
@@ -96,7 +95,6 @@ ColumnLayout {
 
     SettingSlider {
         label: "Power buttons opacity"
-        hint: "On the login screen"
         value: Config.lockPowerOpacity / 100
         onChanged: v => {
             Config.lockPowerOpacity = Math.round(v * 1000) / 10;

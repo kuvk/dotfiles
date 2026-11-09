@@ -63,7 +63,6 @@ ColumnLayout {
 
     SettingsSection {
         title: "System"
-        hint: "The shell and Hyprland"
         foldable: false
 
         // The running theme's accent: its own, or another of its colors (hyprdori-theme-set reads
@@ -124,7 +123,6 @@ ColumnLayout {
         SettingRow {
             label: "Corner radius"
             normalOnly: true
-            hint: "Windows, the shell and terminal apps"
 
             Stepper {
                 text: `${Config.radius} px`
@@ -134,7 +132,6 @@ ColumnLayout {
 
         SettingRow {
             label: "Border width"
-            hint: "Windows, the shell's popups and notifications; 0 for none"
 
             Stepper {
                 text: `${Config.borderWidth} px`
@@ -183,7 +180,6 @@ ColumnLayout {
         SettingRow {
             label: "Blur"
             normalOnly: true
-            hint: "Behind windows and the shell"
 
             Switch {
                 checked: Config.blur
@@ -203,7 +199,6 @@ ColumnLayout {
 
         SettingRow {
             label: "Window buttons"
-            hint: "Close button on shell and GTK windows"
 
             Switch {
                 checked: Config.windowButtons
@@ -217,13 +212,11 @@ ColumnLayout {
 
     SettingsSection {
         title: "Shell"
-        hint: "Bar, dropdowns, launchers, Settings and notifications"
         foldable: false
 
         SettingSlider {
             label: "Bar opacity"
             normalOnly: true
-            hint: "No blur below 50%"
             from: 0.3
             value: Config.barOpacity
             onChanged: v => Config.barOpacity = v
@@ -232,7 +225,6 @@ ColumnLayout {
         SettingSlider {
             label: "Shell opacity"
             normalOnly: true
-            hint: "Dropdowns, launchers, Control Center, Settings and the other shell windows"
             from: 0.5
             value: Config.shellOpacity
             onChanged: v => Config.shellOpacity = v
@@ -241,11 +233,10 @@ ColumnLayout {
         SettingRow {
             label: "Shadow"
             normalOnly: true
-            hint: "Under notifications"
 
             Switch {
-                checked: Config.notificationShadow
-                onToggled: Config.notificationShadow = !Config.notificationShadow
+                checked: Config.shadow
+                onToggled: Config.shadow = !Config.shadow
             }
         }
 
@@ -262,7 +253,6 @@ ColumnLayout {
 
     SettingsSection {
         title: "Hyprland"
-        hint: "Other apps' windows; browsers and fullscreen ones stay opaque"
         foldable: false
 
         SettingSlider {
@@ -284,7 +274,6 @@ ColumnLayout {
         SettingRow {
             label: "Inner gaps"
             normalOnly: true
-            hint: "Between windows"
 
             Stepper {
                 text: `${Config.gapsIn} px`
@@ -294,7 +283,6 @@ ColumnLayout {
         SettingRow {
             label: "Outer gaps"
             normalOnly: true
-            hint: "To the screen's edges"
 
             Stepper {
                 text: `${Config.gapsOut} px`

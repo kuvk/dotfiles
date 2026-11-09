@@ -70,17 +70,8 @@ ColumnLayout {
         }
     }
 
-    StyledText {
-        Layout.fillWidth: true
-        text: "Open terminals change now; reopen other apps. Icons are always Symbols Nerd Font's."
-        color: Theme.dimText
-        font.pixelSize: Theme.smallSize
-        wrapMode: Text.Wrap
-    }
-
     SettingRow {
         label: "Monospace everywhere"
-        hint: "The font for all text; off: the display font outside terminals"
 
         Switch {
             checked: Config.monoEverywhere
@@ -125,7 +116,6 @@ ColumnLayout {
     SettingRow {
         Layout.topMargin: 4
         label: "Hinting"
-        hint: "Slight suits most screens"
 
         Stepper {
             text: Config.fontHinting.charAt(0).toUpperCase() + Config.fontHinting.slice(1)
@@ -138,7 +128,6 @@ ColumnLayout {
 
     SettingRow {
         label: "Antialiasing"
-        hint: "Grayscale avoids color fringes"
 
         Stepper {
             text: ({ none: "None", grayscale: "Grayscale", rgba: "Subpixel" })[Config.fontAntialiasing]

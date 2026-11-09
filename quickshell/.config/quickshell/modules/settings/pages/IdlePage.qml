@@ -42,6 +42,7 @@ ColumnLayout {
             SettingsSection {
                 title: idleSet.modelData.title
                 hint: idleSet.modelData.now ? "Now" : ""
+                foldable: false
 
                 Repeater {
                     model: [

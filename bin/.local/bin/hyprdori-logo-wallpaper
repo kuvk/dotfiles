@@ -5,12 +5,12 @@ Colors are theme color names from the current theme (background, accent, magenta
 or hex values (#1e1e2e). --bg, --fg and --size take comma-separated lists, and every
 combination is drawn, so one run can make a set to pick from.
 
-  hyprdori-logo-wallpaper                                   magenta on the background, 30% high
+  hyprdori-logo-wallpaper                                   magenta on the dark background, 30% high
   hyprdori-logo-wallpaper --fg accent,magenta,blue --size 20,30,45
   hyprdori-logo-wallpaper --bg '#000000' --fg red --res 3840x2160 --output-dir ~/tmp
 
 Options:
-  --bg COLORS          background (default: base)
+  --bg COLORS          background (default: dark_background)
   --fg COLORS          logo color (default: magenta)
   --size PERCENTS      logo height as a share of the screen height (default: 30)
   --res WxH            image size (default: the highest resolution any connected monitor
@@ -102,7 +102,7 @@ def split(value: str) -> list[str]:
 
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument("--bg", default="background")
+    parser.add_argument("--bg", default="dark_background")
     parser.add_argument("--fg", default="magenta")
     parser.add_argument("--size", default="30")
     parser.add_argument("--res")

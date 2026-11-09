@@ -16,7 +16,6 @@ ColumnLayout {
 
     SettingRow {
         label: "Floating bar"
-        hint: "Off: full width, square"
 
         Switch {
             checked: Config.barFloating
@@ -27,11 +26,20 @@ ColumnLayout {
     SettingRow {
         visible: Config.barFloating
         label: "Bar margin"
-        hint: "Space around the floating bar"
 
         Stepper {
             text: `${Config.barMargin} px`
             onStep: d => Config.barMargin = settings.clamp(Config.barMargin + d * 2, 0, 40)
+        }
+    }
+
+    SettingRow {
+        label: "Shadow"
+        normalOnly: true
+
+        Switch {
+            checked: Config.barShadow
+            onToggled: Config.barShadow = !Config.barShadow
         }
     }
 
@@ -46,7 +54,6 @@ ColumnLayout {
 
     SettingRow {
         label: "Weather location"
-        hint: "Empty: detect from IP"
 
         Rectangle {
             implicitWidth: Math.round(220 * Theme.textScale)
@@ -90,14 +97,6 @@ ColumnLayout {
     }
 
     // Modules per bar: the primary monitor's and the others'
-    StyledText {
-        Layout.topMargin: 8
-        Layout.fillWidth: true
-        text: "Modules for each bar, in their order on it."
-        color: Theme.dimText
-        wrapMode: Text.Wrap
-    }
-
     GridLayout {
         Layout.fillWidth: true
         columns: 3
