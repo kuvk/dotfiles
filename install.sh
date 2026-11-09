@@ -80,7 +80,13 @@ ask "Flatpak apps (packages/flatpak.txt)?" y && flatpak=true
 encrypted=n
 grep -qE '^HOOKS=.*\b(sd-)?encrypt\b' /etc/mkinitcpio.conf 2>/dev/null && encrypted=y
 autologin=--no-autologin
-ask "Log in automatically, without the login screen (autologin)?" "$encrypted" && autologin=--autologin
+if ask "Log in automatically, without the login screen (autologin)?" "$encrypted"; then
+    autologin=--autologin
+    note "Autologin: the disk password is the only one at boot; your account's password still unlocks the
+lock screen and sudo. The keyring (saved browser and app passwords) isn't unlocked by a login: the
+first app to use it asks for a keyring password, then every boot. Left empty, it never asks (the
+encrypted disk still protects it)."
+fi
 
 echo
 echo "Package lists: ${groups[*]}$($flatpak && echo ", flatpak")$([[ $autologin == --autologin ]] && echo "; autologin")"

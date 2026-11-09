@@ -192,8 +192,9 @@ PanelWindow {
         if (thisMonitorOnly && screen)
             cmd.push(screen.name);
         Panels.wallpapers = "";
-        // after the picker has faded out; live wallpapers need a moment to start playing
-        SwitchFx.run(cmd, SwitchFx.pickerClosed, kind === "live" ? 1200 : 250);
+        // after the picker has faded out; a still image needs a frame or two to be drawn (the
+        // reveal's slow start covers the rest), a live one a moment to start playing
+        SwitchFx.run(cmd, SwitchFx.pickerClosed, kind === "live" ? 1200 : 100);
     }
 
     // Size of the visible slice at fractional distance `d` from the selection

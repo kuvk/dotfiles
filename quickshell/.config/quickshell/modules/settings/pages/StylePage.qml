@@ -21,7 +21,7 @@ ColumnLayout {
 
         interval: 150
         // the theme's background again with the switch's animation, as the wallpaper picker's
-        onTriggered: SwitchFx.run([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--follow-wallpaper"], 1, 250)
+        onTriggered: SwitchFx.run([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--follow-wallpaper"], 1, 100)
     }
 
     // Long enough for Config to save the choice; then the whole theme again

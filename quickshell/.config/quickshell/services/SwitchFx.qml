@@ -16,8 +16,8 @@ Singleton {
     // "idle" | "capture" | "run" | "reveal"
     property string phase: "idle"
     property int screensReady: 0
-    property int settleMs: 250
-    readonly property int revealMs: 900
+    property int settleMs: 100
+    readonly property int revealMs: 700
     // a picker's fade out (Theme.animDuration) and a frame: the capture mustn't catch it
     readonly property int pickerClosed: Theme.animDuration + 40
 
