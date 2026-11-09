@@ -167,6 +167,42 @@ ColumnLayout {
         update(index, { mode: mode, scale: cleanScale(mons[index].scale, mode) });
     }
 
+    // A mode is "WIDTHxHEIGHT@RATE": the resolutions in the monitor's order (its preferred
+    // first), and the rates the current resolution has
+    function resolutions(m: var): var {
+        return [...new Set(m.modes.map(mode => mode.split("@")[0]))];
+    }
+
+    function rates(m: var): var {
+        const res = m.mode.split("@")[0];
+        return m.modes.filter(mode => mode.split("@")[0] === res).map(mode => mode.split("@")[1]);
+    }
+
+    // another resolution keeps the rate where it has it, else takes its first (highest)
+    function setResolution(index: int, res: string): void {
+        const m = mons[index];
+        const rate = m.mode.split("@")[1];
+        setMode(index, m.modes.find(mode => mode === `${res}@${rate}`) ?? m.modes.find(mode => mode.split("@")[0] === res));
+    }
+
+    function setRate(index: int, rate: string): void {
+        setMode(index, `${mons[index].mode.split("@")[0]}@${rate}`);
+    }
+
+    // Workspaces > Defaults: the primary first, then left to right; at most 5 each (1-5 /
+    // 6-10, or 3 each with three), as hyprdori-monitors splits them
+    function defaultWorkspaces(): void {
+        const on = enabledMons.slice().sort((a, b) => (b.id === primary) - (a.id === primary) || a.x - b.x || a.y - b.y);
+        const per = on.length ? Math.min(5, Math.floor(10 / on.length)) : 0;
+        const w = {};
+        let ws = 1;
+        for (const m of on)
+            for (let i = 0; i < per; i++)
+                w[String(ws++)] = m.id;
+        workspaces = w;
+        dirty = true;
+    }
+
     function cycle(list: var, value: var, step: int): var {
         let i = list.findIndex(v => Math.abs(Number(v) - Number(value)) < 0.001 || v === value);
         if (i < 0)
@@ -210,7 +246,12 @@ ColumnLayout {
             Qt.callLater(Displays.refresh);
         }
     }
-    Component.onCompleted: if (visible) load()
+    Component.onCompleted: {
+        if (visible) {
+            load();
+            Qt.callLater(Displays.refresh);
+        }
+    }
 
     Connections {
         target: Displays
@@ -235,10 +276,6 @@ ColumnLayout {
 
     Separator {}
 
-    TextSize {
-        panel: root
-    }
-
     RowLayout {
         Layout.fillWidth: true
         spacing: 8
@@ -253,7 +290,7 @@ ColumnLayout {
 
         // this setup as if it were new: Hyprland's own layout, workspaces split again
         TextButton {
-            text: "Defaults"
+            text: "Reset"
             enabled: !Displays.busy
             onClicked: Displays.reset()
         }

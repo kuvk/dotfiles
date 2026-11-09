@@ -5,9 +5,12 @@ import qs.config
 import qs.components
 import qs.services
 
-// The selected monitor's options, as Settings' options: on or off, primary, mode, scale,
-// variable refresh, colors, depth, brightness and its workspaces (Displays)
+// The selected monitor's options, as Settings' options: on or off, primary and its workspaces;
+// resolution, refresh rate, scale, brightness and the text size; variable refresh, colors and
+// depth (Displays)
 ColumnLayout {
+    id: options
+
     // the DisplaysEditor: its monitors, selection and actions
     required property var panel
 
@@ -40,13 +43,84 @@ ColumnLayout {
         }
     }
 
+    // The workspaces on this monitor, centered in the row, a click assigns one or unassigns it
+    // (outlined: on another monitor); Defaults splits them as for a new setup
+    Item {
+        Layout.fillWidth: true
+        implicitHeight: 30
+
+        Caption {
+            anchors.left: parent.left
+            anchors.verticalCenter: parent.verticalCenter
+            text: "Workspaces"
+        }
+
+        Row {
+            anchors.centerIn: parent
+            spacing: 4
+
+            Repeater {
+                model: 10
+
+                MouseArea {
+                    id: wsChip
+
+                    required property int index
+                    readonly property int ws: index + 1
+                    readonly property string owner: panel.workspaces[String(ws)] ?? ""
+                    readonly property bool mine: panel.current !== null && owner === panel.current.id
+
+                    width: 30
+                    height: 30
+                    hoverEnabled: true
+                    cursorShape: Qt.PointingHandCursor
+                    onClicked: panel.toggleWorkspace(ws)
+
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: Theme.smallRadius
+                        color: wsChip.mine ? Theme.accent : (wsChip.containsMouse ? Theme.hoverBg : Theme.cardBg)
+                        border.color: !wsChip.mine && wsChip.owner !== "" ? Theme.muted : "transparent"
+                        border.width: Theme.borderWidth
+                    }
+
+                    StyledText {
+                        anchors.centerIn: parent
+                        text: wsChip.ws
+                        color: wsChip.mine ? Theme.background : (wsChip.owner !== "" ? Theme.faintText : Theme.subtext)
+                        font.weight: wsChip.mine ? Font.Bold : Font.Normal
+                    }
+                }
+            }
+        }
+
+        TextButton {
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            text: "Defaults"
+            onClicked: panel.defaultWorkspaces()
+        }
+    }
+
+    Separator {}
+
     SettingRow {
         label: "Resolution"
 
         Stepper {
             enabled: panel.current?.enabled ?? false
-            text: panel.current ? panel.current.mode.replace("@", " @ ") + " Hz" : ""
-            onStep: delta => panel.setMode(panel.selected, panel.cycle(panel.current.modes, panel.current.mode, delta))
+            text: panel.current ? panel.current.mode.split("@")[0] : ""
+            onStep: delta => panel.setResolution(panel.selected, panel.cycle(panel.resolutions(panel.current), panel.current.mode.split("@")[0], delta))
+        }
+    }
+
+    SettingRow {
+        label: "Refresh rate"
+
+        Stepper {
+            enabled: panel.current?.enabled ?? false
+            text: panel.current ? `${panel.current.mode.split("@")[1]} Hz` : ""
+            onStep: delta => panel.setRate(panel.selected, panel.cycle(panel.rates(panel.current), panel.current.mode.split("@")[1], delta))
         }
     }
 
@@ -59,6 +133,28 @@ ColumnLayout {
             onStep: delta => panel.update(panel.selected, { scale: panel.cycle(panel.validScales(panel.current.mode), panel.current.scale, delta) })
         }
     }
+
+    // Reading the brightness takes a moment after opening: the slider keeps its place meanwhile
+    // (invisible), so Displays opens at its final size. Hidden for a monitor without a
+    // brightness control (null).
+    SettingSlider {
+        readonly property var level: panel.current ? Displays.brightness[panel.current.name] : undefined
+
+        visible: !!panel.current?.enabled && level !== null
+        opacity: level === undefined ? 0 : 1
+        enabled: level !== undefined
+        label: "Brightness"
+        valueText: `${level ?? 0}%`
+        value: (level ?? 0) / 100
+        onChanged: v => Displays.setBrightness(panel.current.name, Math.max(1, Math.round(v * 100)))
+    }
+
+    // for this combination of monitors, not only the selected one
+    TextSize {
+        panel: options.panel
+    }
+
+    Separator {}
 
     SettingRow {
         visible: !!panel.current?.enabled && !!panel.current?.vrr_capable
@@ -90,66 +186,6 @@ ColumnLayout {
         Stepper {
             text: `${panel.current?.bitdepth ?? 10}-bit`
             onStep: delta => panel.update(panel.selected, { bitdepth: (panel.current?.bitdepth ?? 10) === 10 ? 8 : 10 })
-        }
-    }
-
-    // Reading the brightness takes a moment after opening: the slider keeps its place meanwhile
-    // (invisible), so Displays opens at its final size. Hidden for a monitor without a
-    // brightness control (null).
-    SettingSlider {
-        readonly property var level: panel.current ? Displays.brightness[panel.current.name] : undefined
-
-        visible: !!panel.current?.enabled && level !== null
-        opacity: level === undefined ? 0 : 1
-        enabled: level !== undefined
-        label: "Brightness"
-        valueText: `${level ?? 0}%`
-        value: (level ?? 0) / 100
-        onChanged: v => Displays.setBrightness(panel.current.name, Math.max(1, Math.round(v * 100)))
-    }
-
-    SettingRow {
-        label: "Workspaces"
-        hint: "Outlined: assigned to another monitor"
-
-        // a click assigns one to this monitor, or unassigns it
-        Row {
-            spacing: 4
-
-            Repeater {
-                model: 10
-
-                MouseArea {
-                    id: wsChip
-
-                    required property int index
-                    readonly property int ws: index + 1
-                    readonly property string owner: panel.workspaces[String(ws)] ?? ""
-                    readonly property bool mine: panel.current !== null && owner === panel.current.id
-
-                    width: 30
-                    height: 30
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: panel.toggleWorkspace(ws)
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: Theme.smallRadius
-                        color: wsChip.mine ? Theme.accent : (wsChip.containsMouse ? Theme.hoverBg : Theme.cardBg)
-                        // assigned to another monitor
-                        border.color: !wsChip.mine && wsChip.owner !== "" ? Theme.muted : "transparent"
-                        border.width: Theme.borderWidth
-                    }
-
-                    StyledText {
-                        anchors.centerIn: parent
-                        text: wsChip.ws
-                        color: wsChip.mine ? Theme.background : (wsChip.owner !== "" ? Theme.faintText : Theme.subtext)
-                        font.weight: wsChip.mine ? Font.Bold : Font.Normal
-                    }
-                }
-            }
         }
     }
 }

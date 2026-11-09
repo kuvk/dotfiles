@@ -83,7 +83,7 @@ FloatingWindow {
     color: Theme.panelBg
     implicitWidth: Math.round(780 * Theme.textScale)
     // one height for every page, enough for Displays without scrolling
-    implicitHeight: Math.round(780 * Theme.textScale)
+    implicitHeight: Math.round(830 * Theme.textScale)
     // can grow wider, not shrink below the default size; its height stays
     minimumSize: Qt.size(implicitWidth, implicitHeight)
     maximumSize: Qt.size(16384, implicitHeight)
