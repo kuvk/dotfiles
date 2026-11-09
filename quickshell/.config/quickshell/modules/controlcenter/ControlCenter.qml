@@ -114,7 +114,7 @@ PanelWindow {
                         StyledText {
                             Layout.alignment: Qt.AlignRight
                             text: Qt.formatDateTime(Time.date, "HH:mm")
-                            font.pixelSize: Theme.fontSize + 2
+                            font.pixelSize: Theme.titleSize
                             font.weight: Font.Bold
                         }
 

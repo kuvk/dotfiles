@@ -24,6 +24,7 @@ BarButton {
     }
 
     Icon {
+        font.pixelSize: Theme.barIconSize
         visible: !Config.cava
         // a waveform while playing, an outlined note when paused
         text: Media.active?.isPlaying ? Icons.waveform : Icons.musicOutline

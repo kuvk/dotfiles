@@ -294,7 +294,7 @@ Item {
                 text: "●".repeat(Lock.password.length)
                 color: root.tint(Config.lockDotsColor)
                 font.family: Theme.font
-                font.pixelSize: 11
+                font.pixelSize: Theme.smallSize
                 font.letterSpacing: 3
                 elide: Text.ElideLeft
             }
@@ -309,7 +309,7 @@ Item {
                 text: Lock.failed && !root.preview ? "<i>ACCESS DENIED</i>" : `<i>\u{f033e}  Logged in as </i><b><font color="${root.tint(Config.lockUserColor)}">${Lock.userName}</font></b>`
                 color: root.tint(Lock.failed && !root.preview ? Config.lockFailColor : Config.lockTextColor)
                 font.family: Theme.font
-                font.pixelSize: 14
+                font.pixelSize: Theme.titleSize
             }
         }
 
@@ -321,7 +321,7 @@ Item {
             text: "Caps Lock is on"
             color: root.tint(Config.lockCapsColor)
             font.family: Theme.font
-            font.pixelSize: 12
+            font.pixelSize: Theme.fontSize
         }
     }
 }

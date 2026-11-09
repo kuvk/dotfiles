@@ -170,14 +170,14 @@ Item {
                             visible: root.showAppName
                             text: root.appName
                             color: root.critical ? Theme.red : Theme.accent
-                            font.pixelSize: Theme.fontSize - 2
+                            font.pixelSize: Theme.captionSize
                             font.weight: Font.DemiBold
                         }
 
                         StyledText {
                             text: Notifs.relativeTime(root.notification, Time.date)
                             color: Theme.dimText
-                            font.pixelSize: Theme.fontSize - 2
+                            font.pixelSize: Theme.captionSize
                         }
                     }
 
@@ -187,7 +187,7 @@ Item {
                         visible: text !== "" && !(root.showAppName && text === root.appName)
                         text: root.notification.summary
                         // the card's text: one size below the global size
-                        font.pixelSize: Theme.fontSize - 1
+                        font.pixelSize: Theme.smallSize
                         font.weight: Font.DemiBold
                         wrapMode: Text.Wrap
                         maximumLineCount: 2
@@ -201,7 +201,7 @@ Item {
                         color: Theme.subtext
                         // one size below the title; a hint from the shell's scripts (keys, an
                         // Update to run: category x-hyprdori.hint) one more
-                        font.pixelSize: root.notification.hints?.category === "x-hyprdori.hint" ? Theme.fontSize - 2 : Theme.fontSize - 1
+                        font.pixelSize: root.notification.hints?.category === "x-hyprdori.hint" ? Theme.captionSize : Theme.smallSize
                         wrapMode: Text.Wrap
                         maximumLineCount: root.popup ? 4 : 8
                         onLinkActivated: link => Qt.openUrlExternally(link)
@@ -213,7 +213,7 @@ Item {
                     visible: !root.showAppName
                     text: Notifs.relativeTime(root.notification, Time.date)
                     color: Theme.dimText
-                    font.pixelSize: Theme.fontSize - 2
+                    font.pixelSize: Theme.captionSize
                 }
             }
 
@@ -235,7 +235,7 @@ Item {
                     verticalAlignment: TextInput.AlignVCenter
                     color: Theme.foreground
                     font.family: Theme.font
-                    font.pixelSize: Theme.fontSize - 1
+                    font.pixelSize: Theme.smallSize
                     clip: true
                     onAccepted: {
                         if (text.trim() === "")
@@ -322,7 +322,7 @@ Item {
                             anchors.centerIn: parent
                             width: Math.min(implicitWidth, parent.width - 12)
                             text: action.modelData.text
-                            font.pixelSize: Theme.fontSize - 1
+                            font.pixelSize: Theme.smallSize
                         }
                     }
                 }

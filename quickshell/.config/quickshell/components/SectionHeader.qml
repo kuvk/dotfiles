@@ -15,7 +15,7 @@ RowLayout {
     StyledText {
         Layout.fillWidth: true
         text: root.title
-        font.pixelSize: Theme.fontSize + 2
+        font.pixelSize: Theme.titleSize
         font.weight: Font.Bold
     }
 

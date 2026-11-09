@@ -221,7 +221,7 @@ PanelWindow {
                                 Layout.fillWidth: true
                                 color: Theme.foreground
                                 font.family: Theme.font
-                                font.pixelSize: Theme.fontSize + 1
+                                font.pixelSize: Theme.subtitleSize
                                 clip: true
                                 onTextChanged: list.currentIndex = 0
 
@@ -315,7 +315,7 @@ PanelWindow {
                                         visible: text !== ""
                                         text: entry.modelData.genericName || entry.modelData.comment || ""
                                         color: Theme.dimText
-                                        font.pixelSize: Theme.fontSize - 2
+                                        font.pixelSize: Theme.captionSize
                                         elide: Text.ElideRight
                                     }
                                 }

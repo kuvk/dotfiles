@@ -463,7 +463,7 @@ PanelWindow {
                         return `No match for "${root.query}"`;
                     return root.shownItems[root.selected]?.name ?? "";
                 }
-                font.pixelSize: Theme.fontSize + 3
+                font.pixelSize: Theme.titleSize
                 font.weight: Font.DemiBold
                 style: Text.Outline
                 styleColor: Theme.alpha(Theme.darkerBackground, 0.6)
@@ -473,7 +473,7 @@ PanelWindow {
                 Layout.alignment: Qt.AlignHCenter
                 text: `${root.shownItems.length ? root.selected + 1 : 0} / ${root.shownItems.length}   ·   Enter: all monitors   ·   Shift+Enter: this monitor   ·   Tab: ${root.kind === "static" ? "live" : "static"}${root.kind === "live" ? "   ·   Del: stop live" : ""}`
                 color: Theme.subtext
-                font.pixelSize: Theme.fontSize - 1
+                font.pixelSize: Theme.smallSize
             }
         }
     }

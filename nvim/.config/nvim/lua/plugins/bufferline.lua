@@ -10,6 +10,8 @@ local function custom_highlights()
       local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
       hl.bg = group:find("Selected") and p.lighter_bg or normal
       hl.sp, hl.underline = p.muted, true
+      -- bufferline defines its groups as defaults, which a set would then leave alone
+      hl.default = nil
       if group:find("^BufferLineSeparator") then
         hl.fg = normal
       end

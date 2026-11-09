@@ -19,7 +19,9 @@ MouseArea {
     Rectangle {
         anchors.fill: parent
         radius: Theme.smallRadius
-        color: root.checked ? Theme.selectedFill : (root.containsMouse ? Theme.hoverBg : Theme.cardBg)
+        color: root.checked ? Theme.selectedFill : (root.containsMouse ? Theme.hoverFill : Theme.idleFill)
+        border.width: root.checked ? 0 : Theme.controlBorder
+        border.color: root.containsMouse ? Theme.hoverBorder : Theme.idleBorder
 
         Behavior on color {
             ColorAnimation {
@@ -36,7 +38,7 @@ MouseArea {
         Icon {
             text: root.icon
             color: root.checked ? Theme.accent : Theme.subtext
-            font.pixelSize: 18
+            font.pixelSize: Theme.iconLargeSize
             Layout.preferredWidth: 22
         }
 
@@ -55,7 +57,7 @@ MouseArea {
                 visible: text !== ""
                 text: root.sublabel
                 color: Theme.subtext
-                font.pixelSize: Theme.fontSize - 2
+                font.pixelSize: Theme.captionSize
             }
         }
     }

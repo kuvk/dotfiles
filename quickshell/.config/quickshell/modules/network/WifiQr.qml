@@ -96,7 +96,7 @@ NetworkOverlay {
         Layout.maximumWidth: 320
         text: (root.qr.ssid || Network.connection || "Wi-Fi").toUpperCase()
         color: Theme.subtext
-        font.pixelSize: Theme.fontSize - 1
+        font.pixelSize: Theme.smallSize
         font.weight: Font.Bold
         font.letterSpacing: 2
         horizontalAlignment: Text.AlignHCenter

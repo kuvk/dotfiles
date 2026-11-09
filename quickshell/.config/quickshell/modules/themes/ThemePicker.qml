@@ -401,7 +401,7 @@ PanelWindow {
                     const t = root.shownItems[root.selected];
                     return t ? `${t.name}${t.mode === "light" ? "  ·  light" : ""}` : "";
                 }
-                font.pixelSize: Theme.fontSize + 3
+                font.pixelSize: Theme.titleSize
                 font.weight: Font.DemiBold
                 style: Text.Outline
                 styleColor: Theme.alpha(Theme.darkerBackground, 0.6)
@@ -411,7 +411,7 @@ PanelWindow {
                 Layout.alignment: Qt.AlignHCenter
                 text: `${root.shownItems.length ? root.selected + 1 : 0} / ${root.shownItems.length}   ·   Enter: apply   ·   type to search   ·   Esc: close`
                 color: Theme.subtext
-                font.pixelSize: Theme.fontSize - 1
+                font.pixelSize: Theme.smallSize
             }
         }
     }

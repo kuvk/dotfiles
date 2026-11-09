@@ -73,7 +73,7 @@ Dropdown {
             text: Qt.formatDate(new Date(root.year, root.month, 1), "MMMM yyyy")
             color: Theme.accent
             font.weight: Font.Bold
-            font.pixelSize: Theme.fontSize + 2
+            font.pixelSize: Theme.titleSize
             horizontalAlignment: Text.AlignHCenter
 
             MouseArea {
@@ -113,7 +113,7 @@ Dropdown {
                 text: Qt.locale().dayName(modelData, Locale.ShortFormat)
                 color: modelData === 0 || modelData === 6 ? Theme.red : Theme.accent
                 font.weight: Font.DemiBold
-                font.pixelSize: Theme.fontSize + 1
+                font.pixelSize: Theme.subtitleSize
                 horizontalAlignment: Text.AlignHCenter
             }
         }
@@ -161,7 +161,7 @@ Dropdown {
                     StyledText {
                         anchors.centerIn: parent
                         text: cell.isWeek ? `W${week.modelData.week}` : cell.modelData.getDate()
-                        font.pixelSize: cell.isWeek ? Theme.fontSize - 1 : Theme.fontSize + 2
+                        font.pixelSize: cell.isWeek ? Theme.smallSize : Theme.titleSize
                         font.weight: cell.isToday ? Font.Bold : Font.Normal
                         color: {
                             if (cell.isWeek)

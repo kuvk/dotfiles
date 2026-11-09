@@ -23,7 +23,7 @@ Dropdown {
         id: modeMetrics
 
         font.family: Theme.font
-        font.pixelSize: Theme.fontSize - 1
+        font.pixelSize: Theme.smallSize
         font.weight: Font.DemiBold
     }
 

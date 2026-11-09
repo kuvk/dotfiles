@@ -83,7 +83,7 @@ Loader {
                     visible: !slot.modelData.thumb && picker.kind === "live"
                     text: Icons.play
                     color: Theme.dimText
-                    font.pixelSize: 28
+                    font.pixelSize: Theme.displayLargeSize
                 }
             }
 

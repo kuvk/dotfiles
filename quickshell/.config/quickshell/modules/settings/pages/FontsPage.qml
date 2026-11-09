@@ -67,7 +67,7 @@ ColumnLayout {
         Layout.fillWidth: true
         text: "Everywhere but terminals. Reopen apps to apply."
         color: Theme.dimText
-        font.pixelSize: Theme.fontSize - 1
+        font.pixelSize: Theme.smallSize
         wrapMode: Text.Wrap
     }
 

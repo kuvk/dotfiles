@@ -72,7 +72,7 @@ PanelWindow {
             Icon {
                 Layout.preferredWidth: root.iconWidth
                 text: Osd.entry.icon
-                color: Osd.entry.dim ? Theme.dimText : Theme.accent
+                color: Osd.entry.dim ? Theme.dimText : Theme.foreground
             }
 
             // a level: one bar, or one per step (the keyboard light) with an equal gap between

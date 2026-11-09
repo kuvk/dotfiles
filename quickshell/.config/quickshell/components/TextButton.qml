@@ -16,7 +16,9 @@ MouseArea {
     Rectangle {
         anchors.fill: parent
         radius: Theme.smallRadius
-        color: root.primary ? (root.containsMouse ? Qt.lighter(Theme.accent, 1.1) : Theme.accent) : (root.containsMouse ? Theme.selection : Theme.lighterBackground)
+        color: root.primary ? (root.containsMouse ? Qt.lighter(Theme.accent, 1.1) : Theme.accent) : (root.containsMouse ? Theme.hoverFill : Theme.idleFill)
+        border.width: root.primary ? 0 : Theme.controlBorder
+        border.color: root.containsMouse ? Theme.hoverBorder : Theme.idleBorder
     }
 
     StyledText {

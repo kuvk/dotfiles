@@ -63,6 +63,9 @@ Singleton {
     readonly property color hoverFill: alpha(foreground, 0.08)
     readonly property color selectedFill: alpha(foreground, 0.18)
     readonly property color idleBorder: alpha(foreground, 0.4)
+    readonly property color hoverBorder: alpha(foreground, 0.25)
+    // controls: a hairline border while idle or hovered, none when selected
+    readonly property int controlBorder: 1
 
     // Surfaces. Gamemode turns blur off in Hyprland, so everything goes opaque.
     readonly property color barBg: alpha(background, gamemode ? 1 : Config.barOpacity)
@@ -87,20 +90,26 @@ Singleton {
     readonly property string monoFont: Config.nerdFont || "JetBrainsMono Nerd Font"
 
     // Text size in px from Displays (~/.config/hypr/monitors.json): the body text, 12 by
-    // default. The other sizes scale with it as Omarchy's do (12: caption 10, title 14,
-    // heading 16, icons 14).
+    // default. The other sizes scale with it as Omarchy's do; at 12: caption 10, small 11,
+    // subtitle 13, title 14, heading 16, display 24 and 28, icons 14 (18 large, 12 in the bar).
     property int textSize: 12
     readonly property real textScale: textSize / 12
     readonly property int fontSize: textSize
     readonly property int captionSize: Math.round(10 * textScale)
     readonly property int smallSize: Math.round(11 * textScale)
+    readonly property int subtitleSize: Math.round(13 * textScale)
     readonly property int titleSize: Math.round(14 * textScale)
     readonly property int headingSize: Math.round(16 * textScale)
+    readonly property int displaySize: Math.round(24 * textScale)
+    readonly property int displayLargeSize: Math.round(28 * textScale)
     readonly property int iconSize: Math.round(14 * textScale)
+    readonly property int iconLargeSize: Math.round(18 * textScale)
+    readonly property int barIconSize: Math.round(12 * textScale)
     // Bar: workspace dots 1 px under the text size, the tray's arrow 2
     readonly property int smallIconSize: textSize - 1
     readonly property int tinyIconSize: textSize - 2
-    readonly property int barHeight: Math.max(30, Math.round(textSize * 2.6))
+    // the bar's height: 26 at 12 px
+    readonly property int barHeight: Math.round(26 * textScale)
     // Floating bar (Settings > Bar): its own margin on the left, right and
     // top (the gap below it is Hyprland's outer gap); 0 for the full-width bar
     readonly property int barMargin: Config.barFloating ? Config.barMargin : 0

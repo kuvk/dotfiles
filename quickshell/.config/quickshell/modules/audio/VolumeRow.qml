@@ -26,7 +26,7 @@ RowLayout {
         Layout.fillWidth: true
         value: root.node?.audio?.volume ?? 0
         to: 1.2
-        color: root.node?.audio?.muted ? Theme.faintText : Theme.accent
+        color: root.node?.audio?.muted ? Theme.faintText : Theme.foreground
         onMoved: v => Audio.setVolume(root.node, v)
     }
 }

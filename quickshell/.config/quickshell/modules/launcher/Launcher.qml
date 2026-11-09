@@ -107,7 +107,7 @@ PanelWindow {
                     Icon {
                         text: Icons.search
                         color: Theme.accent
-                        font.pixelSize: 16
+                        font.pixelSize: Theme.headingSize
                     }
 
                     TextInput {
@@ -116,7 +116,7 @@ PanelWindow {
                         Layout.fillWidth: true
                         color: Theme.foreground
                         font.family: Theme.font
-                        font.pixelSize: 16
+                        font.pixelSize: Theme.headingSize
                         clip: true
                         onTextChanged: list.currentIndex = 0
 
@@ -150,7 +150,7 @@ PanelWindow {
                             visible: search.text === ""
                             text: "Search apps…"
                             color: Theme.muted
-                            font.pixelSize: 16
+                            font.pixelSize: Theme.headingSize
                         }
                     }
                 }
@@ -204,7 +204,7 @@ PanelWindow {
                                 Layout.fillWidth: true
                                 text: entry.modelData.name
                                 color: entry.ListView.isCurrentItem ? Theme.accent : Theme.foreground
-                                font.pixelSize: 14
+                                font.pixelSize: Theme.titleSize
                                 elide: Text.ElideRight
                             }
 
@@ -213,7 +213,7 @@ PanelWindow {
                                 visible: text !== ""
                                 text: entry.modelData.genericName || entry.modelData.comment || ""
                                 color: Theme.dimText
-                                font.pixelSize: 12
+                                font.pixelSize: Theme.fontSize
                                 elide: Text.ElideRight
                             }
                         }

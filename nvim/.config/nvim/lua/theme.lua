@@ -56,7 +56,7 @@ local function custom_highlights()
   local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
   for _, group in ipairs({ "NeoTreeNormal", "NeoTreeNormalNC", "NeoTreeEndOfBuffer" }) do
     local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
-    hl.bg = normal
+    hl.bg, hl.default = normal, nil
     set(0, group, hl)
   end
   set(0, "WinSeparator", { fg = p.muted, bg = normal })

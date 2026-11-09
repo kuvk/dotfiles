@@ -42,7 +42,7 @@ Dropdown {
         id: dnsMetrics
 
         font.family: Theme.font
-        font.pixelSize: Theme.fontSize - 1
+        font.pixelSize: Theme.smallSize
     }
 
     // Omarchy's lines under a working connection, one every few seconds

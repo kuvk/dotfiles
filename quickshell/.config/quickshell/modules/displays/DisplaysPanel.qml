@@ -302,7 +302,7 @@ FloatingWindow {
                     Layout.fillWidth: true
                     text: "Saved for this combination of monitors"
                     color: Theme.dimText
-                    font.pixelSize: Theme.fontSize - 2
+                    font.pixelSize: Theme.captionSize
                 }
 
                 TextButton {

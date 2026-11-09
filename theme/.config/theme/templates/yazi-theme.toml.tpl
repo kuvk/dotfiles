@@ -45,8 +45,8 @@ inactive = { fg = "{{ blue }}", bg = "{{ lighter_background }}" }
 
 [status]
 # Permissions
-perm_sep   = { fg = "{{ mix dark_foreground foreground 20% }}" }
-perm_type  = { fg = "{{ dark_foreground }}" }
+perm_sep   = { fg = "{{ dark_foreground }}" }
+perm_type  = { fg = "{{ accent }}", bold = true }
 perm_read  = { fg = "{{ yellow }}" }
 perm_write = { fg = "{{ red }}" }
 perm_exec  = { fg = "{{ green }}" }

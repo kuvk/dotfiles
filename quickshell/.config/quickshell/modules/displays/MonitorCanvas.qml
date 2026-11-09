@@ -75,7 +75,7 @@ Rectangle {
                         Layout.alignment: Qt.AlignHCenter
                         text: `${Math.round(tile.modelData.width)}×${Math.round(tile.modelData.height)}`
                         color: Theme.subtext
-                        font.pixelSize: Theme.fontSize - 2
+                        font.pixelSize: Theme.captionSize
                     }
                 }
             }
@@ -116,6 +116,6 @@ Rectangle {
         anchors.bottomMargin: 6
         text: "Drag to arrange"
         color: Theme.faintText
-        font.pixelSize: Theme.fontSize - 2
+        font.pixelSize: Theme.captionSize
     }
 }

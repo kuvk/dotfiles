@@ -34,6 +34,7 @@ Row {
     }
 
     Icon {
+        font.pixelSize: Theme.barIconSize
         anchors.verticalCenter: parent.verticalCenter
         visible: root.shellWindow
         text: root.shellIcons[root.toplevel?.title] ?? Distro.logo

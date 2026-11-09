@@ -93,7 +93,7 @@ FloatingWindow {
                         Layout.bottomMargin: 10
                         Layout.leftMargin: 6
                         text: "Settings"
-                        font.pixelSize: Theme.fontSize + 4
+                        font.pixelSize: Theme.headingSize
                         font.weight: Font.Bold
                     }
 

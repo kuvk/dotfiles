@@ -118,7 +118,7 @@ ColumnLayout {
                     StyledText {
                         text: group.modelData.list.length
                         color: Theme.dimText
-                        font.pixelSize: Theme.fontSize - 1
+                        font.pixelSize: Theme.smallSize
                     }
 
                     // hide (stack) / reveal this app's notifications
@@ -243,7 +243,7 @@ ColumnLayout {
                     visible: !group.stacked && group.modelData.list.length > 3
                     text: group.open ? "Show less" : `Show ${group.modelData.list.length - 3} more`
                     color: Theme.subtext
-                    font.pixelSize: Theme.fontSize - 1
+                    font.pixelSize: Theme.smallSize
 
                     MouseArea {
                         anchors.fill: parent

@@ -394,7 +394,7 @@ FloatingWindow {
                                                             anchors.centerIn: parent
                                                             text: parent.modelData
                                                             color: Theme.foreground
-                                                            font.pixelSize: Theme.fontSize - 1
+                                                            font.pixelSize: Theme.smallSize
                                                             font.weight: Font.DemiBold
                                                         }
                                                     }

@@ -85,7 +85,7 @@ Dropdown {
             StyledText {
                 Layout.preferredWidth: 90
                 text: day.index === 0 ? "Today" : Qt.formatDate(new Date(day.modelData.date + "T12:00:00"), "dddd")
-                font.pixelSize: Theme.fontSize - 1
+                font.pixelSize: Theme.smallSize
             }
 
             Icon {

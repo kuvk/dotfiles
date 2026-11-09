@@ -202,7 +202,7 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             text: "Mb/s"
             color: Theme.subtext
-            font.pixelSize: Theme.fontSize - 1
+            font.pixelSize: Theme.smallSize
         }
     }
 
@@ -212,7 +212,7 @@ Item {
         anchors.bottom: parent.bottom
         text: dial.label
         color: Theme.subtext
-        font.pixelSize: Theme.fontSize - 1
+        font.pixelSize: Theme.smallSize
         font.weight: Font.Bold
         font.letterSpacing: 1.5
     }

@@ -136,7 +136,7 @@ PanelWindow {
                     Icon {
                         text: Icons.search
                         color: Theme.accent
-                        font.pixelSize: 16
+                        font.pixelSize: Theme.headingSize
                     }
 
                     TextInput {
@@ -145,7 +145,7 @@ PanelWindow {
                         Layout.fillWidth: true
                         color: Theme.foreground
                         font.family: Theme.font
-                        font.pixelSize: 16
+                        font.pixelSize: Theme.headingSize
                         clip: true
                         onTextChanged: list.currentIndex = 0
 
@@ -182,7 +182,7 @@ PanelWindow {
                             visible: search.text === ""
                             text: root.entries.length > 0 ? "Search clipboard…" : "Clipboard history is empty"
                             color: Theme.muted
-                            font.pixelSize: 16
+                            font.pixelSize: Theme.headingSize
                         }
                     }
                 }

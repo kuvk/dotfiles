@@ -99,7 +99,7 @@ Dropdown {
                             visible: entry.modelData.buttonType !== QsMenuButtonType.None
                             text: entry.modelData.checkState === Qt.Checked ? Icons.check : ""
                             color: Theme.accent
-                            font.pixelSize: 11
+                            font.pixelSize: Theme.smallSize
                         }
 
                         IconImage {

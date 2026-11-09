@@ -42,7 +42,7 @@ GridLayout {
             visible: !!panel.current?.lid_closed
             text: "Off while the lid is closed"
             color: Theme.dimText
-            font.pixelSize: Theme.fontSize - 2
+            font.pixelSize: Theme.captionSize
         }
     }
 
@@ -64,7 +64,7 @@ GridLayout {
         StyledText {
             text: "Gets the first workspaces with Default"
             color: Theme.dimText
-            font.pixelSize: Theme.fontSize - 2
+            font.pixelSize: Theme.captionSize
         }
     }
 
@@ -107,7 +107,7 @@ GridLayout {
         StyledText {
             text: "May blink when it switches"
             color: Theme.dimText
-            font.pixelSize: Theme.fontSize - 2
+            font.pixelSize: Theme.captionSize
         }
     }
 
@@ -142,7 +142,7 @@ GridLayout {
             text: "Smoother gradients"
             visible: (panel.current?.bitdepth ?? 10) === 10
             color: Theme.dimText
-            font.pixelSize: Theme.fontSize - 2
+            font.pixelSize: Theme.captionSize
         }
     }
 
@@ -169,7 +169,7 @@ GridLayout {
         StyledSlider {
             Layout.fillWidth: true
             value: (brightnessSlider.value ?? 0) / 100
-            color: Theme.accent
+            color: Theme.foreground
             onMoved: v => Displays.setBrightness(panel.current.name, Math.max(1, Math.round(v * 100)))
         }
 
@@ -234,7 +234,7 @@ GridLayout {
         StyledText {
             text: "Click to assign or unassign. Outlined: on another monitor."
             color: Theme.dimText
-            font.pixelSize: Theme.fontSize - 2
+            font.pixelSize: Theme.captionSize
         }
     }
 }

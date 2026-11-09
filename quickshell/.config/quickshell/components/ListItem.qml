@@ -20,7 +20,9 @@ MouseArea {
     Rectangle {
         anchors.fill: parent
         radius: Theme.smallRadius
-        color: root.containsMouse ? Theme.hoverBg : (root.highlighted ? Theme.cardBg : "transparent")
+        color: root.highlighted ? Theme.selectedFill : (root.containsMouse ? Theme.hoverFill : "transparent")
+        border.width: root.containsMouse && !root.highlighted ? Theme.controlBorder : 0
+        border.color: Theme.hoverBorder
     }
 
     RowLayout {
@@ -50,7 +52,7 @@ MouseArea {
                 visible: text !== ""
                 text: root.sublabel
                 color: Theme.subtext
-                font.pixelSize: Theme.fontSize - 2
+                font.pixelSize: Theme.captionSize
             }
         }
 

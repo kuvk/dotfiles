@@ -145,13 +145,14 @@ PanelWindow {
         onClicked: barWindow.toggle("weather", weatherButton)
 
         Icon {
+            font.pixelSize: Theme.barIconSize
             text: Weather.icon
             color: Hues.weather
         }
 
         StyledText {
             text: `${Weather.temp}°`
-            color: Theme.subtext
+            color: Theme.foreground
         }
     }
 
@@ -187,6 +188,7 @@ PanelWindow {
             onClicked: System.stayAwake = !System.stayAwake
 
             Icon {
+                font.pixelSize: Theme.barIconSize
                 text: Icons.coffee
                 color: Hues.stayAwake
             }
@@ -199,6 +201,7 @@ PanelWindow {
             onClicked: System.cycleMode()
 
             Icon {
+                font.pixelSize: Theme.barIconSize
                 text: Icons.rocket
                 color: Hues.mode
             }
@@ -214,6 +217,7 @@ PanelWindow {
             onWheel: wheel => Audio.setVolume(Audio.sink, Audio.volume + (wheel.angleDelta.y > 0 ? 0.05 : -0.05))
 
             Icon {
+                font.pixelSize: Theme.barIconSize
                 text: Audio.icon
                 color: Hues.audio
             }
@@ -228,6 +232,7 @@ PanelWindow {
             onClicked: mouse => mouse.button === Qt.RightButton ? Bluetooth.toggle() : barWindow.toggle("bluetooth", btButton)
 
             Icon {
+                font.pixelSize: Theme.barIconSize
                 text: !Bluetooth.enabled ? Icons.bluetoothOff : (Bluetooth.connected.length > 0 ? Icons.bluetoothConnected : Icons.bluetooth)
                 color: Hues.bluetooth
             }
@@ -242,6 +247,7 @@ PanelWindow {
             onClicked: barWindow.toggle("network", netButton)
 
             Icon {
+                font.pixelSize: Theme.barIconSize
                 text: Network.icon
                 // disabled color when Wi-Fi is off, like Bluetooth
                 color: Hues.network
@@ -257,6 +263,7 @@ PanelWindow {
             onClicked: barWindow.toggle("battery", batteryButton)
 
             Icon {
+                font.pixelSize: Theme.barIconSize
                 text: Battery.icon
                 color: Hues.battery
             }
@@ -269,6 +276,7 @@ PanelWindow {
             onClicked: Panels.toggleDisplays()
 
             Icon {
+                font.pixelSize: Theme.barIconSize
                 text: Icons.display
                 color: Hues.system
             }
@@ -281,6 +289,7 @@ PanelWindow {
             onClicked: mouse => mouse.button === Qt.RightButton ? (Notifs.dnd = !Notifs.dnd) : Panels.toggleControlCenter()
 
             Icon {
+                font.pixelSize: Theme.barIconSize
                 text: Icons.sliders
                 color: Hues.notifications
 
@@ -306,6 +315,7 @@ PanelWindow {
             onClicked: Panels.togglePowerMenu()
 
             Icon {
+                font.pixelSize: Theme.barIconSize
                 text: Icons.power
                 color: Hues.power
             }

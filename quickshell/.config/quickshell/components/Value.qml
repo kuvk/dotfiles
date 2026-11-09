@@ -12,7 +12,7 @@ StyledText {
 
     Layout.fillWidth: true
     horizontalAlignment: Text.AlignRight
-    font.pixelSize: Theme.fontSize - 1
+    font.pixelSize: Theme.smallSize
 
     MouseArea {
         anchors.fill: parent

@@ -34,7 +34,7 @@ RowLayout {
         StyledText {
             Layout.fillWidth: true
             text: hero.title
-            font.pixelSize: Theme.fontSize + 2
+            font.pixelSize: Theme.titleSize
             font.weight: Font.Bold
         }
 

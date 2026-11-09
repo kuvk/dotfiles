@@ -19,7 +19,7 @@ ColumnLayout {
 
         IconButton {
             icon: Audio.icon
-            color: Audio.muted ? Theme.dimText : Theme.accent
+            color: Audio.muted ? Theme.dimText : Theme.foreground
             onClicked: Audio.toggleMute(Audio.sink)
         }
 
@@ -27,7 +27,7 @@ ColumnLayout {
             Layout.fillWidth: true
             value: Audio.volume
             to: 1.2
-            color: Audio.muted ? Theme.faintText : Theme.accent
+            color: Audio.muted ? Theme.faintText : Theme.foreground
             onMoved: v => Audio.setVolume(Audio.sink, v)
         }
     }
@@ -40,13 +40,13 @@ ColumnLayout {
         Icon {
             Layout.preferredWidth: 30
             text: Icons.sun
-            color: Theme.accent
+            color: Theme.foreground
         }
 
         StyledSlider {
             Layout.fillWidth: true
             value: System.brightness
-            color: Theme.accent
+            color: Theme.foreground
             onMoved: v => System.setBrightness(v)
         }
     }

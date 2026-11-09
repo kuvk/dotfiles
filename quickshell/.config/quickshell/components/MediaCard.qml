@@ -133,7 +133,7 @@ Card {
                     visible: art.status !== Image.Ready
                     text: Media.iconFor(root.player)
                     color: Theme.dimText
-                    font.pixelSize: 24
+                    font.pixelSize: Theme.displaySize
                 }
             }
 
@@ -158,7 +158,7 @@ Card {
                     Layout.fillWidth: true
                     text: root.player?.identity ?? ""
                     color: Theme.dimText
-                    font.pixelSize: Theme.fontSize - 2
+                    font.pixelSize: Theme.captionSize
                 }
             }
         }
@@ -184,7 +184,7 @@ Card {
                 Layout.fillWidth: true
                 value: root.player?.position ?? 0
                 to: Math.max(1, root.player?.length ?? 1)
-                color: Theme.accent
+                color: Theme.foreground
                 onMoved: v => {
                     if (root.player?.canSeek)
                         root.player.position = v;
@@ -197,7 +197,7 @@ Card {
                 StyledText {
                     text: Media.formatTime(root.player?.position ?? 0)
                     color: Theme.subtext
-                    font.pixelSize: Theme.fontSize - 2
+                    font.pixelSize: Theme.captionSize
                 }
 
                 Item {
@@ -207,7 +207,7 @@ Card {
                 StyledText {
                     text: Media.formatTime(root.player?.length ?? 0)
                     color: Theme.subtext
-                    font.pixelSize: Theme.fontSize - 2
+                    font.pixelSize: Theme.captionSize
                 }
             }
         }
