@@ -2,7 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.config
 
-// "‹ value ›" selector; emits step(-1 | 1)
+// "‹ value ›" selector, the value a step smaller than option labels' text; emits step(-1 | 1)
 RowLayout {
     id: root
 
@@ -24,6 +24,7 @@ RowLayout {
 
         Layout.preferredWidth: 170
         horizontalAlignment: Text.AlignHCenter
+        font.pixelSize: Theme.smallSize
     }
 
     IconButton {

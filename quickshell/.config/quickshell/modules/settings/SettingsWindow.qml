@@ -83,7 +83,7 @@ FloatingWindow {
     color: Theme.panelBg
     implicitWidth: Math.round(780 * Theme.textScale)
     // one height for every page, enough for Displays without scrolling
-    implicitHeight: Math.round(830 * Theme.textScale)
+    implicitHeight: Math.round(880 * Theme.textScale)
     // can grow wider, not shrink below the default size; its height stays
     minimumSize: Qt.size(implicitWidth, implicitHeight)
     maximumSize: Qt.size(16384, implicitHeight)
@@ -98,158 +98,179 @@ FloatingWindow {
         focus: root.shown
         Keys.onEscapePressed: Panels.settings = false
 
-        RowLayout {
+        ColumnLayout {
             anchors.fill: parent
             spacing: 0
 
-            // Sidebar, on the window's background, a divider between it and the page
-            Item {
-                Layout.fillHeight: true
-                implicitWidth: Math.round(190 * Theme.textScale)
+            // The window's title, the close button with window buttons on, a divider under them
+            RowLayout {
+                Layout.fillWidth: true
+                Layout.margins: 16
+                Layout.bottomMargin: 12
+                spacing: 10
 
-                ColumnLayout {
-                    anchors.fill: parent
-                    anchors.margins: 12
-                    spacing: 4
+                Icon {
+                    text: Icons.cog
+                    color: Theme.accent
+                    font.pixelSize: Theme.titleSize + 1
+                }
 
-                    StyledText {
-                        Layout.bottomMargin: 10
-                        Layout.leftMargin: 6
-                        text: "Settings"
-                        font.pixelSize: Theme.headingSize
-                        font.weight: Font.Bold
-                    }
+                StyledText {
+                    Layout.fillWidth: true
+                    text: "Settings"
+                    // a step above a dropdown's title
+                    font.pixelSize: Theme.titleSize + 1
+                    font.weight: Font.Bold
+                    font.capitalization: Font.AllUppercase
+                }
 
-                    Repeater {
-                        model: root.sections
-
-                        MouseArea {
-                            id: entry
-
-                            required property var modelData
-                            readonly property bool current: root.section === modelData.id
-
-                            Layout.fillWidth: true
-                            implicitHeight: 36
-                            hoverEnabled: true
-                            cursorShape: Qt.PointingHandCursor
-                            onClicked: Panels.settingsPage = modelData.id
-
-                            Rectangle {
-                                anchors.fill: parent
-                                radius: Theme.smallRadius
-                                color: entry.current ? Theme.selectedFill : (entry.containsMouse ? Theme.hoverBg : "transparent")
-                            }
-
-                            Row {
-                                anchors.verticalCenter: parent.verticalCenter
-                                anchors.left: parent.left
-                                anchors.leftMargin: 10
-                                spacing: 10
-
-                                Icon {
-                                    width: 18
-                                    text: entry.modelData.icon
-                                    color: entry.current ? Theme.accent : Theme.subtext
-                                }
-
-                                StyledText {
-                                    text: entry.modelData.label
-                                    color: entry.current ? Theme.accent : Theme.foreground
-                                    font.weight: Font.Bold
-                                }
-                            }
-                        }
-                    }
-
-                    Item {
-                        Layout.fillHeight: true
-                    }
-
-                    TextButton {
-                        Layout.fillWidth: true
-                        text: defaultsSaved.running ? "Saved" : "Save as defaults"
-                        onClicked: {
-                            Config.saveDefaults();
-                            defaultsSaved.restart();
-                        }
-
-                        Timer {
-                            id: defaultsSaved
-
-                            interval: 1500
-                        }
-                    }
-
-                    TextButton {
-                        Layout.fillWidth: true
-                        text: "Reset to defaults"
-                        onClicked: Config.reset()
-                    }
+                CloseButton {
+                    onClicked: Panels.settings = false
                 }
             }
 
             Separator {
-                vertical: true
+                Layout.topMargin: 0
+                Layout.bottomMargin: 0
             }
 
-            // Section content
-            ColumnLayout {
+            RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
-                Layout.margins: 16
-                spacing: 12
+                spacing: 0
 
-                // the page's name is in the sidebar; here only the close button, with window buttons on
-                SectionHeader {
-                    visible: Config.windowButtons
+                // Sidebar, on the window's background, a divider between it and the page
+                Item {
+                    Layout.fillHeight: true
+                    implicitWidth: Math.round(190 * Theme.textScale)
 
-                    CloseButton {
-                        onClicked: Panels.settings = false
+                    ColumnLayout {
+                        anchors.fill: parent
+                        anchors.margins: 12
+                        spacing: 4
+
+                        Repeater {
+                            model: root.sections
+
+                            MouseArea {
+                                id: entry
+
+                                required property var modelData
+                                readonly property bool current: root.section === modelData.id
+
+                                Layout.fillWidth: true
+                                implicitHeight: 36
+                                hoverEnabled: true
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: Panels.settingsPage = modelData.id
+
+                                Rectangle {
+                                    anchors.fill: parent
+                                    radius: Theme.smallRadius
+                                    color: entry.current ? Theme.selectedFill : (entry.containsMouse ? Theme.hoverBg : "transparent")
+                                }
+
+                                Row {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    anchors.left: parent.left
+                                    anchors.leftMargin: 10
+                                    spacing: 10
+
+                                    Icon {
+                                        width: 18
+                                        text: entry.modelData.icon
+                                        color: entry.current ? Theme.accent : Theme.subtext
+                                    }
+
+                                    StyledText {
+                                        text: entry.modelData.label
+                                        color: entry.current ? Theme.accent : Theme.foreground
+                                        font.weight: Font.Bold
+                                    }
+                                }
+                            }
+                        }
+
+                        Item {
+                            Layout.fillHeight: true
+                        }
+
+                        TextButton {
+                            Layout.fillWidth: true
+                            text: defaultsSaved.running ? "Saved" : "Save as defaults"
+                            onClicked: {
+                                Config.saveDefaults();
+                                defaultsSaved.restart();
+                            }
+
+                            Timer {
+                                id: defaultsSaved
+
+                                interval: 1500
+                            }
+                        }
+
+                        TextButton {
+                            Layout.fillWidth: true
+                            text: "Reset to defaults"
+                            onClicked: Config.reset()
+                        }
                     }
                 }
 
-                Flickable {
-                    id: settingsFlick
+                Separator {
+                    vertical: true
+                }
 
+                // Section content
+                ColumnLayout {
                     Layout.fillWidth: true
                     Layout.fillHeight: true
-                    contentHeight: page.implicitHeight
-                    clip: true
-                    boundsBehavior: Flickable.StopAtBounds
+                    Layout.margins: 16
+                    spacing: 12
 
-                    ScrollBar {
-                        flick: settingsFlick
-                    }
+                    Flickable {
+                        id: settingsFlick
 
-                    ColumnLayout {
-                        id: page
-                        width: settingsFlick.width
-                        spacing: 12
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+                        contentHeight: page.implicitHeight
+                        clip: true
+                        boundsBehavior: Flickable.StopAtBounds
 
-                        StylePage {
-                            settings: root
-                            visible: root.section === "style"
+                        ScrollBar {
+                            flick: settingsFlick
                         }
 
-                        FontsPage {
-                            settings: root
-                            visible: root.section === "fonts"
-                        }
+                        ColumnLayout {
+                            id: page
+                            width: settingsFlick.width
+                            spacing: 12
 
-                        BarPage {
-                            settings: root
-                            visible: root.section === "bar"
-                        }
+                            StylePage {
+                                settings: root
+                                visible: root.section === "style"
+                            }
 
-                        DisplaysPage {
-                            settings: root
-                            visible: root.section === "displays"
-                        }
+                            FontsPage {
+                                settings: root
+                                visible: root.section === "fonts"
+                            }
 
-                        SleepPage {
-                            settings: root
-                            visible: root.section === "sleep"
+                            BarPage {
+                                settings: root
+                                visible: root.section === "bar"
+                            }
+
+                            DisplaysPage {
+                                settings: root
+                                visible: root.section === "displays"
+                            }
+
+                            SleepPage {
+                                settings: root
+                                visible: root.section === "sleep"
+                            }
                         }
                     }
                 }
