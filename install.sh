@@ -11,8 +11,8 @@
 #
 # Steps: pacman.conf (multilib, the g14 repo on ASUS laptops), mirrors (reflector), config links
 # (stow; files in the way go to ~/.hyprdori-backup), packages (packages/*.txt by detected
-# hardware), Flatpak, services, zsh and its plugins, the theme, then boot: initramfs and kernel options,
-# Plymouth, Limine. The login screen (SDDM) comes with the theme, or autologin if chosen (the
+# hardware, packages/guest.txt in a virtual machine), Flatpak, services, zsh and its plugins,
+# the theme, then boot: initramfs and kernel options, Plymouth, Limine. The login screen (SDDM) comes with the theme, or autologin if chosen (the
 # default with encrypted drives).
 set -euo pipefail
 
@@ -54,8 +54,13 @@ chassis=$(cat /sys/class/dmi/id/chassis_type 2>/dev/null || echo 0)
 laptop=false asus_laptop=false
 [[ " 8 9 10 14 31 32 " == *" $chassis "* ]] && laptop=true
 $laptop && [[ $vendor == ASUSTeK* ]] && asus_laptop=true
+# Inside a virtual machine (a test install): its GPU's Vulkan and the guest agent, and no for
+# the questions about real hardware and running VMs
+guest=false
+systemd-detect-virt --vm --quiet 2>/dev/null && guest=true
 
 groups=(core)
+$guest && groups+=(guest)
 has_gpu 0x10de && groups+=(nvidia)
 has_gpu 0x8086 && groups+=(intel)
 has_gpu 0x1002 && groups+=(amd)
@@ -66,11 +71,11 @@ $laptop && has_gpu 0x10de && ((${#gpus[@]} >= 2)) && groups+=(hybrid)
 if ask "ASUS laptop: the g14 repo, asusctl and ROG Control Center (packages/laptop.txt)?" "$($asus_laptop && echo y || echo n)"; then
     groups+=(laptop)
 fi
-if ask "Desktop PC: fan, pump and RGB control: CoolerControl, liquidctl, OpenRGB (packages/desktop.txt)?" "$($laptop && echo n || echo y)"; then
+if ask "Desktop PC: fan, pump and RGB control: CoolerControl, liquidctl, OpenRGB (packages/desktop.txt)?" "$($laptop || $guest && echo n || echo y)"; then
     groups+=(desktop)
 fi
 ask "Apps with window rules (packages/apps.txt)?" y && groups+=(apps)
-if ask "Virtual machines and Docker (packages/vm.txt)?" y; then
+if ask "Virtual machines and Docker (packages/vm.txt)?" "$($guest && echo n || echo y)"; then
     groups+=(vm)
     has_gpu 0x10de && groups+=(nvidia-docker)
 fi
@@ -187,6 +192,7 @@ if [[ " ${groups[*]} " == *" nvidia "* ]]; then
     fi
 fi
 [[ " ${groups[*]} " == *" desktop "* ]] && services+=(coolercontrold)
+$guest && services+=(qemu-guest-agent)
 vm=false
 [[ " ${groups[*]} " == *" vm "* ]] && vm=true && services+=(libvirtd docker.socket)
 for unit in "${services[@]}"; do

@@ -1,0 +1,6 @@
+# Inside a virtual machine (install.sh finds one with systemd-detect-virt): Vulkan for the
+# virtio GPU (Venus; Mesa is in core.txt), and the agent the host talks to (a clean shutdown
+# from virt-manager, the guest's IP).
+vulkan-virtio
+lib32-vulkan-virtio
+qemu-guest-agent
