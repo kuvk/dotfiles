@@ -36,7 +36,7 @@ PanelWindow {
     margins {
         top: Math.round((screen?.height ?? 1080) * 0.22)
     }
-    implicitWidth: 600
+    implicitWidth: Math.round(600 * Theme.textScale)
     // The window keeps its full size (resizing a layer surface lands a frame
     // late, so the bottom popped in and out while typing); the panel inside
     // drops down and back up with the results, and only it takes the mouse

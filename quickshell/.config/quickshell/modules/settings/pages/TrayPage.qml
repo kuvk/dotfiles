@@ -35,7 +35,7 @@ ColumnLayout {
         hint: "App names, comma separated"
 
         Rectangle {
-            implicitWidth: 220
+            implicitWidth: Math.round(220 * Theme.textScale)
             implicitHeight: 34
             radius: Theme.smallRadius
             color: Theme.cardBg

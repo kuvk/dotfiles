@@ -118,7 +118,7 @@ Dropdown {
                             visible: entry.modelData.hasChildren
                             text: Icons.chevronRight
                             color: Theme.dimText
-                            font.pixelSize: 10
+                            font.pixelSize: Theme.captionSize
                         }
                     }
                 }

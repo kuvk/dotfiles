@@ -166,17 +166,15 @@ GridLayout {
         enabled: value !== undefined
         spacing: 10
 
-        StyledSlider {
-            Layout.fillWidth: true
+        SliderRow {
             value: (brightnessSlider.value ?? 0) / 100
-            color: Theme.foreground
             onMoved: v => Displays.setBrightness(panel.current.name, Math.max(1, Math.round(v * 100)))
         }
 
-        StyledText {
+        Caption {
             Layout.preferredWidth: 40
+            horizontalAlignment: Text.AlignRight
             text: `${brightnessSlider.value ?? 0}%`
-            color: Theme.subtext
         }
     }
 

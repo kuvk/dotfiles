@@ -40,7 +40,7 @@ ColumnLayout {
                 anchors.verticalCenter: parent.verticalCenter
                 text: Distro.logo
                 color: Theme.accent
-                font.pixelSize: 17
+                font.pixelSize: Math.round(17 * Theme.textScale)
             }
 
             StyledText {

@@ -215,8 +215,8 @@ FloatingWindow {
     visible: shown
     title: "Keybindings"
     color: Theme.panelBg
-    implicitWidth: 900
-    implicitHeight: 640
+    implicitWidth: Math.round(900 * Theme.textScale)
+    implicitHeight: Math.round(640 * Theme.textScale)
     // can grow, not shrink below the default size
     minimumSize: Qt.size(implicitWidth, implicitHeight)
 

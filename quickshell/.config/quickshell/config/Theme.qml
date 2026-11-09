@@ -57,6 +57,8 @@ Singleton {
     readonly property color subtext: mix(foreground, background, 0.25)
     readonly property color dimText: mix(foreground, background, 0.5)
     readonly property color faintText: mix(foreground, background, 0.65)
+    // section labels and the values beside them in dropdowns (the text color darkened)
+    readonly property color labelText: Qt.darker(foreground, 1.4)
 
     // States: the text color at a low opacity, the same for every control
     readonly property color idleFill: alpha(foreground, 0.04)

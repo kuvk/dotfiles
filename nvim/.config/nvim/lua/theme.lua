@@ -74,9 +74,11 @@ local function custom_highlights()
   set(0, "@comment.error", { fg = p.red, bold = true })
   -- Folders in accent, like yazi, eza and ls: neo-tree, the completion menu's folder kind and
   -- everything that uses Directory (file pickers, :e completion, netrw)
-  for _, group in ipairs({ "Directory", "NeoTreeDirectoryIcon", "NeoTreeDirectoryName", "BlinkCmpKindFolder", "CmpItemKindFolder" }) do
+  for _, group in ipairs({ "Directory", "NeoTreeDirectoryIcon", "BlinkCmpKindFolder", "CmpItemKindFolder" }) do
     set(0, group, { fg = p.accent })
   end
+  -- folder names in the tree bold
+  set(0, "NeoTreeDirectoryName", { fg = p.accent, bold = true })
   set(0, "NeoTreeRootName", { fg = p.accent, bold = true })
   -- Files without an icon of their own in text, as in yazi and eza
   set(0, "NeoTreeFileIcon", { fg = p.fg })

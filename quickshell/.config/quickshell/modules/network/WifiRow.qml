@@ -53,8 +53,9 @@ ColumnLayout {
         // Forget a known network (on hover for one with a password); a lock otherwise
         IconButton {
             visible: row.canForget && (!row.net.secured || item.containsMouse)
-            icon: Icons.closeCircle
-            color: Theme.red
+            icon: Icons.close
+            color: Theme.dimText
+            tooltip: "Forget"
             size: 26
             onClicked: Network.forget(row.net.ssid)
         }

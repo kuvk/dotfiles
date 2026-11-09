@@ -59,8 +59,8 @@ FloatingWindow {
     visible: shown
     title: "Settings"
     color: Theme.panelBg
-    implicitWidth: 780
-    implicitHeight: 560
+    implicitWidth: Math.round(780 * Theme.textScale)
+    implicitHeight: Math.round(560 * Theme.textScale)
     // can grow, not shrink below the default size
     minimumSize: Qt.size(implicitWidth, implicitHeight)
 
@@ -81,7 +81,7 @@ FloatingWindow {
             // Sidebar
             Rectangle {
                 Layout.fillHeight: true
-                implicitWidth: 190
+                implicitWidth: Math.round(190 * Theme.textScale)
                 color: Theme.alpha(Theme.darkBackground, 0.6)
 
                 ColumnLayout {

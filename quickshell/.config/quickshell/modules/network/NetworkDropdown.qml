@@ -413,8 +413,9 @@ Dropdown {
 
                 IconButton {
                     visible: !vpn.modelData.active && vpn.containsMouse
-                    icon: Icons.closeCircle
-                    color: Theme.red
+                    icon: Icons.close
+                    color: Theme.dimText
+                    tooltip: "Delete"
                     size: 26
                     onClicked: Network.deleteVpn(vpn.modelData.name)
                 }

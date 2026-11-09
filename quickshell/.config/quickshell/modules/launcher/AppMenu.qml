@@ -104,7 +104,7 @@ PanelWindow {
                 // Categories
                 Rectangle {
                     Layout.fillHeight: true
-                    implicitWidth: 190
+                    implicitWidth: Math.round(190 * Theme.textScale)
                     color: Theme.alpha(Theme.darkBackground, 0.6)
                     topLeftRadius: Theme.radius
                     bottomLeftRadius: Theme.radius

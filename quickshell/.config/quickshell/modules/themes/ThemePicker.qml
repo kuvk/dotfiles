@@ -252,7 +252,7 @@ PanelWindow {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: carousel.top
             anchors.bottomMargin: 30
-            implicitWidth: 320
+            implicitWidth: Math.round(320 * Theme.textScale)
             implicitHeight: 34
             radius: height / 2
             color: Theme.alpha(Theme.background, 0.75)

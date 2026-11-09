@@ -40,7 +40,7 @@ ColumnLayout {
         MouseArea {
             id: button
 
-            implicitWidth: 180
+            implicitWidth: Math.round(180 * Theme.textScale)
             implicitHeight: 30
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor

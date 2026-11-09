@@ -20,7 +20,7 @@ PanelWindow {
     // their shadow (it runs off the screen on the other two sides)
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
-    implicitWidth: 440
+    implicitWidth: Math.round(440 * Theme.textScale)
     implicitHeight: Math.ceil(column.implicitHeight + 34)
     WlrLayershell.namespace: "quickshell-notifications"
     WlrLayershell.layer: WlrLayer.Overlay

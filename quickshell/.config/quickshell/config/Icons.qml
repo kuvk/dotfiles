@@ -96,7 +96,6 @@ Singleton {
     readonly property string ethernetOff: g(0xf0202)
     readonly property string qrcode: g(0xf0432)
     readonly property string speedometer: g(0xf04c5)
-    readonly property string closeCircle: g(0xf0159)
     readonly property string lockOutline: g(0xf033e)
     readonly property string copy: g(0xf018f)
     readonly property string web: g(0xf059f)

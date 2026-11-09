@@ -53,7 +53,7 @@ PanelWindow {
     margins {
         top: Math.round((screen?.height ?? 1080) * 0.22)
     }
-    implicitWidth: 640
+    implicitWidth: Math.round(640 * Theme.textScale)
     implicitHeight: 74 + maxRows * (rowHeight + 4) + 12
     readonly property real panelHeight: 74 + (results.length > 0 ? Math.min(results.length, maxRows) * (rowHeight + 4) + 12 : 0)
     mask: Region {

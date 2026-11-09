@@ -59,7 +59,7 @@ ColumnLayout {
 
     Rectangle {
         Layout.alignment: Qt.AlignHCenter
-        implicitWidth: 320
+        implicitWidth: Math.round(320 * Theme.textScale)
         implicitHeight: 34
         radius: height / 2
         color: Theme.alpha(Theme.background, 0.75)

@@ -86,8 +86,9 @@ Dropdown {
                         // Forget a paired device
                         IconButton {
                             visible: dev.modelData.paired && !dev.modelData.connected && dev.containsMouse
-                            icon: Icons.closeCircle
-                            color: Theme.red
+                            icon: Icons.close
+                            color: Theme.dimText
+                            tooltip: "Remove"
                             size: 26
                             onClicked: dev.modelData.forget()
                         }

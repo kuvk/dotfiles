@@ -30,7 +30,7 @@ Rectangle {
     readonly property real offsetY: (height - bounds.h * factor) / 2
 
     Layout.fillWidth: true
-    implicitHeight: 230
+    implicitHeight: Math.round(230 * Theme.textScale)
     radius: Theme.smallRadius
     color: Theme.alpha(Theme.darkerBackground, 0.6)
 

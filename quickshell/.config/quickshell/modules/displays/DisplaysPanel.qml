@@ -217,7 +217,7 @@ FloatingWindow {
     color: Theme.panelBg
     // grows with wider fonts (e.g. a monospaced Nerd Font) so the content
     // never runs into the right edge
-    implicitWidth: Math.max(760, Math.ceil(content.implicitWidth + 32))
+    implicitWidth: Math.max(Math.round(760 * Theme.textScale), Math.ceil(content.implicitWidth + 32))
     implicitHeight: Math.ceil(content.implicitHeight + 32)
     // can grow, not shrink below the default size
     minimumSize: Qt.size(implicitWidth, implicitHeight)

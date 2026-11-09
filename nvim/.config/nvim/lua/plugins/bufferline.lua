@@ -1,28 +1,36 @@
--- Highlights that differ from bufferline's defaults, from the current theme
+-- Backgrounds for every part of the bar, given to bufferline itself so the file icon groups it
+-- makes later get them too: only the selected buffer has one, everything else (other buffers,
+-- the Neo Tree title, the arrows when buffers don't fit) sits on the editor's
+local function bar_highlights()
+  local p = require("theme").palette
+  local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
+  if not p.muted or not normal then
+    return {}
+  end
+  normal = string.format("#%06x", normal)
+  local defaults = require("bufferline.config").get().highlights or {}
+  local result = {}
+  for name in pairs(defaults) do
+    result[name] = { bg = name:find("selected") and p.lighter_bg or normal }
+    if name:find("separator") then
+      result[name].fg = normal
+    end
+  end
+  return result
+end
+
 local function custom_highlights()
   local p = require("theme").palette
-  -- Only the selected buffer has a background; everything else (other buffers, the Neo Tree
-  -- title, the arrows when buffers don't fit) sits on the editor's. A thin muted line runs
-  -- under the whole bar: every part is underlined in muted.
   local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
-  if p.muted then
-    for _, group in ipairs(vim.fn.getcompletion("BufferLine", "highlight")) do
-      local hl = vim.api.nvim_get_hl(0, { name = group, link = false })
-      hl.bg = group:find("Selected") and p.lighter_bg or normal
-      hl.sp, hl.underline = p.muted, true
-      -- bufferline defines its groups as defaults, which a set would then leave alone
-      hl.default = nil
-      if group:find("^BufferLineSeparator") then
-        hl.fg = normal
-      end
-      vim.api.nvim_set_hl(0, group, hl)
-    end
-    vim.api.nvim_set_hl(0, "NeoTreeExplorerLabel", { fg = p.accent, bg = normal, bold = true, sp = p.muted, underline = true })
-  end
+  vim.api.nvim_set_hl(0, "NeoTreeExplorerLabel", { fg = p.accent, bg = normal, bold = true })
   if p.blue then
     vim.api.nvim_set_hl(0, "StatusLine", { fg = p.blue })
   end
 end
+
+-- The line under the bar while it shows: a window bar of the split lines' character and color
+-- (WinSeparator), so it's as thick as they are and nothing draws over it
+local divider = "%#WinSeparator#%{repeat('─', winwidth(0))}"
 
 local options = {
   always_show_bufferline = false,
@@ -67,13 +75,22 @@ local function update_tabline()
   options.always_show_bufferline = tree_open
   require("bufferline.config").get().options.always_show_bufferline = tree_open
   local several = #vim.fn.getbufinfo({ buflisted = 1 }) > 1
-  vim.o.showtabline = (tree_open or several) and 2 or 0
+  local shown = tree_open or several
+  vim.o.showtabline = shown and 2 or 0
+  vim.o.winbar = shown and divider or ""
 end
 
 local function setup()
   -- Re-running setup rebuilds bufferline's highlights, file icon backgrounds
   -- included, from the colorscheme now in use
   require("bufferline").setup({ options = options })
+  -- again with the backgrounds, now that bufferline's own highlight names are known; its
+  -- groups are set as defaults, which leave defined ones alone, so they're cleared first
+  local highlights = bar_highlights()
+  for _, group in ipairs(vim.fn.getcompletion("BufferLine", "highlight")) do
+    vim.api.nvim_set_hl(0, group, {})
+  end
+  require("bufferline").setup({ options = options, highlights = highlights })
   custom_highlights()
 end
 

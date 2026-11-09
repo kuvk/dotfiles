@@ -145,7 +145,7 @@ Item {
                     visible: text !== ""
                     text: Notifs.appGlyphs[root.appName] ?? ""
                     color: Theme.accent
-                    font.pixelSize: 26
+                    font.pixelSize: Math.round(26 * Theme.textScale)
                 }
 
                 IconImage {

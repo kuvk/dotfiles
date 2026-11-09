@@ -2,7 +2,8 @@ import QtQuick
 import QtQuick.Layouts
 import qs.config
 
-// Row used in dropdown lists (networks, devices, sinks)
+// Row used in dropdown lists (networks, devices, sinks): the current one filled and bold,
+// the one under the cursor framed
 MouseArea {
     id: root
 
@@ -20,8 +21,8 @@ MouseArea {
     Rectangle {
         anchors.fill: parent
         radius: Theme.smallRadius
-        color: root.highlighted ? Theme.selectedFill : (root.containsMouse ? Theme.hoverFill : "transparent")
-        border.width: root.containsMouse && !root.highlighted ? Theme.controlBorder : 0
+        color: root.containsMouse ? Theme.hoverFill : (root.highlighted ? Theme.selectedFill : "transparent")
+        border.width: root.containsMouse ? Theme.controlBorder : 0
         border.color: Theme.hoverBorder
     }
 
@@ -33,8 +34,10 @@ MouseArea {
 
         Icon {
             text: root.icon
-            color: root.highlighted ? Theme.accent : Theme.subtext
-            Layout.preferredWidth: 18
+            color: Theme.foreground
+            font.pixelSize: Theme.titleSize
+            Layout.preferredWidth: 22
+            horizontalAlignment: Text.AlignHCenter
         }
 
         ColumnLayout {
@@ -44,14 +47,14 @@ MouseArea {
             StyledText {
                 Layout.fillWidth: true
                 text: root.label
-                color: root.highlighted ? Theme.accent : Theme.foreground
+                font.bold: root.highlighted
             }
 
             StyledText {
                 Layout.fillWidth: true
                 visible: text !== ""
                 text: root.sublabel
-                color: Theme.subtext
+                color: Theme.labelText
                 font.pixelSize: Theme.captionSize
             }
         }

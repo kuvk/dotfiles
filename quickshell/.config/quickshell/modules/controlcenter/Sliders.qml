@@ -1,53 +1,55 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Widgets
 import qs.config
 import qs.components
 import qs.services
-import qs.modules.notifications
 
-// Volume and brightness sliders (Control Center), in the accent like the OSD; volume greys
-// out while muted
+// Volume and brightness (Control Center): each a label with its value on the right and the
+// slider under it, as the audio dropdown; the volume's label mutes it
 ColumnLayout {
     Layout.fillWidth: true
-    spacing: 14
+    spacing: 6
 
     RowLayout {
         Layout.fillWidth: true
-        spacing: 8
+
+        Caption {
+            Layout.fillWidth: true
+            text: "Volume"
+        }
 
         IconButton {
             icon: Audio.icon
-            color: Audio.muted ? Theme.dimText : Theme.foreground
+            color: Theme.labelText
+            size: 18
+            tooltip: Audio.muted ? "Unmute" : "Mute"
             onClicked: Audio.toggleMute(Audio.sink)
         }
 
-        StyledSlider {
-            Layout.fillWidth: true
-            value: Audio.volume
-            to: 1.2
-            color: Audio.muted ? Theme.faintText : Theme.foreground
-            onMoved: v => Audio.setVolume(Audio.sink, v)
+        Caption {
+            Layout.rightMargin: 6
+            text: Audio.muted ? "Muted" : `${Math.round(Audio.volume * 100)}%`
         }
     }
 
-    RowLayout {
-        Layout.fillWidth: true
+    SliderRow {
+        value: Audio.volume
+        to: 1.2
+        muted: Audio.muted
+        onMoved: v => Audio.setVolume(Audio.sink, v)
+    }
+
+    SectionLabel {
+        Layout.topMargin: 6
         visible: System.hasBrightness
-        spacing: 8
+        text: "Brightness"
+        value: `${Math.round(System.brightness * 100)}%`
+    }
 
-        Icon {
-            Layout.preferredWidth: 30
-            text: Icons.sun
-            color: Theme.foreground
-        }
-
-        StyledSlider {
-            Layout.fillWidth: true
-            value: System.brightness
-            color: Theme.foreground
-            onMoved: v => System.setBrightness(v)
-        }
+    SliderRow {
+        visible: System.hasBrightness
+        value: System.brightness
+        onMoved: v => System.setBrightness(v)
     }
 }

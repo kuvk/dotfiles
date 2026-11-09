@@ -32,7 +32,7 @@ PanelWindow {
     }
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
-    implicitWidth: 420
+    implicitWidth: Math.round(420 * Theme.textScale)
     WlrLayershell.namespace: "quickshell-controlcenter"
     WlrLayershell.layer: WlrLayer.Top
     // OnDemand like the dropdowns: the focus grab below hands this window the
