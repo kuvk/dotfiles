@@ -316,7 +316,6 @@ FloatingWindow {
                 boundsBehavior: Flickable.StopAtBounds
 
                 ScrollBar {
-                    parent: bindsFlick
                     flick: bindsFlick
                 }
 
@@ -325,9 +324,7 @@ FloatingWindow {
                     id: columns
 
                     readonly property real columnWidth: (width - spacing) / 2
-
-                    // room for the scroll bar
-                    width: bindsFlick.width - 14
+                    width: bindsFlick.width
                     spacing: 16
 
                     Repeater {

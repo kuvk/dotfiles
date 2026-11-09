@@ -205,7 +205,6 @@ PanelWindow {
                 }
 
                 ScrollBar {
-                    parent: list
                     flick: list
                 }
 

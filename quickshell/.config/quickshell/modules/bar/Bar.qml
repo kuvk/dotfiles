@@ -113,10 +113,9 @@ PanelWindow {
         tooltip: Qt.formatDateTime(Time.date, "dddd\nd MMMM yyyy")
         onClicked: barWindow.toggle("calendar", clockButton)
 
-        StyledText {
+        BarText {
             text: Qt.formatDateTime(Time.date, Config.clockFormat)
             color: Theme.foreground
-            font.weight: Font.DemiBold
         }
     }
 
@@ -127,10 +126,9 @@ PanelWindow {
         tooltip: `Keyboard layout\n${Hypr.layoutName || Hypr.layout}`
         onClicked: Hypr.nextLayout()
 
-        StyledText {
+        BarText {
             text: Hypr.layout
             color: Theme.foreground
-            font.weight: Font.DemiBold
         }
     }
 
@@ -150,7 +148,7 @@ PanelWindow {
             color: Hues.weather
         }
 
-        StyledText {
+        BarText {
             text: `${Weather.temp}°`
             color: Theme.foreground
         }

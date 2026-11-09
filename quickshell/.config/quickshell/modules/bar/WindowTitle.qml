@@ -41,7 +41,7 @@ Row {
         color: Theme.accent
     }
 
-    StyledText {
+    BarText {
         anchors.verticalCenter: parent.verticalCenter
         width: Math.min(implicitWidth, 220)
         text: root.shellWindow ? (root.toplevel?.title ?? "") : (root.entry?.name || root.toplevel?.appId || root.toplevel?.title || "")

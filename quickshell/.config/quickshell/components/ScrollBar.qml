@@ -1,9 +1,12 @@
 import QtQuick
 import qs.config
 
-// Slim scroll bar for a Flickable/ListView, placed over its right edge:
-// faint while idle, clearer while scrolling or under the mouse, draggable.
-// Hidden when everything fits.
+// Slim scroll bar for a Flickable/ListView: faint while idle, clearer while scrolling or under
+// the mouse, draggable. Hidden when everything fits.
+// It sits in the padding of the surface around the list, 1 px inside its right border: the
+// nearest bordered panel (a dropdown, a popup, a framed list), or the window itself (Settings,
+// Displays and Keybindings, whose border Hyprland draws outside). It finds that surface on its
+// own, so a list only needs `flick`.
 Item {
     id: root
 
@@ -11,12 +14,25 @@ Item {
     readonly property bool needed: flick.contentHeight > flick.height + 1
     readonly property bool active: flick.moving || area.containsMouse || area.pressed
 
-    anchors.top: flick.top
-    anchors.bottom: flick.bottom
-    anchors.right: flick.right
-    anchors.rightMargin: 1
+    // the surface it sits on: the nearest ancestor with a border, else the window's root item
+    readonly property Item edge: {
+        let item = flick.parent;
+        while (item && item.parent) {
+            if (item.border && item.border.width > 0)
+                return item;
+            item = item.parent;
+        }
+        return item;
+    }
+    readonly property int edgeBorder: edge && edge.border ? edge.border.width : 0
+
+    parent: edge
+    // along the list's height, mapped onto the surface (again when either moves or resizes)
+    y: (flick.x, flick.y, flick.height, edge?.height, needed, edge ? flick.mapToItem(edge, 0, 0).y : 0)
+    height: flick.height
+    x: (edge?.width ?? 0) - edgeBorder - 1 - width
     width: 8
-    visible: needed
+    visible: needed && flick.visible
     z: 10
 
     Rectangle {

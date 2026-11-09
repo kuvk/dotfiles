@@ -31,7 +31,7 @@ BarButton {
         color: Media.active?.isPlaying ? Theme.brightCyan : Theme.subtext
     }
 
-    StyledText {
+    BarText {
         width: Math.min(implicitWidth, 260)
         text: Media.label
         color: Media.active?.isPlaying ? Theme.brightCyan : Theme.subtext

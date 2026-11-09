@@ -3,14 +3,13 @@ import QtQuick.Layouts
 import qs.config
 
 // A slider on its own row, inset from the dropdown's edges, the row framed while the cursor is
-// over it. `value`, `to`, `knob` and moved() as StyledSlider's; dimmed while `muted`.
+// over it. `value`, `to` and moved() as StyledSlider's; dimmed while `muted`.
 Rectangle {
     id: root
 
     property real value: 0
     property real to: 1
     property bool muted: false
-    property alias knob: slider.knob
     signal moved(real value)
 
     Layout.fillWidth: true

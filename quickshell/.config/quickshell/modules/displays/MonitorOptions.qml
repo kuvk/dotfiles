@@ -24,7 +24,8 @@ GridLayout {
         color: Theme.subtext
     }
 
-    StyledText {
+    Caption {
+        Layout.alignment: Qt.AlignVCenter
         text: "Enabled"
     }
 
@@ -46,7 +47,8 @@ GridLayout {
         }
     }
 
-    StyledText {
+    Caption {
+        Layout.alignment: Qt.AlignVCenter
         text: "Primary"
     }
 
@@ -68,7 +70,8 @@ GridLayout {
         }
     }
 
-    StyledText {
+    Caption {
+        Layout.alignment: Qt.AlignVCenter
         text: "Resolution"
     }
 
@@ -78,7 +81,8 @@ GridLayout {
         onStep: delta => panel.setMode(panel.selected, panel.cycle(panel.current.modes, panel.current.mode, delta))
     }
 
-    StyledText {
+    Caption {
+        Layout.alignment: Qt.AlignVCenter
         text: "Scale"
     }
 
@@ -88,7 +92,8 @@ GridLayout {
         onStep: delta => panel.update(panel.selected, { scale: panel.cycle(panel.validScales(panel.current.mode), panel.current.scale, delta) })
     }
 
-    StyledText {
+    Caption {
+        Layout.alignment: Qt.AlignVCenter
         text: "Variable refresh"
         visible: vrrRow.visible
     }
@@ -111,7 +116,8 @@ GridLayout {
         }
     }
 
-    StyledText {
+    Caption {
+        Layout.alignment: Qt.AlignVCenter
         text: "Colors"
     }
 
@@ -121,7 +127,8 @@ GridLayout {
         onStep: delta => panel.update(panel.selected, { cm: panel.cycle(panel.colorModes, panel.current.cm, delta) })
     }
 
-    StyledText {
+    Caption {
+        Layout.alignment: Qt.AlignVCenter
         text: "Color depth"
         visible: depthRow.visible
     }
@@ -146,7 +153,8 @@ GridLayout {
         }
     }
 
-    StyledText {
+    Caption {
+        Layout.alignment: Qt.AlignVCenter
         text: "Brightness"
         visible: brightnessSlider.visible
         opacity: brightnessSlider.opacity
@@ -178,7 +186,8 @@ GridLayout {
         }
     }
 
-    StyledText {
+    Caption {
+        Layout.alignment: Qt.AlignVCenter
         text: "Workspaces"
     }
 
