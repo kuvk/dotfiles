@@ -68,11 +68,10 @@ Singleton {
     // the background: the theme's own (Theme.backgroundImage) until an image is chosen
     property alias lockFollowsTheme: adapter.lockFollowsTheme
     property alias lockImage: adapter.lockImage
-    property alias lockClock: adapter.lockClock
     property alias lockAvatar: adapter.lockAvatar
-    property alias lockBox: adapter.lockBox
+    // the password field's corners, also on the login and boot screens, and the login screen's buttons
+    property alias lockRounded: adapter.lockRounded
     // percent, to a tenth
-    property alias lockBoxOpacity: adapter.lockBoxOpacity
     property alias lockInputOpacity: adapter.lockInputOpacity
     // the login screen's power buttons
     property alias lockPowerOpacity: adapter.lockPowerOpacity
@@ -240,11 +239,9 @@ Singleton {
             // Lock Screen
             property bool lockFollowsTheme: true
             property string lockImage: ""
-            property bool lockClock: false
             property bool lockAvatar: true
-            property bool lockBox: false
-            property real lockBoxOpacity: 90
-            property real lockInputOpacity: 65
+            property bool lockRounded: true
+            property real lockInputOpacity: 80
             property real lockPowerOpacity: 85
 
             // Idle

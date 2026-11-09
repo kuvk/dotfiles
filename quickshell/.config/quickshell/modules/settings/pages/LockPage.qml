@@ -54,15 +54,7 @@ ColumnLayout {
         }
     }
 
-    // What the lock screen shows, also on the login screen (hyprdori-theme-set --login); the
-    // colors are the theme's
-    SettingsSection {
-        title: "Clock and date"
-        hint: "Top right, on the lock and login screens"
-        key: "lockClock"
-        onEdited: loginApply.restart()
-    }
-
+    // Also on the login screen (hyprdori-theme-set --login); the colors are the theme's
     SettingsSection {
         title: "Avatar"
         hint: "Your picture (~/.face)"
@@ -70,19 +62,14 @@ ColumnLayout {
         onEdited: loginApply.restart()
     }
 
+    // The boot splash draws its field when it's built: theme-boot.sh, which the button runs
     SettingsSection {
-        title: "Box"
-        hint: "A card behind the avatar and password"
-        key: "lockBox"
-        onEdited: loginApply.restart()
-
-        SettingSlider {
-            label: "Box opacity"
-            value: Config.lockBoxOpacity / 100
-            onChanged: v => {
-                Config.lockBoxOpacity = Math.round(v * 1000) / 10;
-                loginApply.restart();
-            }
+        title: "Rounded corners"
+        hint: "The password field on the lock, login and boot screens, and the login screen's buttons"
+        key: "lockRounded"
+        onEdited: {
+            loginApply.restart();
+            settings.bootStale = true;
         }
     }
 
@@ -113,8 +100,22 @@ ColumnLayout {
         onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--login"])
     }
 
-    TextButton {
-        text: "Preview"
-        onClicked: Panels.lockPreview = true
+    RowLayout {
+        spacing: 8
+
+        TextButton {
+            text: "Preview"
+            onClicked: Panels.lockPreview = true
+        }
+
+        // After a corner change: the boot splash is rebuilt with it (asks for the password)
+        TextButton {
+            visible: settings.bootStale
+            text: "Update boot splash"
+            onClicked: {
+                settings.bootStale = false;
+                Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-boot.sh", "--window"]);
+            }
+        }
     }
 }

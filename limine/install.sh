@@ -130,8 +130,8 @@ timeout: 3
 default_entry: 2
 terse: yes
 interface_resolution: ${res_w}x$res_h
-interface_branding: Hyprdori
-interface_branding_colour: $(hex "$accent")
+interface_branding: HYPRDORI 
+interface_branding_colour: $(hex "$magenta")
 interface_help_hidden: yes
 interface_help_colour: $(hex "$accent")
 interface_help_colour_bright: $(hex "$bright_foreground")
@@ -186,4 +186,4 @@ if ! efibootmgr | grep -q '\\EFI\\limine\\BOOTX64.EFI'; then
         --label "Limine" --loader '\EFI\limine\BOOTX64.EFI' --unicode >/dev/null
     echo "Added the Limine boot entry, first in the boot order"
 fi
-echo "Installed. Limine shows at the next boot; rEFInd stays in the firmware boot menu."
+echo "Installed. Limine shows at the next boot."

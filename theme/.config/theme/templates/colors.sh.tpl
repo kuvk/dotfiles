@@ -59,3 +59,5 @@ bright_cyan="{{ bright_cyan }}"
 bright_blue="{{ bright_blue }}"
 bright_magenta="{{ bright_magenta }}"
 subtext="{{ mix foreground background 25% }}"
+# the password field's corners on the boot splash (Settings > Lock Screen > Rounded corners)
+field_radius="{{ login_radius }}"

@@ -1,17 +1,30 @@
 import QtQuick
 
-// ‹ label › pill for choosing a session or user
+// ‹ label › for choosing a session or user. Framed like the power buttons (the session), or
+// plain text between the arrows (`framed: false`, the user above the avatar).
 Rectangle {
     id: root
 
     property string label
+    property bool framed: true
     signal stepped(int delta)
 
-    implicitWidth: row.implicitWidth + 12
+    readonly property bool hovered: previous.containsMouse || next.containsMouse
+
+    implicitWidth: row.implicitWidth + (framed ? 12 : 0)
     implicitHeight: 36
-    radius: 9
-    color: Qt.alpha(config.box, Number(config.boxOpacity))
-    border.color: config.boxOutline
+    radius: Number(config.radius)
+    color: framed ? Qt.alpha(config.powerBg, Number(config.powerOpacity)) : "transparent"
+    border.width: framed ? 1 : 0
+    border.color: hovered ? config.powerHoverOutline : config.powerOutline
+
+    // the shell's hover: the text color over the background
+    Rectangle {
+        anchors.fill: parent
+        visible: root.framed
+        radius: parent.radius
+        color: Qt.alpha(config.text, root.hovered ? 0.08 : 0.04)
+    }
 
     Row {
         id: row
@@ -20,6 +33,8 @@ Rectangle {
         spacing: 4
 
         Arrow {
+            id: previous
+
             delta: -1
         }
 
@@ -32,6 +47,8 @@ Rectangle {
         }
 
         Arrow {
+            id: next
+
             delta: 1
         }
     }
@@ -49,8 +66,8 @@ Rectangle {
 
         Text {
             anchors.centerIn: parent
-            text: arrow.delta < 0 ? "\uf053" : "\uf054"
-            color: arrow.containsMouse ? config.dots : config.subtext
+            text: arrow.delta < 0 ? "" : ""
+            color: arrow.containsMouse ? config.text : config.subtext
             font.family: config.iconFont
             font.pixelSize: 11
         }

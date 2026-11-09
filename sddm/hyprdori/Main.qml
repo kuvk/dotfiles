@@ -5,9 +5,9 @@ import QtQuick.Window
 import SddmComponents
 
 // Login screen in the look of the lock screen (quickshell/.config/quickshell/modules/lock/LockView.qml):
-// its background (the lock screen's, from hyprdori-wallpaper), clock top right, avatar and password in a
-// centered card. The card and controls show on the monitor with the keyboard, which follows the
-// mouse.
+// its background (the lock screen's, from hyprdori-wallpaper), the avatar and password field in
+// the middle, with several users the user's name above the avatar between arrows. The field and
+// controls show on the monitor with the keyboard, which follows the mouse.
 Rectangle {
     id: root
 
@@ -20,7 +20,6 @@ Rectangle {
     property int sessionIndex: Math.max(0, sessionModel.lastIndex)
     property bool failed: false
     property bool busy: false
-    property date now: new Date()
 
     readonly property string userName: userModel.data(userModel.index(userIndex, 0), nameRole) ?? ""
     readonly property string userIcon: userModel.data(userModel.index(userIndex, 0), iconRole) ?? ""
@@ -42,13 +41,6 @@ Rectangle {
 
     Window.onActiveChanged: if (Window.active) password.forceActiveFocus()
 
-    Timer {
-        interval: 1000
-        running: true
-        repeat: true
-        onTriggered: root.now = new Date()
-    }
-
     Connections {
         target: sddm
 
@@ -69,53 +61,15 @@ Rectangle {
         cache: false
     }
 
-    // Clock and date, top right, where the lock screen puts them (96 and 37 px; tops 10 and
-    // 120 px down, 30 in)
-    // (Settings > Lock Screen > Clock and date)
+    // Avatar and password, at the lock screen's positions: the avatar's center 45 px above the
+    // screen's center, the field's 85 px below
     Item {
-        anchors.fill: parent
-        visible: Window.active && String(root.c.showClock) !== "false"
-
-        Text {
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.topMargin: 10
-            anchors.rightMargin: 30
-            text: Qt.formatDateTime(root.now, "HH:mm")
-            color: root.c.clock
-            font.family: root.c.font
-            font.pixelSize: 96
-            font.weight: Font.Medium
-        }
-
-        Text {
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.topMargin: 120
-            anchors.rightMargin: 30
-            text: Qt.formatDateTime(root.now, "dddd, d MMMM yyyy")
-            color: root.c.date
-            font.family: root.c.font
-            font.pixelSize: 37
-        }
-    }
-
-    // Avatar and password, at the lock screen's positions: a 380x300 box in the middle, the
-    // avatar's center 45 px above the screen's center, the field's 85 px below
-    Rectangle {
         id: card
 
         anchors.centerIn: parent
         visible: Window.active
         width: 380
         height: 300
-        radius: 6
-        // Settings > Lock Screen > Box off: only the avatar and password, no card
-        readonly property bool shown: String(root.c.showBox) !== "false"
-
-        color: shown ? Qt.alpha(root.c.box, Number(root.c.boxOpacity)) : "transparent"
-        border.width: shown ? 2 : 0
-        border.color: root.c.boxOutline
 
         // Fades in
         opacity: 0
@@ -127,8 +81,21 @@ Rectangle {
             }
         }
 
+        // Only with several users: the name between arrows, above the avatar (or the field)
+        Controls {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.bottom: avatarItem.visible ? avatarItem.top : field.top
+            anchors.bottomMargin: 12
+            visible: userModel.count > 1
+            framed: false
+            label: root.userName
+            onStepped: d => root.userIndex = root.step(root.userIndex, d, userModel.count)
+        }
+
         // Settings > Lock Screen > Avatar
         Item {
+            id: avatarItem
+
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: -45
@@ -178,25 +145,15 @@ Rectangle {
             Text {
                 anchors.centerIn: parent
                 visible: avatar.status !== Image.Ready
-                text: ""
-                color: root.c.box
+                text: "\u{f0004}"
+                color: root.c.base
                 font.family: root.c.iconFont
                 font.pixelSize: 56
             }
         }
 
-        // Only with several users: under the field
-        Controls {
-            id: users
-
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: field.bottom
-            anchors.topMargin: 10
-            visible: userModel.count > 1
-            label: root.userName
-            onStepped: d => root.userIndex = root.step(root.userIndex, d, userModel.count)
-        }
-
+        // As the lock screen's and the boot splash's: the background at Settings > Lock Screen's
+        // opacity, a 2 px accent outline, rounded or square corners there
         Rectangle {
             id: field
 
@@ -205,10 +162,8 @@ Rectangle {
             anchors.verticalCenterOffset: 85
             implicitWidth: 260
             implicitHeight: 36
-            // a box with the windows' corners (Hyprland's rounding)
-            radius: 6
+            radius: Number(root.c.radius)
             color: Qt.alpha(root.c.input, Number(root.c.inputOpacity))
-            // 2 px like the box, the shell's borders and the boot screen's field
             border.width: 2
             border.color: root.failed ? root.c.fail : (root.busy ? root.c.check : root.c.inputOutline)
 
@@ -246,25 +201,12 @@ Rectangle {
                 onAccepted: root.login()
                 Keys.onEscapePressed: text = ""
             }
-
-            Text {
-                anchors.centerIn: parent
-                width: parent.width - 24
-                horizontalAlignment: Text.AlignHCenter
-                visible: password.text === ""
-                elide: Text.ElideRight
-                textFormat: Text.StyledText
-                text: root.failed ? "<i>ACCESS DENIED</i>" : `<i>\u{f033e}  Log in as </i><b><font color="${root.c.user}">${root.userName}</font></b>`
-                color: root.failed ? root.c.fail : root.c.text
-                font.family: root.c.font
-                font.pixelSize: 14
-            }
         }
 
-        // Under the field (and the user switch); it takes no room when off
+        // Under the field; it takes no room when off
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
-            anchors.top: users.visible ? users.bottom : field.bottom
+            anchors.top: field.bottom
             anchors.topMargin: 8
             visible: keyboard.capsLock
             text: "Caps Lock is on"
@@ -311,18 +253,26 @@ Rectangle {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: modelData.action()
 
-                // Settings > Lock Screen > Power buttons (older theme.conf files: the box's colors)
+                // As the shell's buttons: the background at Settings > Lock Screen's opacity with
+                // the text color faintly over it, a hairline border that lightens under the cursor
                 Rectangle {
                     anchors.fill: parent
-                    radius: 9
-                    color: Qt.alpha(root.c.powerBg || root.c.box, power.containsMouse ? 0.95 : Number(root.c.powerOpacity || root.c.boxOpacity))
-                    border.color: root.c.powerOutline || root.c.boxOutline
+                    radius: Number(root.c.radius)
+                    color: Qt.alpha(root.c.powerBg, Number(root.c.powerOpacity))
+                    border.width: 1
+                    border.color: power.containsMouse ? root.c.powerHoverOutline : root.c.powerOutline
+
+                    Rectangle {
+                        anchors.fill: parent
+                        radius: parent.radius
+                        color: Qt.alpha(root.c.text, power.containsMouse ? 0.08 : 0.04)
+                    }
                 }
 
                 Text {
                     anchors.centerIn: parent
                     text: power.modelData.glyph
-                    color: power.containsMouse ? root.c.dots : (root.c.powerIcon || root.c.text)
+                    color: root.c.text
                     font.family: root.c.iconFont
                     font.pixelSize: 20
                 }
@@ -335,9 +285,9 @@ Rectangle {
                     visible: power.containsMouse
                     width: tip.implicitWidth + 16
                     height: tip.implicitHeight + 8
-                    radius: 6
-                    color: Qt.alpha(root.c.powerBg || root.c.box, 0.95)
-                    border.color: root.c.powerOutline || root.c.boxOutline
+                    radius: Math.max(0, Number(root.c.radius) - 2)
+                    color: root.c.powerBg
+                    border.color: root.c.powerOutline
 
                     Text {
                         id: tip
@@ -346,7 +296,7 @@ Rectangle {
                         text: power.modelData.tip
                         color: root.c.text
                         font.family: root.c.font
-                        font.pixelSize: 12
+                        font.pixelSize: 11
                     }
                 }
             }

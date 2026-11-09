@@ -44,7 +44,7 @@ fi
 
 # The current theme's colors, or Catppuccin's before hyprdori-theme-set has run
 background="#1e1e2e" foreground="#cdd6f4" subtext="#a2a8c2" accent="#89b4fa" magenta="#cba6f7"
-red="#f38ba8" yellow="#fab387"
+red="#f38ba8" yellow="#fab387" field_radius=6
 colors="$home/.config/theme/current/colors.sh"
 if [[ -r $colors ]]; then
     # shellcheck source=/dev/null
@@ -70,18 +70,23 @@ trap 'rm -rf "$build"' EXIT
 # color on a faint track; the farewell line in red, large, alone on the screen
 # The logo drawn like kitty draws it, in 24px rows (scripts/.config/scripts/logo-render.py)
 "$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$magenta" --cell-height 24 --out "$build/logo.png"
-# The password field and progress bar are as wide as the logo; the field is a box with the
-# windows' corners (Hyprland's rounding) and a 2 px outline, like the lock and login screens'
+# The password field and progress bar are as wide as the logo; the field is a box with a 2 px
+# outline and the lock and login screens' corners (Settings > Lock Screen > Rounded corners)
 ew=$(magick identify -format %w "$build/logo.png")
+if ((field_radius > 0)); then
+    field_shape="roundrectangle 1,1 $((ew - 2)),46 $field_radius,$field_radius"
+else
+    field_shape="rectangle 1,1 $((ew - 2)),46"
+fi
 magick -size "${ew}x48" xc:none -fill "$background" -stroke "$accent" -strokewidth 2 \
-    -draw "roundrectangle 1,1 $((ew - 2)),46 6,6" "$build/entry.png"
+    -draw "$field_shape" "$build/entry.png"
 magick -background none -fill "$subtext" -font "$font" -pointsize 16 label:"Speak, friend, and enter!" "$build/hint.png"
 magick -background none -fill "$yellow" -font "$font" -pointsize 16 label:"Tell me, friend, when did you abandon reason for madness?" "$build/wrong1.png"
 magick -background none -fill "$red" -font "$font" -pointsize 16 label:"You shall not pass!" "$build/wrong2.png"
-magick -background none -fill "$red" -font "$font" -pointsize 48 label:"Go back to the Shadow!" "$build/farewell.png"
+magick -background none -fill "$magenta" -font "$font" -pointsize 60 label:"Go back to the Shadow!" "$build/farewell.png"
 magick -size 14x14 xc:none -fill "$foreground" -draw "circle 7,7 7,1" "$build/bullet.png"
 magick -size "${ew}x10" xc:none -fill "${foreground}2e" -draw "roundrectangle 0,0 $((ew - 1)),9 5,5" "$build/progress_box.png"
-magick -size "${ew}x10" xc:none -fill "$foreground" -draw "roundrectangle 0,0 $((ew - 1)),9 5,5" "$build/progress_bar.png"
+magick -size "${ew}x10" xc:none -fill "$accent" -draw "roundrectangle 0,0 $((ew - 1)),9 5,5" "$build/progress_bar.png"
 # Encrypted drives get the password field first; without them the progress bar shows from the start
 encrypted=0
 grep -qE '^HOOKS=.*\b(sd-)?encrypt\b' /etc/mkinitcpio.conf && encrypted=1

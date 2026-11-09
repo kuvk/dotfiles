@@ -4,17 +4,18 @@ import Quickshell
 import qs.config
 import qs.services
 
-// What the lock screen shows on one screen: the background, and on the main screen the
-// clock and date top right and the avatar and password in a centered card. Laid out like
-// the login screen (sddm/hyprdori/Main.qml), in the theme's colors.
+// What the lock screen shows on one screen: the background, and on the main screen the avatar
+// and the password field in the middle. Laid out like the login screen
+// (sddm/hyprdori/Main.qml), in the theme's colors; the field as on the boot splash: the
+// background at Settings > Lock Screen's opacity, a 2 px accent outline, its corners rounded or
+// square there.
 // Keys typed on any screen go to the password: Hyprland gives the keyboard to one of the
 // lock surfaces, not always the main one.
 Item {
     id: root
 
     required property ShellScreen screen
-    // Settings' preview: no keyboard, the field shows its hint, and the clock and password
-    // show on its screen
+    // Settings' preview: no keyboard, and the avatar and password show on its screen
     property bool preview: false
     property bool mainOverride: false
 
@@ -26,19 +27,9 @@ Item {
         return !screens.some(s => s.name === Lock.mainScreen) && screens[0] === screen;
     }
 
-    property date now: new Date()
-
     function takeFocus(): void {
         if (!preview)
             keys.forceActiveFocus();
-    }
-
-    Timer {
-        interval: 1000
-        running: Lock.locked || root.preview
-        repeat: true
-        triggeredOnStart: true
-        onTriggered: root.now = new Date()
     }
 
     Connections {
@@ -130,46 +121,13 @@ Item {
         }
     }
 
-    // Clock and date, top right (Settings > Lock Screen > Clock and date)
-    Item {
-        anchors.fill: parent
-        visible: root.main && Config.lockClock
-
-        Text {
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.topMargin: 10
-            anchors.rightMargin: 30
-            text: Qt.formatDateTime(root.now, "HH:mm")
-            color: Theme.foreground
-            font.family: Theme.font
-            font.pixelSize: 96
-            font.weight: Font.Medium
-        }
-
-        Text {
-            anchors.top: parent.top
-            anchors.right: parent.right
-            anchors.topMargin: 120
-            anchors.rightMargin: 30
-            text: Qt.formatDateTime(root.now, "dddd, d MMMM yyyy")
-            color: Theme.foreground
-            font.family: Theme.font
-            font.pixelSize: 37
-        }
-    }
-
-    // Avatar and password: a 380x300 box in the middle, the avatar's center 45 px above the
+    // Avatar and password, at the login screen's positions: the avatar's center 45 px above the
     // screen's center, the field's 85 px below
-    Rectangle {
+    Item {
         anchors.centerIn: parent
         visible: root.main
         width: 380
         height: 300
-        radius: 6
-        color: Config.lockBox ? Theme.alpha(Theme.background, Config.lockBoxOpacity / 100) : "transparent"
-        border.width: Config.lockBox ? 2 : 0
-        border.color: Theme.border
 
         // Settings > Lock Screen > Avatar: ~/.face
         Item {
@@ -238,10 +196,9 @@ Item {
             anchors.verticalCenterOffset: 85
             width: 260
             height: 36
-            // a box with the windows' corners (Hyprland's rounding), square in Work-Game
-            radius: Theme.radius
+            // Settings > Lock Screen > Rounded corners: the windows' radius (6 with it at 0), or square
+            radius: Config.lockRounded ? (Config.radius || 6) : 0
             color: Theme.alpha(Theme.background, Config.lockInputOpacity / 100)
-            // 2 px like the box, the shell's borders and the boot screen's field
             border.width: 2
             border.color: (Lock.failed ? Theme.red : (Lock.authenticating ? Theme.dimText : Theme.border))
 
@@ -293,19 +250,6 @@ Item {
                 font.pixelSize: Theme.smallSize
                 font.letterSpacing: 3
                 elide: Text.ElideLeft
-            }
-
-            Text {
-                anchors.centerIn: parent
-                width: parent.width - 24
-                horizontalAlignment: Text.AlignHCenter
-                visible: root.preview || Lock.password === ""
-                elide: Text.ElideRight
-                textFormat: Text.StyledText
-                text: Lock.failed && !root.preview ? "<i>ACCESS DENIED</i>" : `<i>\u{f033e}  Logged in as </i><b><font color="${Theme.accent}">${Lock.userName}</font></b>`
-                color: (Lock.failed && !root.preview ? Theme.red : Theme.subtext)
-                font.family: Theme.font
-                font.pixelSize: Theme.titleSize
             }
         }
 

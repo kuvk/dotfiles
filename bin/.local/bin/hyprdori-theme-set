@@ -214,14 +214,12 @@ def shell_settings() -> dict:
         "fontHinting": "slight",
         "fontAntialiasing": "rgba",
         "windowButtons": False,
-        "lockBoxOpacity": 90,
-        "lockBox": False,
         "wallpaperFollowsTheme": True,
-        "lockClock": False,
         "lockAvatar": True,
+        "lockRounded": True,
         "lockPowerOpacity": 85,
         "accentOverrides": {},
-        "lockInputOpacity": 65,
+        "lockInputOpacity": 80,
         "cursorTheme": "Adwaita",
         "cursorSize": 24,
         # Hyprland's look in normal mode (hyprland.lua.tpl)
@@ -422,29 +420,25 @@ def load_theme(name: str) -> dict:
         "hypr_inactive_opacity": f"{float(shell['inactiveOpacity']):g}",
         "hypr_blur": "true" if shell["blur"] else "false",
         # the login screen, as the lock screen: the theme's colors
-        "login_clock": colors["foreground"],
-        "login_date": colors["foreground"],
         "login_avatar": colors["accent"],
-        "login_boxOutline": colors["accent"],
-        "login_box": colors["background"],
         "login_inputOutline": colors["accent"],
         "login_input": colors["background"],
         "login_dots": colors["foreground"],
-        "login_user": colors["accent"],
-        "login_text": mix(colors["foreground"], colors["background"], 0.25),
+        "login_text": colors["foreground"],
         "login_check": mix(colors["foreground"], colors["background"], 0.5),
         "login_fail": colors["red"],
         "login_caps": colors["yellow"],
-        "login_box_opacity": str(shell["lockBoxOpacity"] / 100),
-        "login_show_box": "true" if shell["lockBox"] else "false",
-        "login_show_clock": "true" if shell["lockClock"] else "false",
         "login_show_avatar": "true" if shell["lockAvatar"] else "false",
         "login_power_bg": colors["background"],
         "login_power_opacity": str(shell["lockPowerOpacity"] / 100),
-        "login_power_icon": colors["foreground"],
-        # the text color at 40%, as Qt writes it (#AARRGGBB)
+        # the text color at 40% and 25% (idle and hovered borders, as the shell's), as Qt
+        # writes it (#AARRGGBB)
         "login_power_outline": "#66" + colors["foreground"][1:],
+        "login_power_hover_outline": "#40" + colors["foreground"][1:],
         "login_input_opacity": str(shell["lockInputOpacity"] / 100),
+        # Settings > Lock Screen > Rounded corners: the password field's (lock, login and boot
+        # screens) and the login screen's buttons; the windows' corner radius, or 6 with it at 0
+        "login_radius": str((int(shell["radius"]) or 6) if shell["lockRounded"] else 0),
         "icon_theme": icon_theme_for(shell["iconTheme"], mode),
         "prefer_dark": "0" if mode == "light" else "1",
         # adw-gtk3, when installed, follows gtk.css in plain GTK3 and GTK4 apps too;

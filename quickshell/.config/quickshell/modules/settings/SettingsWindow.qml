@@ -28,6 +28,8 @@ FloatingWindow {
     property string section: "appearance"
     property var cursorThemes: ["Adwaita"]
     property var iconThemes: ["Papirus"]
+    // Lock Screen: a setting the boot splash draws changed since it was last built
+    property bool bootStale: false
 
     function cycle(list: var, value: var, step: int): var {
         const i = Math.max(0, list.indexOf(value));
