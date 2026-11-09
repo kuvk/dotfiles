@@ -36,7 +36,7 @@ hl.window_rule({
   opaque = true,
 })
 
--- The shell's windows (Settings, Displays, Keybindings) draw their own transparency
+-- The shell's windows (Settings, Keybindings) draw their own transparency
 -- (Settings > Style > Shell opacity): Hyprland's window opacity is overridden to full
 hl.window_rule({
   name = "quickshell-opaque",
@@ -51,10 +51,10 @@ hl.window_rule({
   opacity = "1.0 override 1.0 override",
 })
 
--- Quickshell's Settings, Displays and Keybindings: floating and centered (the shell reopens one that gets tiled)
+-- Quickshell's Settings and Keybindings: floating and centered (the shell reopens one that gets tiled)
 hl.window_rule({
   name = "quickshell-windows",
-  match = { class = "^org\\.quickshell$", title = "^(Settings|Displays|Keybindings)$" },
+  match = { class = "^org\\.quickshell$", title = "^(Settings|Keybindings)$" },
   float = true,
   center = true,
 })

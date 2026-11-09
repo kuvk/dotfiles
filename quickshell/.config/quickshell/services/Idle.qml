@@ -6,7 +6,7 @@ import Quickshell.Services.UPower
 import Quickshell.Wayland
 import qs.config
 
-// Idle: lock after Settings > Power & Screen > Idle's lock time, sleep after its sleep time (the battery times
+// Idle: lock after Settings > Screen & Sleep > Idle's lock time, sleep after its sleep time (the battery times
 // while unplugged on a machine with a battery). The lock stays on screen until then: the screens
 // go off when the machine sleeps (services/Lock.qml says why). After Omarchy's idle service (shell/plugins/services/idle,
 // github.com/basecamp/omarchy, MIT): Hyprland reports the idle time (ext-idle-notify,

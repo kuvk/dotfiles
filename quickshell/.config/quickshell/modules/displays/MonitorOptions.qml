@@ -8,7 +8,7 @@ import qs.services
 // The selected monitor: on/off, mode, scale, rotation, variable refresh, colors, depth, brightness, workspaces (Displays)
 // Selected monitor
 GridLayout {
-    // the Displays panel: its monitors, selection and actions
+    // the DisplaysEditor: its monitors, selection and actions
     required property var panel
 
     Layout.fillWidth: true
@@ -32,6 +32,7 @@ GridLayout {
     // The saved choice; with the lid closed and another monitor on, the laptop's
     // screen is off anyway (clamshell) and comes back as chosen here
     RowLayout {
+        Layout.fillWidth: true
         spacing: 10
 
         Switch {
@@ -41,6 +42,8 @@ GridLayout {
 
         StyledText {
             visible: !!panel.current?.lid_closed
+            Layout.fillWidth: true
+            wrapMode: Text.Wrap
             text: "Off while the lid is closed"
             color: Theme.dimText
             font.pixelSize: Theme.captionSize
@@ -53,6 +56,7 @@ GridLayout {
     }
 
     RowLayout {
+        Layout.fillWidth: true
         spacing: 10
 
         Switch {
@@ -64,6 +68,8 @@ GridLayout {
         }
 
         StyledText {
+            Layout.fillWidth: true
+            wrapMode: Text.Wrap
             text: "Gets the first workspaces with Default"
             color: Theme.dimText
             font.pixelSize: Theme.captionSize
@@ -101,6 +107,7 @@ GridLayout {
     RowLayout {
         id: vrrRow
 
+        Layout.fillWidth: true
         visible: !!panel.current?.enabled && !!panel.current?.vrr_capable
         spacing: 10
 
@@ -110,6 +117,8 @@ GridLayout {
         }
 
         StyledText {
+            Layout.fillWidth: true
+            wrapMode: Text.Wrap
             text: "May blink when it switches"
             color: Theme.dimText
             font.pixelSize: Theme.captionSize
@@ -137,6 +146,7 @@ GridLayout {
     RowLayout {
         id: depthRow
 
+        Layout.fillWidth: true
         visible: !!panel.current?.enabled && (panel.current?.max_bitdepth ?? 8) >= 10
         spacing: 10
 
@@ -146,6 +156,8 @@ GridLayout {
         }
 
         StyledText {
+            Layout.fillWidth: true
+            wrapMode: Text.Wrap
             text: "Smoother gradients"
             visible: (panel.current?.bitdepth ?? 10) === 10
             color: Theme.dimText
@@ -167,7 +179,7 @@ GridLayout {
 
         Layout.fillWidth: true
         // Reading the brightness takes a moment after opening: the row keeps its place
-        // meanwhile (invisible), so the window opens at its final size. Hidden for a monitor
+        // meanwhile (invisible), so the dropdown opens at its final size. Hidden for a monitor
         // without a brightness control (null).
         visible: !!panel.current?.enabled && value !== null
         opacity: value === undefined ? 0 : 1
@@ -232,16 +244,24 @@ GridLayout {
                 }
             }
 
+        }
+
+        RowLayout {
+            Layout.fillWidth: true
+            spacing: 8
+
+            StyledText {
+                Layout.fillWidth: true
+                text: "Click to assign or unassign. Outlined: on another monitor."
+                color: Theme.dimText
+                font.pixelSize: Theme.captionSize
+                wrapMode: Text.Wrap
+            }
+
             TextButton {
                 text: "Default"
                 onClicked: panel.defaultWorkspaces()
             }
-        }
-
-        StyledText {
-            text: "Click to assign or unassign. Outlined: on another monitor."
-            color: Theme.dimText
-            font.pixelSize: Theme.captionSize
         }
     }
 }

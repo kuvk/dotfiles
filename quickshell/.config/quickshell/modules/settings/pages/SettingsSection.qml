@@ -3,12 +3,13 @@ import QtQuick.Layouts
 import qs.config
 import qs.components
 
-// A section of a Settings page: a divider above it (none for the page's first), its heading in
-// capitals in the text color (as a dropdown's section, a step above its options' labels), its
-// hint below if any, then its options.
-// While the page doesn't fit the window (the window's foldSections), every section folds: an
-// arrow beside the heading (down while folded, up while open), a click on the heading opens or
-// folds it; the page's first section starts open, the rest folded.
+// A section of a Settings page: its heading in capitals in the text color (as a dropdown's
+// section, a step above its options' labels), its hint below if any, then its options.
+// While the page doesn't fit the window (the window's foldSections), the sections become
+// dropdowns: a divider between them, an arrow at the heading's right (down while folded, up
+// while open, lined up with the steppers' arrows and the switches' knobs), a click on the
+// heading opens or folds it with the dropdowns' slide; the page's first starts open, the rest
+// folded.
 ColumnLayout {
     id: section
 
@@ -30,60 +31,78 @@ ColumnLayout {
     // its height with its options shown, folded or not: the window adds these up to see whether
     // the page fits
     readonly property real fullHeight: Layout.topMargin
-        + (divider.visible ? divider.implicitHeight + 4 + spacing : 0)
-        + (header.visible ? header.implicitHeight + spacing : 0)
+        + (divider.visible ? divider.implicitHeight + divider.Layout.topMargin + divider.Layout.bottomMargin : 0)
+        + (header.visible ? header.implicitHeight + 16 : 0)
         + body.implicitHeight
 
     Layout.fillWidth: true
-    Layout.topMargin: 8
-    spacing: 12
+    // as dropdowns the divider spaces them, evenly above and below each heading
+    Layout.topMargin: folds ? 0 : 8
+    // the gaps are the parts' own margins: a folded section leaves none under its heading
+    spacing: 0
 
-    // between sections, as in dropdowns
     Separator {
         id: divider
 
-        visible: section.title !== "" && !section.first
+        Layout.bottomMargin: 14
+        visible: section.folds && !section.first
     }
 
     // no title: no heading, the options show as they are
-    RowLayout {
+    Item {
         id: header
 
         Layout.fillWidth: true
+        Layout.bottomMargin: section.showsBody ? 16 : 0
         visible: section.title !== ""
-        spacing: 12
+        implicitHeight: headerRow.implicitHeight
 
-        ColumnLayout {
-            Layout.fillWidth: true
-            spacing: 0
+        RowLayout {
+            id: headerRow
 
-            Caption {
+            anchors.fill: parent
+            spacing: 12
+
+            ColumnLayout {
                 Layout.fillWidth: true
-                text: section.title
-                color: Theme.foreground
-                font.pixelSize: Theme.fontSize
+                spacing: 0
+
+                Caption {
+                    Layout.fillWidth: true
+                    text: section.title
+                    color: Theme.foreground
+                    font.pixelSize: Theme.fontSize
+                }
+
+                StyledText {
+                    Layout.fillWidth: true
+                    visible: text !== ""
+                    text: section.hint
+                    color: Theme.dimText
+                    font.pixelSize: Theme.captionSize
+                    elide: Text.ElideMiddle
+                }
             }
 
-            StyledText {
-                Layout.fillWidth: true
-                visible: text !== ""
-                text: section.hint
-                color: Theme.dimText
-                font.pixelSize: Theme.captionSize
-                elide: Text.ElideMiddle
+            // as wide as a stepper's arrow button, so the arrows line up
+            Item {
+                visible: section.folds
+                implicitWidth: 26
+                implicitHeight: 26
+
+                Icon {
+                    anchors.centerIn: parent
+                    text: section.open ? Icons.chevronUp : Icons.chevronDown
+                    color: Theme.subtext
+                }
             }
         }
 
-        Icon {
-            visible: section.folds
-            text: section.open ? Icons.chevronUp : Icons.chevronDown
-            color: Theme.subtext
-        }
-
-        TapHandler {
+        MouseArea {
+            anchors.fill: parent
             enabled: section.folds
             cursorShape: Qt.PointingHandCursor
-            onTapped: section.open = !section.open
+            onClicked: section.open = !section.open
         }
     }
 
@@ -91,9 +110,15 @@ ColumnLayout {
     // would seem to fit again
     Item {
         Layout.fillWidth: true
-        Layout.topMargin: section.showsBody ? 0 : -section.spacing
         implicitHeight: section.showsBody ? body.implicitHeight : 0
         clip: true
+
+        Behavior on implicitHeight {
+            NumberAnimation {
+                duration: Theme.animDuration * 1.6
+                easing.type: Easing.OutCubic
+            }
+        }
 
         ColumnLayout {
             id: body

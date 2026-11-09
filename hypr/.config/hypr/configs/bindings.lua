@@ -44,7 +44,7 @@ hl.bind(mainMod .. " + CONTROL + space", hl.dsp.exec_cmd(appMenu)) -- App menu w
 hl.bind(mainMod .. " + SHIFT + B", hl.dsp.exec_cmd(bar)) -- Show / hide the bar
 hl.bind(mainMod .. " + CONTROL + B", hl.dsp.exec_cmd("qs ipc call bar floating")) -- Floating / full-width bar
 hl.bind(mainMod .. " + CONTROL + T", hl.dsp.exec_cmd(themes)) -- Theme carousel
-hl.bind(mainMod .. " + CONTROL + M", hl.dsp.exec_cmd(displays)) -- Displays
+hl.bind(mainMod .. " + CONTROL + M", hl.dsp.exec_cmd(displays)) -- the Displays dropdown
 hl.bind(mainMod .. " + CONTROL + S", hl.dsp.exec_cmd(settings)) -- Settings
 hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd(sysinfo)) -- System information
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(music)) -- Music player (cliamp)

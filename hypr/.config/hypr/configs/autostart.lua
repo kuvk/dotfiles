@@ -17,7 +17,7 @@ hl.on("hyprland.start", function()
 end)
 
 -- Switch to the saved layout for whatever monitors are now connected
--- (profiles in ~/.config/hypr/monitors.json, edited in the Displays panel)
+-- (profiles in ~/.config/hypr/monitors.json, edited in Displays: the bar's dropdown or Settings)
 local function monitors_changed()
   hl.exec_cmd("~/.local/bin/hyprdori-monitors hotplug")
 end

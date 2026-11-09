@@ -83,14 +83,14 @@ Singleton {
     // ({ "HDMI-A-1": ["displays"] }); a monitor not in it shows every module
     property alias barHidden: adapter.barHidden
 
-    // Power & Screen > Idle: minutes until the screen locks and the machine sleeps, 0 is never;
+    // Screen & Sleep > Idle: minutes until the screen locks and the machine sleeps, 0 is never;
     // *Battery on battery (services/Idle.qml)
     property alias idleLock: adapter.idleLock
     property alias idleSuspend: adapter.idleSuspend
     property alias idleLockBattery: adapter.idleLockBattery
     property alias idleSuspendBattery: adapter.idleSuspendBattery
 
-    // Power & Screen > Night light
+    // Screen & Sleep > Night light
     property alias nightlightSchedule: adapter.nightlightSchedule
     // the schedule may cross midnight
     property alias nightlightStart: adapter.nightlightStart
@@ -248,13 +248,13 @@ Singleton {
             // Bar > Per monitor
             property var barHidden: ({})
 
-            // Power & Screen > Idle
+            // Screen & Sleep > Idle
             property int idleLock: 5
             property int idleSuspend: 20
             property int idleLockBattery: 3
             property int idleSuspendBattery: 10
 
-            // Power & Screen > Night light
+            // Screen & Sleep > Night light
             property bool nightlightSchedule: false
             property string nightlightStart: "20:00"
             property string nightlightEnd: "07:00"

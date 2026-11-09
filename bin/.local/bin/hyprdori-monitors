@@ -20,7 +20,7 @@ current live layout, and workspaces are split across the monitors.
 
 Workspaces by default: the primary monitor gets 1-5, a second monitor 6-10,
 with three monitors 3 each (1-3 on the primary). Any workspace can be
-assigned or left unassigned in the Displays panel.
+assigned or left unassigned in Displays (the bar's dropdown, or Settings).
 
 Per monitor also: variable refresh rate (off by default: turning it on and off at
 fullscreen blanks some screens for a moment) and the color mode: sRGB, or the panel's

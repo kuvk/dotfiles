@@ -58,7 +58,7 @@ Singleton {
     // The shell's own windows stay floating: Hyprland has no rule that forbids
     // tiling, so when one is tiled (changefloatingmode ADDRESS,0) it is
     // reopened, and the floating rule (rules.lua) applies again
-    readonly property var shellWindows: ({ "Settings": "settings", "Displays": "displays", "Keybindings": "keybinds" })
+    readonly property var shellWindows: ({ "Settings": "settings", "Keybindings": "keybinds" })
 
     function keepFloating(data: string): void {
         const [address, floating] = data.split(",");

@@ -9,8 +9,8 @@ import qs.services
 // Every keybinding (SUPER+/). Hyprland's
 // come from ~/.config/hypr/configs/bindings.lua through hypr-keybinds.py, so
 // the list follows that file; the shell's own keys inside its windows are
-// listed below them. Type to filter. A regular window like Settings and
-// Displays (floating and centered by a Hyprland rule, can be tiled).
+// listed below them. Type to filter. A regular window like Settings (floating and centered
+// by a Hyprland rule, can be tiled).
 FloatingWindow {
     id: root
 

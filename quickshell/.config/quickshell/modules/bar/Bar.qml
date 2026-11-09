@@ -5,6 +5,7 @@ import Quickshell.Wayland
 import qs.config
 import qs.components
 import qs.services
+import qs.modules.displays
 import qs.modules.dropdowns
 import qs.modules.audio
 import qs.modules.network
@@ -23,6 +24,11 @@ PanelWindow {
         const pos = item.mapToItem(null, item.width / 2, 0);
         // window coordinates, plus the floating bar's margin
         Panels.toggleDropdown(name, screen, pos.x + Theme.barMargin);
+    }
+
+    // SUPER+CTRL+M: the Displays dropdown from this bar's monitor icon
+    function toggleDisplays(): void {
+        toggle("displays", displaysButton);
     }
 
     function isOpen(name: string): bool {
@@ -266,10 +272,12 @@ PanelWindow {
         }
 
         BarButton {
+            id: displaysButton
+
             visible: barWindow.shows("displays")
-            active: Panels.displays
+            active: barWindow.isOpen("displays")
             tooltip: "Displays"
-            onClicked: Panels.toggleDisplays()
+            onClicked: barWindow.toggle("displays", displaysButton)
 
             Icon {
                 font.pixelSize: Theme.barIconSize
@@ -348,6 +356,10 @@ PanelWindow {
     }
 
     BatteryDropdown {
+        bar: barWindow
+    }
+
+    DisplaysDropdown {
         bar: barWindow
     }
 

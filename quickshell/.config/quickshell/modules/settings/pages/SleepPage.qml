@@ -5,8 +5,8 @@ import qs.config
 import qs.components
 import qs.services
 
-// Settings > Power & Screen: when the screen locks and the machine sleeps (Idle; a second pair
-// on battery where there is one), and the night light's warmth and schedule (Night Light)
+// Settings > Screen & Sleep: when the screen locks and the machine sleeps (Idle; a second pair
+// on battery where there is one), and the night light's warmth and schedule (Night light)
 ColumnLayout {
     // the Settings window: its helpers (clamp, cycle, minutesText, ...) and shared state
     required property var settings
@@ -16,7 +16,6 @@ ColumnLayout {
 
     SettingsSection {
         title: "Idle"
-        hint: "Minutes without input; Stay Awake and playing media hold both off"
 
         Repeater {
             model: [

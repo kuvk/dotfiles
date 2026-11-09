@@ -1,17 +1,17 @@
 import QtQuick
 import QtQuick.Layouts
-import Quickshell
 import qs.config
 import qs.components
 import qs.services
 
-// Display settings: drag monitors to arrange them (they snap edge to edge),
-// pick resolution and scale, turn monitors on/off, assign workspaces, set
-// brightness and text size. Changes are saved per setup by hyprdori-monitors.
-FloatingWindow {
+// Display settings, in the Displays dropdown and on Settings' Displays page: drag monitors to
+// arrange them (they snap edge to edge), pick resolution and scale, turn monitors on and off,
+// assign workspaces, set brightness and text size. Each shown editor works on its own copy of
+// Displays.info, loaded when it shows; Apply saves it for this combination of monitors
+// (hyprdori-monitors).
+ColumnLayout {
     id: root
 
-    readonly property bool shown: Panels.displays
     readonly property var scalePresets: [1, 1.25, 1.333333, 1.5, 1.6, 1.666667, 1.75, 2, 2.5, 3, 4]
     // Hyprland's per-monitor vrr values, and color modes (cm)
     readonly property var vrrNames: ["Off", "Always", "Fullscreen", "Games and video"]
@@ -212,22 +212,18 @@ FloatingWindow {
         dirty = false;
     }
 
-    visible: shown
-    title: "Displays"
-    color: Theme.panelBg
-    // grows with wider fonts (e.g. a monospaced Nerd Font) so the content
-    // never runs into the right edge
-    implicitWidth: Math.max(Math.round(760 * Theme.textScale), Math.ceil(content.implicitWidth + 32))
-    implicitHeight: Math.ceil(content.implicitHeight + 32)
-    // can grow, not shrink below the default size
-    minimumSize: Qt.size(implicitWidth, implicitHeight)
+    Layout.fillWidth: true
+    spacing: 14
 
-    // created on each opening (LazyLoader in shell.qml)
-    Component.onCompleted: {
-        load();
-        Displays.refresh();
-        background.forceActiveFocus();
+    // a fresh copy each time it shows; brightness is read only while one shows (Displays.qml)
+    onVisibleChanged: {
+        if (visible) {
+            load();
+            // once Panels.displays has caught up, so the brightness is read too
+            Qt.callLater(Displays.refresh);
+        }
     }
+    Component.onCompleted: if (visible) load()
 
     Connections {
         target: Displays
@@ -238,86 +234,47 @@ FloatingWindow {
         }
     }
 
-    // A regular window (floating and centered by a Hyprland rule, can be
-    // tiled); closing it from Hyprland updates the panel state
-    onClosed: Panels.displays = false
+    MonitorCanvas {
+        panel: root
+    }
 
-    Rectangle {
-        id: background
+    MonitorPicker {
+        panel: root
+    }
 
-        anchors.fill: parent
-        color: Theme.panelBg
-        focus: root.shown
-        Keys.onEscapePressed: Panels.displays = false
+    MonitorOptions {
+        panel: root
+    }
 
-        ColumnLayout {
-            id: content
+    Separator {}
 
-            anchors.fill: parent
-            anchors.margins: 16
-            spacing: 14
+    TextSize {
+        panel: root
+    }
 
-            SectionHeader {
-                title: "Displays"
+    RowLayout {
+        Layout.fillWidth: true
+        spacing: 8
 
-                StyledText {
-                    anchors.verticalCenter: parent.verticalCenter
-                    visible: Displays.busy
-                    text: "Applying…"
-                    color: Theme.subtext
-                }
+        StyledText {
+            Layout.fillWidth: true
+            text: Displays.busy ? "Applying…" : "Saved for this combination of monitors"
+            color: Theme.dimText
+            font.pixelSize: Theme.captionSize
+            wrapMode: Text.Wrap
+        }
 
-                CloseButton {
-                    onClicked: Panels.displays = false
-                }
-            }
+        TextButton {
+            text: "Revert"
+            enabled: root.dirty
+            onClicked: root.load()
+        }
 
-            MonitorCanvas {
-                panel: root
-            }
-
-            MonitorPicker {
-                panel: root
-            }
-
-            MonitorOptions {
-                panel: root
-            }
-
-            Rectangle {
-                Layout.fillWidth: true
-                implicitHeight: 1
-                color: Theme.selection
-            }
-
-            TextSize {
-                panel: root
-            }
-
-            RowLayout {
-                Layout.fillWidth: true
-                spacing: 8
-
-                StyledText {
-                    Layout.fillWidth: true
-                    text: "Saved for this combination of monitors"
-                    color: Theme.dimText
-                    font.pixelSize: Theme.captionSize
-                }
-
-                TextButton {
-                    text: "Revert"
-                    enabled: root.dirty
-                    onClicked: root.load()
-                }
-
-                TextButton {
-                    text: "Apply"
-                    primary: true
-                    enabled: root.dirty && !Displays.busy
-                    onClicked: root.applyChanges()
-                }
-            }
+        TextButton {
+            text: "Apply"
+            primary: true
+            enabled: root.dirty && !Displays.busy
+            onClicked: root.applyChanges()
         }
     }
 }

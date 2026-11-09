@@ -17,7 +17,10 @@ Singleton {
     property real dropdownX: 0
 
     property bool controlCenter: false
-    property bool displays: false
+    // a Displays editor is showing: the dropdown, or Settings' Displays page (brightness is
+    // read only then, the brightness popup stays quiet)
+    property bool displaysPage: false
+    readonly property bool displays: dropdown === "displays" || displaysPage
     property bool powerMenu: false
     property bool settings: false
     property bool keybinds: false
@@ -84,14 +87,12 @@ Singleton {
         bars = bars.filter(b => b !== bar);
     }
 
-    // Switching workspaces (keys or mouse) closes the dropdowns
+    // Switching workspaces (keys or mouse) hides a tooltip; open dropdowns, the app menu and
+    // Control Center stay
     Connections {
         target: Hyprland
 
         function onFocusedWorkspaceChanged(): void {
-            root.dropdown = "";
-            root.appMenu = false;
-            root.controlCenter = false;
             root.tooltip = "";
         }
     }
@@ -136,12 +137,9 @@ Singleton {
         controlCenter = open;
     }
 
-    // Settings and Displays are regular windows: opening them closes the
-    // overlays, but nothing else closes them
+    // The Displays dropdown on the focused monitor's bar (its keybind)
     function toggleDisplays(): void {
-        const open = !displays;
-        closeAll();
-        displays = open;
+        bars.find(b => b.screen === focusedScreen)?.toggleDisplays();
     }
 
     function togglePowerMenu(): void {

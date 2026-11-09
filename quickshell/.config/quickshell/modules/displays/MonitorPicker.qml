@@ -8,7 +8,7 @@ import qs.services
 // A chip per monitor, disabled ones too; the chosen one is edited below (Displays)
 // Monitor picker (also lists disabled monitors)
 Flow {
-    // the Displays panel: its monitors, selection and actions
+    // the DisplaysEditor: its monitors, selection and actions
     required property var panel
 
     Layout.fillWidth: true

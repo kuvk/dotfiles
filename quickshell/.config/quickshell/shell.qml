@@ -86,12 +86,6 @@ ShellRoot {
     // opening starts at its default size (Hyprland keeps a resized size
     // otherwise)
     LazyLoader {
-        active: Panels.displays
-
-        DisplaysPanel {}
-    }
-
-    LazyLoader {
         active: Panels.settings
 
         SettingsWindow {}

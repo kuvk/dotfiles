@@ -11,7 +11,7 @@ import qs.services
 ColumnLayout {
     id: root
 
-    // the Displays panel: its monitors, selection and actions
+    // the DisplaysEditor: its monitors, selection and actions
     required property var panel
     // the steps, in px; 12 is the default
     readonly property var stops: [9, 10, 11, 12, 14, 16, 20]

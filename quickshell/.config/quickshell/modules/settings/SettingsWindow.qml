@@ -18,7 +18,8 @@ FloatingWindow {
         { id: "style", label: "Style", icon: Icons.palette },
         { id: "fonts", label: "Fonts", icon: Icons.font },
         { id: "bar", label: "Bar", icon: Icons.sliders },
-        { id: "power", label: "Power & Screen", icon: Icons.power }
+        { id: "displays", label: "Displays", icon: Icons.display },
+        { id: "sleep", label: "Screen & Sleep", icon: Icons.bed }
     ]
     property string section: "style"
     // The page's height with every section open; while it's taller than the room for it, its
@@ -37,6 +38,13 @@ FloatingWindow {
         return height + Math.max(0, shown - 1) * current.spacing;
     }
     readonly property bool foldSections: pageFullHeight > settingsFlick.height
+
+    // its Displays page reads brightness while it shows (Panels.displays)
+    Binding {
+        target: Panels
+        property: "displaysPage"
+        value: root.shown && root.section === "displays"
+    }
     property var cursorThemes: ["Adwaita"]
     property var iconThemes: ["Papirus"]
     // Lock Screen: a setting the boot splash draws changed since it was last built
@@ -47,7 +55,7 @@ FloatingWindow {
         return list[(i + step + list.length) % list.length];
     }
 
-    // Settings > Power & Screen > Idle: minutes, 0 is never
+    // Settings > Screen & Sleep > Idle: minutes, 0 is never
     readonly property var idleSteps: [0, 1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120, 180]
 
     function minutesText(minutes: int): string {
@@ -231,9 +239,14 @@ FloatingWindow {
                             visible: root.section === "bar"
                         }
 
-                        PowerPage {
+                        DisplaysPage {
                             settings: root
-                            visible: root.section === "power"
+                            visible: root.section === "displays"
+                        }
+
+                        SleepPage {
+                            settings: root
+                            visible: root.section === "sleep"
                         }
                     }
                 }

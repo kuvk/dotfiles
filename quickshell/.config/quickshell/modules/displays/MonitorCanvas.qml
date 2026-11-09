@@ -8,7 +8,7 @@ import qs.services
 // The monitors as tiles to drag into place; they snap to each other's edges (Displays)
 // Arrangement
 Rectangle {
-    // the Displays panel: its monitors, selection and actions
+    // the DisplaysEditor: its monitors, selection and actions
     required property var panel
 
     id: area

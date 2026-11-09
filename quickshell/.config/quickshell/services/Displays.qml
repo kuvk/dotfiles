@@ -19,7 +19,7 @@ Singleton {
 
     Component.onCompleted: refresh()
 
-    // Brightness only for the open Displays panel, never while locked: DDC/CI probes every
+    // Brightness only while Displays shows (the dropdown or Settings' page), never while locked: DDC/CI probes every
     // monitor's I2C bus, and doing that on each screen change caught the monitors waking
     // from sleep (the NVIDIA driver then failed to read their EDID)
     function refresh(): void {
