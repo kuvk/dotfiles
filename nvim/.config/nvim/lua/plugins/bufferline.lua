@@ -19,13 +19,11 @@ local function bar_highlights()
   return result
 end
 
+-- The "Neo Tree" label keeps lua/theme.lua's color and gets the editor's background
 local function custom_highlights()
-  local p = require("theme").palette
-  local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
-  vim.api.nvim_set_hl(0, "NeoTreeExplorerLabel", { fg = p.accent, bg = normal, bold = true })
-  if p.blue then
-    vim.api.nvim_set_hl(0, "StatusLine", { fg = p.blue })
-  end
+  local label = vim.api.nvim_get_hl(0, { name = "NeoTreeExplorerLabel", link = false })
+  label.bg = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
+  vim.api.nvim_set_hl(0, "NeoTreeExplorerLabel", label)
 end
 
 local options = {

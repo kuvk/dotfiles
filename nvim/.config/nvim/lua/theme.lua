@@ -60,6 +60,10 @@ local function custom_highlights()
     set(0, group, hl)
   end
   set(0, "WinSeparator", { fg = p.muted, bg = normal })
+  -- The status line without a background of its own: lualine's rounded ends sit on the
+  -- editor's, and nothing dark shows while it starts
+  set(0, "StatusLine", { fg = p.blue })
+  set(0, "StatusLineNC", { fg = p.dark_fg })
   set(0, "NeoTreeWinSeparator", { fg = p.muted, bg = normal })
   -- Trouble in the editor's background, like a file; its cursor line is CursorLine
   set(0, "TroubleNormal", { bg = normal })
@@ -94,14 +98,14 @@ local function custom_highlights()
   set(0, "NeoTreeLinkName", { fg = p.cyan, bold = true })
   set(0, "NeoTreeSymbolicLinkTarget", { fg = p.accent })
   set(0, "NeoTreeBrokenLinkTarget", { fg = p.red })
-  -- The "Neo Tree" label above neo-tree (bufferline's offset), in the accent; bufferline.lua
-  -- gives it the bar's look
-  set(0, "NeoTreeExplorerLabel", { fg = p.accent, bold = true })
-  -- Dashboard: the NEOVIM lettering in the accent, the logo (ascii-dori) in magenta, buttons in
-  -- the text color with their keys in the accent
-  set(0, "AlphaHeader", { fg = p.accent })
-  set(0, "AlphaButtons", { fg = p.fg })
-  set(0, "AlphaShortcut", { fg = p.accent })
+  -- The "Neo Tree" label above neo-tree (bufferline's offset), in cyan; bufferline.lua gives it
+  -- the bar's background
+  set(0, "NeoTreeExplorerLabel", { fg = p.cyan, bold = true })
+  -- Dashboard: the NEOVIM lettering in cyan, the logo (ascii-dori) in magenta, buttons in the
+  -- accent with their keys in yellow
+  set(0, "AlphaHeader", { fg = p.cyan })
+  set(0, "AlphaButtons", { fg = p.accent })
+  set(0, "AlphaShortcut", { fg = p.yellow })
   set(0, "AlphaFooter", { fg = p.magenta })
   -- Diagnostic text at the end of a line, with no background
   for _, level in ipairs({ "Error", "Warn", "Info", "Hint" }) do
@@ -229,7 +233,17 @@ function M.setup()
     return
   end
   M.started = true
-  vim.api.nvim_create_autocmd("ColorScheme", { callback = custom_highlights })
+  vim.api.nvim_create_autocmd("ColorScheme", {
+    callback = function()
+      custom_highlights()
+      -- A theme switch while running leaves parts of the screen (the file tree, Trouble, the tab
+      -- bar) drawn on the terminal's background; redraw all of it once the plugins have
+      -- rebuilt their colors (bufferline and lualine do it scheduled)
+      vim.defer_fn(function()
+        vim.cmd("redraw!")
+      end, 50)
+    end,
+  })
   vim.api.nvim_create_autocmd("User", { pattern = { "ThemeShape", "VeryLazy" }, callback = M.apply_shape })
   M.apply()
 
