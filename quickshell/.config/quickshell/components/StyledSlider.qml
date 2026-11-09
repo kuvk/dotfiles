@@ -2,13 +2,15 @@ import QtQuick
 import qs.config
 
 // Minimal slider, value in [0, to]. Emits moved() while dragging. The fill and knob in the
-// text color on a track of the selected fill, like every progress bar in the shell.
+// text color on a track of the selected fill, like every progress bar in the shell; without
+// the knob (`knob: false`) it looks like a progress bar, and is dragged the same way.
 Item {
     id: root
 
     property real value: 0
     property real to: 1
     property color color: Theme.foreground
+    property bool knob: true
     signal moved(real value)
 
     implicitHeight: 18
@@ -36,6 +38,7 @@ Item {
     }
 
     Rectangle {
+        visible: root.knob
         x: Math.min(1, root.value / root.to) * (root.width - width)
         anchors.verticalCenter: parent.verticalCenter
         width: 14

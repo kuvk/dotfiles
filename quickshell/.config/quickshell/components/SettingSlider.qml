@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import qs.config
 
 // A setting set by dragging: its name in small capitals with the value on the right ("95.0%"),
-// the slider under them. `value` runs from `from` to `to`; changed() gives the new one, to a
+// the slider under them, a bar without a knob. `value` runs from `from` to `to`; changed() gives the new one, to a
 // thousandth (a tenth of a percent).
 ColumnLayout {
     id: root
@@ -30,6 +30,7 @@ ColumnLayout {
     }
 
     SliderRow {
+        knob: false
         value: root.value - root.from
         to: root.to - root.from
         onMoved: v => root.changed(Math.round((root.from + v) * 1000) / 1000)
