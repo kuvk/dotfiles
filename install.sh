@@ -12,7 +12,8 @@
 # Steps: pacman.conf (multilib, the g14 repo on ASUS laptops), mirrors (reflector), config links
 # (stow; files in the way go to ~/.hyprdori-backup), packages (packages/*.txt by detected
 # hardware), Flatpak, services, zsh and its plugins, the theme, then boot: initramfs and kernel options,
-# Plymouth, Limine. The login screen (SDDM) comes with the theme.
+# Plymouth, Limine. The login screen (SDDM) comes with the theme, or autologin if chosen (the
+# default with encrypted drives).
 set -euo pipefail
 
 hyprdori=$(dirname "$(readlink -f "$0")")
@@ -75,9 +76,14 @@ if ask "Virtual machines and Docker (packages/vm.txt)?" y; then
 fi
 flatpak=false
 ask "Flatpak apps (packages/flatpak.txt)?" y && flatpak=true
+# With encrypted drives the disk password already guards the machine, so autologin is the default
+encrypted=n
+grep -qE '^HOOKS=.*\b(sd-)?encrypt\b' /etc/mkinitcpio.conf 2>/dev/null && encrypted=y
+autologin=--no-autologin
+ask "Log in automatically, without the login screen (autologin)?" "$encrypted" && autologin=--autologin
 
 echo
-echo "Package lists: ${groups[*]}$($flatpak && echo ", flatpak")"
+echo "Package lists: ${groups[*]}$($flatpak && echo ", flatpak")$([[ $autologin == --autologin ]] && echo "; autologin")"
 ask "Continue?" y || exit 0
 
 # --- pacman.conf ----------------------------------------------------------------------------------
@@ -206,7 +212,7 @@ fi
 
 step "Theme"
 # The login screen first: hyprdori-theme-set writes its colors to the folder this makes
-sudo "$hyprdori/sddm/install.sh" >/dev/null
+sudo "$hyprdori/sddm/install.sh" "$autologin" >/dev/null
 # tmux's theme plugin (.tmux.conf would clone it on first start), so hyprdori-theme-set can write
 # the theme's colors into it now
 tmux_theme="$HOME/.tmux/plugins/catppuccin/tmux"
