@@ -48,11 +48,15 @@ PanelWindow {
     // panel size, plus the gap under the bar and a transparent margin (as in
     // dropdowns/Dropdown.qml, so fractional scales never cut the border)
     readonly property int gap: 6
-    readonly property int pad: 4
+    readonly property int pad: 4 + Theme.shadowPad
     readonly property int panelWidth: 680
     readonly property int panelHeight: 540
     implicitWidth: panelWidth + pad * 2
     implicitHeight: panelHeight + gap + pad
+    // only the panel takes the mouse, not the room around it
+    mask: Region {
+        item: menuPanel
+    }
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
     WlrLayershell.namespace: "quickshell-appmenu"
@@ -87,6 +91,8 @@ PanelWindow {
         clip: true
 
         Rectangle {
+            id: menuPanel
+
             x: root.pad
             y: Math.round(root.gap - (root.panelHeight + root.gap) * (1 - reveal.value))
             width: root.panelWidth
@@ -95,6 +101,8 @@ PanelWindow {
             radius: Theme.radius
             border.color: Theme.border
             border.width: Theme.borderWidth
+            layer.enabled: Theme.shadows
+            layer.effect: ShellShadow {}
 
             RowLayout {
                 anchors.fill: parent

@@ -60,8 +60,9 @@ Singleton {
     // Notifications
     // seconds a popup stays up; critical ones stay until closed
     property alias notificationTimeout: adapter.notificationTimeout
-    // on-screen notifications: an accent outline, and a shadow
-    property alias notificationShadow: adapter.notificationShadow
+    // a shadow under the shell's popups and notifications (Style > Shell), and under the bar (Bar)
+    property alias shadow: adapter.shadow
+    property alias barShadow: adapter.barShadow
 
     // Lock Screen, also the login screen's (hyprdori-theme-set --login); the colors are the theme's
     // the background: the theme's own (Theme.backgroundImage) until an image is chosen
@@ -231,7 +232,8 @@ Singleton {
 
             // Notifications
             property int notificationTimeout: 5
-            property bool notificationShadow: true
+            property bool shadow: true
+            property bool barShadow: false
 
             // Lock Screen
             property bool lockFollowsTheme: true

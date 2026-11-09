@@ -71,17 +71,8 @@ Item {
         border.color: root.critical ? Theme.red : Theme.border
         clip: true
 
-        layer.enabled: root.popup && !Theme.gamemode && Config.notificationShadow
-        // Close to Hyprland's window shadow (decoration.lua): black at 0x66, soft, slightly down
-        layer.effect: MultiEffect {
-            shadowEnabled: true
-            shadowColor: "black"
-            shadowOpacity: 0.4
-            blurMax: 30
-            shadowBlur: 0.5
-            shadowHorizontalOffset: 1
-            shadowVerticalOffset: 3
-        }
+        layer.enabled: root.popup && Theme.shadows
+        layer.effect: ShellShadow {}
 
         // Time left before the popup hides. Along the straight part of the top edge, between
         // the rounded corners, with rounded ends; edge to edge when corners are square.

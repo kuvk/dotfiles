@@ -43,16 +43,30 @@ PanelWindow {
         left: Theme.barMargin
         right: Theme.barMargin
     }
-    implicitHeight: Theme.barHeight
+    // with its shadow (Settings > Bar > Shadow) the window reaches below the bar for it, and
+    // keeps windows away only by the bar's height; only the bar takes the mouse
+    readonly property bool shadowed: Config.barShadow && !Theme.gamemode
+    implicitHeight: Theme.barHeight + (shadowed ? 14 : 0)
+    exclusiveZone: Theme.barHeight
+    mask: Region {
+        item: barBackground
+    }
     color: "transparent"
     WlrLayershell.namespace: "quickshell-bar"
 
     // Background: full width and square, or floating with rounded corners
     Rectangle {
-        anchors.fill: parent
+        id: barBackground
+
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: Theme.barHeight
         z: -1
         color: Theme.barBg
         radius: Theme.barRadius
+        layer.enabled: barWindow.shadowed
+        layer.effect: ShellShadow {}
 
         // the bar is part of the dropdowns' focus grab, so a click on its
         // empty space closes them here
@@ -73,7 +87,7 @@ PanelWindow {
     Row {
         anchors.left: parent.left
         anchors.leftMargin: 4
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenter: barBackground.verticalCenter
 
         BarButton {
             id: launcherButton
@@ -107,7 +121,7 @@ PanelWindow {
     BarButton {
         id: clockButton
 
-        anchors.centerIn: parent
+        anchors.centerIn: barBackground
         visible: barWindow.shows("clock")
         active: barWindow.isOpen("calendar")
         tooltip: Qt.formatDateTime(Time.date, "dddd\nd MMMM yyyy")
@@ -121,7 +135,7 @@ PanelWindow {
 
     BarButton {
         anchors.right: clockButton.left
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenter: barBackground.verticalCenter
         visible: barWindow.shows("layout") && Hypr.layout !== ""
         tooltip: `Keyboard layout\n${Hypr.layoutName || Hypr.layout}`
         onClicked: Hypr.nextLayout()
@@ -136,7 +150,7 @@ PanelWindow {
         id: weatherButton
 
         anchors.left: clockButton.right
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenter: barBackground.verticalCenter
         visible: barWindow.shows("weather") && Weather.ready
         active: barWindow.isOpen("weather")
         tooltip: `${Weather.description}\nFeels like ${Weather.feelsLike}${Weather.unit}\n${Weather.location}`
@@ -158,7 +172,7 @@ PanelWindow {
     Row {
         anchors.right: parent.right
         anchors.rightMargin: 4
-        anchors.verticalCenter: parent.verticalCenter
+        anchors.verticalCenter: barBackground.verticalCenter
 
         MediaWidget {
             id: media
