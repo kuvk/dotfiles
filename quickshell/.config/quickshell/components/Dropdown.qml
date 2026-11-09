@@ -26,7 +26,7 @@ PanelWindow {
     // scales never cut the right or bottom border
     readonly property int gap: 6
     readonly property int pad: 4
-    // wider with bigger text, as Omarchy's panels
+    // wider with bigger text
     readonly property int panelWidth: Math.round(contentWidth * Theme.textScale)
     readonly property int panelHeight: Math.ceil(column.implicitHeight + Theme.padding * 2)
     // While open, a change in height (switching tabs, content shown or hidden) slides the

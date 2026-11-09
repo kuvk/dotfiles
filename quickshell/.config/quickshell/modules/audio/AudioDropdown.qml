@@ -5,7 +5,7 @@ import qs.config
 import qs.components
 import qs.services
 
-// Sound, laid out like Omarchy's audio panel: the output's switch in the header, then for
+// Sound: the output's switch in the header, then for
 // output and input a label with the volume beside it, the slider, and the devices to choose
 // from; then each app's volume
 Dropdown {

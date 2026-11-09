@@ -2,7 +2,7 @@ import QtQuick
 import qs.config
 
 // Minimal slider, value in [0, to]. Emits moved() while dragging. The fill and knob in the
-// text color on a track of the selected fill, as Omarchy's sliders and progress bars.
+// text color on a track of the selected fill, like every progress bar in the shell.
 Item {
     id: root
 
@@ -24,7 +24,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         width: parent.width
         height: 6
-        radius: 3
+        radius: Theme.radius > 0 ? 3 : 0
         color: Theme.selectedFill
 
         Rectangle {
@@ -40,7 +40,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         width: 14
         height: 14
-        radius: 7
+        radius: Theme.radius > 0 ? 7 : 0
         color: root.color
         border.color: Theme.panelBg
         border.width: 2

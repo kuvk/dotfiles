@@ -25,13 +25,18 @@ Flow {
 
             width: chipText.implicitWidth + 24
             height: 30
+            hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onClicked: panel.selected = index
 
+            // like the other controls: selected filled, the rest framed; round, or square
+            // with the square shape
             Rectangle {
                 anchors.fill: parent
-                radius: height / 2
-                color: chip.index === panel.selected ? Theme.accent : Theme.cardBg
+                radius: Theme.radius > 0 ? height / 2 : 0
+                color: chip.index === panel.selected ? Theme.selectedFill : (chip.containsMouse ? Theme.hoverFill : Theme.idleFill)
+                border.width: chip.index === panel.selected ? 0 : Theme.controlBorder
+                border.color: chip.containsMouse ? Theme.hoverBorder : Theme.idleBorder
             }
 
             StyledText {
@@ -39,7 +44,8 @@ Flow {
 
                 anchors.centerIn: parent
                 text: chip.modelData.name + (!chip.modelData.enabled ? " (off)" : chip.modelData.lid_closed ? " (lid closed)" : "")
-                color: chip.index === panel.selected ? Theme.background : (chip.modelData.enabled && !chip.modelData.lid_closed ? Theme.foreground : Theme.dimText)
+                color: chip.modelData.enabled && !chip.modelData.lid_closed ? Theme.foreground : Theme.dimText
+                font.bold: chip.index === panel.selected
             }
         }
     }

@@ -2,7 +2,7 @@
 -- its plugin, which is installed here and loaded on :colorscheme. catppuccin is set up in
 -- catppuccin.lua; aether draws themes without a colorscheme of their own (lua/theme.lua).
 local specs, seen = {}, {}
-for _, file in ipairs(vim.fn.glob(vim.fn.expand("~/.config/theme/themes/*/neovim.lua"), false, true)) do
+for _, file in ipairs(vim.fn.glob(vim.fn.expand("~") .. "/.config/theme/themes/*/neovim.lua", false, true)) do
   local ok, theme = pcall(dofile, file)
   for _, spec in ipairs(ok and type(theme) == "table" and theme or {}) do
     local repo = spec[1]

@@ -159,6 +159,11 @@ function M.apply()
     end)
   end
 
+  -- a colorscheme plugin lazy.nvim hasn't loaded yet (the theme is applied during startup,
+  -- before lazy loads them on :colorscheme): load it first
+  pcall(function()
+    require("lazy.core.loader").colorscheme(theme.colorscheme)
+  end)
   if not pcall(vim.cmd.colorscheme, theme.colorscheme) then
     vim.notify("theme: colorscheme '" .. theme.colorscheme .. "' not available", vim.log.levels.WARN)
     vim.cmd.colorscheme(fallback.colorscheme)

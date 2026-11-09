@@ -6,8 +6,7 @@ import qs.components
 import qs.services
 
 // Text size for this combination of monitors: the shell, GTK apps and kitty. A slider on
-// fixed steps with its size in px beside the title, after Omarchy's display panel
-// (https://github.com/basecamp/omarchy, MIT). Applied with the panel's other changes.
+// fixed steps with its size in px beside the title. Applied with the panel's other changes.
 ColumnLayout {
     id: root
 

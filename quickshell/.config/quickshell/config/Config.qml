@@ -21,7 +21,7 @@ Singleton {
     property alias iconTheme: adapter.iconTheme
     property alias borderWidth: adapter.borderWidth
     property alias barOpacity: adapter.barOpacity
-    property alias panelOpacity: adapter.panelOpacity
+    property alias shellOpacity: adapter.shellOpacity
     // Hyprland windows in normal mode; fullscreen ones stay opaque
     property alias activeOpacity: adapter.activeOpacity
     property alias inactiveOpacity: adapter.inactiveOpacity
@@ -217,7 +217,7 @@ Singleton {
             property string iconTheme: "Papirus"
             property int borderWidth: 2
             property real barOpacity: 0.95
-            property real panelOpacity: 0.95
+            property real shellOpacity: 0.95
             property real activeOpacity: 0.98
             property real inactiveOpacity: 0.95
             property bool blur: true

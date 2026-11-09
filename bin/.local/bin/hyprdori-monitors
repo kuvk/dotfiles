@@ -32,7 +32,7 @@ screen even in SDR, and some screens (the Samsung Odyssey G50F) reconnect on it.
 Color depth: 10-bit by default where the screen takes it (its EDID: the color depth, or an
 HDMI screen's deep color flags), else 8.
 
-Text size is in px (9-20, default 12), like Omarchy's display text size: it
+Text size is in px (9-20, default 12): it
 sets the shell font, GTK's font size (hyprdori-theme-set --text-size) and kitty's
 font size.
 """
@@ -69,7 +69,7 @@ PROFILE_VERSION = 2
 VRR_MODES = (0, 1, 2, 3)  # off, always, fullscreen, games and video
 COLOR_MODES = ("srgb", "edid")
 
-# Text size anchors, as Omarchy's: 12 px is the shell's body text, a 9 pt kitty font and an
+# Text size anchors: 12 px is the shell's body text, a 9 pt kitty font and an
 # 11 pt GTK font
 TEXT_SIZE_DEFAULT = 12  # px, for a setup with no saved size
 TEXT_SIZE_BASE = 12

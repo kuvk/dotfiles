@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs the migrations in Hyprdori's migrations/ that haven't run on this machine yet, oldest
 # first: one-time changes an update needs, like moving a renamed folder. Done ones are listed
-# in ~/.local/state/hyprdori/migrations/. After Omarchy's migrations.
+# in ~/.local/state/hyprdori/migrations/.
 #
 #   hyprdori-migrate               run the new ones (hyprdori-update does)
 #   hyprdori-migrate --mark-done   count them all as done (a fresh install, install.sh)

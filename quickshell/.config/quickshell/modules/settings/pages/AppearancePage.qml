@@ -171,47 +171,39 @@ ColumnLayout {
         }
     }
 
-    SettingRow {
+    SettingSlider {
         label: "Bar opacity"
         normalOnly: true
         hint: "No blur below 50%"
-
-        Stepper {
-            text: `${Math.round(Config.barOpacity * 100)}%`
-            onStep: d => Config.barOpacity = Math.round(settings.clamp(Config.barOpacity + d * 0.05, 0.3, 1) * 100) / 100
-        }
+        from: 0.3
+        value: Config.barOpacity
+        onChanged: v => Config.barOpacity = v
     }
 
-    SettingRow {
-        label: "Panel opacity"
+    SettingSlider {
+        label: "Shell opacity"
         normalOnly: true
-        hint: "Dropdowns, launchers, tooltips"
-
-        Stepper {
-            text: `${Math.round(Config.panelOpacity * 100)}%`
-            onStep: d => Config.panelOpacity = Math.round(settings.clamp(Config.panelOpacity + d * 0.05, 0.5, 1) * 100) / 100
-        }
+        hint: "Dropdowns, launchers, Control Center, Settings and the other shell windows"
+        from: 0.5
+        value: Config.shellOpacity
+        onChanged: v => Config.shellOpacity = v
     }
 
-    SettingRow {
+    SettingSlider {
         label: "Active window opacity"
         normalOnly: true
-        hint: "Fullscreen windows stay opaque"
-
-        Stepper {
-            text: `${Math.round(Config.activeOpacity * 100)}%`
-            onStep: d => Config.activeOpacity = Math.round(settings.clamp(Config.activeOpacity + d * 0.01, 0.5, 1) * 100) / 100
-        }
+        hint: "Other apps' windows; browsers and fullscreen windows stay opaque"
+        from: 0.5
+        value: Config.activeOpacity
+        onChanged: v => Config.activeOpacity = v
     }
 
-    SettingRow {
+    SettingSlider {
         label: "Inactive window opacity"
         normalOnly: true
-
-        Stepper {
-            text: `${Math.round(Config.inactiveOpacity * 100)}%`
-            onStep: d => Config.inactiveOpacity = Math.round(settings.clamp(Config.inactiveOpacity + d * 0.01, 0.5, 1) * 100) / 100
-        }
+        from: 0.5
+        value: Config.inactiveOpacity
+        onChanged: v => Config.inactiveOpacity = v
     }
 
     SettingRow {

@@ -10,8 +10,7 @@ import Quickshell.Io
 //
 // Chrome is neutral: surfaces and controls are the text color at a low opacity (idle,
 // hover, selected). Color means something: the accent for selected text and focus, each bar
-// item in its own hue (Hues.qml), red for errors. After Omarchy's shell Style and Color
-// (https://github.com/basecamp/omarchy, MIT).
+// item in its own hue (Hues.qml), red for errors.
 Singleton {
     id: root
 
@@ -71,7 +70,9 @@ Singleton {
 
     // Surfaces. Gamemode turns blur off in Hyprland, so everything goes opaque.
     readonly property color barBg: alpha(background, gamemode ? 1 : Config.barOpacity)
-    readonly property color panelBg: alpha(background, gamemode ? 1 : Config.panelOpacity)
+    // Settings > Appearance > Shell opacity: dropdowns, the launcher, Control Center, Settings and
+    // the other shell windows (Hyprland leaves them opaque, rules.lua)
+    readonly property color panelBg: alpha(background, gamemode ? 1 : Config.shellOpacity)
     readonly property color cardBg: idleFill
     readonly property color hoverBg: hoverFill
     // popups and dropdowns are framed in the accent, as Hyprland frames the focused window
@@ -92,8 +93,8 @@ Singleton {
     readonly property string monoFont: Config.nerdFont || "JetBrainsMono Nerd Font"
 
     // Text size in px from Displays (~/.config/hypr/monitors.json): the body text, 12 by
-    // default. The other sizes scale with it as Omarchy's do; at 12: caption 10, small 11,
-    // subtitle 13, title 14, heading 16, display 24 and 28, icons 14 (18 large, 12 in the bar).
+    // default. The other sizes scale with it; at 12: caption 10, small 11,
+    // subtitle 13, title 14, heading 16, display 24 and 28, icons 14 (18 large; the bar's at the text size).
     property int textSize: 12
     readonly property real textScale: textSize / 12
     readonly property int fontSize: textSize
@@ -106,10 +107,8 @@ Singleton {
     readonly property int displayLargeSize: Math.round(28 * textScale)
     readonly property int iconSize: Math.round(14 * textScale)
     readonly property int iconLargeSize: Math.round(18 * textScale)
-    readonly property int barIconSize: Math.round(12 * textScale)
-    // Bar: workspace dots 1 px under the text size, the tray's arrow 2
-    readonly property int smallIconSize: textSize - 1
-    readonly property int tinyIconSize: textSize - 2
+    // the bar: icons, workspaces and text all at the text size
+    readonly property int barIconSize: textSize
     // the bar's height: 26 at 12 px
     readonly property int barHeight: Math.round(26 * textScale)
     // Floating bar (Settings > Bar): its own margin on the left, right and

@@ -42,6 +42,20 @@ hl.window_rule({
   opaque = true,
 })
 
+-- The shell's windows draw their own transparency (Settings > Appearance > Shell opacity)
+hl.window_rule({
+  name = "quickshell-opaque",
+  match = { class = "^org\\.quickshell$" },
+  opaque = true,
+})
+
+-- Browsers opaque: pages and video behind a see-through window don't read well
+hl.window_rule({
+  name = "browsers-opaque",
+  match = { class = "^(brave-browser|chromium|google-chrome|firefox|zen|librewolf|vivaldi-stable|brave-.*)$" },
+  opaque = true,
+})
+
 -- Quickshell's Settings, Displays and Keybindings: floating and centered (the shell reopens one that gets tiled)
 hl.window_rule({
   name = "quickshell-windows",
