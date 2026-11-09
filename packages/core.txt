@@ -87,7 +87,7 @@ ttf-nerd-fonts-symbols   # Quickshell's icons, kitty's symbol_map
 noto-fonts
 noto-fonts-emoji
 noto-fonts-cjk
-otf-apple-sf-pro-fixed   # AUR, login screen and Quickshell's display font
+otf-apple-sf-pro         # AUR, login screen and Quickshell's display font
 
 # Terminal
 kitty

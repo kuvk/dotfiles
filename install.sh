@@ -169,8 +169,19 @@ if ! command -v paru >/dev/null; then
     rm -rf "$build"
 fi
 mapfile -t wanted < <(for group in "${groups[@]}"; do list "$group"; done | sort -u)
-# paru installs repo and AUR packages alike, and asks once
-paru -Syu --needed "${wanted[@]}"
+# paru installs repo and AUR packages alike, and asks once. When that fails (an AUR package
+# that doesn't build), the rest go one at a time and the failures are listed: the install goes on
+if ! paru -Syu --needed "${wanted[@]}"; then
+    note "Not everything installed; trying the missing packages one at a time"
+    failed=()
+    for pkg in "${wanted[@]}"; do
+        pacman -Q "$pkg" &>/dev/null && continue
+        paru -S --needed --noconfirm "$pkg" || failed+=("$pkg")
+    done
+    if ((${#failed[@]})); then
+        note "Not installed: ${failed[*]}. The rest of the install goes on; try them later with paru -S."
+    fi
+fi
 
 if $flatpak; then
     step "Flatpak"
