@@ -73,6 +73,8 @@ Singleton {
     // Settings > Appearance > Shell opacity: dropdowns, the launcher, Control Center, Settings and
     // the other shell windows (Hyprland leaves them opaque, rules.lua)
     readonly property color panelBg: alpha(background, gamemode ? 1 : Config.shellOpacity)
+    // Behind full-screen overlays (power menu, pickers, network): the wallpaper dimmed and blurred
+    readonly property color backdrop: alpha(darkerBackground, gamemode ? 1 : 0.75)
     readonly property color cardBg: idleFill
     readonly property color hoverBg: hoverFill
     // popups and dropdowns are framed in the accent, as Hyprland frames the focused window

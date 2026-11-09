@@ -375,7 +375,7 @@ PanelWindow {
         id: background
 
         anchors.fill: parent
-        color: Theme.alpha(Theme.darkerBackground, Theme.gamemode ? 1 : 0.6)
+        color: Theme.backdrop
         // transparent until the window has its monitor's size and scale
         // (keys still work meanwhile)
         opacity: root.contentRevealed ? reveal.value : 0

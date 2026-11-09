@@ -212,7 +212,7 @@ PanelWindow {
         id: background
 
         anchors.fill: parent
-        color: Theme.alpha(Theme.darkerBackground, Theme.gamemode ? 1 : 0.6)
+        color: Theme.backdrop
         opacity: root.contentRevealed ? reveal.value : 0
         focus: root.shown
 
