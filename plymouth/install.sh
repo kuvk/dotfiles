@@ -42,9 +42,9 @@ else
     home=$HOME
 fi
 
-# The current theme's slots, or Catppuccin Mocha before hyprdori-theme-set has run
-base="#1e1e2e" surface0="#313244" text="#cdd6f4" subtext0="#a6adc8" mauve="#cba6f7"
-accent="#89b4fa" accent2="#89b4fa" magenta="#f5c2e7"
+# The current theme's colors, or Catppuccin's before hyprdori-theme-set has run
+background="#1e1e2e" foreground="#cdd6f4" subtext="#a2a8c2" accent="#89b4fa" magenta="#cba6f7"
+red="#f38ba8" yellow="#fab387"
 colors="$home/.config/theme/current/colors.sh"
 if [[ -r $colors ]]; then
     # shellcheck source=/dev/null
@@ -64,33 +64,34 @@ rgb() { awk -v r=$((16#${1:1:2})) -v g=$((16#${1:3:2})) -v b=$((16#${1:5:2})) 'B
 build=$(mktemp -d)
 trap 'rm -rf "$build"' EXIT
 
-# Images: the logo in magenta; the password field in surface0 with an accent outline, dots in
-# accent2, the progress bar in accent; the hint under the field in subtext0 (accent2, then accent after wrong
-# passwords); the farewell line in accent2, large, alone on the screen
+# Images, in the lock and login screens' look: the logo in magenta; the password field on the
+# background with an accent outline, dots in the text color; the hint under the field in the
+# secondary text color (yellow, then red after wrong passwords); the progress bar in the text
+# color on a faint track; the farewell line in red, large, alone on the screen
 # The logo drawn like kitty draws it, in 24px rows (scripts/.config/scripts/logo-render.py)
 "$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$magenta" --cell-height 24 --out "$build/logo.png"
 # The password field and progress bar are as wide as the logo; the field is a box with the
 # windows' corners (Hyprland's rounding) and a 2 px outline, like the lock and login screens'
 ew=$(magick identify -format %w "$build/logo.png")
-magick -size "${ew}x48" xc:none -fill "$surface0" -stroke "$accent" -strokewidth 2 \
+magick -size "${ew}x48" xc:none -fill "$background" -stroke "$accent" -strokewidth 2 \
     -draw "roundrectangle 1,1 $((ew - 2)),46 6,6" "$build/entry.png"
-magick -background none -fill "$subtext0" -font "$font" -pointsize 16 label:"Speak, friend, and enter!" "$build/hint.png"
-magick -background none -fill "$accent2" -font "$font" -pointsize 16 label:"Tell me, friend, when did you abandon reason for madness?" "$build/wrong1.png"
-magick -background none -fill "$accent" -font "$font" -pointsize 16 label:"You shall not pass!" "$build/wrong2.png"
-magick -background none -fill "$accent2" -font "$font" -pointsize 48 label:"Go back to the Shadow!" "$build/farewell.png"
-magick -size 14x14 xc:none -fill "$accent2" -draw "circle 7,7 7,1" "$build/bullet.png"
-magick -size "${ew}x10" xc:none -fill "$surface0" -draw "roundrectangle 0,0 $((ew - 1)),9 5,5" "$build/progress_box.png"
-magick -size "${ew}x10" xc:none -fill "$accent" -draw "roundrectangle 0,0 $((ew - 1)),9 5,5" "$build/progress_bar.png"
+magick -background none -fill "$subtext" -font "$font" -pointsize 16 label:"Speak, friend, and enter!" "$build/hint.png"
+magick -background none -fill "$yellow" -font "$font" -pointsize 16 label:"Tell me, friend, when did you abandon reason for madness?" "$build/wrong1.png"
+magick -background none -fill "$red" -font "$font" -pointsize 16 label:"You shall not pass!" "$build/wrong2.png"
+magick -background none -fill "$red" -font "$font" -pointsize 48 label:"Go back to the Shadow!" "$build/farewell.png"
+magick -size 14x14 xc:none -fill "$foreground" -draw "circle 7,7 7,1" "$build/bullet.png"
+magick -size "${ew}x10" xc:none -fill "${foreground}2e" -draw "roundrectangle 0,0 $((ew - 1)),9 5,5" "$build/progress_box.png"
+magick -size "${ew}x10" xc:none -fill "$foreground" -draw "roundrectangle 0,0 $((ew - 1)),9 5,5" "$build/progress_bar.png"
 # Encrypted drives get the password field first; without them the progress bar shows from the start
 encrypted=0
 grep -qE '^HOOKS=.*\b(sd-)?encrypt\b' /etc/mkinitcpio.conf && encrypted=1
-sed -e "s/@BG_RGB@/$(rgb "$base")/" -e "s/@TEXT_RGB@/$(rgb "$subtext0")/" -e "s/@ENCRYPTED@/$encrypted/" \
+sed -e "s/@BG_RGB@/$(rgb "$background")/" -e "s/@TEXT_RGB@/$(rgb "$subtext")/" -e "s/@ENCRYPTED@/$encrypted/" \
     "$here/hyprdori.script" >"$build/hyprdori.script"
-sed -e "s/@BG@/${base#\#}/" "$here/hyprdori.plymouth" >"$build/hyprdori.plymouth"
+sed -e "s/@BG@/${background#\#}/" "$here/hyprdori.plymouth" >"$build/hyprdori.plymouth"
 
 if [[ $mode == preview-farewell ]]; then
     # 1920x1080: the line alone, centered
-    magick -size 1920x1080 "xc:$base" "$build/farewell.png" -gravity center -composite "$preview"
+    magick -size 1920x1080 "xc:$background" "$build/farewell.png" -gravity center -composite "$preview"
     echo "Preview: $preview"
     exit 0
 fi
@@ -100,7 +101,7 @@ if [[ $mode == preview* ]]; then
     ly=$((540 - lh / 2)); ey=$((ly + lh + 40)); ex=$((960 - ew / 2))
     if [[ $mode == preview-progress ]]; then
         py=$((ey + 24 - 5))
-        magick -size 1920x1080 "xc:$base" \
+        magick -size 1920x1080 "xc:$background" \
             "$build/logo.png" -geometry +$((960 - lw / 2))+$ly -composite \
             "$build/progress_box.png" -geometry +$ex+$py -composite \
             \( "$build/progress_bar.png" -resize "$((ew * 6 / 10))x10!" \) -geometry +$ex+$py -composite \
@@ -108,7 +109,7 @@ if [[ $mode == preview* ]]; then
         echo "Preview: $preview"
         exit 0
     fi
-    magick -size 1920x1080 "xc:$base" \
+    magick -size 1920x1080 "xc:$background" \
         "$build/logo.png" -geometry +$((960 - lw / 2))+$ly -composite \
         "$build/entry.png" -geometry +$ex+$ey -composite \
         \( "$build/bullet.png" -resize 9x9 \) -geometry +$((ex + ew / 2 - 17))+$((ey + 19)) -composite \

@@ -214,27 +214,12 @@ def shell_settings() -> dict:
         "fontHinting": "slight",
         "fontAntialiasing": "rgba",
         "windowButtons": False,
-        "lockClockColor": "accent2",
-        "lockAvatarColor": "accent",
-        "lockBoxOutlineColor": "accent",
-        "lockBoxColor": "base",
-        "lockInputOutlineColor": "accent",
-        "lockInputColor": "base",
-        "lockDotsColor": "accent2",
-        "lockUserColor": "accent",
-        "lockTextColor": "text",
-        "lockCheckColor": "accent",
-        "lockFailColor": "red",
-        "lockCapsColor": "peach",
         "lockBoxOpacity": 90,
         "lockBox": False,
         "wallpaperFollowsTheme": True,
         "lockClock": False,
         "lockAvatar": True,
-        "lockPowerColor": "base",
         "lockPowerOpacity": 85,
-        "lockPowerIconColor": "accent2",
-        "lockPowerOutlineColor": "accent",
         "accentOverrides": {},
         "lockInputOpacity": 65,
         "cursorTheme": "Adwaita",
@@ -335,8 +320,8 @@ def palette(data: dict) -> tuple[dict, dict]:
 
 
 def shell_slots(c: dict) -> dict:
-    """Colors by the names Settings > Lock Screen saved before (base, mauve, ...), for the
-    login screen; dim text steps evenly from dark_foreground to foreground."""
+    """Colors by the names older settings saved (base, mauve, ...), for an accent chosen
+    then; dim text steps evenly from dark_foreground to foreground."""
     fg, dim = c["foreground"], c["dark_foreground"]
     return {
         "base": c["background"], "mantle": c["dark_background"], "crust": c["darker_background"],
@@ -397,7 +382,6 @@ def load_theme(name: str) -> dict:
     mode = theme_mode(data, colors)
 
     shell = shell_settings()
-    lock = shell_slots(colors)  # Settings > Lock Screen names its colors this way
     hinting, antialiasing = shell["fontHinting"], shell["fontAntialiasing"]
     strings = {
         "theme": name,
@@ -437,28 +421,29 @@ def load_theme(name: str) -> dict:
         "hypr_active_opacity": f"{float(shell['activeOpacity']):g}",
         "hypr_inactive_opacity": f"{float(shell['inactiveOpacity']):g}",
         "hypr_blur": "true" if shell["blur"] else "false",
-        # the login screen uses the lock screen's colors
-        "login_clock": lock.get(shell["lockClockColor"], lock["text"]),
-        "login_date": lock.get(shell["lockClockColor"], lock["text"]),  # one color for both
-        "login_avatar": lock.get(shell["lockAvatarColor"], lock["text"]),
-        "login_boxOutline": lock.get(shell["lockBoxOutlineColor"], lock["text"]),
-        "login_box": lock.get(shell["lockBoxColor"], lock["text"]),
-        "login_inputOutline": lock.get(shell["lockInputOutlineColor"], lock["text"]),
-        "login_input": lock.get(shell["lockInputColor"], lock["text"]),
-        "login_dots": lock.get(shell["lockDotsColor"], lock["text"]),
-        "login_user": lock.get(shell["lockUserColor"], lock["text"]),
-        "login_text": lock.get(shell["lockTextColor"], lock["text"]),
-        "login_check": lock.get(shell["lockCheckColor"], lock["text"]),
-        "login_fail": lock.get(shell["lockFailColor"], lock["text"]),
-        "login_caps": lock.get(shell["lockCapsColor"], lock["text"]),
+        # the login screen, as the lock screen: the theme's colors
+        "login_clock": colors["foreground"],
+        "login_date": colors["foreground"],
+        "login_avatar": colors["accent"],
+        "login_boxOutline": colors["accent"],
+        "login_box": colors["background"],
+        "login_inputOutline": colors["accent"],
+        "login_input": colors["background"],
+        "login_dots": colors["foreground"],
+        "login_user": colors["accent"],
+        "login_text": mix(colors["foreground"], colors["background"], 0.25),
+        "login_check": mix(colors["foreground"], colors["background"], 0.5),
+        "login_fail": colors["red"],
+        "login_caps": colors["yellow"],
         "login_box_opacity": str(shell["lockBoxOpacity"] / 100),
         "login_show_box": "true" if shell["lockBox"] else "false",
         "login_show_clock": "true" if shell["lockClock"] else "false",
         "login_show_avatar": "true" if shell["lockAvatar"] else "false",
-        "login_power_bg": lock.get(shell["lockPowerColor"], lock["base"]),
+        "login_power_bg": colors["background"],
         "login_power_opacity": str(shell["lockPowerOpacity"] / 100),
-        "login_power_icon": lock.get(shell["lockPowerIconColor"], lock["text"]),
-        "login_power_outline": lock.get(shell["lockPowerOutlineColor"], lock["text"]),
+        "login_power_icon": colors["foreground"],
+        # the text color at 40%, as Qt writes it (#AARRGGBB)
+        "login_power_outline": "#66" + colors["foreground"][1:],
         "login_input_opacity": str(shell["lockInputOpacity"] / 100),
         "icon_theme": icon_theme_for(shell["iconTheme"], mode),
         "prefer_dark": "0" if mode == "light" else "1",

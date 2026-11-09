@@ -64,33 +64,18 @@ Singleton {
     property alias notificationBorder: adapter.notificationBorder
     property alias notificationShadow: adapter.notificationShadow
 
-    // Lock Screen: colors are theme color names; they also go to the login screen (hyprdori-theme-set --login)
+    // Lock Screen, also the login screen's (hyprdori-theme-set --login); the colors are the theme's
     // the background: the theme's own (Theme.backgroundImage) until an image is chosen
     property alias lockFollowsTheme: adapter.lockFollowsTheme
     property alias lockImage: adapter.lockImage
     property alias lockClock: adapter.lockClock
-    property alias lockClockColor: adapter.lockClockColor
     property alias lockAvatar: adapter.lockAvatar
-    property alias lockAvatarColor: adapter.lockAvatarColor
     property alias lockBox: adapter.lockBox
-    property alias lockBoxOutlineColor: adapter.lockBoxOutlineColor
-    property alias lockBoxColor: adapter.lockBoxColor
-    // percent, like the other opacities here
+    // percent, to a tenth
     property alias lockBoxOpacity: adapter.lockBoxOpacity
-    property alias lockInputOutlineColor: adapter.lockInputOutlineColor
-    property alias lockInputColor: adapter.lockInputColor
     property alias lockInputOpacity: adapter.lockInputOpacity
-    property alias lockDotsColor: adapter.lockDotsColor
-    property alias lockUserColor: adapter.lockUserColor
-    property alias lockTextColor: adapter.lockTextColor
-    property alias lockCheckColor: adapter.lockCheckColor
-    property alias lockFailColor: adapter.lockFailColor
-    property alias lockCapsColor: adapter.lockCapsColor
     // the login screen's power buttons
-    property alias lockPowerColor: adapter.lockPowerColor
     property alias lockPowerOpacity: adapter.lockPowerOpacity
-    property alias lockPowerIconColor: adapter.lockPowerIconColor
-    property alias lockPowerOutlineColor: adapter.lockPowerOutlineColor
 
     // Idle: minutes until the screen locks and the machine sleeps, 0 is never; *Battery on battery (services/Idle.qml)
     property alias idleLock: adapter.idleLock
@@ -256,26 +241,11 @@ Singleton {
             property bool lockFollowsTheme: true
             property string lockImage: ""
             property bool lockClock: false
-            property string lockClockColor: "accent2"
             property bool lockAvatar: true
-            property string lockAvatarColor: "accent"
             property bool lockBox: false
-            property string lockBoxOutlineColor: "accent"
-            property string lockBoxColor: "base"
-            property int lockBoxOpacity: 90
-            property string lockInputOutlineColor: "accent"
-            property string lockInputColor: "base"
-            property int lockInputOpacity: 65
-            property string lockDotsColor: "accent2"
-            property string lockUserColor: "accent"
-            property string lockTextColor: "text"
-            property string lockCheckColor: "accent"
-            property string lockFailColor: "red"
-            property string lockCapsColor: "peach"
-            property string lockPowerColor: "base"
-            property int lockPowerOpacity: 85
-            property string lockPowerIconColor: "accent2"
-            property string lockPowerOutlineColor: "accent"
+            property real lockBoxOpacity: 90
+            property real lockInputOpacity: 65
+            property real lockPowerOpacity: 85
 
             // Idle
             property int idleLock: 5

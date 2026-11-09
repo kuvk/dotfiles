@@ -45,10 +45,12 @@ else
     home=$HOME
 fi
 
-# The current theme's slots, or Catppuccin Mocha before hyprdori-theme-set has run
-base="#1e1e2e" surface1="#45475a" surface2="#585b70" text="#cdd6f4" subtext1="#bac2de"
-subtext0="#a6adc8" overlay1="#7f849c" red="#f38ba8" green="#a6e3a1" yellow="#f9e2af"
-blue="#89b4fa" pink="#f5c2e7" teal="#94e2d5" mauve="#cba6f7" accent="#89b4fa" accent2="#89b4fa" magenta="#f5c2e7"
+# The current theme's colors, or Catppuccin's before hyprdori-theme-set has run
+background="#1e1e2e" selection="#45475a" muted="#585b70" foreground="#cdd6f4"
+light_foreground="#bac2de" bright_foreground="#cdd6f4" accent="#89b4fa" magenta="#cba6f7"
+red="#f38ba8" green="#a6e3a1" yellow="#fab387" blue="#89b4fa" cyan="#94e2d5"
+bright_red="#f38ba8" bright_green="#a6e3a1" bright_yellow="#f9e2af" bright_blue="#89b4fa"
+bright_magenta="#f5c2e7" bright_cyan="#94e2d5"
 colors="$home/.config/theme/current/colors.sh"
 if [[ -r $colors ]]; then
     # shellcheck source=/dev/null
@@ -116,7 +118,7 @@ wallpaper() {
     for k in "${found[@]}"; do line=$((7 + ${#k})); ((line > max_len)) && max_len=$line; done
     cols=$((res_w / cell_w)); prefix=$(((cols - max_len - 3) / 2))
     center=$(((res_w - cols * cell_w) / 2 + prefix * cell_w + (max_len - 1) * cell_w / 2))
-    magick -size "${res_w}x$res_h" "xc:$base" \
+    magick -size "${res_w}x$res_h" "xc:$background" \
         "$build/logo.png" -geometry +$((center - lw / 2))+$((top - 32 * scale - lh)) -composite "$1"
 }
 
@@ -128,20 +130,21 @@ timeout: 3
 default_entry: 2
 terse: yes
 interface_resolution: ${res_w}x$res_h
-interface_branding:
+interface_branding: Hyprdori
+interface_branding_colour: $(hex "$accent")
 interface_help_hidden: yes
-interface_help_colour: $(hex "$accent2")
-interface_help_colour_bright: $(hex "$accent")
+interface_help_colour: $(hex "$accent")
+interface_help_colour_bright: $(hex "$bright_foreground")
 wallpaper: boot():/EFI/limine/wallpaper.png
 wallpaper_style: centered
-backdrop: $(hex "$base")
+backdrop: $(hex "$background")
 term_font_scale: ${scale}x$scale
-term_background: ff$(hex "$base")
+term_background: ff$(hex "$background")
 term_foreground: $(hex "$accent")
-term_background_bright: $(hex "$surface1")
+term_background_bright: $(hex "$selection")
 term_foreground_bright: $(hex "$accent")
-term_palette: $(hex "$surface1" "$red" "$green" "$yellow" "$blue" "$pink" "$teal" "$subtext1")
-term_palette_bright: $(hex "$surface2" "$red" "$green" "$yellow" "$blue" "$pink" "$teal" "$subtext0")
+term_palette: $(hex "$selection" "$red" "$green" "$yellow" "$blue" "$magenta" "$cyan" "$light_foreground")
+term_palette_bright: $(hex "$muted" "$bright_red" "$bright_green" "$bright_yellow" "$bright_blue" "$bright_magenta" "$bright_cyan" "$bright_foreground")
 term_margin: 0
 term_margin_gradient: 0
 

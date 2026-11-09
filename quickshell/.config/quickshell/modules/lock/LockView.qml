@@ -6,7 +6,7 @@ import qs.services
 
 // What the lock screen shows on one screen: the background, and on the main screen the
 // clock and date top right and the avatar and password in a centered card. Laid out like
-// the login screen (sddm/hyprdori/Main.qml), with the colors from Settings > Lock Screen.
+// the login screen (sddm/hyprdori/Main.qml), in the theme's colors.
 // Keys typed on any screen go to the password: Hyprland gives the keyboard to one of the
 // lock surfaces, not always the main one.
 Item {
@@ -27,10 +27,6 @@ Item {
     }
 
     property date now: new Date()
-
-    function tint(name: string): color {
-        return Theme.named(name) ?? Theme.foreground;
-    }
 
     function takeFocus(): void {
         if (!preview)
@@ -145,7 +141,7 @@ Item {
             anchors.topMargin: 10
             anchors.rightMargin: 30
             text: Qt.formatDateTime(root.now, "HH:mm")
-            color: root.tint(Config.lockClockColor)
+            color: Theme.foreground
             font.family: Theme.font
             font.pixelSize: 96
             font.weight: Font.Medium
@@ -157,7 +153,7 @@ Item {
             anchors.topMargin: 120
             anchors.rightMargin: 30
             text: Qt.formatDateTime(root.now, "dddd, d MMMM yyyy")
-            color: root.tint(Config.lockClockColor)
+            color: Theme.foreground
             font.family: Theme.font
             font.pixelSize: 37
         }
@@ -171,9 +167,9 @@ Item {
         width: 380
         height: 300
         radius: 6
-        color: Config.lockBox ? Theme.alpha(root.tint(Config.lockBoxColor), Config.lockBoxOpacity / 100) : "transparent"
+        color: Config.lockBox ? Theme.alpha(Theme.background, Config.lockBoxOpacity / 100) : "transparent"
         border.width: Config.lockBox ? 2 : 0
-        border.color: root.tint(Config.lockBoxOutlineColor)
+        border.color: Theme.border
 
         // Settings > Lock Screen > Avatar: ~/.face
         Item {
@@ -187,7 +183,7 @@ Item {
             Rectangle {
                 anchors.fill: parent
                 radius: width / 2
-                color: root.tint(Config.lockAvatarColor)
+                color: Theme.border
             }
 
             Image {
@@ -228,7 +224,7 @@ Item {
                 anchors.centerIn: parent
                 visible: avatar.status !== Image.Ready
                 text: "\u{f0004}"
-                color: root.tint(Config.lockBoxColor)
+                color: Theme.background
                 font.family: Theme.iconFont
                 font.pixelSize: 56
             }
@@ -244,10 +240,10 @@ Item {
             height: 36
             // a box with the windows' corners (Hyprland's rounding), square in Work-Game
             radius: Theme.radius
-            color: Theme.alpha(root.tint(Config.lockInputColor), Config.lockInputOpacity / 100)
+            color: Theme.alpha(Theme.background, Config.lockInputOpacity / 100)
             // 2 px like the box, the shell's borders and the boot screen's field
             border.width: 2
-            border.color: root.tint(Lock.failed ? Config.lockFailColor : (Lock.authenticating ? Config.lockCheckColor : Config.lockInputOutlineColor))
+            border.color: (Lock.failed ? Theme.red : (Lock.authenticating ? Theme.dimText : Theme.border))
 
             transform: Translate {
                 id: offset
@@ -292,7 +288,7 @@ Item {
                 horizontalAlignment: Text.AlignHCenter
                 visible: !root.preview && Lock.password !== ""
                 text: "●".repeat(Lock.password.length)
-                color: root.tint(Config.lockDotsColor)
+                color: Theme.foreground
                 font.family: Theme.font
                 font.pixelSize: Theme.smallSize
                 font.letterSpacing: 3
@@ -306,8 +302,8 @@ Item {
                 visible: root.preview || Lock.password === ""
                 elide: Text.ElideRight
                 textFormat: Text.StyledText
-                text: Lock.failed && !root.preview ? "<i>ACCESS DENIED</i>" : `<i>\u{f033e}  Logged in as </i><b><font color="${root.tint(Config.lockUserColor)}">${Lock.userName}</font></b>`
-                color: root.tint(Lock.failed && !root.preview ? Config.lockFailColor : Config.lockTextColor)
+                text: Lock.failed && !root.preview ? "<i>ACCESS DENIED</i>" : `<i>\u{f033e}  Logged in as </i><b><font color="${Theme.accent}">${Lock.userName}</font></b>`
+                color: (Lock.failed && !root.preview ? Theme.red : Theme.subtext)
                 font.family: Theme.font
                 font.pixelSize: Theme.titleSize
             }
@@ -319,7 +315,7 @@ Item {
             anchors.topMargin: 8
             visible: Lock.capsLock && !root.preview
             text: "Caps Lock is on"
-            color: root.tint(Config.lockCapsColor)
+            color: Theme.yellow
             font.family: Theme.font
             font.pixelSize: Theme.fontSize
         }

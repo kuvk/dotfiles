@@ -5,7 +5,7 @@ font={{ text_font }}
 iconFont={{ nerd_font }}
 base={{ background }}
 subtext={{ mix dark_foreground foreground 80% }}
-; From Settings > Lock Screen
+; As the lock screen: the theme's colors, and what Settings > Lock Screen shows
 clock={{ login_clock }}
 date={{ login_date }}
 avatar={{ login_avatar }}

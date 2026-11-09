@@ -54,19 +54,13 @@ ColumnLayout {
         }
     }
 
-    // Each part of the lock screen, and the login screen's power buttons.
-    // Colors also go to the login screen (hyprdori-theme-set --login).
+    // What the lock screen shows, also on the login screen (hyprdori-theme-set --login); the
+    // colors are the theme's
     SettingsSection {
         title: "Clock and date"
         hint: "Top right, on the lock and login screens"
         key: "lockClock"
         onEdited: loginApply.restart()
-
-        LockColor {
-            label: "Color"
-            key: "lockClockColor"
-            onEdited: loginApply.restart()
-        }
     }
 
     SettingsSection {
@@ -74,12 +68,6 @@ ColumnLayout {
         hint: "Your picture (~/.face)"
         key: "lockAvatar"
         onEdited: loginApply.restart()
-
-        LockColor {
-            label: "Outline"
-            key: "lockAvatarColor"
-            onEdited: loginApply.restart()
-        }
     }
 
     SettingsSection {
@@ -88,72 +76,36 @@ ColumnLayout {
         key: "lockBox"
         onEdited: loginApply.restart()
 
-        LockColor {
-            label: "Outline"
-            key: "lockBoxOutlineColor"
-            onEdited: loginApply.restart()
-        }
-
-        LockColor {
-            label: "Background"
-            key: "lockBoxColor"
-            opacityKey: "lockBoxOpacity"
-            onEdited: loginApply.restart()
-        }
-    }
-
-    SettingsSection {
-        title: "Password field"
-        hint: "Colors of the field and its text"
-
-        Repeater {
-            model: [
-                { label: "Outline", key: "lockInputOutlineColor" },
-                { label: "Background", key: "lockInputColor", opacity: "lockInputOpacity" },
-                { label: "Typing dots", key: "lockDotsColor" },
-                { label: "User name", key: "lockUserColor" },
-                { label: "Text", key: "lockTextColor" },
-                { label: "Checking password", key: "lockCheckColor" },
-                { label: "Wrong password", key: "lockFailColor" },
-                { label: "Caps Lock on", key: "lockCapsColor" }
-            ]
-
-            LockColor {
-                required property var modelData
-
-                label: modelData.label
-                key: modelData.key
-                opacityKey: modelData.opacity ?? ""
-                onEdited: loginApply.restart()
+        SettingSlider {
+            label: "Box opacity"
+            value: Config.lockBoxOpacity / 100
+            onChanged: v => {
+                Config.lockBoxOpacity = Math.round(v * 1000) / 10;
+                loginApply.restart();
             }
         }
     }
 
-    SettingsSection {
-        title: "Power buttons"
-        hint: "On the login screen"
-
-        LockColor {
-            label: "Background"
-            key: "lockPowerColor"
-            opacityKey: "lockPowerOpacity"
-            onEdited: loginApply.restart()
-        }
-
-        LockColor {
-            label: "Icons"
-            key: "lockPowerIconColor"
-            onEdited: loginApply.restart()
-        }
-
-        LockColor {
-            label: "Outline"
-            key: "lockPowerOutlineColor"
-            onEdited: loginApply.restart()
+    SettingSlider {
+        label: "Password field opacity"
+        value: Config.lockInputOpacity / 100
+        onChanged: v => {
+            Config.lockInputOpacity = Math.round(v * 1000) / 10;
+            loginApply.restart();
         }
     }
 
-    // The login screen shares these colors. Long enough for Config to save them.
+    SettingSlider {
+        label: "Power buttons opacity"
+        hint: "On the login screen"
+        value: Config.lockPowerOpacity / 100
+        onChanged: v => {
+            Config.lockPowerOpacity = Math.round(v * 1000) / 10;
+            loginApply.restart();
+        }
+    }
+
+    // The login screen shares these settings. Long enough for Config to save them.
     Timer {
         id: loginApply
 
