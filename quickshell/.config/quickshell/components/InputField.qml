@@ -3,7 +3,8 @@ import QtQuick.Layouts
 import qs.config
 import qs.services
 
-// One-line text input in a dropdown: Enter accepts, Esc cancels
+// One-line text input, in dropdowns and Settings: Enter accepts, Esc cancels; edited() gives the
+// trimmed text when typing ends (Enter or leaving the field)
 Rectangle {
     id: field
 
@@ -13,6 +14,7 @@ Rectangle {
     property bool active: false
     signal accepted(string value)
     signal canceled
+    signal edited(string value)
 
     Layout.fillWidth: true
     implicitHeight: 34
@@ -37,6 +39,7 @@ Rectangle {
         echoMode: field.password ? TextInput.Password : TextInput.Normal
         clip: true
         onAccepted: field.accepted(text)
+        onEditingFinished: field.edited(text.trim())
         Keys.onEscapePressed: field.canceled()
 
         StyledText {

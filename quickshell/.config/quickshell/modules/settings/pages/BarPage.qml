@@ -1,12 +1,12 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
-import Quickshell.Io
 import qs.config
 import qs.components
 import qs.services
 
-// Settings > Bar
+// Settings > Bar: the bar's look, clock, weather, tray and player (General), and which modules
+// each connected monitor's bar shows (Per monitor)
 ColumnLayout {
     // the Settings window: its helpers (clamp, cycle, minutesText, ...) and shared state
     required property var settings
@@ -14,158 +14,160 @@ ColumnLayout {
     Layout.fillWidth: true
     spacing: 12
 
-    SettingRow {
-        label: "Floating bar"
+    SettingsSection {
+        title: "General"
 
-        Switch {
-            checked: Config.barFloating
-            onToggled: Config.barFloating = !Config.barFloating
+        SettingRow {
+            label: "Floating bar"
+
+            Switch {
+                checked: Config.barFloating
+                onToggled: Config.barFloating = !Config.barFloating
+            }
         }
-    }
 
-    SettingRow {
-        visible: Config.barFloating
-        label: "Bar margin"
+        SettingRow {
+            visible: Config.barFloating
+            label: "Bar margin"
 
-        Stepper {
-            text: `${Config.barMargin} px`
-            onStep: d => Config.barMargin = settings.clamp(Config.barMargin + d * 2, 0, 40)
+            Stepper {
+                text: `${Config.barMargin} px`
+                onStep: d => Config.barMargin = settings.clamp(Config.barMargin + d * 2, 0, 40)
+            }
         }
-    }
 
-    SettingRow {
-        label: "Shadow"
-        normalOnly: true
+        SettingRow {
+            label: "Clock"
 
-        Switch {
-            checked: Config.barShadow
-            onToggled: Config.barShadow = !Config.barShadow
+            Stepper {
+                text: Qt.formatDateTime(Time.date, Config.clockFormat)
+                onStep: d => Config.clockFormat = settings.cycle(settings.clockFormats, Config.clockFormat, d)
+            }
         }
-    }
 
-    SettingRow {
-        label: "Clock"
+        SettingRow {
+            label: "Weather location"
 
-        Stepper {
-            text: Qt.formatDateTime(Time.date, Config.clockFormat)
-            onStep: d => Config.clockFormat = settings.cycle(settings.clockFormats, Config.clockFormat, d)
-        }
-    }
-
-    SettingRow {
-        label: "Weather location"
-
-        Rectangle {
-            implicitWidth: Math.round(220 * Theme.textScale)
-            implicitHeight: 34
-            radius: Theme.smallRadius
-            color: Theme.cardBg
-            border.color: location.activeFocus ? Theme.accent : "transparent"
-            border.width: Theme.borderWidth
-
-            TextInput {
-                id: location
-
-                anchors.fill: parent
-                anchors.leftMargin: 10
-                anchors.rightMargin: 10
-                verticalAlignment: TextInput.AlignVCenter
-                color: Theme.foreground
-                font.family: Theme.font
-                font.pixelSize: Theme.fontSize
-                clip: true
+            InputField {
+                Layout.fillWidth: false
+                implicitWidth: Math.round(220 * Theme.textScale)
+                placeholder: "Automatic"
                 text: Config.weatherLocation
-                onEditingFinished: Config.weatherLocation = text.trim()
+                onEdited: value => Config.weatherLocation = value
+            }
+        }
 
-                StyledText {
-                    anchors.fill: parent
-                    visible: location.text === "" && !location.activeFocus
-                    text: "Automatic"
-                    color: Theme.dimText
+        SettingRow {
+            label: "Temperature unit"
+
+            TextButton {
+                text: Config.weatherFahrenheit ? "°F" : "°C"
+                onClicked: Config.weatherFahrenheit = !Config.weatherFahrenheit
+            }
+        }
+
+        SettingRow {
+            label: "Tray icons"
+
+            Stepper {
+                text: Config.trayMonochrome ? "Monochrome" : (Config.trayTint ? "Tinted" : "Original")
+                onStep: d => {
+                    const modes = ["original", "tinted", "mono"];
+                    const now = Config.trayMonochrome ? "mono" : (Config.trayTint ? "tinted" : "original");
+                    const next = settings.cycle(modes, now, d);
+                    Config.trayMonochrome = next === "mono";
+                    Config.trayTint = next === "tinted";
                 }
             }
         }
-    }
 
-    SettingRow {
-        label: "Temperature unit"
+        SettingRow {
+            label: "Tray apps in their own colors"
 
-        TextButton {
-            text: Config.weatherFahrenheit ? "°F" : "°C"
-            onClicked: Config.weatherFahrenheit = !Config.weatherFahrenheit
+            InputField {
+                Layout.fillWidth: false
+                implicitWidth: Math.round(220 * Theme.textScale)
+                placeholder: "App names, with commas"
+                text: Config.trayKeepColors
+                onEdited: value => Config.trayKeepColors = value
+            }
+        }
+
+        SettingRow {
+            label: "Player visualizer"
+
+            Switch {
+                checked: Config.cava
+                onToggled: Config.cava = !Config.cava
+            }
+        }
+
+        SettingRow {
+            visible: Config.cava
+            label: "Visualizer bars"
+
+            Stepper {
+                text: `${Config.cavaBars}`
+                onStep: d => Config.cavaBars = settings.clamp(Config.cavaBars + d * 4, 8, 64)
+            }
         }
     }
 
-    // Modules per bar: the primary monitor's and the others'
-    GridLayout {
-        Layout.fillWidth: true
-        columns: 3
-        columnSpacing: 16
-        rowSpacing: 8
+    // A column per connected monitor; one without a choice yet shows every module
+    SettingsSection {
+        title: "Per monitor"
 
-        StyledText {
+        GridLayout {
             Layout.fillWidth: true
-            text: "Module"
-            color: Theme.subtext
-            font.weight: Font.DemiBold
-        }
+            columns: Quickshell.screens.length + 1
+            columnSpacing: 16
+            rowSpacing: 12
 
-        StyledText {
-            Layout.alignment: Qt.AlignHCenter
-            text: "Primary"
-            color: Theme.subtext
-            font.weight: Font.DemiBold
-        }
-
-        StyledText {
-            Layout.alignment: Qt.AlignHCenter
-            text: "Others"
-            color: Theme.subtext
-            font.weight: Font.DemiBold
-        }
-
-        Repeater {
-            model: Config.barModules
-
-            StyledText {
-                required property var modelData
-                required property int index
-
-                Layout.row: index + 1
-                Layout.column: 0
+            Caption {
                 Layout.fillWidth: true
-                text: modelData.label
-                color: Theme.foreground
+                text: "Module"
             }
-        }
 
-        Repeater {
-            model: Config.barModules
+            Repeater {
+                model: Quickshell.screens
 
-            Switch {
-                required property var modelData
-                required property int index
+                Caption {
+                    required property ShellScreen modelData
 
-                Layout.row: index + 1
-                Layout.column: 1
-                Layout.alignment: Qt.AlignHCenter
-                checked: Config.barShows(true, modelData.id)
-                onToggled: Config.setBarModule(true, modelData.id, !checked)
+                    Layout.alignment: Qt.AlignHCenter
+                    text: modelData.name
+                }
             }
-        }
 
-        Repeater {
-            model: Config.barModules
+            Repeater {
+                model: Config.barModules
 
-            Switch {
-                required property var modelData
-                required property int index
+                // the module's name, then its switch on each monitor
+                Caption {
+                    required property var modelData
+                    required property int index
 
-                Layout.row: index + 1
-                Layout.column: 2
-                Layout.alignment: Qt.AlignHCenter
-                checked: Config.barShows(false, modelData.id)
-                onToggled: Config.setBarModule(false, modelData.id, !checked)
+                    Layout.row: index + 1
+                    Layout.column: 0
+                    Layout.fillWidth: true
+                    text: modelData.label
+                }
+            }
+
+            Repeater {
+                model: Quickshell.screens.length * Config.barModules.length
+
+                Switch {
+                    required property int index
+                    readonly property var module: Config.barModules[Math.floor(index / Quickshell.screens.length)]
+                    readonly property string monitor: Quickshell.screens[index % Quickshell.screens.length]?.name ?? ""
+
+                    Layout.row: Math.floor(index / Quickshell.screens.length) + 1
+                    Layout.column: index % Quickshell.screens.length + 1
+                    Layout.alignment: Qt.AlignHCenter
+                    checked: Config.barShows(monitor, module.id)
+                    onToggled: Config.setBarModule(monitor, module.id, !checked)
+                }
             }
         }
     }

@@ -60,6 +60,6 @@ bright_blue="{{ bright_blue }}"
 bright_magenta="{{ bright_magenta }}"
 subtext="{{ mix foreground background 25% }}"
 # the boot splash's password field: its fill (as the lock and login screens') and corners
-# (Settings > Lock Screen > Rounded corners)
+# (Settings > Style > Lock screen > Rounded corners)
 field="{{ login_input }}"
 field_radius="{{ login_radius }}"

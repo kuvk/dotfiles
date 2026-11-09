@@ -3,7 +3,7 @@ import Quickshell
 import Quickshell.Wayland
 import qs.services
 
-// Settings > Lock Screen > Preview: the lock screen's look on the focused monitor,
+// Settings > Style > Lock screen > Preview: the lock screen's look on the focused monitor,
 // without locking. A click or Esc closes it.
 PanelWindow {
     id: root

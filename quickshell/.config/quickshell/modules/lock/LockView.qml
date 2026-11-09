@@ -7,7 +7,7 @@ import qs.services
 // What the lock screen shows on one screen: the background, and on the main screen the avatar
 // and the password field in the middle. Laid out like the login screen
 // (sddm/hyprdori/Main.qml), in the theme's colors; the field as on the boot splash: the
-// background at Settings > Lock Screen's opacity, a 2 px accent outline, its corners rounded or
+// background at Settings > Style > Lock screen's opacity, a 2 px accent outline, its corners rounded or
 // square there.
 // Keys typed on any screen go to the password: Hyprland gives the keyboard to one of the
 // lock surfaces, not always the main one.
@@ -57,7 +57,7 @@ Item {
 
     Component.onCompleted: Qt.callLater(takeFocus)
 
-    // The theme's background, or the chosen image (Settings > Lock Screen; services/Lock.qml).
+    // The theme's background, or the chosen image (Settings > Style > Lock screen; services/Lock.qml).
     // Already no larger than the largest screen (hyprdori-wallpaper lock), so it loads at once,
     // before the lock is up; decoded once for every screen (Qt's image cache).
     Image {
@@ -129,7 +129,7 @@ Item {
         width: 380
         height: 300
 
-        // Settings > Lock Screen > Avatar: ~/.face
+        // Settings > Style > Lock screen > Avatar: ~/.face
         Item {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
@@ -196,7 +196,7 @@ Item {
             anchors.verticalCenterOffset: 85
             width: 300
             height: 40
-            // Settings > Lock Screen > Rounded corners: the windows' radius (8 with it at 0), or square
+            // Settings > Style > Lock screen > Rounded corners: the windows' radius (8 with it at 0), or square
             radius: Config.lockRounded ? (Config.radius || 8) : 0
             // the background with 5% of the text color (Omarchy's field), at Settings' opacity
             color: Theme.alpha(Theme.mix(Theme.background, Theme.foreground, 0.05), Config.lockInputOpacity / 100)

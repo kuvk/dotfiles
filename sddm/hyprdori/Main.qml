@@ -92,7 +92,7 @@ Rectangle {
             onStepped: d => root.userIndex = root.step(root.userIndex, d, userModel.count)
         }
 
-        // Settings > Lock Screen > Avatar
+        // Settings > Style > Lock screen > Avatar
         Item {
             id: avatarItem
 
@@ -152,7 +152,7 @@ Rectangle {
             }
         }
 
-        // As the lock screen's and the boot splash's: the background at Settings > Lock Screen's
+        // As the lock screen's and the boot splash's: the background at Settings > Style > Lock screen's
         // opacity, a 2 px accent outline, rounded or square corners there
         Rectangle {
             id: field
@@ -253,7 +253,7 @@ Rectangle {
                 cursorShape: Qt.PointingHandCursor
                 onClicked: modelData.action()
 
-                // As the shell's buttons: the background at Settings > Lock Screen's opacity with
+                // As the shell's buttons: the background at Settings > Style > Lock screen's opacity with
                 // the text color faintly over it, a hairline border that lightens under the cursor
                 Rectangle {
                     anchors.fill: parent

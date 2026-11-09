@@ -18,12 +18,25 @@ FloatingWindow {
         { id: "style", label: "Style", icon: Icons.palette },
         { id: "fonts", label: "Fonts", icon: Icons.font },
         { id: "bar", label: "Bar", icon: Icons.sliders },
-        { id: "lock", label: "Lock Screen", icon: Icons.lock },
-        { id: "idle", label: "Idle", icon: Icons.bed },
-        { id: "nightlight", label: "Night Light", icon: Icons.nightlight },
-        { id: "tray", label: "Tray & Player", icon: Icons.music }
+        { id: "power", label: "Power & Screen", icon: Icons.power }
     ]
     property string section: "style"
+    // The page's height with every section open; while it's taller than the room for it, its
+    // sections fold (SettingsSection)
+    readonly property real pageFullHeight: {
+        const current = Array.from(page.children).find(p => p.visible);
+        if (!current)
+            return 0;
+        let height = 0, shown = 0;
+        for (const item of current.children) {
+            if (!item.visible)
+                continue;
+            height += item.fullHeight ?? item.implicitHeight;
+            shown++;
+        }
+        return height + Math.max(0, shown - 1) * current.spacing;
+    }
+    readonly property bool foldSections: pageFullHeight > settingsFlick.height
     property var cursorThemes: ["Adwaita"]
     property var iconThemes: ["Papirus"]
     // Lock Screen: a setting the boot splash draws changed since it was last built
@@ -34,7 +47,7 @@ FloatingWindow {
         return list[(i + step + list.length) % list.length];
     }
 
-    // Settings > Idle: minutes, 0 is never
+    // Settings > Power & Screen > Idle: minutes, 0 is never
     readonly property var idleSteps: [0, 1, 2, 3, 5, 10, 15, 20, 30, 45, 60, 90, 120, 180]
 
     function minutesText(minutes: int): string {
@@ -78,11 +91,10 @@ FloatingWindow {
             anchors.fill: parent
             spacing: 0
 
-            // Sidebar
-            Rectangle {
+            // Sidebar, on the window's background, a divider between it and the page
+            Item {
                 Layout.fillHeight: true
                 implicitWidth: Math.round(190 * Theme.textScale)
-                color: Theme.alpha(Theme.darkBackground, 0.6)
 
                 ColumnLayout {
                     anchors.fill: parent
@@ -133,6 +145,7 @@ FloatingWindow {
                                 StyledText {
                                     text: entry.modelData.label
                                     color: entry.current ? Theme.accent : Theme.foreground
+                                    font.weight: Font.Bold
                                 }
                             }
                         }
@@ -163,6 +176,10 @@ FloatingWindow {
                         onClicked: Config.reset()
                     }
                 }
+            }
+
+            Separator {
+                vertical: true
             }
 
             // Section content
@@ -204,34 +221,19 @@ FloatingWindow {
                             visible: root.section === "style"
                         }
 
-                        BarPage {
-                            settings: root
-                            visible: root.section === "bar"
-                        }
-
-                        LockPage {
-                            settings: root
-                            visible: root.section === "lock"
-                        }
-
-                        IdlePage {
-                            settings: root
-                            visible: root.section === "idle"
-                        }
-
-                        NightLightPage {
-                            settings: root
-                            visible: root.section === "nightlight"
-                        }
-
                         FontsPage {
                             settings: root
                             visible: root.section === "fonts"
                         }
 
-                        TrayPage {
+                        BarPage {
                             settings: root
-                            visible: root.section === "tray"
+                            visible: root.section === "bar"
+                        }
+
+                        PowerPage {
+                            settings: root
+                            visible: root.section === "power"
                         }
                     }
                 }

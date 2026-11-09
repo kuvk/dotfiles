@@ -1,5 +1,5 @@
 #!/bin/bash
-# Night light (hyprsunset) at the temperature from Settings > Night Light.
+# Night light (hyprsunset) at the temperature from Settings > Power & Screen > Night light.
 #
 #   nightlight-toggle.sh           toggle
 #   nightlight-toggle.sh on|off    set it (the schedule in services/System.qml)

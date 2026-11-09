@@ -9,62 +9,41 @@ import Quickshell.Io
 Singleton {
     id: root
 
-    // Appearance: colors, corners, cursor, icons, opacity, blur, animations
+    // The aliases follow the Settings pages and their sections.
+
+    // Style > System: what the shell and Hyprland share
     // per theme, another of its colors as the accent: { "catppuccin": "magenta" }, read by hyprdori-theme-set
     property alias accentOverrides: adapter.accentOverrides
     // the theme's background on the desktop, redrawn on theme change; set by the wallpaper picker
     property alias wallpaperFollowsTheme: adapter.wallpaperFollowsTheme
     property alias radius: adapter.radius
+    property alias borderWidth: adapter.borderWidth
     // read by hyprdori-theme-set, like the fonts and colors
     property alias cursorTheme: adapter.cursorTheme
     property alias cursorSize: adapter.cursorSize
     property alias iconTheme: adapter.iconTheme
-    property alias borderWidth: adapter.borderWidth
-    property alias barOpacity: adapter.barOpacity
-    property alias shellOpacity: adapter.shellOpacity
-    // Hyprland windows in normal mode; fullscreen ones stay opaque
-    property alias activeOpacity: adapter.activeOpacity
-    property alias inactiveOpacity: adapter.inactiveOpacity
     // Hyprland's blur in normal mode (Work-Game has none); services/Hypr.qml
     property alias blur: adapter.blur
     property alias animations: adapter.animations
-
-    // Fonts (hyprdori-theme-set --fonts): the terminals' font, monospaced; the display font for
-    // the shell's and apps' text unless monoEverywhere puts the font there too
-    property alias font: adapter.font
-    property alias displayFont: adapter.displayFont
-    property alias monoEverywhere: adapter.monoEverywhere
-    property alias fontHinting: adapter.fontHinting
-    property alias fontAntialiasing: adapter.fontAntialiasing
-
-    // Bar
-    // margins around the bar and rounded corners
-    property alias barFloating: adapter.barFloating
-    property alias barMargin: adapter.barMargin
-    property alias clockFormat: adapter.clockFormat
-    // empty: detect from IP (wttr.in)
-    property alias weatherLocation: adapter.weatherLocation
-    property alias weatherFahrenheit: adapter.weatherFahrenheit
-    // bar modules hidden on the primary monitor's bar and on the others
-    property alias barHiddenPrimary: adapter.barHiddenPrimary
-    property alias barHiddenOthers: adapter.barHiddenOthers
-
-    // Windows
     property alias windowButtons: adapter.windowButtons
-    // Hyprland's window gaps, normal and in Work-Game
+
+    // Style > Shell
+    property alias barOpacity: adapter.barOpacity
+    property alias shellOpacity: adapter.shellOpacity
+    // seconds a popup stays up; critical ones stay until closed
+    property alias notificationTimeout: adapter.notificationTimeout
+
+    // Style > Hyprland: windows in normal mode (fullscreen ones stay opaque), gaps normal and in
+    // Work-Game
+    property alias activeOpacity: adapter.activeOpacity
+    property alias inactiveOpacity: adapter.inactiveOpacity
     property alias gapsIn: adapter.gapsIn
     property alias gapsOut: adapter.gapsOut
     property alias gameGapsIn: adapter.gameGapsIn
     property alias gameGapsOut: adapter.gameGapsOut
 
-    // Notifications
-    // seconds a popup stays up; critical ones stay until closed
-    property alias notificationTimeout: adapter.notificationTimeout
-    // a shadow under the shell's popups and notifications (Style > Shell), and under the bar (Bar)
-    property alias shadow: adapter.shadow
-    property alias barShadow: adapter.barShadow
-
-    // Lock Screen, also the login screen's (hyprdori-theme-set --login); the colors are the theme's
+    // Style > Lock screen, also the login screen's (hyprdori-theme-set --login); the colors are
+    // the theme's
     // the background: the theme's own (Theme.backgroundImage) until an image is chosen
     property alias lockFollowsTheme: adapter.lockFollowsTheme
     property alias lockImage: adapter.lockImage
@@ -76,21 +55,22 @@ Singleton {
     // the login screen's power buttons
     property alias lockPowerOpacity: adapter.lockPowerOpacity
 
-    // Idle: minutes until the screen locks and the machine sleeps, 0 is never; *Battery on battery (services/Idle.qml)
-    property alias idleLock: adapter.idleLock
-    property alias idleSuspend: adapter.idleSuspend
-    property alias idleLockBattery: adapter.idleLockBattery
-    property alias idleSuspendBattery: adapter.idleSuspendBattery
+    // Fonts (hyprdori-theme-set --fonts): the terminals' font, monospaced; the display font for
+    // the shell's and apps' text unless monoEverywhere puts the font there too
+    property alias font: adapter.font
+    property alias displayFont: adapter.displayFont
+    property alias monoEverywhere: adapter.monoEverywhere
+    property alias fontHinting: adapter.fontHinting
+    property alias fontAntialiasing: adapter.fontAntialiasing
 
-    // Night Light
-    property alias nightlightSchedule: adapter.nightlightSchedule
-    // the schedule may cross midnight
-    property alias nightlightStart: adapter.nightlightStart
-    property alias nightlightEnd: adapter.nightlightEnd
-    // kelvin, read by scripts/nightlight-toggle.sh
-    property alias nightlightTemperature: adapter.nightlightTemperature
-
-    // Tray & Player
+    // Bar > General
+    // margins around the bar and rounded corners
+    property alias barFloating: adapter.barFloating
+    property alias barMargin: adapter.barMargin
+    property alias clockFormat: adapter.clockFormat
+    // empty: detect from IP (wttr.in)
+    property alias weatherLocation: adapter.weatherLocation
+    property alias weatherFahrenheit: adapter.weatherFahrenheit
     property alias trayMonochrome: adapter.trayMonochrome
     property alias trayTint: adapter.trayTint
     // tray apps whose icon colors carry meaning (the ROG dGPU state) stay original when
@@ -98,6 +78,25 @@ Singleton {
     property alias trayKeepColors: adapter.trayKeepColors
     property alias cava: adapter.cava
     property alias cavaBars: adapter.cavaBars
+
+    // Bar > Per monitor: modules hidden per monitor, by its connector name
+    // ({ "HDMI-A-1": ["displays"] }); a monitor not in it shows every module
+    property alias barHidden: adapter.barHidden
+
+    // Power & Screen > Idle: minutes until the screen locks and the machine sleeps, 0 is never;
+    // *Battery on battery (services/Idle.qml)
+    property alias idleLock: adapter.idleLock
+    property alias idleSuspend: adapter.idleSuspend
+    property alias idleLockBattery: adapter.idleLockBattery
+    property alias idleSuspendBattery: adapter.idleSuspendBattery
+
+    // Power & Screen > Night light
+    property alias nightlightSchedule: adapter.nightlightSchedule
+    // the schedule may cross midnight
+    property alias nightlightStart: adapter.nightlightStart
+    property alias nightlightEnd: adapter.nightlightEnd
+    // kelvin, read by scripts/nightlight-toggle.sh
+    property alias nightlightTemperature: adapter.nightlightTemperature
 
     // In the bar's order, left to right
     readonly property var barModules: [
@@ -120,18 +119,20 @@ Singleton {
         { id: "power", label: "Power menu" }
     ]
 
-    function barShows(primary: bool, id: string): bool {
-        return !(primary ? barHiddenPrimary : barHiddenOthers).includes(id);
+    function barShows(monitor: string, id: string): bool {
+        return !(barHidden[monitor] ?? []).includes(id);
     }
 
-    function setBarModule(primary: bool, id: string, shown: bool): void {
-        const list = (primary ? barHiddenPrimary : barHiddenOthers).filter(m => m !== id);
+    function setBarModule(monitor: string, id: string, shown: bool): void {
+        const all = Object.assign({}, barHidden);
+        const list = (all[monitor] ?? []).filter(m => m !== id);
         if (!shown)
             list.push(id);
-        if (primary)
-            barHiddenPrimary = list;
+        if (list.length > 0)
+            all[monitor] = list;
         else
-            barHiddenOthers = list;
+            delete all[monitor];
+        barHidden = all;
     }
 
     // How often the weather refreshes
@@ -192,20 +193,38 @@ Singleton {
             property int version: 0
             // The settings, by Settings page, with their built-in defaults (defaults.json overrides them)
 
-            // Appearance
+            // Style > System
             property var accentOverrides: ({})
             property bool wallpaperFollowsTheme: true
             property int radius: 10
+            property int borderWidth: 2
             property string cursorTheme: "Adwaita"
             property int cursorSize: 24
             property string iconTheme: "Papirus"
-            property int borderWidth: 2
-            property real barOpacity: 0.92
-            property real shellOpacity: 0.92
-            property real activeOpacity: 0.95
-            property real inactiveOpacity: 0.85
             property bool blur: true
             property bool animations: true
+            property bool windowButtons: false
+
+            // Style > Shell
+            property real barOpacity: 0.92
+            property real shellOpacity: 0.92
+            property int notificationTimeout: 5
+
+            // Style > Hyprland
+            property real activeOpacity: 0.95
+            property real inactiveOpacity: 0.85
+            property int gapsIn: 5
+            property int gapsOut: 10
+            property int gameGapsIn: 2
+            property int gameGapsOut: 4
+
+            // Style > Lock screen
+            property bool lockFollowsTheme: true
+            property string lockImage: ""
+            property bool lockAvatar: true
+            property bool lockRounded: true
+            property real lockInputOpacity: 80
+            property real lockPowerOpacity: 85
 
             // Fonts
             property string font: "JetBrainsMono Nerd Font"
@@ -214,53 +233,32 @@ Singleton {
             property string fontHinting: "slight"
             property string fontAntialiasing: "rgba"
 
-            // Bar
+            // Bar > General
             property bool barFloating: false
             property int barMargin: 6
             property string clockFormat: "dddd HH:mm"
             property string weatherLocation: ""
             property bool weatherFahrenheit: false
-            property var barHiddenPrimary: ["displays"]
-            property var barHiddenOthers: ["displays"]
-
-            // Windows
-            property bool windowButtons: false
-            property int gapsIn: 5
-            property int gapsOut: 10
-            property int gameGapsIn: 2
-            property int gameGapsOut: 4
-
-            // Notifications
-            property int notificationTimeout: 5
-            property bool shadow: true
-            property bool barShadow: false
-
-            // Lock Screen
-            property bool lockFollowsTheme: true
-            property string lockImage: ""
-            property bool lockAvatar: true
-            property bool lockRounded: true
-            property real lockInputOpacity: 80
-            property real lockPowerOpacity: 85
-
-            // Idle
-            property int idleLock: 5
-            property int idleSuspend: 20
-            property int idleLockBattery: 3
-            property int idleSuspendBattery: 10
-
-            // Night Light
-            property bool nightlightSchedule: false
-            property string nightlightStart: "20:00"
-            property string nightlightEnd: "07:00"
-            property int nightlightTemperature: 4500
-
-            // Tray & Player
             property bool trayMonochrome: false
             property bool trayTint: false
             property string trayKeepColors: ""
             property bool cava: true
             property int cavaBars: 40
+
+            // Bar > Per monitor
+            property var barHidden: ({})
+
+            // Power & Screen > Idle
+            property int idleLock: 5
+            property int idleSuspend: 20
+            property int idleLockBattery: 3
+            property int idleSuspendBattery: 10
+
+            // Power & Screen > Night light
+            property bool nightlightSchedule: false
+            property string nightlightStart: "20:00"
+            property string nightlightEnd: "07:00"
+            property int nightlightTemperature: 4500
         }
     }
 }

@@ -3,27 +3,36 @@ import QtQuick.Layouts
 import qs.config
 import qs.components
 
-// A section in a Settings page: a divider above it (none for a page's first), its heading in
+// A section of a Settings page: a divider above it (none for the page's first), its heading in
 // capitals in the text color (as a dropdown's section, a step above its options' labels), its
-// hint below if any and, centered beside both on the right, one of:
-// - a switch, with `key` (a Config bool): it shows and hides the options under it;
-// - `controls` (buttons and the like), when there is nothing under it to fold;
-// - an arrow that folds and unfolds the options under it, folded at first;
-// - nothing, with `foldable: false`: a heading over options that always show.
-// `edited` after the switch changes.
+// hint below if any, then its options.
+// While the page doesn't fit the window (the window's foldSections), every section folds: an
+// arrow beside the heading (down while folded, up while open), a click on the heading opens or
+// folds it; the page's first section starts open, the rest folded.
 ColumnLayout {
     id: section
 
     property string title
     property string hint: ""
-    property string key: ""
-    property bool open: false
-    property bool foldable: true
     default property alias content: body.data
-    property alias controls: controlsRow.data
-    signal edited
 
-    readonly property bool folds: foldable && key === "" && title !== "" && body.children.length > 0
+    // the page it's on, whose `settings` is the Settings window
+    readonly property var page: {
+        let item = parent;
+        while (item && item.settings === undefined)
+            item = item.parent;
+        return item;
+    }
+    readonly property bool folds: title !== "" && (page?.settings?.foldSections ?? false)
+    readonly property bool first: parent ? Array.from(parent.children).find(c => c.fullHeight !== undefined) === section : true
+    property bool open: first
+    readonly property bool showsBody: !folds || open
+    // its height with its options shown, folded or not: the window adds these up to see whether
+    // the page fits
+    readonly property real fullHeight: Layout.topMargin
+        + (divider.visible ? divider.implicitHeight + 4 + spacing : 0)
+        + (header.visible ? header.implicitHeight + spacing : 0)
+        + body.implicitHeight
 
     Layout.fillWidth: true
     Layout.topMargin: 8
@@ -31,11 +40,15 @@ ColumnLayout {
 
     // between sections, as in dropdowns
     Separator {
-        visible: section.title !== "" && section.parent && section.parent.children[0] !== section
+        id: divider
+
+        visible: section.title !== "" && !section.first
     }
 
-    // no title: no header, the options show as they are
+    // no title: no heading, the options show as they are
     RowLayout {
+        id: header
+
         Layout.fillWidth: true
         visible: section.title !== ""
         spacing: 12
@@ -61,41 +74,32 @@ ColumnLayout {
             }
         }
 
-        RowLayout {
-            id: controlsRow
-
-            spacing: 8
-        }
-
-        Switch {
-            visible: section.key !== ""
-            checked: section.key ? Config[section.key] : false
-            onToggled: {
-                Config[section.key] = !Config[section.key];
-                section.edited();
-            }
-        }
-
-        MouseArea {
+        Icon {
             visible: section.folds
-            implicitWidth: 28
-            implicitHeight: 28
-            cursorShape: Qt.PointingHandCursor
-            onClicked: section.open = !section.open
+            text: section.open ? Icons.chevronUp : Icons.chevronDown
+            color: Theme.subtext
+        }
 
-            Icon {
-                anchors.centerIn: parent
-                text: section.open ? Icons.chevronUp : Icons.chevronDown
-                color: Theme.subtext
-            }
+        TapHandler {
+            enabled: section.folds
+            cursorShape: Qt.PointingHandCursor
+            onTapped: section.open = !section.open
         }
     }
 
-    ColumnLayout {
-        id: body
-
+    // Folded by its height, not hidden: hidden options would measure nothing, and the page
+    // would seem to fit again
+    Item {
         Layout.fillWidth: true
-        visible: section.key ? Config[section.key] : (section.folds ? section.open : true)
-        spacing: 12
+        Layout.topMargin: section.showsBody ? 0 : -section.spacing
+        implicitHeight: section.showsBody ? body.implicitHeight : 0
+        clip: true
+
+        ColumnLayout {
+            id: body
+
+            width: parent.width
+            spacing: 12
+        }
     }
 }

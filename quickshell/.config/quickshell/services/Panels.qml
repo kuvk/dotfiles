@@ -26,7 +26,7 @@ Singleton {
     property bool appMenu: false // app menu dropdown with categories
     property bool wifiQr: false // the connected Wi-Fi as a QR code
     property bool speedTest: false // internet speed test dials
-    property bool lockPreview: false // Settings > Lock Screen > Preview
+    property bool lockPreview: false // Settings > Style > Lock screen > Preview
     property var trayItem: null // SystemTrayItem whose menu is open
 
     // The click that dismisses a dropdown can also land on the button that

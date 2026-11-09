@@ -4,7 +4,7 @@ import Quickshell.Services.SystemTray
 import Quickshell.Widgets
 import qs.config
 
-// A tray app's icon in one of three styles (Settings > Tray & Player):
+// A tray app's icon in one of three styles (Settings > Bar):
 // original, tinted toward the theme, or monochrome (recolored in the text
 // color).
 // Apps listed in "Keep original colors" always keep theirs, for icons whose

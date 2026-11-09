@@ -35,7 +35,7 @@ Singleton {
     property string mainScreen: ""
 
     // The background: the theme's own (Theme.backgroundImage, hyprdori-theme-set) unless the user chose an
-    // image in Settings > Lock Screen (the theme's when that can't be read). Whenever it
+    // image in Settings > Style > Lock screen (the theme's when that can't be read). Whenever it
     // changes, `hyprdori-wallpaper lock` makes it ready to load at once (a copy scaled to the
     // largest screen when it's bigger, also given to the login screen), so locking never
     // waits for a large picture and nothing stays loaded while unlocked.

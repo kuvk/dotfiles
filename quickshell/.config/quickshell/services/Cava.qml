@@ -6,7 +6,7 @@ import Quickshell.Io
 import qs.config
 
 // Audio visualizer data for the player: runs cava (raw text output) while
-// something plays. `values` holds 0..1 per bar; Settings > Tray & Player sets
+// something plays. `values` holds 0..1 per bar; Settings > Bar sets
 // the number of bars.
 Singleton {
     id: root

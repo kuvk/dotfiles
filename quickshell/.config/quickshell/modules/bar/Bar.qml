@@ -13,11 +13,9 @@ PanelWindow {
     id: barWindow
 
     required property ShellScreen modelData
-    // The profile's primary monitor (Displays); with none known yet, every bar is primary
-    readonly property bool primary: Displays.primaryName === "" || Displays.primaryName === screen?.name
-
+    // Settings > Bar > Per monitor: this monitor's modules, all of them for one not set yet
     function shows(id: string): bool {
-        return Config.barShows(primary, id);
+        return Config.barShows(screen?.name ?? "", id);
     }
 
     // Open a dropdown centered under `item`

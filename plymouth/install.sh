@@ -71,7 +71,7 @@ trap 'rm -rf "$build"' EXIT
 # The logo drawn like kitty draws it, in 24px rows (scripts/.config/scripts/logo-render.py)
 "$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$magenta" --cell-height 24 --out "$build/logo.png"
 # The password field and progress bar are 40 px wider than the logo; the field is 52 px high, a
-# box with a 2 px outline and the lock and login screens' corners (Settings > Lock Screen >
+# box with a 2 px outline and the lock and login screens' corners (Settings > Style > Lock screen >
 # Rounded corners)
 ew=$(($(magick identify -format %w "$build/logo.png") + 40))
 eh=52
