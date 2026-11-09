@@ -125,6 +125,10 @@ Singleton {
             arrivals[n.id] = new Date();
             root.arrivals = arrivals;
             n.closed.connect(() => root.dismissPopup(n));
+            // kept from before a reload of the shell (lastGeneration): back in the history, not
+            // shown again
+            if (n.lastGeneration)
+                return;
             if (!root.dnd || n.urgency === NotificationUrgency.Critical)
                 root.popups = [...root.popups.filter(p => p.id !== n.id), n];
         }
