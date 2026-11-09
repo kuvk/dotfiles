@@ -70,15 +70,17 @@ trap 'rm -rf "$build"' EXIT
 # color on a faint track; the farewell line in red, large, alone on the screen
 # The logo drawn like kitty draws it, in 24px rows (scripts/.config/scripts/logo-render.py)
 "$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$magenta" --cell-height 24 --out "$build/logo.png"
-# The password field and progress bar are as wide as the logo; the field is a box with a 2 px
-# outline and the lock and login screens' corners (Settings > Lock Screen > Rounded corners)
-ew=$(magick identify -format %w "$build/logo.png")
+# The password field and progress bar are 40 px wider than the logo; the field is 52 px high, a
+# box with a 2 px outline and the lock and login screens' corners (Settings > Lock Screen >
+# Rounded corners)
+ew=$(($(magick identify -format %w "$build/logo.png") + 40))
+eh=52
 if ((field_radius > 0)); then
-    field_shape="roundrectangle 1,1 $((ew - 2)),46 $field_radius,$field_radius"
+    field_shape="roundrectangle 1,1 $((ew - 2)),$((eh - 2)) $field_radius,$field_radius"
 else
-    field_shape="rectangle 1,1 $((ew - 2)),46"
+    field_shape="rectangle 1,1 $((ew - 2)),$((eh - 2))"
 fi
-magick -size "${ew}x48" xc:none -fill "$field" -stroke "$accent" -strokewidth 2 \
+magick -size "${ew}x$eh" xc:none -fill "$field" -stroke "$accent" -strokewidth 2 \
     -draw "$field_shape" "$build/entry.png"
 magick -background none -fill "$subtext" -font "$font" -pointsize 16 label:"Speak, friend, and enter!" "$build/hint.png"
 magick -background none -fill "$yellow" -font "$font" -pointsize 16 label:"Tell me, friend, when did you abandon reason for madness?" "$build/wrong1.png"
@@ -105,7 +107,7 @@ if [[ $mode == preview* ]]; then
     lw=$(magick identify -format %w "$build/logo.png"); lh=$(magick identify -format %h "$build/logo.png")
     ly=$((540 - lh / 2)); ey=$((ly + lh + 40)); ex=$((960 - ew / 2))
     if [[ $mode == preview-progress ]]; then
-        py=$((ey + 24 - 5))
+        py=$((ey + eh / 2 - 5))
         magick -size 1920x1080 "xc:$background" \
             "$build/logo.png" -geometry +$((960 - lw / 2))+$ly -composite \
             "$build/progress_box.png" -geometry +$ex+$py -composite \
@@ -117,10 +119,10 @@ if [[ $mode == preview* ]]; then
     magick -size 1920x1080 "xc:$background" \
         "$build/logo.png" -geometry +$((960 - lw / 2))+$ly -composite \
         "$build/entry.png" -geometry +$ex+$ey -composite \
-        \( "$build/bullet.png" -resize 9x9 \) -geometry +$((ex + ew / 2 - 17))+$((ey + 19)) -composite \
-        \( "$build/bullet.png" -resize 9x9 \) -geometry +$((ex + ew / 2 - 4))+$((ey + 19)) -composite \
-        \( "$build/bullet.png" -resize 9x9 \) -geometry +$((ex + ew / 2 + 9))+$((ey + 19)) -composite \
-        "$build/hint.png" -geometry +$((960 - $(magick identify -format %w "$build/hint.png") / 2))+$((ey + 48 + 16)) -composite \
+        \( "$build/bullet.png" -resize 9x9 \) -geometry +$((ex + ew / 2 - 17))+$((ey + eh / 2 - 5)) -composite \
+        \( "$build/bullet.png" -resize 9x9 \) -geometry +$((ex + ew / 2 - 4))+$((ey + eh / 2 - 5)) -composite \
+        \( "$build/bullet.png" -resize 9x9 \) -geometry +$((ex + ew / 2 + 9))+$((ey + eh / 2 - 5)) -composite \
+        "$build/hint.png" -geometry +$((960 - $(magick identify -format %w "$build/hint.png") / 2))+$((ey + eh + 16)) -composite \
         "$preview"
     echo "Preview: $preview"
     exit 0

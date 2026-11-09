@@ -194,8 +194,8 @@ Item {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: 85
-            width: 260
-            height: 36
+            width: 300
+            height: 40
             // Settings > Lock Screen > Rounded corners: the windows' radius (8 with it at 0), or square
             radius: Config.lockRounded ? (Config.radius || 8) : 0
             // the background with 5% of the text color (Omarchy's field), at Settings' opacity

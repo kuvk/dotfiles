@@ -9,9 +9,14 @@
     <edit mode="assign" name="rgba"><const>{{ fc_rgba }}</const></edit>
     <edit mode="assign" name="lcdfilter"><const>{{ fc_lcdfilter }}</const></edit>
   </match>
-  <!-- The font: first for "monospace", which terminals and code editors ask for -->
+  <!-- The font: first for "monospace", which terminals and code editors ask for; not in
+       browsers, where pages keep the browser's own fonts -->
   <match target="pattern">
     <test name="family" qual="any"><string>monospace</string></test>
+    <test name="prgname" compare="not_eq"><string>chromium</string></test>
+    <test name="prgname" compare="not_eq"><string>brave</string></test>
+    <test name="prgname" compare="not_eq"><string>firefox</string></test>
+    <test name="prgname" compare="not_eq"><string>zen</string></test>
     <edit name="family" mode="prepend_first" binding="strong"><string>{{ nerd_font }}</string></edit>
   </match>
 </fontconfig>

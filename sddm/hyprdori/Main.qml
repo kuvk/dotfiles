@@ -160,8 +160,8 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             anchors.verticalCenterOffset: 85
-            implicitWidth: 260
-            implicitHeight: 36
+            implicitWidth: 300
+            implicitHeight: 40
             radius: Number(root.c.radius)
             color: Qt.alpha(root.c.input, Number(root.c.inputOpacity))
             border.width: 2
