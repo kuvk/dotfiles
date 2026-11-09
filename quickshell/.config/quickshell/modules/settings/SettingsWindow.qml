@@ -21,7 +21,8 @@ FloatingWindow {
         { id: "displays", label: "Displays", icon: Icons.display },
         { id: "sleep", label: "Screen & Sleep", icon: Icons.bed }
     ]
-    property string section: "style"
+    // the page shown, chosen in the sidebar or by Panels.openSettings
+    readonly property string section: Panels.settingsPage
     // The page's height with every section open; while it's taller than the room for it, its
     // sections fold (SettingsSection)
     readonly property real pageFullHeight: {
@@ -81,9 +82,11 @@ FloatingWindow {
     title: "Settings"
     color: Theme.panelBg
     implicitWidth: Math.round(780 * Theme.textScale)
-    implicitHeight: Math.round(560 * Theme.textScale)
-    // can grow, not shrink below the default size
+    // one height for every page, enough for Displays without scrolling
+    implicitHeight: Math.round(780 * Theme.textScale)
+    // can grow wider, not shrink below the default size; its height stays
     minimumSize: Qt.size(implicitWidth, implicitHeight)
+    maximumSize: Qt.size(16384, implicitHeight)
 
     // A regular window (floating and centered by a Hyprland rule, can be
     // tiled); closing it from Hyprland updates the panel state
@@ -130,7 +133,7 @@ FloatingWindow {
                             implicitHeight: 36
                             hoverEnabled: true
                             cursorShape: Qt.PointingHandCursor
-                            onClicked: root.section = modelData.id
+                            onClicked: Panels.settingsPage = modelData.id
 
                             Rectangle {
                                 anchors.fill: parent

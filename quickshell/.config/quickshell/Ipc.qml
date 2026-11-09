@@ -157,6 +157,11 @@ Scope {
         function toggle(): void {
             Panels.toggleSettings();
         }
+
+        // a page by its sidebar id: style, fonts, bar, displays, sleep
+        function open(page: string): void {
+            Panels.openSettings(page);
+        }
     }
 
     IpcHandler {

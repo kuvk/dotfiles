@@ -155,6 +155,18 @@ Singleton {
         settings = open;
     }
 
+    // The page Settings shows (its sidebar), kept while it's closed
+    property string settingsPage: "style"
+
+    // Settings open on a page (the Control Center's and app menu's Displays button)
+    function openSettings(page: string): void {
+        settingsPage = page;
+        if (!settings) {
+            closeAll();
+            settings = true;
+        }
+    }
+
     function toggleKeybinds(): void {
         const open = !keybinds;
         closeAll();

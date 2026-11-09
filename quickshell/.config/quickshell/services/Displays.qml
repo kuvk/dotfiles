@@ -34,6 +34,13 @@ Singleton {
         applyProc.running = true;
     }
 
+    // Displays > Defaults: this setup as if it were new (hyprdori-monitors reset)
+    function reset(): void {
+        busy = true;
+        applyProc.command = [script, "reset"];
+        applyProc.running = true;
+    }
+
     function setBrightness(name: string, pct: int): void {
         const b = Object.assign({}, brightness);
         b[name] = pct;

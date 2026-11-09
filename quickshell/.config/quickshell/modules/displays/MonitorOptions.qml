@@ -5,59 +5,31 @@ import qs.config
 import qs.components
 import qs.services
 
-// The selected monitor: on/off, mode, scale, rotation, variable refresh, colors, depth, brightness, workspaces (Displays)
-// Selected monitor
-GridLayout {
+// The selected monitor's options, as Settings' options: on or off, primary, mode, scale,
+// variable refresh, colors, depth, brightness and its workspaces (Displays)
+ColumnLayout {
     // the DisplaysEditor: its monitors, selection and actions
     required property var panel
 
     Layout.fillWidth: true
     visible: panel.current !== null
-    columns: 2
-    columnSpacing: 16
-    rowSpacing: 10
+    spacing: 12
 
-    StyledText {
-        Layout.columnSpan: 2
-        Layout.fillWidth: true
-        text: panel.current ? (panel.current.description || panel.current.name) : ""
-        color: Theme.subtext
-    }
-
-    Caption {
-        Layout.alignment: Qt.AlignVCenter
-        text: "Enabled"
-    }
-
-    // The saved choice; with the lid closed and another monitor on, the laptop's
-    // screen is off anyway (clamshell) and comes back as chosen here
-    RowLayout {
-        Layout.fillWidth: true
-        spacing: 10
+    // The saved choice; with the lid closed and another monitor on, the laptop's screen is off
+    // anyway (clamshell) and comes back as chosen here
+    SettingRow {
+        label: "Enabled"
+        hint: panel.current?.lid_closed ? "Off while the lid is closed" : ""
 
         Switch {
             checked: panel.current?.enabled ?? false
             onToggled: panel.setEnabled(panel.selected, !checked)
         }
-
-        StyledText {
-            visible: !!panel.current?.lid_closed
-            Layout.fillWidth: true
-            wrapMode: Text.Wrap
-            text: "Off while the lid is closed"
-            color: Theme.dimText
-            font.pixelSize: Theme.captionSize
-        }
     }
 
-    Caption {
-        Layout.alignment: Qt.AlignVCenter
-        text: "Primary"
-    }
-
-    RowLayout {
-        Layout.fillWidth: true
-        spacing: 10
+    SettingRow {
+        label: "Primary"
+        hint: "Gets the first workspaces"
 
         Switch {
             checked: panel.current !== null && panel.current.id === panel.primary
@@ -66,147 +38,82 @@ GridLayout {
                 panel.dirty = true;
             }
         }
+    }
 
-        StyledText {
-            Layout.fillWidth: true
-            wrapMode: Text.Wrap
-            text: "Gets the first workspaces with Default"
-            color: Theme.dimText
-            font.pixelSize: Theme.captionSize
+    SettingRow {
+        label: "Resolution"
+
+        Stepper {
+            enabled: panel.current?.enabled ?? false
+            text: panel.current ? panel.current.mode.replace("@", " @ ") + " Hz" : ""
+            onStep: delta => panel.setMode(panel.selected, panel.cycle(panel.current.modes, panel.current.mode, delta))
         }
     }
 
-    Caption {
-        Layout.alignment: Qt.AlignVCenter
-        text: "Resolution"
+    SettingRow {
+        label: "Scale"
+
+        Stepper {
+            enabled: panel.current?.enabled ?? false
+            text: panel.current ? `${Math.round(panel.current.scale * 1000) / 10}%  (${Math.round(panel.current.width)}×${Math.round(panel.current.height)})` : ""
+            onStep: delta => panel.update(panel.selected, { scale: panel.cycle(panel.validScales(panel.current.mode), panel.current.scale, delta) })
+        }
     }
 
-    Stepper {
-        enabled: panel.current?.enabled ?? false
-        text: panel.current ? panel.current.mode.replace("@", " @ ") + " Hz" : ""
-        onStep: delta => panel.setMode(panel.selected, panel.cycle(panel.current.modes, panel.current.mode, delta))
-    }
-
-    Caption {
-        Layout.alignment: Qt.AlignVCenter
-        text: "Scale"
-    }
-
-    Stepper {
-        enabled: panel.current?.enabled ?? false
-        text: panel.current ? `${Math.round(panel.current.scale * 1000) / 10}%  (${Math.round(panel.current.width)}×${Math.round(panel.current.height)})` : ""
-        onStep: delta => panel.update(panel.selected, { scale: panel.cycle(panel.validScales(panel.current.mode), panel.current.scale, delta) })
-    }
-
-    Caption {
-        Layout.alignment: Qt.AlignVCenter
-        text: "Variable refresh"
-        visible: vrrRow.visible
-    }
-
-    RowLayout {
-        id: vrrRow
-
-        Layout.fillWidth: true
+    SettingRow {
         visible: !!panel.current?.enabled && !!panel.current?.vrr_capable
-        spacing: 10
+        label: "Variable refresh"
+        hint: "May blink when it switches"
 
         Stepper {
             text: panel.vrrNames[panel.current?.vrr ?? 0] ?? "Off"
             onStep: delta => panel.update(panel.selected, { vrr: ((panel.current.vrr ?? 0) + delta + 4) % 4 })
         }
+    }
 
-        StyledText {
-            Layout.fillWidth: true
-            wrapMode: Text.Wrap
-            text: "May blink when it switches"
-            color: Theme.dimText
-            font.pixelSize: Theme.captionSize
+    SettingRow {
+        label: "Colors"
+
+        Stepper {
+            enabled: panel.current?.enabled ?? false
+            text: panel.current ? (panel.colorNames[panel.current.cm] ?? panel.current.cm) : ""
+            onStep: delta => panel.update(panel.selected, { cm: panel.cycle(panel.colorModes, panel.current.cm, delta) })
         }
     }
 
-    Caption {
-        Layout.alignment: Qt.AlignVCenter
-        text: "Colors"
-    }
-
-    Stepper {
-        enabled: panel.current?.enabled ?? false
-        text: panel.current ? (panel.colorNames[panel.current.cm] ?? panel.current.cm) : ""
-        onStep: delta => panel.update(panel.selected, { cm: panel.cycle(panel.colorModes, panel.current.cm, delta) })
-    }
-
-    Caption {
-        Layout.alignment: Qt.AlignVCenter
-        text: "Color depth"
-        visible: depthRow.visible
-    }
-
     // Screens that take 10-bit (their EDID)
-    RowLayout {
-        id: depthRow
-
-        Layout.fillWidth: true
+    SettingRow {
         visible: !!panel.current?.enabled && (panel.current?.max_bitdepth ?? 8) >= 10
-        spacing: 10
+        label: "Color depth"
+        hint: (panel.current?.bitdepth ?? 10) === 10 ? "Smoother gradients" : ""
 
         Stepper {
             text: `${panel.current?.bitdepth ?? 10}-bit`
             onStep: delta => panel.update(panel.selected, { bitdepth: (panel.current?.bitdepth ?? 10) === 10 ? 8 : 10 })
         }
-
-        StyledText {
-            Layout.fillWidth: true
-            wrapMode: Text.Wrap
-            text: "Smoother gradients"
-            visible: (panel.current?.bitdepth ?? 10) === 10
-            color: Theme.dimText
-            font.pixelSize: Theme.captionSize
-        }
     }
 
-    Caption {
-        Layout.alignment: Qt.AlignVCenter
-        text: "Brightness"
-        visible: brightnessSlider.visible
-        opacity: brightnessSlider.opacity
+    // Reading the brightness takes a moment after opening: the slider keeps its place meanwhile
+    // (invisible), so Displays opens at its final size. Hidden for a monitor without a
+    // brightness control (null).
+    SettingSlider {
+        readonly property var level: panel.current ? Displays.brightness[panel.current.name] : undefined
+
+        visible: !!panel.current?.enabled && level !== null
+        opacity: level === undefined ? 0 : 1
+        enabled: level !== undefined
+        label: "Brightness"
+        valueText: `${level ?? 0}%`
+        value: (level ?? 0) / 100
+        onChanged: v => Displays.setBrightness(panel.current.name, Math.max(1, Math.round(v * 100)))
     }
 
-    RowLayout {
-        id: brightnessSlider
+    SettingRow {
+        label: "Workspaces"
+        hint: "Outlined: assigned to another monitor"
 
-        readonly property var value: panel.current ? Displays.brightness[panel.current.name] : undefined
-
-        Layout.fillWidth: true
-        // Reading the brightness takes a moment after opening: the row keeps its place
-        // meanwhile (invisible), so the dropdown opens at its final size. Hidden for a monitor
-        // without a brightness control (null).
-        visible: !!panel.current?.enabled && value !== null
-        opacity: value === undefined ? 0 : 1
-        enabled: value !== undefined
-        spacing: 10
-
-        SliderRow {
-            value: (brightnessSlider.value ?? 0) / 100
-            onMoved: v => Displays.setBrightness(panel.current.name, Math.max(1, Math.round(v * 100)))
-        }
-
-        Caption {
-            Layout.preferredWidth: 40
-            horizontalAlignment: Text.AlignRight
-            text: `${brightnessSlider.value ?? 0}%`
-        }
-    }
-
-    Caption {
-        Layout.alignment: Qt.AlignVCenter
-        text: "Workspaces"
-    }
-
-    ColumnLayout {
-        spacing: 4
-
-        RowLayout {
+        // a click assigns one to this monitor, or unassigns it
+        Row {
             spacing: 4
 
             Repeater {
@@ -220,8 +127,8 @@ GridLayout {
                     readonly property string owner: panel.workspaces[String(ws)] ?? ""
                     readonly property bool mine: panel.current !== null && owner === panel.current.id
 
-                    implicitWidth: 30
-                    implicitHeight: 30
+                    width: 30
+                    height: 30
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
                     onClicked: panel.toggleWorkspace(ws)
@@ -242,25 +149,6 @@ GridLayout {
                         font.weight: wsChip.mine ? Font.Bold : Font.Normal
                     }
                 }
-            }
-
-        }
-
-        RowLayout {
-            Layout.fillWidth: true
-            spacing: 8
-
-            StyledText {
-                Layout.fillWidth: true
-                text: "Click to assign or unassign. Outlined: on another monitor."
-                color: Theme.dimText
-                font.pixelSize: Theme.captionSize
-                wrapMode: Text.Wrap
-            }
-
-            TextButton {
-                text: "Default"
-                onClicked: panel.defaultWorkspaces()
             }
         }
     }

@@ -16,7 +16,7 @@ RowLayout {
     Repeater {
         model: [
             { icon: Icons.cog, label: "Settings", run: () => Panels.toggleSettings() },
-            { icon: Icons.display, label: "Displays", run: () => Panels.toggleDisplays() },
+            { icon: Icons.display, label: "Displays", run: () => Panels.openSettings("displays") },
             { icon: Icons.keyboard, label: "Keybindings", run: () => Panels.toggleKeybinds() },
             { icon: Icons.info, label: "System information", run: () => System.showSysinfo() }
         ]

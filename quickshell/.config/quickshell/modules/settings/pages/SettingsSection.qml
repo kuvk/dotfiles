@@ -6,10 +6,10 @@ import qs.components
 // A section of a Settings page: its heading in capitals in the text color (as a dropdown's
 // section, a step above its options' labels), its hint below if any, then its options.
 // While the page doesn't fit the window (the window's foldSections), the sections become
-// dropdowns: a divider between them, an arrow at the heading's right (down while folded, up
-// while open, lined up with the steppers' arrows and the switches' knobs), a click on the
-// heading opens or folds it with the dropdowns' slide; the page's first starts open, the rest
-// folded.
+// dropdowns: an arrow at the heading's right (down while folded, up while open, lined up with
+// the steppers' arrows and the switches' knobs), a click on the heading slides its options open
+// or shut like the shell's dropdowns, with a divider under them while open; the page's first
+// starts open, the rest folded.
 ColumnLayout {
     id: section
 
@@ -25,35 +25,26 @@ ColumnLayout {
         return item;
     }
     readonly property bool folds: title !== "" && (page?.settings?.foldSections ?? false)
-    readonly property bool first: parent ? Array.from(parent.children).find(c => c.fullHeight !== undefined) === section : true
+    readonly property var sections: parent ? Array.from(parent.children).filter(c => c.fullHeight !== undefined) : []
+    readonly property bool first: sections[0] === section
+    readonly property bool last: sections[sections.length - 1] === section
     property bool open: first
     readonly property bool showsBody: !folds || open
     // its height with its options shown, folded or not: the window adds these up to see whether
     // the page fits
-    readonly property real fullHeight: Layout.topMargin
-        + (divider.visible ? divider.implicitHeight + divider.Layout.topMargin + divider.Layout.bottomMargin : 0)
-        + (header.visible ? header.implicitHeight + 16 : 0)
-        + body.implicitHeight
+    // (as laid out open, without dividers: it mustn't depend on the folding it decides)
+    readonly property real fullHeight: 8 + (header.visible ? header.implicitHeight + 16 : 0) + body.implicitHeight
 
     Layout.fillWidth: true
-    // as dropdowns the divider spaces them, evenly above and below each heading
-    Layout.topMargin: folds ? 0 : 8
-    // the gaps are the parts' own margins: a folded section leaves none under its heading
+    Layout.topMargin: folds ? 12 : 8
+    // the gap under the heading is inside the part that slides, so a section folds in one move
     spacing: 0
-
-    Separator {
-        id: divider
-
-        Layout.bottomMargin: 14
-        visible: section.folds && !section.first
-    }
 
     // no title: no heading, the options show as they are
     Item {
         id: header
 
         Layout.fillWidth: true
-        Layout.bottomMargin: section.showsBody ? 16 : 0
         visible: section.title !== ""
         implicitHeight: headerRow.implicitHeight
 
@@ -107,10 +98,11 @@ ColumnLayout {
     }
 
     // Folded by its height, not hidden: hidden options would measure nothing, and the page
-    // would seem to fit again
+    // would seem to fit again. Shut, it's also transparent, so nothing shows at its edge.
     Item {
         Layout.fillWidth: true
-        implicitHeight: section.showsBody ? body.implicitHeight : 0
+        implicitHeight: section.showsBody ? reveal.implicitHeight : 0
+        opacity: implicitHeight > 0.5 ? 1 : 0
         clip: true
 
         Behavior on implicitHeight {
@@ -121,10 +113,24 @@ ColumnLayout {
         }
 
         ColumnLayout {
-            id: body
+            id: reveal
 
             width: parent.width
-            spacing: 12
+            spacing: 0
+
+            ColumnLayout {
+                id: body
+
+                Layout.fillWidth: true
+                Layout.topMargin: header.visible ? 16 : 0
+                spacing: 12
+            }
+
+            // under an open section's options while the sections are dropdowns
+            Separator {
+                Layout.topMargin: 14
+                visible: section.folds && !section.last
+            }
         }
     }
 }
