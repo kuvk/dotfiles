@@ -5,12 +5,6 @@ hl.layer_rule({
   ignore_alpha = 0.2,
 })
 
--- Notifications: blur only behind the card, not its shadow (up to 0.4 opaque)
-hl.layer_rule({
-  match = { class = "^(quickshell-notifications)$" },
-  ignore_alpha = 0.5,
-})
-
 -- Quickshell animates its dropdowns and tooltips itself
 hl.layer_rule({
   match = {

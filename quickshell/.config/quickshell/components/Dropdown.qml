@@ -25,8 +25,7 @@ PanelWindow {
     // Gap under the bar, and a transparent margin so fractional monitor
     // scales never cut the right or bottom border
     readonly property int gap: 6
-    // room around the panel: a transparent margin, and the shadow's
-    readonly property int pad: 4 + Theme.shadowPad
+    readonly property int pad: 4
     // wider with bigger text
     readonly property int panelWidth: Math.round(contentWidth * Theme.textScale)
     readonly property int panelHeight: Math.ceil(column.implicitHeight + Theme.padding * 2)
@@ -99,8 +98,6 @@ PanelWindow {
             radius: Theme.radius
             border.color: Theme.border
             border.width: Theme.borderWidth
-            layer.enabled: Theme.shadows
-            layer.effect: ShellShadow {}
 
             focus: root.shown
             Keys.onEscapePressed: Panels.closeDropdown(root.name)

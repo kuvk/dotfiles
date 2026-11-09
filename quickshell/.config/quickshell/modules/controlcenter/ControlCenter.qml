@@ -26,21 +26,13 @@ PanelWindow {
         right: true
         bottom: true
     }
-    // 6 px from the screen's right and bottom edges; with the shadow the window reaches the
-    // edges and keeps that space inside, with room for the shadow on the left
-    readonly property int panelWidth: Math.round(420 * Theme.textScale)
-    readonly property int edge: Theme.shadows ? 0 : 6
     margins {
-        right: root.edge
-        bottom: root.edge
-    }
-    // only the panel takes the mouse, not the room around it
-    mask: Region {
-        item: panel
+        right: 6
+        bottom: 6
     }
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
-    implicitWidth: panelWidth + (Theme.shadows ? Theme.shadowPad + 6 : 0)
+    implicitWidth: Math.round(420 * Theme.textScale)
     WlrLayershell.namespace: "quickshell-controlcenter"
     WlrLayershell.layer: WlrLayer.Top
     // OnDemand like the dropdowns: the focus grab below hands this window the
@@ -75,18 +67,13 @@ PanelWindow {
         clip: true
 
         Rectangle {
-            id: panel
-
-            x: Theme.shadows ? Theme.shadowPad : 0
-            width: root.panelWidth
-            height: parent.height - root.gap - (6 - root.edge)
+            width: parent.width
+            height: parent.height - root.gap
             y: Math.round(root.gap - (height + root.gap) * (1 - reveal.value))
             color: Theme.panelBg
             radius: Theme.radius
             border.color: Theme.border
             border.width: Theme.borderWidth
-            layer.enabled: Theme.shadows
-            layer.effect: ShellShadow {}
 
             focus: root.shown
             Keys.onEscapePressed: Panels.controlCenter = false

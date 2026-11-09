@@ -75,10 +75,6 @@ Singleton {
     readonly property color panelBg: alpha(background, gamemode ? 1 : Config.shellOpacity)
     // Behind full-screen overlays (power menu, pickers, network): the wallpaper dimmed and blurred
     readonly property color backdrop: alpha(darkerBackground, gamemode ? 1 : 0.75)
-    // Settings > Style > Shell > Shadow (none in Work-Game): popups keep this much room around
-    // their panel for it (ShellShadow)
-    readonly property bool shadows: Config.shadow && !gamemode
-    readonly property int shadowPad: shadows ? 14 : 0
     readonly property color cardBg: idleFill
     readonly property color hoverBg: hoverFill
     // popups and dropdowns are framed in the accent, as Hyprland frames the focused window
@@ -115,8 +111,8 @@ Singleton {
     readonly property int iconLargeSize: Math.round(18 * textScale)
     // the bar: icons, workspaces and text all at the text size
     readonly property int barIconSize: textSize
-    // the workspace dots, a step smaller than the rest of the bar
-    readonly property int workspaceIconSize: Math.round(textSize * 0.85)
+    // the bar's small icons, a step smaller than the rest: the workspace dots, the tray's arrow
+    readonly property int barSmallIconSize: Math.round(textSize * 0.85)
     // the bar's height: 26 at 12 px
     readonly property int barHeight: Math.round(26 * textScale)
     // Floating bar (Settings > Bar): its own margin on the left, right and

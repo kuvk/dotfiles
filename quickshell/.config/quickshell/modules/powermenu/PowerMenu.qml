@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Wayland
@@ -139,17 +138,6 @@ Scope {
                                 color: button.selected ? Theme.alpha(Theme.selection, Theme.gamemode ? 1 : 0.9) : Theme.alpha(Theme.lighterBackground, Theme.gamemode ? 1 : 0.75)
                                 border.color: button.selected ? Theme.named(button.modelData.color) : "transparent"
                                 border.width: Theme.borderWidth
-
-                                // tight shadow: small offset, soft edge
-                                layer.enabled: !Theme.gamemode
-                                layer.effect: MultiEffect {
-                                    shadowEnabled: true
-                                    shadowColor: "black"
-                                    shadowOpacity: 0.55
-                                    shadowBlur: 0.45
-                                    shadowVerticalOffset: 4
-                                    shadowHorizontalOffset: 0
-                                }
 
                                 Behavior on color {
                                     ColorAnimation {

@@ -1,5 +1,4 @@
 import QtQuick
-import QtQuick.Effects
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Services.Notifications
@@ -70,9 +69,6 @@ Item {
         border.width: root.critical || root.popup ? Theme.borderWidth : 0
         border.color: root.critical ? Theme.red : Theme.border
         clip: true
-
-        layer.enabled: root.popup && Theme.shadows
-        layer.effect: ShellShadow {}
 
         // Time left before the popup hides. Along the straight part of the top edge, between
         // the rounded corners, with rounded ends; edge to edge when corners are square.

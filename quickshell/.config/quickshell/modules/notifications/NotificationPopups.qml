@@ -16,12 +16,11 @@ PanelWindow {
         top: true
         right: true
     }
-    // the cards sit 10px from the screen's edges, with 30px on the left and below for
-    // their shadow (it runs off the screen on the other two sides)
+    // the cards sit 10 px from the screen's right edge, 4 px below the window's top
     exclusionMode: ExclusionMode.Normal
     exclusiveZone: 0
-    implicitWidth: Math.round(440 * Theme.textScale)
-    implicitHeight: Math.ceil(column.implicitHeight + 34)
+    implicitWidth: Math.round(440 * Theme.textScale) - 30
+    implicitHeight: Math.ceil(column.implicitHeight + 8)
     WlrLayershell.namespace: "quickshell-notifications"
     WlrLayershell.layer: WlrLayer.Overlay
     WlrLayershell.keyboardFocus: Notifs.replying ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
@@ -29,9 +28,8 @@ PanelWindow {
     ColumnLayout {
         id: column
 
-        x: 30
         y: 4
-        width: parent.width - 40
+        width: parent.width - 10
         spacing: Theme.spacing
 
         Repeater {

@@ -16,12 +16,8 @@ hl.config({
     inactive_opacity = theme.inactive_opacity or 0.85,
     fullscreen_opacity = 1.0,
 
-    shadow = {
-      enabled = false,
-      range = 10,
-      render_power = 3,
-      color = 0x66000000,
-    },
+    -- no shadows anywhere
+    shadow = { enabled = false },
 
     blur = {
       enabled = theme.blur ~= false,

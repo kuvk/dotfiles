@@ -54,7 +54,6 @@ style_on() {
 hl.config({
     animations = { enabled = false },
     decoration = {
-        shadow = { enabled = false },
         blur = { enabled = false },
         active_opacity = 1,
         inactive_opacity = 1,
@@ -70,7 +69,7 @@ hl.config({
 }
 
 style_off() {
-    # decoration.lua again (opacity, shadow, blur), so its values live in one place; the
+    # decoration.lua again (opacity, blur), so its values live in one place; the
     # shell then sets the corners and blur from Settings (services/Hypr.qml)
     hyprctl eval "$borders
 package.loaded['configs.decoration'] = nil

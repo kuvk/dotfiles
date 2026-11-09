@@ -53,9 +53,8 @@ PanelWindow {
     margins {
         top: Math.round((screen?.height ?? 1080) * 0.22)
     }
-    // the panel, and room for its shadow on the sides and below
-    implicitWidth: Math.round(640 * Theme.textScale) + Theme.shadowPad * 2
-    implicitHeight: 74 + maxRows * (rowHeight + 4) + 12 + Theme.shadowPad
+    implicitWidth: Math.round(640 * Theme.textScale)
+    implicitHeight: 74 + maxRows * (rowHeight + 4) + 12
     readonly property real panelHeight: 74 + (results.length > 0 ? Math.min(results.length, maxRows) * (rowHeight + 4) + 12 : 0)
     mask: Region {
         item: panel
@@ -100,16 +99,13 @@ PanelWindow {
     Rectangle {
         id: panel
 
-        x: Theme.shadowPad
-        width: parent.width - Theme.shadowPad * 2
+        width: parent.width
         height: root.panelHeight
         clip: true
         color: Theme.panelBg
         radius: Theme.radius
         border.color: Theme.border
         border.width: Theme.borderWidth
-        layer.enabled: Theme.shadows
-        layer.effect: ShellShadow {}
 
         Behavior on height {
             NumberAnimation {
@@ -122,7 +118,7 @@ PanelWindow {
             x: 13
             y: 13
             width: parent.width - 26
-            height: root.implicitHeight - Theme.shadowPad - 26
+            height: root.implicitHeight - 26
             spacing: 12
 
             Rectangle {
