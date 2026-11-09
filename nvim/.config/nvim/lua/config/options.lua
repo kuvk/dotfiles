@@ -78,9 +78,15 @@ vim.g.loaded_python3_provider = 0
 -- Backspace
 opt.backspace = "indent,eol,start"
 
--- No command line row, noice.lua draws it. One status line across splits, shown once lualine
--- has set it up (plugins/lualine.lua): until then it's drawn in no colors at all
-opt.cmdheight = 0
+-- No command line row, noice.lua draws it; the row stays while Neovim starts (init.lua). One
+-- status line across splits, shown once lualine has set it up (plugins/lualine.lua).
+opt.cmdheight = 1
+vim.api.nvim_create_autocmd("VimEnter", {
+  once = true,
+  callback = function()
+    vim.o.cmdheight = 0
+  end,
+})
 opt.laststatus = 0
 
 opt.sessionoptions = "blank,buffers,curdir,folds,help,tabpages,winsize,winpos,terminal,localoptions"

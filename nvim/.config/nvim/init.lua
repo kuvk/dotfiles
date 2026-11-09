@@ -1,11 +1,9 @@
--- Before anything else: true colors, no command line row and no status line (lualine shows
--- it), and the status line in no colors. Otherwise a slow start draws Neovim's default
--- status line, black, before the colorscheme and lualine load.
+-- While starting: true colors, no status line until lualine shows it, and a command line row.
+-- Without that row a message while plugins load (cmdheight 0) takes over the bottom rows,
+-- black, before the colorscheme draws them; noice draws the command line once Neovim has
+-- started, and the row goes (options.lua).
 vim.o.termguicolors = true
-vim.o.cmdheight = 0
 vim.o.laststatus = 0
-vim.api.nvim_set_hl(0, "StatusLine", {})
-vim.api.nvim_set_hl(0, "StatusLineNC", {})
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
