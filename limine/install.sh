@@ -130,8 +130,8 @@ timeout: 3
 default_entry: 2
 terse: yes
 interface_resolution: ${res_w}x$res_h
-interface_branding: HYPRDORI 
-interface_branding_colour: $(hex "$magenta")
+interface_branding: HYPRDORI
+interface_branding_colour: $(hex "$accent")
 interface_help_hidden: yes
 interface_help_colour: $(hex "$accent")
 interface_help_colour_bright: $(hex "$bright_foreground")

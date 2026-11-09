@@ -87,6 +87,9 @@ local function setup()
       theme = mode_theme(),
       component_separators = "",
       section_separators = { left = right, right = left },
+      -- one status line for every window (laststatus 3), set once rather than per window, so
+      -- new windows (the file tree, a buffer) never show it empty until lualine's next refresh
+      globalstatus = true,
     },
     sections = {
       lualine_a = { { "mode", separator = { left = left }, right_padding = 2 } },
@@ -164,7 +167,19 @@ end
 return {
   "nvim-lualine/lualine.nvim",
   config = function()
+    -- lualine writes its line into each window; a new window (the file tree) or a new buffer
+    -- would show the empty global one until lualine's next refresh, so the global one follows
+    -- the latest line
+    local nvim_opts = require("lualine.utils.nvim_opts")
+    local set = nvim_opts.set
+    nvim_opts.set = function(name, value, opts)
+      set(name, value, opts)
+      if name == "statusline" and opts and opts.window and type(value) == "string" and value ~= "" then
+        vim.go.statusline = value
+      end
+    end
     setup()
+    vim.o.laststatus = 3
     -- Colors come from the colorscheme, so rebuild when the theme changes
     vim.api.nvim_create_autocmd("ColorScheme", { callback = setup })
     vim.api.nvim_create_autocmd("User", { pattern = "ThemeShape", callback = setup })
