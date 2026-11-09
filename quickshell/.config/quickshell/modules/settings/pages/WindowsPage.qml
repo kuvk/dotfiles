@@ -27,6 +27,43 @@ ColumnLayout {
         }
     }
 
+    SettingRow {
+        label: "Border width"
+
+        Stepper {
+            text: `${Config.borderWidth} px`
+            onStep: d => Config.borderWidth = settings.clamp(Config.borderWidth + d, 0, 4)
+        }
+    }
+
+    SettingSlider {
+        label: "Active window opacity"
+        normalOnly: true
+        hint: "Other apps' windows; browsers and fullscreen windows stay opaque"
+        from: 0.5
+        value: Config.activeOpacity
+        onChanged: v => Config.activeOpacity = v
+    }
+
+    SettingSlider {
+        label: "Inactive window opacity"
+        normalOnly: true
+        from: 0.5
+        value: Config.inactiveOpacity
+        onChanged: v => Config.inactiveOpacity = v
+    }
+
+    SettingRow {
+        label: "Blur"
+        normalOnly: true
+        hint: "Behind windows and the shell"
+
+        Switch {
+            checked: Config.blur
+            onToggled: Config.blur = !Config.blur
+        }
+    }
+
     StyledText {
         text: "Inner: between windows. Outer: to the screen edge."
         color: Theme.dimText
