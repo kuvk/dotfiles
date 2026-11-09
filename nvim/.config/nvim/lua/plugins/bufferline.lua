@@ -1,8 +1,6 @@
 -- Backgrounds for every part of the bar, given to bufferline itself so the file icon groups it
 -- makes later get them too: only the selected buffer has one, everything else (other buffers,
--- the Neo Tree title, the arrows when buffers don't fit) sits on the editor's. Every part is
--- underlined in muted, which draws the divider under the whole bar (kitty puts underlines at
--- the bottom of the cell, as thick as the split lines: kitty.conf)
+-- the Neo Tree title, the arrows when buffers don't fit) sits on the editor's
 local function bar_highlights()
   local p = require("theme").palette
   local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
@@ -13,7 +11,7 @@ local function bar_highlights()
   local defaults = require("bufferline.config").get().highlights or {}
   local result = {}
   for name in pairs(defaults) do
-    result[name] = { bg = name:find("selected") and p.lighter_bg or normal, sp = p.muted, underline = true }
+    result[name] = { bg = name:find("selected") and p.lighter_bg or normal}
     if name:find("separator") then
       result[name].fg = normal
     end
@@ -24,7 +22,7 @@ end
 local function custom_highlights()
   local p = require("theme").palette
   local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
-  vim.api.nvim_set_hl(0, "NeoTreeExplorerLabel", { fg = p.accent, bg = normal, bold = true, sp = p.muted, underline = true })
+  vim.api.nvim_set_hl(0, "NeoTreeExplorerLabel", { fg = p.accent, bg = normal, bold = true })
   if p.blue then
     vim.api.nvim_set_hl(0, "StatusLine", { fg = p.blue })
   end
