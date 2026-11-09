@@ -104,5 +104,9 @@ tab_bar_right = [{ type = "zoom" }, { type = "hostname" }]
 # what Hyprland shows as the window title
 window_title = "{hostname}: {workspace}"
 
+status_indicators = "dots"
 [ui.sound.agents]
 claude = "on"
+
+[ui.toast]
+delivery = "herdr"
