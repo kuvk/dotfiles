@@ -81,18 +81,18 @@ Singleton {
     readonly property color border: accent
     readonly property int borderWidth: Config.borderWidth
 
-    // Fonts. Settings > Fonts. Text: the display font, or the Nerd Font with "Nerd Fonts only".
-    // Icons: Symbols Nerd Font, or the Nerd Font's proportional ("Propo") variant: in the
-    // monospaced variants wide icons spill out of their cell and sit off-center in buttons.
-    readonly property string nerdFamily: (Config.nerdFont || "JetBrainsMono Nerd Font").replace(/ (Mono|Propo)$/, "")
-    readonly property string font: Config.nerdFontOnly ? (Config.nerdFont || nerdFamily) : (Config.displayFont || "SF Pro Display")
+    // Fonts. Settings > Fonts: one font for text, also the terminals' (monoFont). Icons from
+    // Symbols Nerd Font, centered in buttons whatever the font; without it, the font's own
+    // (a Nerd Font's proportional "Propo" variant when installed)
+    readonly property string font: Config.font || "JetBrainsMono Nerd Font"
+    readonly property string monoFont: font
     readonly property string iconFont: {
-        if (Config.nerdSymbols)
+        const families = Qt.fontFamilies();
+        if (families.includes("Symbols Nerd Font"))
             return "Symbols Nerd Font";
-        const propo = nerdFamily + " Propo";
-        return Qt.fontFamilies().includes(propo) ? propo : nerdFamily;
+        const propo = font.replace(/ (Mono|Propo)$/, "") + " Propo";
+        return families.includes(propo) ? propo : font;
     }
-    readonly property string monoFont: Config.nerdFont || "JetBrainsMono Nerd Font"
 
     // Text size in px from Displays (~/.config/hypr/monitors.json): the body text, 12 by
     // default. The other sizes scale with it; at 12: caption 10, small 11,

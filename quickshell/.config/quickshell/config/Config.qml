@@ -29,11 +29,8 @@ Singleton {
     property alias blur: adapter.blur
     property alias animations: adapter.animations
 
-    // Fonts
-    property alias nerdFont: adapter.nerdFont
-    property alias displayFont: adapter.displayFont
-    property alias nerdFontOnly: adapter.nerdFontOnly
-    property alias nerdSymbols: adapter.nerdSymbols
+    // Fonts: one font for all text, in the shell, terminals and apps (hyprdori-theme-set --fonts)
+    property alias font: adapter.font
     property alias fontHinting: adapter.fontHinting
     property alias fontAntialiasing: adapter.fontAntialiasing
 
@@ -208,10 +205,7 @@ Singleton {
             property bool animations: true
 
             // Fonts
-            property string nerdFont: "JetBrainsMono Nerd Font"
-            property string displayFont: "SF Pro Display"
-            property bool nerdFontOnly: true
-            property bool nerdSymbols: true
+            property string font: "JetBrainsMono Nerd Font"
             property string fontHinting: "slight"
             property string fontAntialiasing: "rgba"
 

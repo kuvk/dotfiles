@@ -18,9 +18,10 @@ out. After Omarchy's omarchy-theme-color and omarchy-theme-set-templates
   hyprdori-theme-set --icons NAME  apply an icon theme (Settings > Appearance saves the choice)
   hyprdori-theme-set --cursor NAME SIZE
                           apply a cursor everywhere (Settings > Appearance saves the choice)
-  hyprdori-theme-set --fonts NERD DISPLAY on|off HINTING ANTIALIASING
-                          apply fonts everywhere (Settings > Fonts saves the choice); on means
-                          Nerd Fonts only. HINTING: none|slight|medium|full,
+  hyprdori-theme-set --fonts FONT HINTING ANTIALIASING
+                          apply the font everywhere: terminals, the shell, apps, the login
+                          screen and fontconfig's monospace (Settings > Fonts saves the
+                          choice). HINTING: none|slight|medium|full,
                           ANTIALIASING: none|grayscale|rgba
   hyprdori-theme-set --login    rewrite the login screen's colors from Settings > Lock Screen
   hyprdori-theme-set --text-size  GTK's font size from Displays > Text size (hyprdori-monitors)
@@ -208,9 +209,7 @@ def shell_settings() -> dict:
     """What's chosen in Quickshell's Settings: the saved settings, then the shell's
     defaults.json (a fresh install, before the shell has saved any), then these."""
     settings = {
-        "displayFont": "SF Pro Display",
-        "nerdFont": "JetBrainsMono Nerd Font",
-        "nerdFontOnly": True,
+        "font": "JetBrainsMono Nerd Font",
         "fontHinting": "slight",
         "fontAntialiasing": "rgba",
         "windowButtons": False,
@@ -239,6 +238,9 @@ def shell_settings() -> dict:
         except (OSError, json.JSONDecodeError):
             continue
         settings.update({key: saved[key] for key in settings if key in saved})
+        # settings saved before the single font: the Nerd Font was the terminals' font
+        if "font" not in saved and saved.get("nerdFont"):
+            settings["font"] = saved["nerdFont"]
     return settings | SETTINGS_OVERRIDE
 
 
@@ -389,10 +391,9 @@ def load_theme(name: str) -> dict:
         "nvim_colorscheme": nvim_colorscheme(path.parent, mode),
         "cursor_theme": shell["cursorTheme"],
         "cursor_size": str(shell["cursorSize"]),
-        "display_font": shell["displayFont"],
-        "nerd_font": shell["nerdFont"],
-        # what apps show text in: "Nerd Fonts only" replaces the display font
-        "text_font": shell["nerdFont"] if shell["nerdFontOnly"] else shell["displayFont"],
+        # Settings > Fonts: one font for everything, as text and as monospace
+        "nerd_font": shell["font"],
+        "text_font": shell["font"],
         "font_hinting": hinting,
         "font_antialiasing": antialiasing,
         "gtk_font_pt": str(gtk_font_pt()),
@@ -967,14 +968,15 @@ def main(argv: list[str]) -> int:
         strings = generate(current_theme())["strings"]
         run_quiet(["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", strings["icon_theme"]])
         return 0
-    if len(argv) == 6 and argv[0] == "--fonts":
-        nerd, display, only, hinting, antialiasing = argv[1:]
-        if only not in ("on", "off") or hinting not in HINTINGS or antialiasing not in ANTIALIASINGS:
-            print(f"Unknown font options '{only} {hinting} {antialiasing}'", file=sys.stderr)
+    if len(argv) == 4 and argv[0] == "--fonts":
+        font, hinting, antialiasing = argv[1:]
+        if hinting not in HINTINGS or antialiasing not in ANTIALIASINGS:
+            print(f"Unknown font options '{hinting} {antialiasing}'", file=sys.stderr)
             return 1
-        SETTINGS_OVERRIDE.update(nerdFont=nerd, displayFont=display, nerdFontOnly=only == "on",
-                                 fontHinting=hinting, fontAntialiasing=antialiasing)
+        SETTINGS_OVERRIDE.update(font=font, fontHinting=hinting, fontAntialiasing=antialiasing)
         apply_fonts(generate(current_theme())["strings"])
+        # kitty rereads kitty-font.conf
+        run_quiet(["pkill", "-USR1", "-x", "kitty"])
         return 0
     if argv == ["--text-size"]:
         # Displays > Text size changed (hyprdori-monitors): GTK's font size

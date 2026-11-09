@@ -13,12 +13,17 @@ ColumnLayout {
 
     id: fontsPage
 
-    readonly property var families: Qt.fontFamilies()
-    // full Nerd Fonts, one entry per family (no Mono/Propo
-    // variants, no Symbols): letters and icons
-    readonly property var nerdFonts: families.filter(f => /Nerd Font$/.test(f) && !f.startsWith("Symbols Nerd Font"))
-    // everything else, for the display font
-    readonly property var displayFonts: families.filter(f => !/Nerd Font/.test(f))
+    // Monospaced families, one entry each, as fc-list names them (no emoji or symbol fonts):
+    // the font is the terminals' too
+    property var families: []
+
+    Process {
+        running: true
+        command: ["fc-list", ":spacing=100", "-f", "%{family[0]}\n"]
+        stdout: StdioCollector {
+            onStreamFinished: fontsPage.families = [...new Set(text.split("\n").filter(f => f !== "" && !/emoji|signwriting|Symbols Nerd Font/i.test(f)))].sort()
+        }
+    }
 
     Layout.fillWidth: true
     spacing: 12
@@ -65,64 +70,24 @@ ColumnLayout {
 
     StyledText {
         Layout.fillWidth: true
-        text: "Everywhere but terminals. Reopen apps to apply."
+        text: "Terminals, the shell, apps and the login screen. Open terminals change now; reopen other apps."
         color: Theme.dimText
         font.pixelSize: Theme.smallSize
         wrapMode: Text.Wrap
     }
 
-    SettingRow {
-        label: "Nerd Fonts only"
-        hint: "Nerd Font for all text"
-
-        Switch {
-            checked: Config.nerdFontOnly
-            onToggled: {
-                Config.nerdFontOnly = !Config.nerdFontOnly;
-                fontApply.restart();
-            }
-        }
-    }
-
-    SettingRow {
-        label: "Use Nerd Symbols font"
-        hint: "Off: icons from the Nerd Font"
-
-        Switch {
-            checked: Config.nerdSymbols
-            onToggled: Config.nerdSymbols = !Config.nerdSymbols
-        }
-    }
-
     StyledText {
         Layout.topMargin: 4
-        text: "Nerd Font"
+        text: "Font"
         font.weight: Font.DemiBold
     }
 
     FontDropdown {
-        value: Config.nerdFont
-        options: fontsPage.nerdFonts
-        sample: Distro.logo + " " + Icons.cog + " 0O1lI"
+        value: Config.font
+        options: fontsPage.families
+        sample: "0O1lI {}[] => != " + Icons.cog
         onPicked: family => {
-            Config.nerdFont = family;
-            fontApply.restart();
-        }
-    }
-
-    StyledText {
-        Layout.topMargin: 4
-        text: "Display font"
-        font.weight: Font.DemiBold
-        opacity: Config.nerdFontOnly ? 0.4 : 1
-    }
-
-    FontDropdown {
-        enabled: !Config.nerdFontOnly
-        value: Config.displayFont
-        options: fontsPage.displayFonts
-        onPicked: family => {
-            Config.displayFont = family;
+            Config.font = family;
             fontApply.restart();
         }
     }
@@ -159,6 +124,6 @@ ColumnLayout {
         id: fontApply
 
         interval: 400
-        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--fonts", Config.nerdFont, Config.displayFont, Config.nerdFontOnly ? "on" : "off", Config.fontHinting, Config.fontAntialiasing])
+        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--fonts", Config.font, Config.fontHinting, Config.fontAntialiasing])
     }
 }
