@@ -36,6 +36,8 @@ local options = {
     icon = "", -- "▎" this should be omitted if indicator style is not 'icon'
     style = "none", -- "icon" | "underline" | "none",
   },
+  -- buffers side by side, with no separator column between them
+  separator_style = { "", "" },
   tab_size = 20,
   enforce_regular_tabs = true,
   hover = {
