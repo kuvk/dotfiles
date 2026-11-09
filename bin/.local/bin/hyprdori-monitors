@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Monitor layouts per setup, with workspaces, brightness and text size.
+"""Monitor layouts per setup, with workspaces and text size. Brightness isn't part of a
+setup: it's read from and set on the screen itself (backlight, or DDC/CI), which keeps it.
 
 Each combination of connected monitors (home dock, office, laptop alone, ...)
 gets its own profile in ~/.config/hypr/monitors.json. Monitors are matched by
@@ -577,7 +578,10 @@ def brightness_set(name: str, pct: int) -> None:
         return
     bus = ddc_buses().get(name)
     if bus:
-        run(["ddcutil", "--bus", bus, "setvcp", "10", str(pct), "--noverify"])
+        # the screen's own scale: its maximum isn't always 100 (the Odyssey G50F's is 50)
+        parts = run(["ddcutil", "--bus", bus, "getvcp", "10", "--terse"]).split()
+        top = int(parts[4]) if len(parts) >= 5 and parts[2] == "C" else 100
+        run(["ddcutil", "--bus", bus, "setvcp", "10", str(max(1, round(pct * top / 100))), "--noverify"])
 
 
 # ---------------------------------------------------------------- state for quickshell

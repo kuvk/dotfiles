@@ -28,7 +28,9 @@ PanelWindow {
     readonly property int pad: 4
     // wider with bigger text
     readonly property int panelWidth: Math.round(contentWidth * Theme.textScale)
-    readonly property int panelHeight: Math.ceil(column.implicitHeight + Theme.padding * 2)
+    // as tall as its content, at most the Control Center's height (Theme.popupHeight); taller
+    // content scrolls
+    readonly property int panelHeight: Math.min(Math.ceil(column.implicitHeight + Theme.padding * 2), Theme.popupHeight(screen))
     // While open, a change in height (switching tabs, content shown or hidden) slides the
     // bottom edge. The panel is drawn inside a window as tall as the space under the bar:
     // resizing a layer window makes it flash as if it reopened, so its size never changes,
@@ -44,6 +46,9 @@ PanelWindow {
             easing.type: Easing.OutCubic
         }
     }
+
+    // each opening starts at the top
+    onShownChanged: if (shown) flick.contentY = 0
 
     property Region panelRegion: Region {
         item: panel
@@ -103,14 +108,15 @@ PanelWindow {
             Keys.onEscapePressed: Panels.closeDropdown(root.name)
             Keys.onPressed: event => root.keyPressed(event)
 
-            // Inside the border: while the height slides, content is cut there, not drawn over it
+            // Inside the border: while the height slides, content is cut there, not drawn over it;
+            // past the Control Center's height it scrolls
             Item {
                 anchors.fill: parent
                 anchors.margins: Theme.borderWidth
                 clip: true
 
-                ColumnLayout {
-                    id: column
+                Flickable {
+                    id: flick
 
                     anchors.top: parent.top
                     anchors.left: parent.left
@@ -118,7 +124,20 @@ PanelWindow {
                     anchors.margins: Theme.padding - Theme.borderWidth
                     // its full height, also while the panel is shorter
                     height: root.panelHeight - Theme.padding * 2
-                    spacing: Theme.spacing
+                    contentHeight: column.implicitHeight
+                    interactive: contentHeight > height
+                    boundsBehavior: Flickable.StopAtBounds
+
+                    ColumnLayout {
+                        id: column
+
+                        width: flick.width
+                        spacing: Theme.spacing
+                    }
+                }
+
+                ScrollBar {
+                    flick: flick
                 }
             }
         }

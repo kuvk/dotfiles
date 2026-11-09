@@ -111,6 +111,13 @@ Singleton {
     readonly property int iconLargeSize: Math.round(18 * textScale)
     // the bar: icons, workspaces and text all at the text size
     readonly property int barIconSize: textSize
+    // The tallest a popup gets on a screen: the Control Center's height there (the screen under
+    // the bar, less the 6 px gap below the bar and the 6 px to the bottom edge). Dropdowns scroll
+    // past it; Settings is never taller than its smallest value across the screens.
+    function popupHeight(screen: var): int {
+        return Math.max(0, (screen?.height ?? 0) - barHeight - barMargin - 12);
+    }
+
     // the bar's small icons, a step smaller than the rest: the workspace dots, the tray's arrow
     readonly property int barSmallIconSize: Math.round(textSize * 0.85)
     // the bar's height: 26 at 12 px

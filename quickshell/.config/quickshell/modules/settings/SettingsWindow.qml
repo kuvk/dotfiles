@@ -82,8 +82,9 @@ FloatingWindow {
     title: "Settings"
     color: Theme.panelBg
     implicitWidth: Math.round(780 * Theme.textScale)
-    // one height for every page, enough for Displays without scrolling
-    implicitHeight: Math.round(880 * Theme.textScale)
+    // one height for every page, enough for Displays without scrolling, but never taller than
+    // the Control Center on the most scaled screen (Displays scrolls there)
+    implicitHeight: Math.min(Math.round(880 * Theme.textScale), ...Quickshell.screens.map(s => Theme.popupHeight(s)))
     // can grow wider, not shrink below the default size; its height stays
     minimumSize: Qt.size(implicitWidth, implicitHeight)
     maximumSize: Qt.size(16384, implicitHeight)

@@ -32,6 +32,14 @@ ColumnLayout {
     readonly property var current: mons[selected] ?? null
     readonly property var enabledMons: mons.filter(m => m.enabled)
 
+    // each time it shows: a fresh copy, the primary monitor selected
+    function open(): void {
+        load();
+        selected = Math.max(0, mons.findIndex(m => m.id === primary));
+        // once Panels.displays has caught up, so the brightness is read too
+        Qt.callLater(Displays.refresh);
+    }
+
     function load(): void {
         const s = Displays.info;
         mons = (s.monitors ?? []).map(m => Object.assign({}, m));
@@ -239,19 +247,8 @@ ColumnLayout {
     spacing: 14
 
     // a fresh copy each time it shows; brightness is read only while one shows (Displays.qml)
-    onVisibleChanged: {
-        if (visible) {
-            load();
-            // once Panels.displays has caught up, so the brightness is read too
-            Qt.callLater(Displays.refresh);
-        }
-    }
-    Component.onCompleted: {
-        if (visible) {
-            load();
-            Qt.callLater(Displays.refresh);
-        }
-    }
+    onVisibleChanged: if (visible) open()
+    Component.onCompleted: if (visible) open()
 
     Connections {
         target: Displays
