@@ -14,26 +14,28 @@ ColumnLayout {
     Layout.fillWidth: true
     spacing: 12
 
-    // The theme's background (it changes with the theme) until the user chooses
-    // another image; choosing the theme's own follows the theme again.
-    // The login screen shows the same.
-    SettingsSection {
-        title: "Background"
-        hint: Config.lockFollowsTheme || Config.lockImage === "" ? "The theme's, also on the login screen" : Config.lockImage.slice(Config.lockImage.lastIndexOf("/") + 1)
-        controls: [
-            TextButton {
-                visible: !Config.lockFollowsTheme && Config.lockImage !== ""
-                text: "Theme's"
-                onClicked: {
+    // The theme's background (it changes with the theme) until the user chooses another image,
+    // as Style > Background; choosing the theme's own follows the theme again. The login
+    // screen shows the same.
+    SettingRow {
+        id: lockBackground
+
+        readonly property bool theirs: Config.lockFollowsTheme || Config.lockImage === ""
+
+        label: "Background"
+        hint: theirs ? "Theme's default active" : "User's choice active"
+
+        TextButton {
+            text: lockBackground.theirs ? "Choose" : "Theme's"
+            onClicked: {
+                if (lockBackground.theirs) {
+                    lockImagePicker.running = true;
+                } else {
                     Config.lockFollowsTheme = true;
                     Config.lockImage = "";
                 }
-            },
-            TextButton {
-                text: "Choose…"
-                onClicked: lockImagePicker.running = true
             }
-        ]
+        }
 
         Process {
             id: lockImagePicker
@@ -55,21 +57,31 @@ ColumnLayout {
     }
 
     // Also on the login screen (hyprdori-theme-set --login); the colors are the theme's
-    SettingsSection {
-        title: "Avatar"
+    SettingRow {
+        label: "Avatar"
         hint: "Your picture (~/.face)"
-        key: "lockAvatar"
-        onEdited: loginApply.restart()
+
+        Switch {
+            checked: Config.lockAvatar
+            onToggled: {
+                Config.lockAvatar = !Config.lockAvatar;
+                loginApply.restart();
+            }
+        }
     }
 
     // The boot splash draws its field when it's built: theme-boot.sh, which the button runs
-    SettingsSection {
-        title: "Rounded corners"
+    SettingRow {
+        label: "Rounded corners"
         hint: "The password field on the lock, login and boot screens, and the login screen's buttons"
-        key: "lockRounded"
-        onEdited: {
-            loginApply.restart();
-            settings.bootStale = true;
+
+        Switch {
+            checked: Config.lockRounded
+            onToggled: {
+                Config.lockRounded = !Config.lockRounded;
+                loginApply.restart();
+                settings.bootStale = true;
+            }
         }
     }
 

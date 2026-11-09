@@ -15,9 +15,9 @@ out. After Omarchy's omarchy-theme-color and omarchy-theme-set-templates
   hyprdori-theme-set --current  print the current theme name
   hyprdori-theme-set --cursors  list the installed cursor themes as JSON
   hyprdori-theme-set --icon-themes  list the installed icon themes as JSON
-  hyprdori-theme-set --icons NAME  apply an icon theme (Settings > Appearance saves the choice)
+  hyprdori-theme-set --icons NAME  apply an icon theme (Settings > Style saves the choice)
   hyprdori-theme-set --cursor NAME SIZE
-                          apply a cursor everywhere (Settings > Appearance saves the choice)
+                          apply a cursor everywhere (Settings > Style saves the choice)
   hyprdori-theme-set --fonts FONT DISPLAY on|off HINTING ANTIALIASING
                           apply the fonts (Settings > Fonts saves the choice): FONT for
                           terminals and fontconfig's monospace, DISPLAY for the shell, apps and
@@ -28,9 +28,9 @@ out. After Omarchy's omarchy-theme-color and omarchy-theme-set-templates
   hyprdori-theme-set --follow-wallpaper
                           the logo wallpaper in this theme's colors, while the desktop
                           shows the theme's background (picked in the wallpaper picker,
-                          or Settings > Appearance > Wallpaper > Theme's)
+                          or Settings > Style > Background > Theme's)
   hyprdori-theme-set --window-buttons on|off
-                          close button in GTK apps (Settings > Windows saves the choice)
+                          close button in GTK apps (Settings > Style saves the choice)
   hyprdori-theme-set --hypr      Hyprland's gaps, corners, window opacity and blur from Settings
                           into its generated theme.lua (the shell runs it on a change)
   hyprdori-theme-set --shape rounded|square
@@ -211,7 +211,7 @@ def shell_settings() -> dict:
     settings = {
         "font": "JetBrainsMono Nerd Font",
         "displayFont": "SF Pro Display",
-        "monoEverywhere": True,
+        "monoEverywhere": False,
         "fontHinting": "slight",
         "fontAntialiasing": "rgba",
         "windowButtons": False,
@@ -224,11 +224,11 @@ def shell_settings() -> dict:
         "cursorTheme": "Adwaita",
         "cursorSize": 24,
         # Hyprland's look in normal mode (hyprland.lua.tpl)
-        "radius": 8,
+        "radius": 10,
         "gapsIn": 5,
         "gapsOut": 10,
-        "activeOpacity": 0.98,
-        "inactiveOpacity": 0.95,
+        "activeOpacity": 0.95,
+        "inactiveOpacity": 0.85,
         "blur": True,
         "iconTheme": "Papirus",
     }
@@ -351,7 +351,7 @@ def theme_mode(data: dict, colors: dict) -> str:
 
 
 def accent_override(name: str, colors: dict) -> str | None:
-    """Settings > Appearance > Accent: one of this theme's colors (or a #hex) instead of
+    """Settings > Style > Accent: one of this theme's colors (or a #hex) instead of
     its own accent; none is the theme's."""
     chosen = shell_settings().get("accentOverrides", {})
     value = chosen.get(name) if isinstance(chosen, dict) else None
@@ -909,7 +909,7 @@ def btop_corners(shape: str) -> None:
 def follow_wallpaper(theme: dict) -> None:
     """The theme's background (theme_background) on every monitor while the wallpaper
     follows the theme: picking the theme's own background turns that on (the wallpaper
-    picker, Settings > Appearance > Wallpaper > Theme's), picking another turns it off. The lock screen follows the
+    picker, Settings > Style > Background > Theme's), picking another turns it off. The lock screen follows the
     theme on its own (Settings > Lock Screen)."""
     if not shell_settings().get("wallpaperFollowsTheme"):
         return

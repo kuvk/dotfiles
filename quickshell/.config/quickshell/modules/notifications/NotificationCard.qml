@@ -65,9 +65,9 @@ Item {
         implicitHeight: layout.implicitHeight + 24
         radius: Theme.radius
         color: root.popup ? Theme.panelBg : root.solid ? Qt.tint(Theme.background, Theme.cardBg) : Theme.cardBg
-        // On screen: an accent outline (Settings > Notifications > Border); critical ones,
+        // On screen: an accent outline as wide as the windows' (Settings > Style > Border width); critical ones,
         // anywhere, a red one
-        border.width: root.critical || (root.popup && Config.notificationBorder) ? Theme.borderWidth : 0
+        border.width: root.critical || root.popup ? Theme.borderWidth : 0
         border.color: root.critical ? Theme.red : Theme.border
         clip: true
 

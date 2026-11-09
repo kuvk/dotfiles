@@ -2,7 +2,7 @@ import QtQuick
 import qs.config
 
 // Small X for the top right corner of windows: no background, the X turns
-// the accent color on hover. Shown with Settings > Windows > Window buttons;
+// the accent color on hover. Shown with Settings > Style > Window buttons;
 // off, it keeps its place, so the window's layout doesn't move.
 MouseArea {
     id: root

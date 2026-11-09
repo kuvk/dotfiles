@@ -185,7 +185,7 @@ PanelWindow {
         const item = shownItems[selected];
         if (!item)
             return;
-        // Settings > Appearance > Wallpaper follows theme: on with the theme's own background
+        // Settings > Style > Background follows the theme: on with the theme's own background
         // (hyprdori-theme-set) on every monitor, off with anything else
         Config.wallpaperFollowsTheme = kind === "static" && !thisMonitorOnly && item.path === Theme.backgroundImage;
         const cmd = [script, "set", kind, item.path];

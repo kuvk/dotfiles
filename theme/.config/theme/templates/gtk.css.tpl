@@ -73,7 +73,7 @@ dialog > .background {
   border-radius: 0;
 }
 
-/* The only window button is close (Settings > Windows), drawn like the shell's:
+/* The only window button is close (Settings > Style > Window buttons), drawn like the shell's:
    a bare X that turns the accent color on hover. headerbar is GTK3, windowcontrols GTK4 */
 headerbar button.titlebutton.close,
 .titlebar button.titlebutton.close,

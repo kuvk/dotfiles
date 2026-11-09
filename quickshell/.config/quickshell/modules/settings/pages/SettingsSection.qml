@@ -7,7 +7,8 @@ import qs.components
 // both on the right, one of:
 // - a switch, with `key` (a Config bool): it shows and hides the options under it;
 // - `controls` (buttons and the like), when there is nothing under it to fold;
-// - an arrow that folds and unfolds the options under it, folded at first.
+// - an arrow that folds and unfolds the options under it, folded at first;
+// - nothing, with `foldable: false`: a heading over options that always show.
 // `edited` after the switch changes.
 ColumnLayout {
     id: section
@@ -16,11 +17,12 @@ ColumnLayout {
     property string hint: ""
     property string key: ""
     property bool open: false
+    property bool foldable: true
     default property alias content: body.data
     property alias controls: controlsRow.data
     signal edited
 
-    readonly property bool folds: key === "" && title !== "" && body.children.length > 0
+    readonly property bool folds: foldable && key === "" && title !== "" && body.children.length > 0
 
     Layout.fillWidth: true
     Layout.topMargin: 8

@@ -91,10 +91,9 @@ ColumnLayout {
         }
     }
 
-    StyledText {
+    Caption {
         Layout.topMargin: 4
         text: "Font"
-        font.weight: Font.DemiBold
     }
 
     FontDropdown {
@@ -107,10 +106,9 @@ ColumnLayout {
         }
     }
 
-    StyledText {
+    Caption {
         Layout.topMargin: 4
         text: "Display font"
-        font.weight: Font.DemiBold
         opacity: Config.monoEverywhere ? 0.4 : 1
     }
 

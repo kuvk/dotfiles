@@ -61,7 +61,6 @@ Singleton {
     // seconds a popup stays up; critical ones stay until closed
     property alias notificationTimeout: adapter.notificationTimeout
     // on-screen notifications: an accent outline, and a shadow
-    property alias notificationBorder: adapter.notificationBorder
     property alias notificationShadow: adapter.notificationShadow
 
     // Lock Screen, also the login screen's (hyprdori-theme-set --login); the colors are the theme's
@@ -195,22 +194,22 @@ Singleton {
             // Appearance
             property var accentOverrides: ({})
             property bool wallpaperFollowsTheme: true
-            property int radius: 8
+            property int radius: 10
             property string cursorTheme: "Adwaita"
             property int cursorSize: 24
             property string iconTheme: "Papirus"
             property int borderWidth: 2
-            property real barOpacity: 0.95
-            property real shellOpacity: 0.95
-            property real activeOpacity: 0.98
-            property real inactiveOpacity: 0.95
+            property real barOpacity: 0.92
+            property real shellOpacity: 0.92
+            property real activeOpacity: 0.95
+            property real inactiveOpacity: 0.85
             property bool blur: true
             property bool animations: true
 
             // Fonts
             property string font: "JetBrainsMono Nerd Font"
             property string displayFont: "SF Pro Display"
-            property bool monoEverywhere: true
+            property bool monoEverywhere: false
             property string fontHinting: "slight"
             property string fontAntialiasing: "rgba"
 
@@ -227,12 +226,11 @@ Singleton {
             property bool windowButtons: false
             property int gapsIn: 5
             property int gapsOut: 10
-            property int gameGapsIn: 5
-            property int gameGapsOut: 10
+            property int gameGapsIn: 2
+            property int gameGapsOut: 4
 
             // Notifications
             property int notificationTimeout: 5
-            property bool notificationBorder: true
             property bool notificationShadow: true
 
             // Lock Screen
@@ -253,7 +251,7 @@ Singleton {
             property bool nightlightSchedule: false
             property string nightlightStart: "20:00"
             property string nightlightEnd: "07:00"
-            property int nightlightTemperature: 4300
+            property int nightlightTemperature: 4500
 
             // Tray & Player
             property bool trayMonochrome: false

@@ -15,17 +15,15 @@ FloatingWindow {
     readonly property bool shown: Panels.settings
     readonly property var clockFormats: ["dddd HH:mm", "ddd HH:mm", "HH:mm", "ddd d MMM  HH:mm", "dddd h:mm AP"]
     readonly property var sections: [
-        { id: "appearance", label: "Appearance", icon: Icons.palette },
+        { id: "style", label: "Style", icon: Icons.palette },
         { id: "fonts", label: "Fonts", icon: Icons.font },
         { id: "bar", label: "Bar", icon: Icons.sliders },
-        { id: "windows", label: "Windows", icon: Icons.display },
-        { id: "notifications", label: "Notifications", icon: Icons.bell },
         { id: "lock", label: "Lock Screen", icon: Icons.lock },
         { id: "idle", label: "Idle", icon: Icons.bed },
         { id: "nightlight", label: "Night Light", icon: Icons.nightlight },
         { id: "tray", label: "Tray & Player", icon: Icons.music }
     ]
-    property string section: "appearance"
+    property string section: "style"
     property var cursorThemes: ["Adwaita"]
     property var iconThemes: ["Papirus"]
     // Lock Screen: a setting the boot splash draws changed since it was last built
@@ -192,35 +190,22 @@ FloatingWindow {
                     boundsBehavior: Flickable.StopAtBounds
 
                     ScrollBar {
-                        parent: settingsFlick
                         flick: settingsFlick
                     }
 
                     ColumnLayout {
                         id: page
-
-                        // room for the scroll bar
-                        width: settingsFlick.width - 14
+                        width: settingsFlick.width
                         spacing: 12
 
-                        AppearancePage {
+                        StylePage {
                             settings: root
-                            visible: root.section === "appearance"
+                            visible: root.section === "style"
                         }
 
                         BarPage {
                             settings: root
                             visible: root.section === "bar"
-                        }
-
-                        WindowsPage {
-                            settings: root
-                            visible: root.section === "windows"
-                        }
-
-                        NotificationsPage {
-                            settings: root
-                            visible: root.section === "notifications"
                         }
 
                         LockPage {

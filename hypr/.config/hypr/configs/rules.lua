@@ -42,18 +42,19 @@ hl.window_rule({
   opaque = true,
 })
 
--- The shell's windows draw their own transparency (Settings > Appearance > Shell opacity)
+-- The shell's windows (Settings, Displays, Keybindings) draw their own transparency
+-- (Settings > Style > Shell opacity): Hyprland's window opacity is overridden to full
 hl.window_rule({
   name = "quickshell-opaque",
   match = { class = "^org\\.quickshell$" },
-  opaque = true,
+  opacity = "1.0 override 1.0 override",
 })
 
 -- Browsers opaque: pages and video behind a see-through window don't read well
 hl.window_rule({
   name = "browsers-opaque",
   match = { class = "^(brave-browser|chromium|google-chrome|firefox|zen|librewolf|vivaldi-stable|brave-.*)$" },
-  opaque = true,
+  opacity = "1.0 override 1.0 override",
 })
 
 -- Quickshell's Settings, Displays and Keybindings: floating and centered (the shell reopens one that gets tiled)

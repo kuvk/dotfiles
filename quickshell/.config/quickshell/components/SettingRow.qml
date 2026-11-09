@@ -2,7 +2,8 @@ import QtQuick
 import QtQuick.Layouts
 import qs.config
 
-// "Label ........ control" row for the Settings window
+// An option in Settings: its label in small capitals (Caption, as SettingSlider's), its hint
+// below, its control on the right. Every option in Settings is one of these or a SettingSlider.
 RowLayout {
     id: root
 
@@ -21,7 +22,7 @@ RowLayout {
         Layout.fillWidth: true
         spacing: 0
 
-        StyledText {
+        Caption {
             Layout.fillWidth: true
             text: root.label
         }

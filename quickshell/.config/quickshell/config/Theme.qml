@@ -70,7 +70,7 @@ Singleton {
 
     // Surfaces. Gamemode turns blur off in Hyprland, so everything goes opaque.
     readonly property color barBg: alpha(background, gamemode ? 1 : Config.barOpacity)
-    // Settings > Appearance > Shell opacity: dropdowns, the launcher, Control Center, Settings and
+    // Settings > Style > Shell opacity: dropdowns, the launcher, Control Center, Settings and
     // the other shell windows (Hyprland leaves them opaque, rules.lua)
     readonly property color panelBg: alpha(background, gamemode ? 1 : Config.shellOpacity)
     // Behind full-screen overlays (power menu, pickers, network): the wallpaper dimmed and blurred
