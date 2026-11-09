@@ -1,6 +1,8 @@
 -- Backgrounds for every part of the bar, given to bufferline itself so the file icon groups it
 -- makes later get them too: only the selected buffer has one, everything else (other buffers,
--- the Neo Tree title, the arrows when buffers don't fit) sits on the editor's
+-- the Neo Tree title, the arrows when buffers don't fit) sits on the editor's. Every part is
+-- underlined in muted, which draws the divider under the whole bar (kitty puts underlines at
+-- the bottom of the cell, as thick as the split lines: kitty.conf)
 local function bar_highlights()
   local p = require("theme").palette
   local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
@@ -11,7 +13,7 @@ local function bar_highlights()
   local defaults = require("bufferline.config").get().highlights or {}
   local result = {}
   for name in pairs(defaults) do
-    result[name] = { bg = name:find("selected") and p.lighter_bg or normal }
+    result[name] = { bg = name:find("selected") and p.lighter_bg or normal, sp = p.muted, underline = true }
     if name:find("separator") then
       result[name].fg = normal
     end
@@ -22,15 +24,11 @@ end
 local function custom_highlights()
   local p = require("theme").palette
   local normal = vim.api.nvim_get_hl(0, { name = "Normal", link = false }).bg
-  vim.api.nvim_set_hl(0, "NeoTreeExplorerLabel", { fg = p.accent, bg = normal, bold = true })
+  vim.api.nvim_set_hl(0, "NeoTreeExplorerLabel", { fg = p.accent, bg = normal, bold = true, sp = p.muted, underline = true })
   if p.blue then
     vim.api.nvim_set_hl(0, "StatusLine", { fg = p.blue })
   end
 end
-
--- The line under the bar while it shows: a window bar of the split lines' character and color
--- (WinSeparator), so it's as thick as they are and nothing draws over it
-local divider = "%#WinSeparator#%{repeat('─', winwidth(0))}"
 
 local options = {
   always_show_bufferline = false,
@@ -77,7 +75,6 @@ local function update_tabline()
   local several = #vim.fn.getbufinfo({ buflisted = 1 }) > 1
   local shown = tree_open or several
   vim.o.showtabline = shown and 2 or 0
-  vim.o.winbar = shown and divider or ""
 end
 
 local function setup()
