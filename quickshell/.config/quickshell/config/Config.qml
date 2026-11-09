@@ -29,8 +29,11 @@ Singleton {
     property alias blur: adapter.blur
     property alias animations: adapter.animations
 
-    // Fonts: one font for all text, in the shell, terminals and apps (hyprdori-theme-set --fonts)
+    // Fonts (hyprdori-theme-set --fonts): the terminals' font, monospaced; the display font for
+    // the shell's and apps' text unless monoEverywhere puts the font there too
     property alias font: adapter.font
+    property alias displayFont: adapter.displayFont
+    property alias monoEverywhere: adapter.monoEverywhere
     property alias fontHinting: adapter.fontHinting
     property alias fontAntialiasing: adapter.fontAntialiasing
 
@@ -192,7 +195,7 @@ Singleton {
             // Appearance
             property var accentOverrides: ({})
             property bool wallpaperFollowsTheme: true
-            property int radius: 6
+            property int radius: 8
             property string cursorTheme: "Adwaita"
             property int cursorSize: 24
             property string iconTheme: "Papirus"
@@ -206,6 +209,8 @@ Singleton {
 
             // Fonts
             property string font: "JetBrainsMono Nerd Font"
+            property string displayFont: "SF Pro Display"
+            property bool monoEverywhere: true
             property string fontHinting: "slight"
             property string fontAntialiasing: "rgba"
 

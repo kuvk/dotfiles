@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # The boot splash (Plymouth) and boot menu (Limine) in the current theme: runs both
-# installers with one password prompt. They read the theme and logo when they run, so a
-# theme or accent change shows at boot only after this.
+# installers with one password prompt, and copies the login screen's theme (sddm/hyprdori)
+# where SDDM reads it. They read the theme and logo when they run, so a theme or accent
+# change shows at boot only after this; the login screen's colors follow on their own.
 #
 #   theme-boot.sh            update, unless they're already built from the current theme
 #   theme-boot.sh --force    update anyway
@@ -27,7 +28,8 @@ note() { printf '%s\n' "$1"; command -v notify-send >/dev/null && [[ ! -t 1 ]] &
 fingerprint() {
     local home=$1
     cat "$home/.config/theme/current/colors.sh" "$home/.config/theme/logo/ascii-dori" \
-        "$hyprdori"/plymouth/* "$hyprdori/limine/install.sh" "$scripts/logo-render.py" 2>/dev/null |
+        "$hyprdori"/plymouth/* "$hyprdori/limine/install.sh" "$scripts/logo-render.py" \
+        "$hyprdori"/sddm/hyprdori/* 2>/dev/null |
         sha256sum | cut -d' ' -f1
 }
 
@@ -43,6 +45,12 @@ if [[ ${1:-} == --as-root ]]; then
         read -ra options <<<"$(sed -n 's/^# Options: //p' /efi/EFI/limine/limine.conf)"
     fi
     "$hyprdori/limine/install.sh" "${options[@]}"
+    # the login screen's layout, once sddm/install.sh has set it up; its colors are in
+    # /var/lib/hyprdori/theme.conf, which the theme writes itself
+    if [[ -d /usr/share/sddm/themes/hyprdori ]]; then
+        install -m 0644 "$hyprdori"/sddm/hyprdori/*.qml "$hyprdori"/sddm/hyprdori/metadata.desktop \
+            "$hyprdori"/sddm/hyprdori/theme.conf /usr/share/sddm/themes/hyprdori/
+    fi
     if [[ -d ${stamp%/*} ]]; then
         fingerprint "$home" >"$stamp"
         chown "$user" "$stamp"
@@ -55,19 +63,20 @@ if [[ ${1:-} == --window ]]; then
     exec kitty --class theme-boot --title "Boot screens" "$self" --in-window
 fi
 if [[ ${1:-} == --in-window ]]; then
-    # The logo in accent2, from the current theme
-    accent2="#cba6f7"
+    # The logo in magenta, from the current theme
+    magenta="#cba6f7"
     # shellcheck source=/dev/null
     . "$HOME/.config/theme/current/colors.sh" 2>/dev/null
-    color=$(printf '38;2;%d;%d;%d' "0x${accent2:1:2}" "0x${accent2:3:2}" "0x${accent2:5:2}")
+    color=$(printf '38;2;%d;%d;%d' "0x${magenta:1:2}" "0x${magenta:3:2}" "0x${magenta:5:2}")
     printf '\n\e[%sm' "$color"
     sed 's/^/  /' "$HOME/.config/theme/logo/ascii-dori" 2>/dev/null
     printf '\e[0m\n'
     cat <<'MSG'
   The boot menu (Limine) and boot splash (Plymouth) keep the colors they were installed
-  with. This runs both installers again with the current theme, accents and logo, so the
-  boot matches the desktop from the next start. It needs the sudo password and takes
-  about a minute, as the splash is rebuilt into every initramfs.
+  with. This runs both installers again with the current theme, accents and logo, and
+  updates the login screen's layout, so they match the desktop from the next start. It
+  needs the sudo password and takes about a minute, as the splash is rebuilt into
+  every initramfs.
 
 MSG
     status=0

@@ -16,6 +16,8 @@ ColumnLayout {
     // Monospaced families, one entry each, as fc-list names them (no emoji or symbol fonts):
     // the font is the terminals' too
     property var families: []
+    // the rest, for the display font
+    readonly property var displayFonts: Qt.fontFamilies().filter(f => !families.includes(f) && !/Nerd Font|emoji/i.test(f))
 
     Process {
         running: true
@@ -70,10 +72,23 @@ ColumnLayout {
 
     StyledText {
         Layout.fillWidth: true
-        text: "Terminals, the shell, apps and the login screen. Open terminals change now; reopen other apps."
+        text: "Open terminals change now; reopen other apps. Icons are always Symbols Nerd Font's."
         color: Theme.dimText
         font.pixelSize: Theme.smallSize
         wrapMode: Text.Wrap
+    }
+
+    SettingRow {
+        label: "Monospace everywhere"
+        hint: "The font for all text; off: the display font outside terminals"
+
+        Switch {
+            checked: Config.monoEverywhere
+            onToggled: {
+                Config.monoEverywhere = !Config.monoEverywhere;
+                fontApply.restart();
+            }
+        }
     }
 
     StyledText {
@@ -88,6 +103,23 @@ ColumnLayout {
         sample: "0O1lI {}[] => != " + Icons.cog
         onPicked: family => {
             Config.font = family;
+            fontApply.restart();
+        }
+    }
+
+    StyledText {
+        Layout.topMargin: 4
+        text: "Display font"
+        font.weight: Font.DemiBold
+        opacity: Config.monoEverywhere ? 0.4 : 1
+    }
+
+    FontDropdown {
+        enabled: !Config.monoEverywhere
+        value: Config.displayFont
+        options: fontsPage.displayFonts
+        onPicked: family => {
+            Config.displayFont = family;
             fontApply.restart();
         }
     }
@@ -124,6 +156,6 @@ ColumnLayout {
         id: fontApply
 
         interval: 400
-        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--fonts", Config.font, Config.fontHinting, Config.fontAntialiasing])
+        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--fonts", Config.font, Config.displayFont, Config.monoEverywhere ? "on" : "off", Config.fontHinting, Config.fontAntialiasing])
     }
 }

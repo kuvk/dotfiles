@@ -18,11 +18,11 @@ out. After Omarchy's omarchy-theme-color and omarchy-theme-set-templates
   hyprdori-theme-set --icons NAME  apply an icon theme (Settings > Appearance saves the choice)
   hyprdori-theme-set --cursor NAME SIZE
                           apply a cursor everywhere (Settings > Appearance saves the choice)
-  hyprdori-theme-set --fonts FONT HINTING ANTIALIASING
-                          apply the font everywhere: terminals, the shell, apps, the login
-                          screen and fontconfig's monospace (Settings > Fonts saves the
-                          choice). HINTING: none|slight|medium|full,
-                          ANTIALIASING: none|grayscale|rgba
+  hyprdori-theme-set --fonts FONT DISPLAY on|off HINTING ANTIALIASING
+                          apply the fonts (Settings > Fonts saves the choice): FONT for
+                          terminals and fontconfig's monospace, DISPLAY for the shell, apps and
+                          the login screen, or FONT there too with on (Monospace everywhere).
+                          HINTING: none|slight|medium|full, ANTIALIASING: none|grayscale|rgba
   hyprdori-theme-set --login    rewrite the login screen's colors from Settings > Lock Screen
   hyprdori-theme-set --text-size  GTK's font size from Displays > Text size (hyprdori-monitors)
   hyprdori-theme-set --follow-wallpaper
@@ -210,6 +210,8 @@ def shell_settings() -> dict:
     defaults.json (a fresh install, before the shell has saved any), then these."""
     settings = {
         "font": "JetBrainsMono Nerd Font",
+        "displayFont": "SF Pro Display",
+        "monoEverywhere": True,
         "fontHinting": "slight",
         "fontAntialiasing": "rgba",
         "windowButtons": False,
@@ -222,7 +224,7 @@ def shell_settings() -> dict:
         "cursorTheme": "Adwaita",
         "cursorSize": 24,
         # Hyprland's look in normal mode (hyprland.lua.tpl)
-        "radius": 6,
+        "radius": 8,
         "gapsIn": 5,
         "gapsOut": 10,
         "activeOpacity": 0.98,
@@ -238,9 +240,12 @@ def shell_settings() -> dict:
         except (OSError, json.JSONDecodeError):
             continue
         settings.update({key: saved[key] for key in settings if key in saved})
-        # settings saved before the single font: the Nerd Font was the terminals' font
+        # settings saved before these names: the Nerd Font was the terminals' font, and
+        # "Nerd Fonts only" put it everywhere
         if "font" not in saved and saved.get("nerdFont"):
             settings["font"] = saved["nerdFont"]
+        if "monoEverywhere" not in saved and "nerdFontOnly" in saved:
+            settings["monoEverywhere"] = bool(saved["nerdFontOnly"])
     return settings | SETTINGS_OVERRIDE
 
 
@@ -391,12 +396,12 @@ def load_theme(name: str) -> dict:
         "nvim_colorscheme": nvim_colorscheme(path.parent, mode),
         "cursor_theme": shell["cursorTheme"],
         "cursor_size": str(shell["cursorSize"]),
-        # Settings > Fonts: one font for everything, as text and as monospace
+        # Settings > Fonts: the terminals' font (also monospace), and what apps show text in
         "nerd_font": shell["font"],
-        "text_font": shell["font"],
+        "text_font": shell["font"] if shell["monoEverywhere"] else shell["displayFont"],
         "font_hinting": hinting,
         "font_antialiasing": antialiasing,
-        "gtk_font_pt": str(gtk_font_pt()),
+        "gtk_font_pt": gtk_font_pt(),
         # the cursor line in Neovim's neo-tree (Catppuccin's: surface0 64% over base); yazi's
         # hover highlight uses it too
         "cursorline": mix(colors["background"], colors["lighter_background"], 0.64),
@@ -423,23 +428,24 @@ def load_theme(name: str) -> dict:
         # the login screen, as the lock screen: the theme's colors
         "login_avatar": colors["accent"],
         "login_inputOutline": colors["accent"],
-        "login_input": colors["background"],
+        # the password field's and buttons' fill: the background with 5% of the text color, as
+        # Omarchy's field (lock, login and boot screens)
+        "login_input": mix(colors["background"], colors["foreground"], 0.05),
         "login_dots": colors["foreground"],
         "login_text": colors["foreground"],
         "login_check": mix(colors["foreground"], colors["background"], 0.5),
         "login_fail": colors["red"],
         "login_caps": colors["yellow"],
         "login_show_avatar": "true" if shell["lockAvatar"] else "false",
-        "login_power_bg": colors["background"],
+        "login_power_bg": mix(colors["background"], colors["foreground"], 0.05),
         "login_power_opacity": str(shell["lockPowerOpacity"] / 100),
-        # the text color at 40% and 25% (idle and hovered borders, as the shell's), as Qt
-        # writes it (#AARRGGBB)
-        "login_power_outline": "#66" + colors["foreground"][1:],
-        "login_power_hover_outline": "#40" + colors["foreground"][1:],
+        # outlined like the password field, in the accent; lighter under the cursor
+        "login_power_outline": colors["accent"],
+        "login_power_hover_outline": mix(colors["accent"], colors["foreground"], 0.4),
         "login_input_opacity": str(shell["lockInputOpacity"] / 100),
         # Settings > Lock Screen > Rounded corners: the password field's (lock, login and boot
-        # screens) and the login screen's buttons; the windows' corner radius, or 6 with it at 0
-        "login_radius": str((int(shell["radius"]) or 6) if shell["lockRounded"] else 0),
+        # screens) and the login screen's buttons; the windows' corner radius, or 8 with it at 0
+        "login_radius": str((int(shell["radius"]) or 8) if shell["lockRounded"] else 0),
         "icon_theme": icon_theme_for(shell["iconTheme"], mode),
         "prefer_dark": "0" if mode == "light" else "1",
         # adw-gtk3, when installed, follows gtk.css in plain GTK3 and GTK4 apps too;
@@ -689,16 +695,17 @@ def set_xwayland_cursor(theme: str, size: str) -> None:
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
 
-def gtk_font_pt() -> int:
-    """GTK's font size in points for Displays > Text size (px, kept by hyprdori-monitors):
-    12 px is 11 pt, as GTK's own size. Set as the font size rather than GTK's text-scaling-factor, which
-    Electron apps on Wayland (Obsidian, Mullvad) apply to their content without resizing
-    the window, leaving an empty strip."""
+def gtk_font_pt() -> str:
+    """GTK's and Qt's font size in points for Displays > Text size (px, kept by
+    hyprdori-monitors): the shell's text size, as kitty's (0.75 pt a px, so 12 px is 9 pt, 14 px
+    10.5). Set as the font size rather than GTK's text-scaling-factor, which Electron apps on
+    Wayland (Obsidian, Mullvad) apply to their content without resizing the window, leaving
+    an empty strip."""
     try:
         size = int(json.loads((HOME / ".config/hypr/monitors.json").read_text()).get("text_size", 12))
     except (OSError, ValueError, TypeError, AttributeError):
         size = 12
-    return max(6, round(11 * size / 12))
+    return f"{max(6.0, round(size * 0.75 * 2) / 2):g}"
 
 
 def apply_fonts(strings: dict) -> None:
@@ -968,12 +975,13 @@ def main(argv: list[str]) -> int:
         strings = generate(current_theme())["strings"]
         run_quiet(["gsettings", "set", "org.gnome.desktop.interface", "icon-theme", strings["icon_theme"]])
         return 0
-    if len(argv) == 4 and argv[0] == "--fonts":
-        font, hinting, antialiasing = argv[1:]
-        if hinting not in HINTINGS or antialiasing not in ANTIALIASINGS:
-            print(f"Unknown font options '{hinting} {antialiasing}'", file=sys.stderr)
+    if len(argv) == 6 and argv[0] == "--fonts":
+        font, display, everywhere, hinting, antialiasing = argv[1:]
+        if everywhere not in ("on", "off") or hinting not in HINTINGS or antialiasing not in ANTIALIASINGS:
+            print(f"Unknown font options '{everywhere} {hinting} {antialiasing}'", file=sys.stderr)
             return 1
-        SETTINGS_OVERRIDE.update(font=font, fontHinting=hinting, fontAntialiasing=antialiasing)
+        SETTINGS_OVERRIDE.update(font=font, displayFont=display, monoEverywhere=everywhere == "on",
+                                 fontHinting=hinting, fontAntialiasing=antialiasing)
         apply_fonts(generate(current_theme())["strings"])
         # kitty rereads kitty-font.conf
         run_quiet(["pkill", "-USR1", "-x", "kitty"])

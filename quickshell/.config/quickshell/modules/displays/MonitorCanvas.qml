@@ -55,7 +55,7 @@ Rectangle {
             Rectangle {
                 anchors.fill: parent
                 anchors.margins: 2
-                radius: 6
+                radius: Theme.smallRadius
                 color: tile.index === panel.selected ? Theme.selectedFill : Theme.lighterBackground
                 border.color: tile.index === panel.selected ? Theme.accent : Theme.muted
                 border.width: 2

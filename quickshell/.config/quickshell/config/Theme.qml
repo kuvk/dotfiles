@@ -81,17 +81,17 @@ Singleton {
     readonly property color border: accent
     readonly property int borderWidth: Config.borderWidth
 
-    // Fonts. Settings > Fonts: one font for text, also the terminals' (monoFont). Icons from
-    // Symbols Nerd Font, centered in buttons whatever the font; without it, the font's own
-    // (a Nerd Font's proportional "Propo" variant when installed)
-    readonly property string font: Config.font || "JetBrainsMono Nerd Font"
-    readonly property string monoFont: font
+    // Fonts. Settings > Fonts: text in the display font, or the terminals' (monoFont) with
+    // "Monospace everywhere". Icons from Symbols Nerd Font, centered in buttons whatever the
+    // font; without it, the font's own (a Nerd Font's proportional "Propo" variant when installed)
+    readonly property string monoFont: Config.font || "JetBrainsMono Nerd Font"
+    readonly property string font: Config.monoEverywhere ? monoFont : (Config.displayFont || "SF Pro Display")
     readonly property string iconFont: {
         const families = Qt.fontFamilies();
         if (families.includes("Symbols Nerd Font"))
             return "Symbols Nerd Font";
-        const propo = font.replace(/ (Mono|Propo)$/, "") + " Propo";
-        return families.includes(propo) ? propo : font;
+        const propo = monoFont.replace(/ (Mono|Propo)$/, "") + " Propo";
+        return families.includes(propo) ? propo : monoFont;
     }
 
     // Text size in px from Displays (~/.config/hypr/monitors.json): the body text, 12 by

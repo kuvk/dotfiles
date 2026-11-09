@@ -196,9 +196,10 @@ Item {
             anchors.verticalCenterOffset: 85
             width: 260
             height: 36
-            // Settings > Lock Screen > Rounded corners: the windows' radius (6 with it at 0), or square
-            radius: Config.lockRounded ? (Config.radius || 6) : 0
-            color: Theme.alpha(Theme.background, Config.lockInputOpacity / 100)
+            // Settings > Lock Screen > Rounded corners: the windows' radius (8 with it at 0), or square
+            radius: Config.lockRounded ? (Config.radius || 8) : 0
+            // the background with 5% of the text color (Omarchy's field), at Settings' opacity
+            color: Theme.alpha(Theme.mix(Theme.background, Theme.foreground, 0.05), Config.lockInputOpacity / 100)
             border.width: 2
             border.color: (Lock.failed ? Theme.red : (Lock.authenticating ? Theme.dimText : Theme.border))
 

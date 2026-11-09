@@ -44,7 +44,7 @@ fi
 
 # The current theme's colors, or Catppuccin's before hyprdori-theme-set has run
 background="#1e1e2e" foreground="#cdd6f4" subtext="#a2a8c2" accent="#89b4fa" magenta="#cba6f7"
-red="#f38ba8" yellow="#fab387" field_radius=6
+red="#f38ba8" yellow="#fab387" field="#272738" field_radius=8
 colors="$home/.config/theme/current/colors.sh"
 if [[ -r $colors ]]; then
     # shellcheck source=/dev/null
@@ -64,8 +64,8 @@ rgb() { awk -v r=$((16#${1:1:2})) -v g=$((16#${1:3:2})) -v b=$((16#${1:5:2})) 'B
 build=$(mktemp -d)
 trap 'rm -rf "$build"' EXIT
 
-# Images, in the lock and login screens' look: the logo in magenta; the password field on the
-# background with an accent outline, dots in the text color; the hint under the field in the
+# Images, in the lock and login screens' look: the logo in magenta; the password field (the
+# background with 5% of the text color) with an accent outline, dots in the text color; the hint under the field in the
 # secondary text color (yellow, then red after wrong passwords); the progress bar in the text
 # color on a faint track; the farewell line in red, large, alone on the screen
 # The logo drawn like kitty draws it, in 24px rows (scripts/.config/scripts/logo-render.py)
@@ -78,7 +78,7 @@ if ((field_radius > 0)); then
 else
     field_shape="rectangle 1,1 $((ew - 2)),46"
 fi
-magick -size "${ew}x48" xc:none -fill "$background" -stroke "$accent" -strokewidth 2 \
+magick -size "${ew}x48" xc:none -fill "$field" -stroke "$accent" -strokewidth 2 \
     -draw "$field_shape" "$build/entry.png"
 magick -background none -fill "$subtext" -font "$font" -pointsize 16 label:"Speak, friend, and enter!" "$build/hint.png"
 magick -background none -fill "$yellow" -font "$font" -pointsize 16 label:"Tell me, friend, when did you abandon reason for madness?" "$build/wrong1.png"
