@@ -211,7 +211,7 @@ def shell_settings() -> dict:
     settings = {
         "font": "JetBrainsMono Nerd Font",
         "displayFont": "SF Pro Display",
-        "monoEverywhere": False,
+        "monoEverywhere": True,
         "fontHinting": "slight",
         "fontAntialiasing": "rgba",
         "windowButtons": False,
@@ -220,7 +220,7 @@ def shell_settings() -> dict:
         "lockRounded": True,
         "lockPowerOpacity": 85,
         "accentOverrides": {},
-        "lockInputOpacity": 80,
+        "lockInputOpacity": 75,
         "cursorTheme": "Adwaita",
         "cursorSize": 24,
         # Hyprland's look in normal mode (hyprland.lua.tpl)
@@ -228,7 +228,7 @@ def shell_settings() -> dict:
         "gapsIn": 5,
         "gapsOut": 10,
         "activeOpacity": 0.95,
-        "inactiveOpacity": 0.85,
+        "inactiveOpacity": 0.88,
         "blur": True,
         "iconTheme": "Papirus",
     }

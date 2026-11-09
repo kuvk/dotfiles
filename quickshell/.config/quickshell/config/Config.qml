@@ -206,13 +206,13 @@ Singleton {
             property bool windowButtons: false
 
             // Style > Shell
-            property real barOpacity: 0.92
-            property real shellOpacity: 0.92
+            property real barOpacity: 0.93
+            property real shellOpacity: 0.93
             property int notificationTimeout: 5
 
             // Style > Hyprland
             property real activeOpacity: 0.95
-            property real inactiveOpacity: 0.85
+            property real inactiveOpacity: 0.88
             property int gapsIn: 5
             property int gapsOut: 10
             property int gameGapsIn: 2
@@ -223,13 +223,13 @@ Singleton {
             property string lockImage: ""
             property bool lockAvatar: true
             property bool lockRounded: true
-            property real lockInputOpacity: 80
+            property real lockInputOpacity: 75
             property real lockPowerOpacity: 85
 
             // Fonts
             property string font: "JetBrainsMono Nerd Font"
             property string displayFont: "SF Pro Display"
-            property bool monoEverywhere: false
+            property bool monoEverywhere: true
             property string fontHinting: "slight"
             property string fontAntialiasing: "rgba"
 

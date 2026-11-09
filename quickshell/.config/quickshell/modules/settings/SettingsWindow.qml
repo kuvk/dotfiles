@@ -122,7 +122,6 @@ FloatingWindow {
                     // a step above a dropdown's title
                     font.pixelSize: Theme.titleSize + 1
                     font.weight: Font.Bold
-                    font.capitalization: Font.AllUppercase
                 }
 
                 CloseButton {
