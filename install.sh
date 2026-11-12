@@ -227,6 +227,9 @@ else
 fi
 # zsh's plugins (vi mode, highlighting, suggestions, completions, history search)
 "$HOME/.local/bin/hyprdori-zsh-plugins"
+# yazi's plugins from its package list (yazi/.config/yazi/package.toml: full-border, at the
+# version it names)
+command -v ya >/dev/null && { ya pkg install >/dev/null || note "Couldn't install yazi's plugins (ya pkg install)"; }
 # herdr's Ctrl+H/J/K/L across its panes and Neovim's splits (herdr/.config/herdr/config.toml)
 if command -v herdr >/dev/null && ! herdr plugin list 2>/dev/null | grep -q vim-herdr-navigation; then
     herdr plugin install --yes paulbkim-dev/vim-herdr-navigation >/dev/null || note "Couldn't install herdr's navigation plugin"

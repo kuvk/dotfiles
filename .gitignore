@@ -34,15 +34,13 @@ hypr/.config/hypr/hyprtoolkit.conf
 # zsh
 .zcompdump*
 .zsh_history*
-# yazi: no plugins installed with `ya pkg`, only the ones kept here (full-border is
-# yazi-rs/plugins', MIT, its LICENSE beside it)
+# yazi: plugins from `ya pkg` aren't kept (package.toml lists them, install.sh installs them),
+# only the local ones
 yazi/.config/yazi/plugins/*
-!yazi/.config/yazi/plugins/full-border.yazi/
 !yazi/.config/yazi/plugins/office.yazi/
 !yazi/.config/yazi/plugins/places.yazi/
 !yazi/.config/yazi/plugins/smart-enter.yazi/
 yazi/.config/yazi/flavors/
-yazi/.config/yazi/package.toml
 # lazygit remembers recent repos and popups here
 lazygit/.config/lazygit/state.yml
 # kitty's theme kitten
