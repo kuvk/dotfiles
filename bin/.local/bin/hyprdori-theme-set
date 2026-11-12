@@ -407,8 +407,8 @@ def load_theme(name: str) -> dict:
         "nerd_font": shell["font"],
         "text_font": shell["font"] if shell["monoEverywhere"] else shell["displayFont"],
         # the browsers' own text (tabs, address bar, menus; fontconfig.conf): the display font
-        # with Monospace everywhere when chosen (hyprdori-browser-theme-setup
-        # --keep-display-font), else the same as everything else (the rule changes nothing)
+        # with Monospace everywhere when they don't follow the font (hyprdori-browser-theme-setup
+        # --follow-font false), else the same as everything else (the rule changes nothing)
         "browser_font": shell["displayFont"] if shell["monoEverywhere"] and BROWSER_DISPLAY_FONT.exists()
                         else (shell["font"] if shell["monoEverywhere"] else shell["displayFont"]),
         "font_hinting": hinting,

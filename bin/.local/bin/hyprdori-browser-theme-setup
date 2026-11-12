@@ -12,14 +12,14 @@
 #                                           Appearance > Theme to Classic; the next theme
 #                                           switch (or hyprdori-theme-set) puts it back
 #   hyprdori-browser-theme-setup --remove   undo everything
-#   hyprdori-browser-theme-setup --keep-display-font
-#                                           the browsers' own text (tabs, address bar, menus)
-#                                           in the display font while Monospace everywhere puts
-#                                           the terminals' font everywhere else; no sudo
-#   hyprdori-browser-theme-setup --follow-font
-#                                           back to the font everything else uses; no sudo
+#   hyprdori-browser-theme-setup --follow-font [true|false]
+#                                           true (the default): the browsers' own text (tabs,
+#                                           address bar, menus) in the font everything else
+#                                           uses; false: in the display font, also when
+#                                           Monospace everywhere puts the terminals' font
+#                                           everywhere else. No sudo
 #
-# The font choice is ~/.config/hyprdori/browser-display-font (there or not), which
+# The font choice is ~/.config/hyprdori/browser-display-font (there for false), which
 # hyprdori-theme-set turns into a fontconfig rule for Chromium, Brave, Firefox and Zen; restart
 # the browsers to see it.
 
@@ -29,13 +29,17 @@ set -euo pipefail
 
 # The browsers' font: a per-user setting, so no root (through sudo, it's done as the user)
 case ${1:-} in
-    --keep-display-font | --follow-font)
+    --follow-font | --follow-font=*)
         if ((EUID == 0)); then
             [[ -n ${SUDO_USER:-} && $SUDO_USER != root ]] || { echo "Run it as yourself." >&2; exit 1; }
             exec sudo -u "$SUDO_USER" "$(readlink -f "$0")" "$@"
         fi
+        follow=${1#--follow-font}
+        follow=${follow#=}
+        [[ -z $follow ]] && follow=${2:-true}
+        [[ $follow == true || $follow == false ]] || { echo "--follow-font takes true or false" >&2; exit 2; }
         flag=${XDG_CONFIG_HOME:-$HOME/.config}/hyprdori/browser-display-font
-        if [[ $1 == --keep-display-font ]]; then
+        if [[ $follow == false ]]; then
             mkdir -p "${flag%/*}"
             : >"$flag"
             echo "Browsers keep the display font for their own text while Monospace everywhere is on."

@@ -20,7 +20,7 @@
     <edit name="family" mode="prepend_first" binding="strong"><string>{{ nerd_font }}</string></edit>
   </match>
   <!-- The browsers' own text (tabs, address bar, menus: GTK's font): the display font with
-       Monospace everywhere when chosen (hyprdori-browser-theme-setup, its keep-display-font);
+       Monospace everywhere when they don't follow the font (hyprdori-browser-theme-setup, follow-font false);
        otherwise browser_font is text_font and these change nothing -->
   <match target="pattern">
     <test name="prgname"><string>chromium</string></test>
