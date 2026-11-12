@@ -6,14 +6,15 @@
 {
   "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
   "logo": {
-    "source": "~/.config/theme/logo/ascii-dori",
+    "source": "~/.config/theme/logo/dori-logo",
     "type": "auto",
     "width": 12,
+    // top and bottom center the logo (14 rows) beside the info (24 lines)
     "padding": {
-      "top": 3,
-      "right": 3,
-      "left": 3,
-			"bottom": 2,
+      "top": 5,
+      "right": 4,
+      "left": 2,
+      "bottom": 5,
     },
     "color": {
       "1": "{{ magenta.ansi }}",
@@ -31,26 +32,26 @@
       "key": "╭────────────╮",
       "type": "custom",
     },
-    {
-      "key": "│ {#{{ accent.ansi }}}{icon}  distro  {#keys}│",
-      "type": "os",
+    {  
+       "key": "│ {#{{ accent.ansi }}}{icon}  distro  {#keys}│",
+       "type": "os",
     },
-    {
-      "key": "│ {#{{ accent.ansi }}}  kernel  {#keys}│",
-      "type": "kernel",
-    },
-    {
-      "key": "│ {#{{ accent.ansi }}}󰅐  uptime  {#keys}│",
-      "type": "uptime",
-    },
-    {
-      "key": "│ {#{{ accent.ansi }}}󱦟  os age  {#keys}│",
-      "type": "command",
-      "text": "printf \"%s days\" \"$(( ($(date +%s) - $(stat -c %W /)) / 86400 ))\"",
-    },
-    {
-      "key": "│ {#{{ accent.ansi }}}  pkgs    {#keys}│",
-      "type": "packages",
+    {  
+       "key": "│ {#{{ accent.ansi }}}  kernel  {#keys}│",
+       "type": "kernel",
+    }, 
+    {  
+       "key": "│ {#{{ accent.ansi }}}󰅐  uptime  {#keys}│",
+       "type": "uptime",
+    }, 
+    {  
+       "key": "│ {#{{ accent.ansi }}}󱦟  os age  {#keys}│",
+       "type": "command",
+       "text": "printf \"%s days\" \"$(( ($(date +%s) - $(stat -c %W /)) / 86400 ))\"",
+    }, 
+    {  
+       "key": "│ {#{{ accent.ansi }}}  pkgs    {#keys}│",
+       "type": "packages",
     },
     {
       "key": "├────────────┤",

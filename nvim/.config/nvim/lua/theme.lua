@@ -101,7 +101,7 @@ local function custom_highlights()
   -- The "Neo Tree" label above neo-tree (bufferline's offset), in cyan; bufferline.lua gives it
   -- the bar's background
   set(0, "NeoTreeExplorerLabel", { fg = p.cyan, bold = true })
-  -- Dashboard: the NEOVIM lettering in cyan, the logo (ascii-dori) in magenta, buttons in the
+  -- Dashboard: the NEOVIM lettering in cyan, the logo (dori-logo) in magenta, buttons in the
   -- accent with their keys in yellow
   set(0, "AlphaHeader", { fg = p.cyan })
   set(0, "AlphaButtons", { fg = p.accent })
