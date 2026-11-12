@@ -9,7 +9,7 @@ logo.sprite = Sprite(logo.image);
 logo.sprite.SetOpacity(1);
 
 # Use these to adjust the progress bar timing
-global.fake_progress_limit = 0.7;  # Target percentage for fake progress (0.0 to 1.0)
+global.fake_progress_limit = 1; # Target percentage for fake progress (0.0 to 1.0)
 global.fake_progress_duration = 15.0;  # Duration in seconds to reach limit
 
 # Progress bar animation variables

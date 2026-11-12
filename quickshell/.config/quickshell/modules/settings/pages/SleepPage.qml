@@ -19,9 +19,9 @@ ColumnLayout {
 
         Repeater {
             model: [
-                { label: "Lock the screen", key: "idleLock", battery: false },
+                { label: "Lock", key: "idleLock", battery: false },
                 { label: "Sleep", key: "idleSuspend", battery: false },
-                { label: "Lock the screen on battery", key: "idleLockBattery", battery: true },
+                { label: "Lock on battery", key: "idleLockBattery", battery: true },
                 { label: "Sleep on battery", key: "idleSuspendBattery", battery: true }
             ]
 
@@ -59,7 +59,7 @@ ColumnLayout {
 
         SettingRow {
             label: "Schedule"
-            hint: "A manual toggle holds until the next switch"
+            hint: "Holds until the next switch"
 
             Switch {
                 checked: Config.nightlightSchedule
