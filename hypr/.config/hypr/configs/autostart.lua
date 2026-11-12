@@ -7,12 +7,12 @@ hl.on("hyprland.start", function()
   hl.exec_cmd("~/.local/bin/hyprdori-monitors startup")
   -- Regenerate ~/.config/theme/current (no-op if nothing changed), then the shell
   hl.exec_cmd("~/.local/bin/hyprdori-theme-set")
-  -- shell.sh starts the shell again if it crashes; the shell does idle (services/Idle.qml), and
-  -- sleep-monitor.sh locks it before every suspend
-  hl.exec_cmd("~/.config/scripts/shell.sh & ~/.config/scripts/sleep-monitor.sh & hyprpaper & udiskie &")
+  -- hyprdori-shell starts the shell again if it crashes; the shell does idle (services/Idle.qml), and
+  -- hyprdori-sleep-monitor locks it before every suspend
+  hl.exec_cmd("~/.local/bin/hyprdori-shell & ~/.local/bin/hyprdori-sleep-monitor & hyprpaper & udiskie &")
   -- Saved wallpapers per monitor, once hyprpaper is up
   hl.exec_cmd("sleep 1; ~/.local/bin/hyprdori-wallpaper restore")
-  hl.exec_cmd("~/.config/scripts/autostart.sh")
+  hl.exec_cmd("~/.local/bin/hyprdori-autostart")
   hl.exec_cmd("systemctl --user start hyprpolkitagent")
 end)
 

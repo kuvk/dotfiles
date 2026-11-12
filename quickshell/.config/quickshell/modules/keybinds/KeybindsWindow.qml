@@ -7,7 +7,7 @@ import qs.components
 import qs.services
 
 // Every keybinding (SUPER+/). Hyprland's
-// come from ~/.config/hypr/configs/bindings.lua through hypr-keybinds.py, so
+// come from ~/.config/hypr/configs/bindings.lua through hyprdori-keybinds, so
 // the list follows that file; the shell's own keys inside its windows are
 // listed below them. Type to filter. A regular window like Settings (floating and centered
 // by a Hyprland rule, can be tiled).
@@ -15,7 +15,7 @@ FloatingWindow {
     id: root
 
     readonly property bool shown: Panels.keybinds
-    readonly property string script: Quickshell.env("HOME") + "/.config/scripts/hypr-keybinds.py"
+    readonly property string script: Quickshell.env("HOME") + "/.local/bin/hyprdori-keybinds"
     property var hyprSections: []
     property string query: ""
 
@@ -233,7 +233,7 @@ FloatingWindow {
                 try {
                     root.hyprSections = JSON.parse(text);
                 } catch (e) {
-                    console.warn("Keybindings: bad list from hypr-keybinds.py", e);
+                    console.warn("Keybindings: bad list from hyprdori-keybinds", e);
                 }
             }
         }

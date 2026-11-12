@@ -93,6 +93,6 @@ ColumnLayout {
         id: nightlightApply
 
         interval: 400
-        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/nightlight-toggle.sh", "apply"])
+        onTriggered: Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-nightlight", "apply"])
     }
 }

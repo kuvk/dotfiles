@@ -25,7 +25,7 @@ Singleton {
     // Window gaps, corners, opacity and blur from Settings, at once; hyprdori-theme-set --hypr
     // writes them to Hyprland's generated theme.lua as well, so it starts with them.
     // Work-Game has its own gaps; its square corners, opaque windows and no blur come from
-    // hypr-gamemode.sh, which a config reload undoes, so it runs again then (restyle).
+    // hyprdori-gamemode, which a config reload undoes, so it runs again then (restyle).
     function applyLook(): void {
         const inner = Theme.gamemode ? Config.gameGapsIn : Config.gapsIn;
         const outer = Theme.gamemode ? Config.gameGapsOut : Config.gapsOut;
@@ -80,7 +80,7 @@ Singleton {
     }
 
     function nextLayout(): void {
-        Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/switch-layout.sh"]);
+        Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-switch-layout"]);
     }
 
     Connections {
@@ -93,7 +93,7 @@ Singleton {
             else if (event.name === "configreloaded") {
                 gapsDelay.restart();
                 if (Theme.gamemode)
-                    Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/hypr-gamemode.sh", "restyle"]);
+                    Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-gamemode", "restyle"]);
             }
             else if (event.name === "changefloatingmode")
                 root.keepFloating(event.data);

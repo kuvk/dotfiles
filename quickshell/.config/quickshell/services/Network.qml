@@ -8,7 +8,7 @@ import qs.config
 
 // Network state. Wi-Fi comes straight from NetworkManager over D-Bus (Quickshell.Networking):
 // the network list fills in as scans report, and connecting, forgetting and the Wi-Fi switch
-// go through it. ~/.config/scripts/network.py has the rest: wired, VPN, DNS, live stats with
+// go through it. ~/.local/bin/hyprdori-network has the rest: wired, VPN, DNS, live stats with
 // ping, the Wi-Fi band, the QR code and the speed test.
 //
 // Modeled on Omarchy's network panel (shell/plugins/panels/network,
@@ -17,7 +17,7 @@ import qs.config
 Singleton {
     id: root
 
-    readonly property string script: Quickshell.env("HOME") + "/.config/scripts/network.py"
+    readonly property string script: Quickshell.env("HOME") + "/.local/bin/hyprdori-network"
 
     // ---------------------------------------------------------------- devices
 
@@ -345,7 +345,7 @@ Singleton {
         startAction("connect", ssid, n => n.connectWithPsk(password));
     }
 
-    // WPA-Enterprise: network.py makes the profile, the password on stdin
+    // WPA-Enterprise: hyprdori-network makes the profile, the password on stdin
     function connectEnterprise(ssid: string, identity: string, password: string): void {
         startAction("connect", ssid, n => {
             eapProc.secret = password;
@@ -396,7 +396,7 @@ Singleton {
         }
     }
 
-    // ---------------------------------------------------------------- wired, VPN, DNS (network.py status)
+    // ---------------------------------------------------------------- wired, VPN, DNS (hyprdori-network status)
 
     property string error: ""
     // { wired, vpns, wireguardFiles, active, dns }
@@ -514,7 +514,7 @@ Singleton {
         onTriggered: apSignalProc.running = true
     }
 
-    // ---------------------------------------------------------------- live stats (network.py stats)
+    // ---------------------------------------------------------------- live stats (hyprdori-network stats)
 
     // { iface, type, ip, prefix, gateway, rx_bytes, tx_bytes, router_ping_ms, internet_ping_ms }
     property var stats: ({})
@@ -590,7 +590,7 @@ Singleton {
         return formatBytes(bytes) + "/s";
     }
 
-    // ---------------------------------------------------------------- Wi-Fi band (network.py band)
+    // ---------------------------------------------------------------- Wi-Fi band (hyprdori-network band)
 
     property string bandCurrent: "" // "2.4" | "5" | "6"
     property string bandSelected: "auto"
@@ -651,7 +651,7 @@ Singleton {
         }
     }
 
-    // ---------------------------------------------------------------- speed test (network.py speedtest)
+    // ---------------------------------------------------------------- speed test (hyprdori-network speedtest)
 
     // { phase: "ping" | "download" | "upload" | "done" | "error", ping, jitter, download, upload, message }
     property var speed: ({})

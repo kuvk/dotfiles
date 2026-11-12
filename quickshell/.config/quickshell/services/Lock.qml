@@ -21,7 +21,7 @@ import qs.config
 // Unlike Omarchy's, it doesn't turn the screens off while locked: on hybrid laptops Hyprland
 // doesn't survive the NVIDIA GPU losing all its lit outputs (DPMS off). The screens go off
 // when the machine sleeps.
-// scripts/sleep-lock.sh asks for the lock before every suspend and waits for `secure`.
+// hyprdori-sleep-lock asks for the lock before every suspend and waits for `secure`.
 Singleton {
     id: root
 

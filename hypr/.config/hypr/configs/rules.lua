@@ -59,7 +59,7 @@ hl.window_rule({
   center = true,
 })
 
--- System Information (scripts/sysinfo.sh): fastfetch in kitty, at the size kitty opens with
+-- System Information (hyprdori-sysinfo): fastfetch in kitty, at the size kitty opens with
 hl.window_rule({
   name = "sysinfo",
   match = { class = "^hyprdori-sysinfo$" },
@@ -77,7 +77,7 @@ hl.window_rule({
   size = "800 600",
 })
 
--- theme-boot.sh --window: updating the boot screens after a theme change
+-- hyprdori-theme-boot --window: updating the boot screens after a theme change
 hl.window_rule({
   name = "theme-boot",
   match = { class = "^(theme-boot)$" },

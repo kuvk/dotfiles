@@ -5,11 +5,11 @@
 #   Game  the same, plus a plain US keyboard (Alt and Super not swapped, as input.lua
 #         does, and no layout switching) so games get the printed keys, and Stay Awake
 #
-#   hypr-gamemode.sh work     Work mode, or back to normal if already in it (SUPER+G)
-#   hypr-gamemode.sh game     Game mode, or back to normal if already in it (SUPER+CTRL+G)
-#   hypr-gamemode.sh cycle    normal, Work, Game, normal (the bar and Control Center)
-#   hypr-gamemode.sh normal   leave either mode
-#   hypr-gamemode.sh restyle  the mode's look again (the shell runs it after Hyprland
+#   hyprdori-gamemode work     Work mode, or back to normal if already in it (SUPER+G)
+#   hyprdori-gamemode game     Game mode, or back to normal if already in it (SUPER+CTRL+G)
+#   hyprdori-gamemode cycle    normal, Work, Game, normal (the bar and Control Center)
+#   hyprdori-gamemode normal   leave either mode
+#   hyprdori-gamemode restyle  the mode's look again (the shell runs it after Hyprland
 #                             reloads its config, which brings back the normal look)
 #
 # /tmp/hypr-gamemode holds the mode; it exists in both, as other scripts only check that.
@@ -134,7 +134,7 @@ case ${1:-work} in
     normal) set_mode normal ;;
     restyle) [[ $mode == normal ]] || style_on ;;
     *)
-        echo "usage: hypr-gamemode.sh [work|game|cycle|normal|restyle]" >&2
+        echo "usage: hyprdori-gamemode [work|game|cycle|normal|restyle]" >&2
         exit 1
         ;;
 esac

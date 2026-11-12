@@ -6,9 +6,9 @@ theme's palette and writes them to ~/.config/theme/icons/<theme>/. Quickshell
 uses the current theme's folder, or Catppuccin's when a theme has none.
 Run it after adding or changing a theme.
 
-  theme-icons.py              all themes
-  theme-icons.py NAME...      only these themes
-  theme-icons.py --missing    only themes without an icons folder yet
+  hyprdori-theme-icons              all themes
+  hyprdori-theme-icons NAME...      only these themes
+  hyprdori-theme-icons --missing    only themes without an icons folder yet
 """
 
 from __future__ import annotations

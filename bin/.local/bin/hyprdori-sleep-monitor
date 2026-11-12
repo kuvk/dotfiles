@@ -1,7 +1,7 @@
 #!/bin/bash
 # Locks the screen before every suspend (the power menu, the idle timer, the lid): holds a
 # logind delay inhibitor, and when logind announces a sleep (PrepareForSleep), runs
-# sleep-lock.sh and lets go so the sleep goes ahead. Then takes a new inhibitor for the next
+# hyprdori-sleep-lock and lets go so the sleep goes ahead. Then takes a new inhibitor for the next
 # one. Started at login (autostart.lua); stops with Hyprland. After Omarchy's
 # omarchy-system-sleep-monitor (github.com/basecamp/omarchy, MIT).
 
@@ -39,7 +39,7 @@ trap 'kill "$events_PID" 2>/dev/null' EXIT
 while hyprland_alive; do
     if read -r -t 5 line <&"${events[0]}"; then
         if [[ $line == *"boolean true"* ]]; then
-            "$scripts/sleep-lock.sh"
+            "$hyprdori-sleep-lock"
             exit 0
         fi
     elif (($? <= 128)); then

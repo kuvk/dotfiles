@@ -2,7 +2,7 @@ import QtQuick
 import qs.config
 
 // Power menu / session icon: the theme's recolored SVG from
-// ~/.config/theme/icons/<theme>/ (theme-icons.py), or the Nerd Font glyph
+// ~/.config/theme/icons/<theme>/ (hyprdori-theme-icons), or the Nerd Font glyph
 // when there is none.
 Item {
     id: root

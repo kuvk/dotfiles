@@ -86,7 +86,7 @@ Singleton {
         onTriggered: if (root.inCycle) Lock.lock()
     }
 
-    // The lock comes first: scripts/sleep-lock.sh locks before every suspend
+    // The lock comes first: hyprdori-sleep-lock locks before every suspend
     Timer {
         id: sleepTimer
 

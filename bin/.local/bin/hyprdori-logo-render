@@ -7,8 +7,8 @@ as shapes the logo is sharp at any size and the same everywhere: the wallpaper
 (hyprdori-logo-wallpaper), the boot splash (plymouth/install.sh) and the boot menu
 (limine/install.sh), like fastfetch in kitty and the System Information window.
 
-  logo-render.py --color '#cba6f7' --cell-height 24 --out logo.png
-  logo-render.py --color '#cba6f7' --height 480 --out logo.png    the whole logo 480px high
+  hyprdori-logo-render --color '#cba6f7' --cell-height 24 --out logo.png
+  hyprdori-logo-render --color '#cba6f7' --height 480 --out logo.png    the whole logo 480px high
 
 Options:
   --color HEX          the logo's color (#rrggbb)

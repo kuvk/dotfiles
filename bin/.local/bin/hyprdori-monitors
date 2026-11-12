@@ -62,7 +62,7 @@ LAST_RUN_FILE = LOCK_FILE.with_name("hypr-monitors.last")
 LAST_RUN_WINDOW = 10.0  # s; the same monitors again this soon need nothing done
 # Hyprland's rule for monitors no profile names: preferred mode, automatic position and scale
 FALLBACK_RULE = 'hl.monitor({ output = "", mode = "preferred", position = "auto", scale = "auto", supports_hdr = -1 })'
-GAMEMODE_SCRIPT = HOME / ".config/scripts/hypr-gamemode.sh"
+GAMEMODE_SCRIPT = HOME / ".local/bin/hyprdori-gamemode"
 THEME_SET = HOME / ".local/bin/hyprdori-theme-set"
 
 INTERNAL_PREFIXES = ("eDP", "LVDS", "DSI")

@@ -42,7 +42,7 @@ HOME = Path.home()
 THEME_COLORS = HOME / ".config/theme/current/quickshell.json"
 DEFAULT_LOGO = HOME / ".config/theme/logo/ascii-dori"
 DEFAULT_DIR = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "hyprdori/backgrounds/default"
-RENDER = HOME / ".config/scripts/logo-render.py"
+RENDER = HOME / ".local/bin/hyprdori-logo-render"
 HEX_RE = re.compile(r"^#?[0-9a-fA-F]{6}$")
 
 
@@ -82,7 +82,7 @@ def largest_monitor() -> tuple[int, int]:
 
 
 def render(logo: Path, fg: str, bg: str, width: int, height: int, share: float, out: Path) -> None:
-    # The logo drawn like kitty draws it (logo-render.py), then centered on the color
+    # The logo drawn like kitty draws it (hyprdori-logo-render), then centered on the color
     with tempfile.TemporaryDirectory() as tmp:
         mark = Path(tmp) / "logo.png"
         subprocess.run(

@@ -108,8 +108,8 @@ wallpaper() {
     local logo_text lw lh top k line max_len=0 cols prefix center
     logo_text="$home/.config/theme/logo/ascii-dori"
     [[ -r $logo_text ]] || { echo "No logo at $logo_text" >&2; exit 1; }
-    # drawn like kitty draws it, in 12px rows (24 on large screens), by Hyprdori's logo-render.py
-    "$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$magenta" --cell-height $((12 * scale)) --out "$build/logo.png"
+    # drawn like kitty draws it, in 12px rows (24 on large screens), by Hyprdori's hyprdori-logo-render
+    "$here/../bin/.local/bin/hyprdori-logo-render" --logo "$logo_text" --color "$magenta" --cell-height $((12 * scale)) --out "$build/logo.png"
     lw=$(magick identify -format %w "$build/logo.png"); lh=$(magick identify -format %h "$build/logo.png")
     top=$(((res_h / cell_h - ${#found[@]} - 1) / 2 * cell_h))
     # Limine's centering (menu.c): each line is its tree marks plus " name ", the widest

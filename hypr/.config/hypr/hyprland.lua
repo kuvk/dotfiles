@@ -18,7 +18,7 @@ require("configs.decoration")
 require("configs.animations")
 require("configs.rules")
 
--- Single window (SUPER+SHIFT+S, ~/.config/scripts/hypr-single-window.sh): on while the flag exists
+-- Single window (SUPER+SHIFT+S, ~/.local/bin/hyprdori-single-window): on while the flag exists
 local single = io.open(os.getenv("HOME") .. "/.local/state/hyprdori/single-window")
 if single then
   single:close()

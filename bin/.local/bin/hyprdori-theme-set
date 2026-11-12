@@ -585,7 +585,7 @@ def render_starship(theme: dict) -> None:
 
 
 def icons_dir(name: str) -> str:
-    """Power menu icons from theme-icons.py, or Catppuccin's for a theme
+    """Power menu icons from hyprdori-theme-icons, or Catppuccin's for a theme
     that has none yet."""
     for candidate in (name, "catppuccin"):
         if (ICONS_DIR / candidate / "lock.svg").is_file():
@@ -815,7 +815,7 @@ def redraw_prompts() -> None:
 
 
 def restart_yazi() -> None:
-    """yazi can't reload its theme: every yazi started by yazi-live.sh is told
+    """yazi can't reload its theme: every yazi started by hyprdori-yazi-live is told
     to quit (it writes its folder) and the script reopens it right there."""
     runtime = Path(os.environ.get("XDG_RUNTIME_DIR", "/tmp")) / "yazi-live"
     if not shutil.which("ya") or not runtime.is_dir():
@@ -837,7 +837,7 @@ BROWSER_HELPER = "/usr/local/bin/browser-theme-policy"
 
 
 def browsers(color: str) -> None:
-    """Chromium/Brave theme color via managed policy (browser-theme-setup.sh).
+    """Chromium/Brave theme color via managed policy (hyprdori-browser-theme-setup).
     Does nothing until that one-time setup has been run."""
     if not Path(BROWSER_HELPER).exists() or not shutil.which("sudo"):
         return
@@ -930,9 +930,9 @@ def follow_wallpaper(theme: dict) -> None:
 
 def notify_switch(summary: str) -> None:
     """The theme notification. When the boot menu and splash still have other colors
-    (theme-boot.sh --check), it says so, and its Update button runs theme-boot.sh in a
+    (hyprdori-theme-boot --check), it says so, and its Update button runs hyprdori-theme-boot in a
     kitty window (password prompt and output)."""
-    script = HOME / ".config/scripts/theme-boot.sh"
+    script = HOME / ".local/bin/hyprdori-theme-boot"
     stale = script.exists() and subprocess.run(
         [str(script), "--check"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode == 0
     if not stale or not shutil.which("notify-send"):

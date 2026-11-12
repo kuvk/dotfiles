@@ -4,10 +4,10 @@
 # where SDDM reads it. They read the theme and logo when they run, so a theme or accent
 # change shows at boot only after this; the login screen's colors follow on their own.
 #
-#   theme-boot.sh            update, unless they're already built from the current theme
-#   theme-boot.sh --force    update anyway
-#   theme-boot.sh --check    say whether an update is needed (exit 0 yes, 1 no); no root
-#   theme-boot.sh --window   in a kitty window: the logo, what this does, a Y/n question, the
+#   hyprdori-theme-boot            update, unless they're already built from the current theme
+#   hyprdori-theme-boot --force    update anyway
+#   hyprdori-theme-boot --check    say whether an update is needed (exit 0 yes, 1 no); no root
+#   hyprdori-theme-boot --window   in a kitty window: the logo, what this does, a Y/n question, the
 #                            output, then any key closes it (the notification's Update button)
 #
 # Asks for the password in a terminal (sudo) or, started from the desktop, in the polkit
@@ -28,7 +28,7 @@ note() { printf '%s\n' "$1"; command -v notify-send >/dev/null && [[ ! -t 1 ]] &
 fingerprint() {
     local home=$1
     cat "$home/.config/theme/current/colors.sh" "$home/.config/theme/logo/ascii-dori" \
-        "$hyprdori"/plymouth/* "$hyprdori/limine/install.sh" "$scripts/logo-render.py" \
+        "$hyprdori"/plymouth/* "$hyprdori/limine/install.sh" "$hyprdori-logo-render" \
         "$hyprdori"/sddm/hyprdori/* 2>/dev/null |
         sha256sum | cut -d' ' -f1
 }

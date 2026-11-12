@@ -36,7 +36,7 @@ done
 # Every theme renders every template (in memory; nothing is written)
 while IFS= read -r line; do
     fail "theme: $line"
-done < <(python3 - "$hyprdori" <<'PY'
+done < <(PYTHONDONTWRITEBYTECODE=1 python3 - "$hyprdori" <<'PY'
 import importlib.machinery, importlib.util, sys
 from pathlib import Path
 root = Path(sys.argv[1])
@@ -80,7 +80,7 @@ while IFS= read -r line; do
 done < <(git grep -n -I -i -E 'kuvk' -- "${current[@]}" 2>/dev/null | grep -v -E 'github\.com/kuvk/')
 while IFS= read -r line; do
     fail "old path: $line"
-done < <(git grep -n -I -E '(\.config/scripts/(theme-set|wallpaper|hypr-monitors|webapp|update|sysmaintenance|logo-wallpaper|convert-live-wallpapers)\.(py|sh))|share/dotfiles|config/dotfiles' -- "${current[@]}" 2>/dev/null)
+done < <(git grep -n -I -E '\.config/scripts|scripts/\.config|share/dotfiles|config/dotfiles' -- "${current[@]}" 2>/dev/null)
 
 if ((failed)); then
     exit 1

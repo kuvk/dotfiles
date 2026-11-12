@@ -3,7 +3,7 @@
 # the session locked until a new one takes the lock over (it locks again at start when Hyprland
 # still holds a lock). Stops with Hyprland, when the shell quits on its own (exit 0), or after
 # it failed within seconds of starting 5 times in a row: Hyprland restarted after its own crash
-# can refuse it, and retrying wouldn't help (journalctl -t shell.sh says so).
+# can refuse it, and retrying wouldn't help (journalctl -t hyprdori-shell says so).
 
 # Hyprland is still running: its pid in hyprland.lock (a crashed one leaves its socket file behind)
 hyprland_lock="$XDG_RUNTIME_DIR/hypr/$HYPRLAND_INSTANCE_SIGNATURE/hyprland.lock"
@@ -22,7 +22,7 @@ while hyprland_alive; do
     qs && break
     if ((SECONDS - started < 10)); then
         ((++quick_failures >= 5)) && {
-            logger -t shell.sh "Quickshell failed 5 times in a row right after starting; not starting it again"
+            logger -t hyprdori-shell "Quickshell failed 5 times in a row right after starting; not starting it again"
             break
         }
     else

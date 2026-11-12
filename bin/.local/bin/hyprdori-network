@@ -5,19 +5,19 @@ Everything goes through NetworkManager (nmcli); the speed test uses
 Cloudflare's speed endpoints, like speed.cloudflare.com, with the standard
 library only.
 
-  network.py status                     JSON: wired, VPNs, details, DNS
-  network.py wired on|off IFACE         connect / disconnect a wired device
-  network.py vpn up|down|delete NAME    WireGuard or other VPN connections
-  network.py vpn import FILE.conf       import a WireGuard config
-  network.py dns auto|cloudflare|google|quad9   DNS for the active connections
-  network.py dns custom "1.1.1.1 9.9.9.9"
-  network.py speedtest                  JSON lines: ping, download, upload
-  network.py stats                      JSON: the default route's interface, addresses,
+  hyprdori-network status                     JSON: wired, VPNs, details, DNS
+  hyprdori-network wired on|off IFACE         connect / disconnect a wired device
+  hyprdori-network vpn up|down|delete NAME    WireGuard or other VPN connections
+  hyprdori-network vpn import FILE.conf       import a WireGuard config
+  hyprdori-network dns auto|cloudflare|google|quad9   DNS for the active connections
+  hyprdori-network dns custom "1.1.1.1 9.9.9.9"
+  hyprdori-network speedtest                  JSON lines: ping, download, upload
+  hyprdori-network stats                      JSON: the default route's interface, addresses,
                                         byte counters and one ping to the router and 1.1.1.1
-  network.py band [auto|2.4|5|6]        JSON: the Wi-Fi band in use and available; or pin one
-  network.py qr [IFACE]                 JSON: the connected Wi-Fi as a QR code matrix (qrencode)
-  network.py password IFACE             the connected Wi-Fi's password
-  network.py eap SSID IDENTITY          join a WPA-Enterprise (PEAP/MSCHAPv2) network,
+  hyprdori-network band [auto|2.4|5|6]        JSON: the Wi-Fi band in use and available; or pin one
+  hyprdori-network qr [IFACE]                 JSON: the connected Wi-Fi as a QR code matrix (qrencode)
+  hyprdori-network password IFACE             the connected Wi-Fi's password
+  hyprdori-network eap SSID IDENTITY          join a WPA-Enterprise (PEAP/MSCHAPv2) network,
                                         the password on stdin
 
 stats, band, qr, password and eap follow Omarchy's network panel scripts

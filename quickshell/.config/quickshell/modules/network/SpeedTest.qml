@@ -7,7 +7,7 @@ import qs.services
 // Internet speed test: download and upload dials in Mb/s with ping and jitter under them.
 // The dials follow Omarchy's speed test overlay (shell/Ui/SpeedTestOverlay.qml,
 // github.com/basecamp/omarchy, MIT): open 270° arcs, a tick ring, a needle fading toward
-// the pivot, a sweep to full scale on open. The measuring is network.py speedtest
+// the pivot, a sweep to full scale on open. The measuring is hyprdori-network speedtest
 // (Cloudflare's speed endpoints).
 NetworkOverlay {
     id: root

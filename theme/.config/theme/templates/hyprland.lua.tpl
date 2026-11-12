@@ -8,7 +8,7 @@ return {
   active_border = {{ hypr_gradient hyprland_active_border accent }},
   inactive_border = {{ hypr_gradient hyprland_inactive_border rgba(595959aa) }},
   -- Quickshell's Settings for normal mode (Appearance, Windows); Work-Game has its own look
-  -- (hypr-gamemode.sh). The shell also applies changes at once (services/Hypr.qml).
+  -- (hyprdori-gamemode). The shell also applies changes at once (services/Hypr.qml).
   gaps_in = {{ hypr_gaps_in }},
   gaps_out = {{ hypr_gaps_out }},
   rounding = {{ hypr_rounding }},

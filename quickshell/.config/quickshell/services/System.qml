@@ -5,16 +5,16 @@ import Quickshell
 import Quickshell.Io
 import qs.config
 
-// Small bits of system state driven by the existing scripts in ~/.config/scripts
+// Small bits of system state driven by Hyprdori's commands in ~/.local/bin
 Singleton {
     id: root
 
-    readonly property string scripts: Quickshell.env("HOME") + "/.config/scripts/"
+    readonly property string scripts: Quickshell.env("HOME") + "/.local/bin/"
 
     property bool nightlight: false
     // Holds idle off: no idle lock or sleep (services/Idle.qml)
     property bool stayAwake: false
-    // Work-Game: "normal", "work" or "game" (hypr-gamemode.sh reports it over IPC)
+    // Work-Game: "normal", "work" or "game" (hyprdori-gamemode reports it over IPC)
     property string mode: "normal"
     readonly property bool gamemode: mode !== "normal"
     // For the bar's tooltip and the Control Center tile
@@ -48,10 +48,10 @@ Singleton {
         Hypr.applyLook();
     }
 
-    // System Information: fastfetch in a kitty window (scripts/sysinfo.sh), opened or closed
+    // System Information: fastfetch in a kitty window (hyprdori-sysinfo), opened or closed
     function showSysinfo(): void {
         Panels.closeAll();
-        Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/sysinfo.sh"]);
+        Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-sysinfo"]);
     }
     property bool hasBrightness: false
     property real brightness: 0
@@ -84,7 +84,7 @@ Singleton {
         }
         const inHours = inNightlightHours();
         if (inHours !== wasInNightlightHours && (inHours || wasInNightlightHours !== null)) {
-            Quickshell.execDetached([scripts + "nightlight-toggle.sh", inHours ? "on" : "off"]);
+            Quickshell.execDetached([scripts + "hyprdori-nightlight", inHours ? "on" : "off"]);
             nightlight = inHours;
             delayedRefresh.restart();
         }
@@ -119,14 +119,14 @@ Singleton {
     }
 
     function toggleNightlight(): void {
-        Quickshell.execDetached([scripts + "nightlight-toggle.sh"]);
+        Quickshell.execDetached([scripts + "hyprdori-nightlight"]);
         nightlight = !nightlight;
         delayedRefresh.restart();
     }
 
     // normal, Work, Game, normal; the script reports back through `qs ipc call theme mode`
     function cycleMode(): void {
-        Quickshell.execDetached([scripts + "hypr-gamemode.sh", "cycle"]);
+        Quickshell.execDetached([scripts + "hyprdori-gamemode", "cycle"]);
     }
 
     function setBrightness(value: real): void {
@@ -151,7 +151,7 @@ Singleton {
             Lock.lock();
             break;
         case "suspend":
-            // scripts/sleep-lock.sh locks before sleeping
+            // hyprdori-sleep-lock locks before sleeping
             Quickshell.execDetached(["systemctl", "suspend"]);
             break;
         // hyprshutdown asks every app to close (an app with unsaved work can ask first), exits

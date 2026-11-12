@@ -4,8 +4,8 @@
 # of filling the screen. SUPER+SHIFT+S turns it on and off; it stays as left across
 # reloads and restarts (hyprland.lua loads the file while the flag exists).
 #
-#   hypr-single-window.sh          on, or off if on
-#   hypr-single-window.sh on|off
+#   hyprdori-single-window          on, or off if on
+#   hyprdori-single-window on|off
 set -euo pipefail
 
 FLAG="$HOME/.local/state/hyprdori/single-window"
@@ -35,7 +35,7 @@ case ${1:-toggle} in
     on) on ;;
     off) off ;;
     *)
-        echo "usage: hypr-single-window.sh [on|off]" >&2
+        echo "usage: hyprdori-single-window [on|off]" >&2
         exit 1
         ;;
 esac

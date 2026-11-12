@@ -357,7 +357,7 @@ ColumnLayout {
             }
         }
 
-        // The boot splash draws its field when it's built: theme-boot.sh, which the button runs
+        // The boot splash draws its field when it's built: hyprdori-theme-boot, which the button runs
         SettingRow {
             label: "Rounded corners"
 
@@ -403,7 +403,7 @@ ColumnLayout {
                 text: "Update boot splash"
                 onClicked: {
                     settings.bootStale = false;
-                    Quickshell.execDetached([Quickshell.env("HOME") + "/.config/scripts/theme-boot.sh", "--window"]);
+                    Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-boot", "--window"]);
                 }
             }
         }

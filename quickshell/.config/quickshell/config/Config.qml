@@ -95,7 +95,7 @@ Singleton {
     // the schedule may cross midnight
     property alias nightlightStart: adapter.nightlightStart
     property alias nightlightEnd: adapter.nightlightEnd
-    // kelvin, read by scripts/nightlight-toggle.sh
+    // kelvin, read by hyprdori-nightlight
     property alias nightlightTemperature: adapter.nightlightTemperature
 
     // In the bar's order, left to right

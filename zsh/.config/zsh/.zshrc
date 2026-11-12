@@ -211,12 +211,12 @@ alias cat="bat --style=plain,header,grid"
 # the repo this file is linked from (zsh/.config/zsh/.zshrc, four folders up), wherever it was cloned
 alias dots="z \"${${(%):-%x}:A:h:h:h:h}\""
 
-# yazi that follows theme changes (yazi-live.sh); on quit, the shell moves to
+# yazi that follows theme changes (hyprdori-yazi-live); on quit, the shell moves to
 # yazi's last folder
 y() {
     local tmp
     tmp="$(mktemp -t yazi-cwd.XXXXXX)"
-    YAZI_LIVE_CWD_OUT="$tmp" ~/.config/scripts/yazi-live.sh "$@"
+    YAZI_LIVE_CWD_OUT="$tmp" ~/.local/bin/hyprdori-yazi-live "$@"
     local cwd
     cwd="$(command cat -- "$tmp" 2>/dev/null)"
     [[ -n $cwd && $cwd != "$PWD" ]] && builtin cd -- "$cwd"

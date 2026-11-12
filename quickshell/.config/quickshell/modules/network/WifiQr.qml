@@ -8,7 +8,7 @@ import qs.services
 
 // The connected Wi-Fi as a QR code a phone camera can join from, with the password on
 // request. After Omarchy's Wi-Fi QR card (shell/plugins/panels/wifiqr,
-// github.com/basecamp/omarchy, MIT); network.py qr makes the matrix with qrencode.
+// github.com/basecamp/omarchy, MIT); hyprdori-network qr makes the matrix with qrencode.
 NetworkOverlay {
     id: root
 
@@ -16,7 +16,7 @@ NetworkOverlay {
     layerName: "quickshell-wifiqr"
     onCloseRequested: Panels.wifiQr = false
 
-    readonly property string script: Quickshell.env("HOME") + "/.config/scripts/network.py"
+    readonly property string script: Quickshell.env("HOME") + "/.local/bin/hyprdori-network"
     property var qr: ({}) // { iface, ssid, security, rows }
     readonly property int size: qr.rows?.length ?? 0
     property bool loading: false

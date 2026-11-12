@@ -1,5 +1,5 @@
 #!/bin/bash
-# Lock before a suspend and wait until the session lock is secure (sleep-monitor.sh runs this
+# Lock before a suspend and wait until the session lock is secure (hyprdori-sleep-monitor runs this
 # when logind announces a sleep, holding it back with a delay inhibitor meanwhile). After
 # Omarchy's omarchy-system-sleep-lock (github.com/basecamp/omarchy, MIT).
 #
@@ -39,7 +39,7 @@ while (($(now_ms) < deadline)); do
 done
 
 # The machine sleeps anyway: say so on the screen it wakes up to
-echo "sleep-lock.sh: suspending without a secure lock (not locked within ${budget} ms)" >&2
+echo "hyprdori-sleep-lock: suspending without a secure lock (not locked within ${budget} ms)" >&2
 notify-send -u critical -a "Lock screen" "Slept without locking" \
     "Not locked within ${budget} ms." 2>/dev/null
 exit 1

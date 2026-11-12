@@ -2,8 +2,7 @@
 # btop without the NVIDIA card while it sleeps (hybrid laptops): btop's NVIDIA support (NVML)
 # wakes the card, and it stays on as long as btop runs. With the card asleep, btop runs on a
 # copy of its config without nvidia in shown_gpus; settings changed in that session are
-# copied back afterwards, shown_gpus as it was. With the card awake (in use, or on AC with
-# nvidia-hybrid) it runs as usual. Reading runtime_status doesn't wake the card.
+# copied back afterwards, shown_gpus as it was. With the card awake it runs as usual. Reading runtime_status doesn't wake the card.
 real=/usr/bin/btop
 conf="${XDG_CONFIG_HOME:-$HOME/.config}/btop/btop.conf"
 

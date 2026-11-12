@@ -6,11 +6,11 @@
 # a 6-digit hex color, and a sudoers rule that lets the user run exactly that
 # without a password. Nothing else gets root.
 #
-#   sudo ~/.config/scripts/browser-theme-setup.sh            install
-#   sudo ~/.config/scripts/browser-theme-setup.sh --unlock   drop the color policy for
+#   sudo ~/.local/bin/hyprdori-browser-theme-setup            install
+#   sudo ~/.local/bin/hyprdori-browser-theme-setup --unlock   drop the color policy for
 #        now, e.g. to switch Appearance > Theme to Classic; the next theme
 #        switch (or hyprdori-theme-set) puts it back
-#   sudo ~/.config/scripts/browser-theme-setup.sh --remove   undo everything
+#   sudo ~/.local/bin/hyprdori-browser-theme-setup --remove   undo everything
 set -euo pipefail
 
 HELPER=/usr/local/bin/browser-theme-policy
@@ -68,7 +68,7 @@ chmod 0755 "$HELPER"
 
 rule="$user ALL=(root) NOPASSWD: $HELPER [0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]"
 tmp=$(mktemp)
-printf '# Lets hyprdori-theme-set write the browser theme color (browser-theme-setup.sh)\n%s\n' "$rule" >"$tmp"
+printf '# Lets hyprdori-theme-set write the browser theme color (hyprdori-browser-theme-setup)\n%s\n' "$rule" >"$tmp"
 if visudo -cf "$tmp" >/dev/null; then
     install -m 0440 -o root -g root -T "$tmp" "$SUDOERS"
     rm -f "$tmp"

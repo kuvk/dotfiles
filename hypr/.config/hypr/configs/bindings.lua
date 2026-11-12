@@ -2,8 +2,8 @@
 ---- MY PROGRAMS ----
 ---------------------
 local terminal = "kitty"
--- yazi-live.sh restarts yazi in place when the theme changes
-local fileManager = terminal .. " -e ~/.config/scripts/yazi-live.sh"
+-- hyprdori-yazi-live restarts yazi in place when the theme changes
+local fileManager = terminal .. " -e ~/.local/bin/hyprdori-yazi-live"
 -- local fileManager = "dolphin"
 local menu = "qs ipc call launcher toggle"
 local appMenu = "qs ipc call launcher menu"
@@ -17,18 +17,18 @@ local lock = "qs ipc call lock lock"
 local powermenu = "qs ipc call power toggle"
 local settings = "qs ipc call settings toggle"
 local keybinds = "qs ipc call keybinds toggle"
-local sysinfo = "~/.config/scripts/sysinfo.sh"
+local sysinfo = "~/.local/bin/hyprdori-sysinfo"
 local music = "kitty --class cliamp -e cliamp"
 local email = "thunderbird"
-local gamemode = "~/.config/scripts/hypr-gamemode.sh"
-local nightlight = "~/.config/scripts/nightlight-toggle.sh"
-local singleWindow = "~/.config/scripts/hypr-single-window.sh"
+local gamemode = "~/.local/bin/hyprdori-gamemode"
+local nightlight = "~/.local/bin/hyprdori-nightlight"
+local singleWindow = "~/.local/bin/hyprdori-single-window"
 
 ---------------------
 ---- KEYBINDINGS ----
 ---------------------
 -- The Keybindings window (mainMod + /) is built from this file by
--- ~/.config/scripts/hypr-keybinds.py: a "-- Name" line starts a section, a
+-- ~/.local/bin/hyprdori-keybinds: a "-- Name" line starts a section, a
 -- trailing "-- text" describes a bind, and "--> keys | text" lines describe
 -- binds made in loops.
 local mainMod = "SUPER"
@@ -118,5 +118,5 @@ hl.bind("XF86AudioPrev", hl.dsp.exec_cmd("playerctl previous"), player_opts) -- 
 
 -- lid closed: lock, or with an external monitor the laptop's screen off; opened: back on
 -- (not listed in the keybindings)
-hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("~/.config/scripts/lid-close.sh"), { locked = true })
+hl.bind("switch:on:Lid Switch", hl.dsp.exec_cmd("~/.local/bin/hyprdori-lid-close"), { locked = true })
 hl.bind("switch:off:Lid Switch", hl.dsp.exec_cmd("~/.local/bin/hyprdori-monitors lid"), { locked = true })

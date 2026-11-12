@@ -84,14 +84,14 @@ Scope {
             Theme.reload();
         }
 
-        // "normal", "work" or "game", from hypr-gamemode.sh
+        // "normal", "work" or "game", from hyprdori-gamemode
         function mode(name: string): void {
             Theme.gamemode = name !== "normal";
             System.setMode(name);
         }
     }
 
-    // SUPER+`, the idle timer, and scripts/sleep-lock.sh before every suspend
+    // SUPER+`, the idle timer, and hyprdori-sleep-lock before every suspend
     IpcHandler {
         target: "lock"
 
@@ -103,7 +103,7 @@ Scope {
             return Lock.locked;
         }
 
-        // { requested, secure }: sleep-lock.sh waits for secure before letting the machine sleep
+        // { requested, secure }: hyprdori-sleep-lock waits for secure before letting the machine sleep
         function status(): string {
             return JSON.stringify({ requested: Lock.locked, secure: Lock.secure });
         }

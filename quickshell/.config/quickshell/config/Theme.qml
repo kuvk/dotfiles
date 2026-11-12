@@ -18,11 +18,11 @@ Singleton {
     property string theme: "catppuccin"
     property string themeName: "Catppuccin"
     property string mode: "dark"
-    // power menu icons for this theme (theme-icons.py), "" = use glyphs
+    // power menu icons for this theme (hyprdori-theme-icons), "" = use glyphs
     property string iconsDir: ""
     // the theme's own background image (hyprdori-theme-set): the wallpaper and lock screen while they follow the theme
     property string backgroundImage: ""
-    // Set by hypr-gamemode.sh over IPC: opaque surfaces, square corners, no animations
+    // Set by hyprdori-gamemode over IPC: opaque surfaces, square corners, no animations
     property bool gamemode: false
 
     // The theme's colors

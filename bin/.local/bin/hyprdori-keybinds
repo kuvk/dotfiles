@@ -10,7 +10,7 @@ In bindings.lua:
                                        a bind made in a loop, described by hand
 Binds without a description are left out.
 
-  hypr-keybinds.py            JSON: [{"section": ..., "binds": [{"keys": [...], "desc": ...}]}]
+  hyprdori-keybinds            JSON: [{"section": ..., "binds": [{"keys": [...], "desc": ...}]}]
 """
 
 from __future__ import annotations

@@ -17,7 +17,7 @@
 set -euo pipefail
 
 hyprdori=$(dirname "$(readlink -f "$0")")
-not_stowed=(limine migrations nvidia-hybrid packages plymouth sddm)
+not_stowed=(limine migrations packages plymouth sddm)
 
 step() { printf '\n\e[1;34m==> %s\e[0m\n' "$1"; }
 note() { printf '\e[33m%s\e[0m\n' "$1"; }
@@ -196,11 +196,6 @@ services=(NetworkManager bluetooth power-profiles-daemon sddm fstrim.timer)
 if [[ " ${groups[*]} " == *" nvidia "* ]]; then
     services+=(nvidia-suspend nvidia-hibernate nvidia-resume)
     $laptop && services+=(nvidia-powerd)
-    # Hybrid laptop (NVIDIA next to the built-in GPU): the NVIDIA card stays powered on AC, so
-    # plugging a monitor into its ports doesn't have to wake it
-    if $laptop && ((${#gpus[@]} >= 2)); then
-        sudo "$hyprdori/nvidia-hybrid/install.sh" >/dev/null || note "Couldn't install the NVIDIA AC power rule"
-    fi
 fi
 [[ " ${groups[*]} " == *" desktop "* ]] && services+=(coolercontrold)
 $guest && services+=(qemu-guest-agent)
@@ -210,7 +205,7 @@ for unit in "${services[@]}"; do
     if sudo systemctl enable "$unit" &>/dev/null; then echo "Enabled $unit"; else note "Couldn't enable $unit"; fi
 done
 # The lock screen gets up to 15 s, not logind's 5, to come up before a suspend
-# (scripts/sleep-lock.sh). logind reads it on reload.
+# (hyprdori-sleep-lock). logind reads it on reload.
 sudo install -Dm644 /dev/stdin /etc/systemd/logind.conf.d/20-inhibit-delay.conf <<'EOF'
 [Login]
 InhibitDelayMaxSec=15
@@ -231,7 +226,7 @@ else
     echo "Already zsh."
 fi
 # zsh's plugins (vi mode, highlighting, suggestions, completions, history search)
-"$HOME/.config/scripts/install-zsh-plugins.py"
+"$HOME/.local/bin/hyprdori-zsh-plugins"
 
 step "Theme"
 # The login screen first: hyprdori-theme-set writes its colors to the folder this makes
@@ -248,7 +243,7 @@ tmux_theme="$HOME/.tmux/plugins/catppuccin/tmux"
 # the theme from then on.
 wall=$(jq -r '.background // empty' "$HOME/.config/theme/current/quickshell.json" 2>/dev/null) || wall=
 "$HOME/.local/bin/hyprdori-wallpaper" default ${wall:+"$wall"}
-sudo "$HOME/.config/scripts/browser-theme-setup.sh"
+sudo "$HOME/.local/bin/hyprdori-browser-theme-setup"
 
 # --- Boot: initramfs, kernel options, splash, menu -------------------------------------------------------------
 step "Boot"

@@ -68,8 +68,8 @@ trap 'rm -rf "$build"' EXIT
 # background with 5% of the text color) with an accent outline, dots in the text color; the hint under the field in the
 # secondary text color (yellow, then red after wrong passwords); the progress bar in the text
 # color on a faint track; the farewell line in red, large, alone on the screen
-# The logo drawn like kitty draws it, in 24px rows (scripts/.config/scripts/logo-render.py)
-"$here/../scripts/.config/scripts/logo-render.py" --logo "$logo_text" --color "$magenta" --cell-height 24 --out "$build/logo.png"
+# The logo drawn like kitty draws it, in 24px rows (bin/.local/bin/hyprdori-logo-render)
+"$here/../bin/.local/bin/hyprdori-logo-render" --logo "$logo_text" --color "$magenta" --cell-height 24 --out "$build/logo.png"
 # The password field and progress bar are 40 px wider than the logo; the field is 52 px high, a
 # box with a 2 px outline and the lock and login screens' corners (Settings > Style > Lock screen >
 # Rounded corners)
