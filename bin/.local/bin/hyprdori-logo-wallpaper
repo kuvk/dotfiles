@@ -12,7 +12,8 @@ combination is drawn, so one run can make a set to pick from.
 Options:
   --bg COLORS          background (default: dark_background)
   --fg COLORS          logo color (default: magenta)
-  --size PERCENTS      logo height as a share of the screen height (default: 30)
+  --size PERCENTS      logo height as a share of the screen height (default: 30); a wide
+                       logo is made smaller to fit 80% of the width
   --res WxH            image size (default: the highest resolution any connected monitor
                        has, else 2560x1440; works from a console too)
   --output-dir DIR     where the images go (default: ~/.local/share/hyprdori/backgrounds/
@@ -82,13 +83,22 @@ def largest_monitor() -> tuple[int, int]:
 
 
 def render(logo: Path, fg: str, bg: str, width: int, height: int, share: float, out: Path) -> None:
-    # The logo drawn like kitty draws it (hyprdori-logo-render), then centered on the color
+    # The logo drawn like kitty draws it (hyprdori-logo-render), then centered on the color; a
+    # wide logo is drawn smaller, to at most 80% of the width
     with tempfile.TemporaryDirectory() as tmp:
         mark = Path(tmp) / "logo.png"
-        subprocess.run(
-            [str(RENDER), "--logo", str(logo), "--color", fg, "--height", str(round(height * share)), "--out", str(mark)],
-            check=True,
-        )
+        rows = len(logo.read_text(encoding="utf-8").rstrip("\n").split("\n"))
+        cell_h = max(2, round(height * share / rows))
+        for _ in range(2):
+            subprocess.run(
+                [str(RENDER), "--logo", str(logo), "--color", fg, "--cell-height", str(cell_h), "--out", str(mark)],
+                check=True,
+            )
+            drawn = int(subprocess.run(["magick", "identify", "-format", "%w", str(mark)],
+                                       check=True, capture_output=True, text=True).stdout)
+            if drawn <= width * 0.8:
+                break
+            cell_h = max(2, int(cell_h * width * 0.8 / drawn) // 2 * 2)
         subprocess.run(
             ["magick", "-size", f"{width}x{height}", f"xc:{bg}", str(mark), "-gravity", "center",
              "-composite", str(out)],
