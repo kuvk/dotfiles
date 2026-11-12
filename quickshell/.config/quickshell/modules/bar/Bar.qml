@@ -14,6 +14,11 @@ PanelWindow {
     id: barWindow
 
     required property ShellScreen modelData
+    // The status icons on the right (not the tray, not media): each in a slot of one width, so
+    // their open-dropdown underline is the same length; the font's icons are 6 to 14 px wide at
+    // the bar's 12 px. Less padding than other bar items keeps them no wider than before.
+    readonly property int iconSlot: Math.ceil(Theme.barIconSize * 1.2)
+    readonly property int iconPadding: 9
     // Settings > Bar > Per monitor: this monitor's modules, all of them for one not set yet
     function shows(id: string): bool {
         return Config.barShows(screen?.name ?? "", id);
@@ -185,12 +190,14 @@ PanelWindow {
         }
 
         BarButton {
+            sidePadding: barWindow.iconPadding
             visible: barWindow.shows("stayAwake")
             tooltip: System.stayAwake ? "Allow Idle Lock & Screensaver" : "Stay Awake"
             onClicked: System.stayAwake = !System.stayAwake
 
             Icon {
                 font.pixelSize: Theme.barIconSize
+                width: barWindow.iconSlot
                 text: Icons.coffee
                 color: Hues.stayAwake
             }
@@ -198,18 +205,21 @@ PanelWindow {
 
         // Click: normal, Work, Game, normal
         BarButton {
+            sidePadding: barWindow.iconPadding
             visible: barWindow.shows("workGame")
             tooltip: `Work-Game: ${System.modeLabel}`
             onClicked: System.cycleMode()
 
             Icon {
                 font.pixelSize: Theme.barIconSize
+                width: barWindow.iconSlot
                 text: Icons.rocket
                 color: Hues.mode
             }
         }
 
         BarButton {
+            sidePadding: barWindow.iconPadding
             id: audioButton
 
             visible: barWindow.shows("audio")
@@ -220,12 +230,14 @@ PanelWindow {
 
             Icon {
                 font.pixelSize: Theme.barIconSize
+                width: barWindow.iconSlot
                 text: Audio.icon
                 color: Hues.audio
             }
         }
 
         BarButton {
+            sidePadding: barWindow.iconPadding
             id: btButton
 
             visible: barWindow.shows("bluetooth")
@@ -235,12 +247,14 @@ PanelWindow {
 
             Icon {
                 font.pixelSize: Theme.barIconSize
+                width: barWindow.iconSlot
                 text: !Bluetooth.enabled ? Icons.bluetoothOff : (Bluetooth.connected.length > 0 ? Icons.bluetoothConnected : Icons.bluetooth)
                 color: Hues.bluetooth
             }
         }
 
         BarButton {
+            sidePadding: barWindow.iconPadding
             id: netButton
 
             visible: barWindow.shows("network")
@@ -250,6 +264,7 @@ PanelWindow {
 
             Icon {
                 font.pixelSize: Theme.barIconSize
+                width: barWindow.iconSlot
                 text: Network.icon
                 // disabled color when Wi-Fi is off, like Bluetooth
                 color: Hues.network
@@ -257,6 +272,7 @@ PanelWindow {
         }
 
         BarButton {
+            sidePadding: barWindow.iconPadding
             id: batteryButton
 
             visible: barWindow.shows("battery") && Battery.available
@@ -266,12 +282,14 @@ PanelWindow {
 
             Icon {
                 font.pixelSize: Theme.barIconSize
+                width: barWindow.iconSlot
                 text: Battery.icon
                 color: Hues.battery
             }
         }
 
         BarButton {
+            sidePadding: barWindow.iconPadding
             id: displaysButton
 
             visible: barWindow.shows("displays")
@@ -281,12 +299,14 @@ PanelWindow {
 
             Icon {
                 font.pixelSize: Theme.barIconSize
+                width: barWindow.iconSlot
                 text: Icons.display
                 color: Hues.system
             }
         }
 
         BarButton {
+            sidePadding: barWindow.iconPadding
             visible: barWindow.shows("controlCenter")
             active: Panels.controlCenter && Panels.overlayScreen === barWindow.screen
             tooltip: `Control Center\nNotifications: ${Notifs.count}${Notifs.dnd ? "\nDo not disturb" : ""}`
@@ -294,6 +314,7 @@ PanelWindow {
 
             Icon {
                 font.pixelSize: Theme.barIconSize
+                width: barWindow.iconSlot
                 text: Icons.sliders
                 color: Hues.notifications
 
@@ -313,6 +334,7 @@ PanelWindow {
         }
 
         BarButton {
+            sidePadding: barWindow.iconPadding
             visible: barWindow.shows("power")
             active: Panels.powerMenu
             tooltip: "Power Menu"
@@ -320,6 +342,7 @@ PanelWindow {
 
             Icon {
                 font.pixelSize: Theme.barIconSize
+                width: barWindow.iconSlot
                 text: Icons.power
                 color: Hues.power
             }

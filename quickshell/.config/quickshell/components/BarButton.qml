@@ -13,8 +13,10 @@ MouseArea {
     property bool active: false
     property bool indicator: true
     property string tooltip: ""
+    // the space on each side of the content (the bar's icons on the right use less)
+    property real sidePadding: Theme.padding
 
-    implicitWidth: row.implicitWidth + Theme.padding * 2
+    implicitWidth: row.implicitWidth + sidePadding * 2
     implicitHeight: Theme.barHeight
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
