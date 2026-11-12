@@ -12,7 +12,8 @@
 # Steps: pacman.conf (multilib, the g14 repo on ASUS laptops), mirrors (reflector), config links
 # (stow; files in the way go to ~/.hyprdori-backup), packages (packages/*.txt by detected
 # hardware, packages/guest.txt in a virtual machine), Flatpak, services, zsh and its plugins,
-# the theme, then boot: initramfs and kernel options, Plymouth, Limine. The login screen (SDDM) comes with the theme, or autologin if chosen (the
+# the theme, snapshots on a btrfs root (snapper, snap-pac, limine-snapper-sync), then boot:
+# initramfs and kernel options, Plymouth, Limine. The login screen (SDDM) comes with the theme, or autologin if chosen (the
 # default with encrypted drives).
 set -euo pipefail
 
@@ -81,6 +82,13 @@ if ask "Virtual machines and Docker (packages/vm.txt)?" "$($guest && echo n || e
 fi
 flatpak=false
 ask "Flatpak apps (packages/flatpak.txt)?" y && flatpak=true
+# A btrfs root laid out as the install guide's (@ and @snapshots): snapshots, also in the boot menu
+snapshots=false
+if [[ $(findmnt -no FSTYPE /) == btrfs ]] &&
+    ask "Snapshots: before and after every update, bootable from the boot menu (packages/snapshots.txt)?" y; then
+    snapshots=true
+    groups+=(snapshots)
+fi
 # With encrypted drives the disk password already guards the machine, so autologin is the default
 encrypted=n
 grep -qE '^HOOKS=.*\b(sd-)?encrypt\b' /etc/mkinitcpio.conf 2>/dev/null && encrypted=y
@@ -252,6 +260,63 @@ sudo "$HOME/.local/bin/hyprdori-browser-theme-setup" >/dev/null
 # the theme from then on.
 wall=$(jq -r '.background // empty' "$HOME/.config/theme/current/quickshell.json" 2>/dev/null) || wall=
 "$HOME/.local/bin/hyprdori-wallpaper" default ${wall:+"$wall"}
+
+# --- Snapshots: snapper on @snapshots, limine-snapper-sync, read-only snapshots with an overlay -------------
+if $snapshots && command -v snapper >/dev/null; then
+    step "Snapshots"
+    # snapper's config for /, its snapshots in @snapshots (mounted at /.snapshots by fstab) rather
+    # than the subvolume snapper makes itself
+    if ! sudo snapper list-configs 2>/dev/null | grep -q '^root '; then
+        mountpoint -q /.snapshots && sudo umount /.snapshots
+        sudo rmdir /.snapshots 2>/dev/null || true
+        sudo snapper -c root create-config /
+        # fstab mounts @snapshots there (the install guide): snapper's own subvolume makes way
+        if findmnt --fstab /.snapshots >/dev/null; then
+            sudo btrfs subvolume delete /.snapshots >/dev/null
+            sudo mkdir /.snapshots
+            sudo mount -a
+            echo "snapper's root config, snapshots in @snapshots"
+        else
+            echo "snapper's root config, snapshots in its own /.snapshots subvolume"
+        fi
+    fi
+    sudo chmod 750 /.snapshots
+    sudo systemctl enable --now snapper-timeline.timer snapper-cleanup.timer
+    # The boot menu's snapshots: their entries in /efi/limine.conf (limine/install.sh adds the
+    # place), booted read-only with a throwaway layer on top (systemd.volatile=overlay: the
+    # initramfs gets systemd's volatile-root service, which the systemd hook leaves out, and the
+    # overlay module), restored with limine-snapper-restore
+    if command -v limine-snapper-sync >/dev/null; then
+        sudo tee /etc/default/limine >/dev/null <<CONF
+# limine-snapper-sync, written by Hyprdori's install.sh
+ESP_PATH="/efi"
+TARGET_OS_NAME="Arch Linux"
+SNAPPER_CONFIG_NAME="root"
+LIMIT_USAGE_PERCENT=85
+MAX_SNAPSHOT_ENTRIES=auto
+SNAPSHOT_KERNEL_PARAMETERS+=systemd.volatile=overlay
+SNAPSHOT_WRITABLE=no
+RESTORE_METHOD=replace
+SNAPSHOT_FORMAT_CHOICE=2
+TERMINAL=kitty
+TERMINAL_ARG="-e"
+CONF
+        sudo install -d /etc/mkinitcpio.conf.d
+        sudo tee /etc/mkinitcpio.conf.d/snapshots.conf >/dev/null <<'CONF'
+# Booting a read-only snapshot with a throwaway layer (systemd.volatile=overlay, install.sh)
+MODULES+=(overlay)
+BINARIES+=(/usr/lib/systemd/systemd-volatile-root)
+FILES+=(/usr/lib/systemd/system/systemd-volatile-root.service)
+CONF
+        sudo systemctl enable limine-snapper-sync.service
+        echo "Snapshots in the boot menu (/etc/default/limine, /etc/mkinitcpio.conf.d/snapshots.conf)"
+    else
+        note "limine-snapper-sync isn't installed: snapshots are taken, but not in the boot menu."
+    fi
+    # Copy-on-write off where VM disks and Docker's data go (files made after this)
+    sudo install -d /var/lib/libvirt/images /var/lib/docker
+    sudo chattr +C /var/lib/libvirt/images /var/lib/docker
+fi
 
 # --- Boot: initramfs, kernel options, splash, menu -------------------------------------------------------------
 step "Boot"

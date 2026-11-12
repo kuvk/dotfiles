@@ -1,0 +1,5 @@
+# A btrfs root (install.sh asks then): snapshots before and after every update, bootable from
+# the menu
+snapper                  # snapshots of / (the "root" config in @snapshots)
+snap-pac                 # a snapshot before and after every pacman or paru run
+limine-snapper-sync      # AUR, built with GraalVM (a ~300 MB download, minutes): the menu's Snapshots

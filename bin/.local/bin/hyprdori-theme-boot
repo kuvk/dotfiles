@@ -48,9 +48,12 @@ if [[ ${1:-} == --as-root ]]; then
     "$hyprdori/plymouth/install.sh" "$@"
     # Limine with the options it was installed with (hyprdori-update does the same)
     options=()
-    if [[ -r /efi/EFI/limine/limine.conf ]]; then
-        read -ra options <<<"$(sed -n 's/^# Options: //p' /efi/EFI/limine/limine.conf)"
-    fi
+    for conf in /efi/limine.conf /efi/EFI/limine/limine.conf; do
+        if [[ -r $conf ]]; then
+            read -ra options <<<"$(sed -n 's/^# Options: //p' "$conf")"
+            break
+        fi
+    done
     "$hyprdori/limine/install.sh" "${options[@]}"
     # the login screen's layout, once sddm/install.sh has set it up; its colors are in
     # /var/lib/hyprdori/theme.conf, which the theme writes itself

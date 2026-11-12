@@ -67,12 +67,15 @@ if command -v flatpak >/dev/null; then
 fi
 
 # --- Limine: its EFI file and menu entries follow the package and the kernels in /efi/arch ---
-conf=/efi/EFI/limine/limine.conf
+# the menu: /efi/limine.conf, or where it was before snapshots (EFI/limine)
+conf=/efi/limine.conf
+[[ -r $conf ]] || conf=/efi/EFI/limine/limine.conf
 if [[ -r $conf ]]; then
     step "Limine"
     reasons=()
     cmp -s /usr/share/limine/BOOTX64.EFI /efi/EFI/limine/BOOTX64.EFI || reasons+=("a new Limine")
-    in_menu=$(sed -n 's|^//||p' "$conf" | sort | tr '\n' ' ')
+    # the kernel entries (//name), not the Snapshots folder or the snapshots in it (///...)
+    in_menu=$(sed -n 's|^//\([^/]\)|\1|p' "$conf" | grep -vx Snapshots | sort | tr '\n' ' ')
     on_esp=$(for k in /efi/arch/vmlinuz-*; do [[ -e /efi/arch/initramfs-${k#*/vmlinuz-}.img ]] && echo "${k#*/vmlinuz-}"; done | sort | tr '\n' ' ')
     [[ $in_menu == "$on_esp" ]] || reasons+=("kernels changed: ${on_esp:-none}")
     if ((${#reasons[@]})); then

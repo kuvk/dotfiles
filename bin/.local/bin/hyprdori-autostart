@@ -1,6 +1,7 @@
 #!/bin/bash
-# What else starts at login (autostart.lua runs this once): clipboard history and ROG Control
-# Center when installed; more can be added below. Running it again would start them twice.
+# What else starts at login (autostart.lua runs this once): clipboard history, the snapshot
+# notifications and ROG Control Center when installed; more can be added below. Running it again
+# would start them twice.
 #
 #   hyprdori-autostart
 
@@ -29,6 +30,14 @@ if command -v cliphist >/dev/null; then
         wl-paste --type text --watch cliphist store &
         wl-paste --type image --watch cliphist store &
     fi
+fi
+
+# Snapshots (limine-snapper-sync; Hyprland doesn't run its autostart entries): after booting a
+# snapshot from the boot menu, an offer to restore it; and a notification when syncing the
+# menu's snapshots fails (it follows the journal's errors, idle otherwise)
+if command -v limine-snapper-restore >/dev/null; then
+    limine-snapper-restore --notify &
+    limine-snapper-notify &
 fi
 
 # ROG Control Center

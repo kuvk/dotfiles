@@ -14,6 +14,11 @@
 #
 # Kernel options come from /etc/kernel/cmdline (made from the running system's on first run).
 # At boot, E on an entry edits its options for that boot only.
+#
+# The menu is /efi/limine.conf (Limine's last place to look, so nothing may sit in EFI/limine).
+# With snapshots (a btrfs root and limine-snapper-sync, set up by install.sh) the Arch Linux
+# entry gets a Snapshots folder, which limine-snapper-sync fills: it's filled again after
+# every rewrite here.
 set -euo pipefail
 
 here=$(dirname "$(readlink -f "$0")")
@@ -80,6 +85,9 @@ found_kernels() {
     return 0
 }
 mapfile -t found < <(found_kernels)
+# Snapshots in the menu: a btrfs root with limine-snapper-sync (install.sh sets it up)
+snapshots=false
+[[ $(findmnt -no FSTYPE / 2>/dev/null) == btrfs ]] && command -v limine-snapper-sync >/dev/null && snapshots=true
 ((${#found[@]})) || { echo "No kernels with images in $kernels" >&2; exit 1; }
 
 # The resolution: given, or the first connected screen's native mode on the boot display's
@@ -155,16 +163,21 @@ term_margin_gradient: 0
 
 /+Arch Linux
 EOF
+    # limine-snapper-sync finds this entry by the machine's id
+    $snapshots && echo "    comment: machine-id=$(cat /etc/machine-id)"
     local k
     for k in "${found[@]}"; do
         cat <<EOF
 //$k
     protocol: linux
-    path: boot():/${kernels#"$esp"/}/vmlinuz-$k
+    kernel_path: boot():/${kernels#"$esp"/}/vmlinuz-$k
     module_path: boot():/${kernels#"$esp"/}/initramfs-$k.img
-    cmdline: $cmdline
+    kernel_cmdline: $cmdline
 EOF
     done
+    # where limine-snapper-sync puts an entry per snapshot
+    $snapshots && echo "//Snapshots"
+    return 0
 }
 
 if [[ $mode == print ]]; then
@@ -181,7 +194,13 @@ conf=$(config)
 wallpaper "$build/wallpaper.png"
 install -D -m 0644 /usr/share/limine/BOOTX64.EFI "$esp/EFI/limine/BOOTX64.EFI"
 install -m 0644 "$build/wallpaper.png" "$esp/EFI/limine/"
-printf '%s\n' "$conf" >"$esp/EFI/limine/limine.conf"
+printf '%s\n' "$conf" >"$esp/limine.conf"
+# Limine reads the one next to its EFI file first: none there, so it reads /efi/limine.conf
+rm -f "$esp/EFI/limine/limine.conf"
+if $snapshots; then
+    limine-snapper-sync >/dev/null 2>&1 && echo "Snapshot entries added (limine-snapper-sync)" ||
+        echo "limine-snapper-sync couldn't add the snapshot entries; they come with the next snapshot" >&2
+fi
 
 # A firmware boot entry, first in the boot order, made once
 if ! efibootmgr | grep -q '\\EFI\\limine\\BOOTX64.EFI'; then
