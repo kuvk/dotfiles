@@ -28,7 +28,7 @@ note() { printf '%s\n' "$1"; command -v notify-send >/dev/null && [[ ! -t 1 ]] &
 fingerprint() {
     local home=$1
     cat "$home/.config/theme/current/colors.sh" "$home/.config/theme/logo/ascii-dori" \
-        "$hyprdori"/plymouth/* "$hyprdori/limine/install.sh" "$hyprdori-logo-render" \
+        "$hyprdori"/plymouth/* "$hyprdori/limine/install.sh" "$scripts/hyprdori-logo-render" \
         "$hyprdori"/sddm/hyprdori/* 2>/dev/null |
         sha256sum | cut -d' ' -f1
 }

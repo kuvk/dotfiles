@@ -137,7 +137,7 @@ def main(argv: list[str]) -> int:
     try:
         text = path.read_text()
     except OSError as e:
-        print(f"hypr-keybinds: {e}", file=sys.stderr)
+        print(f"hyprdori-keybinds: {e}", file=sys.stderr)
         print("[]")
         return 1
     print(json.dumps(parse(text)))

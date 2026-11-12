@@ -82,6 +82,15 @@ while IFS= read -r line; do
     fail "old path: $line"
 done < <(git grep -n -I -E '\.config/scripts|scripts/\.config|share/dotfiles|config/dotfiles' -- "${current[@]}" 2>/dev/null)
 
+# Every path to a Hyprdori command points at one (~/.local/bin/hyprdori-*, "$scripts/hyprdori-*",
+# bin/.local/bin/hyprdori-*), and no shell variable runs straight into a name (a variable then -name)
+while IFS= read -r name; do
+    [[ -f bin/.local/bin/$name ]] || fail "missing command: $name"
+done < <(git grep -h -o -I -E '(\.local/bin/|\$scripts/|\$\{scripts\}/)hyprdori-[a-z][a-z-]*' -- "${current[@]}" 2>/dev/null | sed 's|.*/||' | sort -u)
+while IFS= read -r line; do
+    fail "variable run into a command name: $line"
+done < <(git grep -n -I -E '"\$[A-Za-z_]+-[a-z]' -- 'bin/*' install.sh 'limine/*' 'plymouth/*' 'sddm/*' 2>/dev/null | grep -v -E '"\$[A-Za-z_]+-[0-9]')
+
 if ((failed)); then
     exit 1
 fi

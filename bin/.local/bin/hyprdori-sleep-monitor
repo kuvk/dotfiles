@@ -39,7 +39,7 @@ trap 'kill "$events_PID" 2>/dev/null' EXIT
 while hyprland_alive; do
     if read -r -t 5 line <&"${events[0]}"; then
         if [[ $line == *"boolean true"* ]]; then
-            "$hyprdori-sleep-lock"
+            "$scripts/hyprdori-sleep-lock"
             exit 0
         fi
     elif (($? <= 128)); then
