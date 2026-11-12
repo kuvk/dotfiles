@@ -26,9 +26,14 @@ out. After Omarchy's omarchy-theme-color and omarchy-theme-set-templates
   hyprdori-theme-set --login    rewrite the login screen's colors from Settings > Style > Lock screen
   hyprdori-theme-set --text-size  GTK's font size from Displays > Text size (hyprdori-monitors)
   hyprdori-theme-set --follow-wallpaper
-                          the logo wallpaper in this theme's colors, while the desktop
-                          shows the theme's background (picked in the wallpaper picker,
-                          or Settings > Style > Background > Theme's)
+                          the theme's background on the desktop, while it follows the theme
+                          (the theme's own picked in the wallpaper picker, or Settings > Style >
+                          Background > Theme's)
+  hyprdori-theme-set --theme-default PATH
+                          make PATH (a dori* image in ~/.local/share/hyprdori/backgrounds/
+                          default/<theme>/) the current theme's background, for the lock
+                          screen at once and the desktop with --follow-wallpaper (the
+                          wallpaper picker, hyprdori-logo-wallpaper --window)
   hyprdori-theme-set --window-buttons on|off
                           close button in GTK apps (Settings > Style saves the choice)
   hyprdori-theme-set --hypr      Hyprland's gaps, corners, window opacity and blur from Settings
@@ -607,23 +612,69 @@ def logo_checksum(*commands: Path) -> str:
     return drawn.hexdigest()[:8]
 
 
+BACKGROUNDS_DIR = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "hyprdori/backgrounds/default"
+# Which image is each theme's background, by theme: a file name in its folder (--theme-default)
+THEME_DEFAULTS = Path(os.environ.get("XDG_STATE_HOME", HOME / ".local/state")) / "hyprdori/theme-backgrounds.json"
+IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp"}
+
+
+def theme_defaults() -> dict:
+    try:
+        data = json.loads(THEME_DEFAULTS.read_text())
+        return data if isinstance(data, dict) else {}
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
+def set_theme_default(name: str, path: Path) -> None:
+    data = theme_defaults()
+    data[name] = path.name
+    THEME_DEFAULTS.parent.mkdir(parents=True, exist_ok=True)
+    tmp = THEME_DEFAULTS.with_suffix(".tmp")
+    tmp.write_text(json.dumps(data, indent=2) + "\n")
+    tmp.replace(THEME_DEFAULTS)
+
+
+def theme_folder(name: str) -> Path:
+    """A theme's own wallpapers (backgrounds/default/<theme>/): the picker shows the current
+    theme's folder only."""
+    return BACKGROUNDS_DIR / name
+
+
+def is_theme_wallpaper(path: Path, name: str) -> bool:
+    return path.parent == theme_folder(name) and path.name.startswith("dori") and path.suffix.lower() in IMAGE_SUFFIXES
+
+
 def theme_background(theme: dict) -> Path | None:
-    """This theme's own background: the logo and text in magenta on the dark background
-    (hyprdori-logo-wallpaper), drawn once per theme, colors and logo into
-    ~/.local/share/hyprdori/backgrounds/default. The wallpaper and the lock screen show it while
-    they follow the theme (Settings)."""
+    """This theme's own background, which the wallpaper and the lock screen show while they
+    follow the theme (Settings): the image chosen for it (a dori* image in its folder, set by the
+    wallpaper generator or by picking one, --theme-default); with that gone, the newest dori*
+    image there; with none, the standard one, the logos in magenta on the dark background
+    (hyprdori-logo-wallpaper), drawn again when the colors or the logos change."""
     colors, name = theme["colors"], theme["strings"]["theme"]
-    folder = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "hyprdori/backgrounds/default"
+    folder = theme_folder(name)
     drawn = logo_checksum(HOME / ".local/bin/hyprdori-logo-wallpaper")
-    path = folder / f"dori-theme-{name}-{colors['magenta'][1:]}-on-{colors['dark_background'][1:]}-{drawn}.png"
-    if path.exists():
-        return path
-    folder.mkdir(parents=True, exist_ok=True)
-    for old in folder.glob(f"dori-theme-{name}-*.png"):  # this theme in older colors
-        old.unlink(missing_ok=True)
-    run_quiet([str(HOME / ".local/bin/hyprdori-logo-wallpaper"), "--bg", colors["dark_background"], "--fg", colors["magenta"],
-               "--output", str(path)])
-    return path if path.exists() else None
+    standard = folder / f"dori-theme-{colors['magenta'][1:]}-on-{colors['dark_background'][1:]}-{drawn}.png"
+    chosen = folder / theme_defaults().get(name, "") if theme_defaults().get(name) else None
+    if chosen and chosen.is_file() and is_theme_wallpaper(chosen, name) and not chosen.name.startswith("dori-theme-"):
+        return chosen
+    if not (chosen and chosen.name.startswith("dori-theme-")):
+        # the chosen one is gone (or none was): the newest made for this theme
+        made = sorted((p for p in folder.glob("dori*") if is_theme_wallpaper(p, name) and not p.name.startswith("dori-theme-")),
+                      key=lambda p: p.stat().st_mtime, reverse=True) if folder.is_dir() else []
+        if made:
+            set_theme_default(name, made[0])
+            return made[0]
+    if not standard.exists():
+        folder.mkdir(parents=True, exist_ok=True)
+        for old in folder.glob("dori-theme-*.png"):  # this theme in older colors or logos
+            old.unlink(missing_ok=True)
+        run_quiet([str(HOME / ".local/bin/hyprdori-logo-wallpaper"), "--bg", colors["dark_background"],
+                   "--fg", colors["magenta"], "--output", str(standard)])
+    if standard.exists():
+        set_theme_default(name, standard)
+        return standard
+    return None
 
 
 def render_quickshell(theme: dict) -> None:
@@ -1015,6 +1066,16 @@ def main(argv: list[str]) -> int:
         return 0
     if argv == ["--follow-wallpaper"]:
         follow_wallpaper(load_theme(current_theme()))
+        return 0
+    if len(argv) == 2 and argv[0] == "--theme-default":
+        name, path = current_theme(), Path(argv[1]).expanduser()
+        if not (path.is_file() and is_theme_wallpaper(path, name)):
+            print(f"theme-set: --theme-default takes a dori* image in {theme_folder(name)}", file=sys.stderr)
+            return 1
+        set_theme_default(name, path)
+        # quickshell.json's background: the lock screen and Settings follow (the desktop with
+        # --follow-wallpaper, or the picker that set it)
+        render_quickshell(load_theme(name))
         return 0
     if argv == ["--login"]:
         generate(current_theme())

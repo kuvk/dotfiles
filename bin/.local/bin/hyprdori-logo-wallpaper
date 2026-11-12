@@ -21,10 +21,14 @@ Options:
                        of the width
   --res WxH            image size (default: the highest resolution any connected monitor
                        has, else 2560x1440; works from a console too)
-  --output-dir DIR     where the images go (default: ~/.local/share/hyprdori/backgrounds/
-                       default, which the wallpaper picker lists)
+  --output-dir DIR     where the images go (default: the current theme's folder,
+                       ~/.local/share/hyprdori/backgrounds/default/<theme>, which the
+                       wallpaper picker lists while that theme is on)
   --logo FILE          another logo (default: ~/.config/theme/logo/dori-logo)
   --text FILE          another text logo (default: ~/.config/theme/logo/dori-text), or none
+  --window             a window to make one for the current theme: what it does, a question,
+                       then its colors and size to choose; saved in the theme's folder and
+                       made the theme's background (the app launcher's Wallpaper generator)
   --output FILE        one file at this path instead (one of each color and one size only;
                        hyprdori-theme-set uses it for the wallpaper that follows the theme)
 
@@ -49,7 +53,18 @@ HOME = Path.home()
 THEME_COLORS = HOME / ".config/theme/current/quickshell.json"
 DEFAULT_LOGO = HOME / ".config/theme/logo/dori-logo"
 DEFAULT_TEXT = HOME / ".config/theme/logo/dori-text"
-DEFAULT_DIR = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "hyprdori/backgrounds/default"
+def current_theme_dir() -> Path:
+    """The current theme's own wallpapers: backgrounds/default/<theme> (the picker lists the
+    current theme's only)."""
+    root = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "hyprdori/backgrounds/default"
+    try:
+        slug = json.loads((HOME / ".config/theme/current/quickshell.json").read_text()).get("theme", "")
+    except (OSError, json.JSONDecodeError):
+        slug = ""
+    return root / slug if slug else root
+
+
+DEFAULT_DIR = current_theme_dir()
 RENDER = HOME / ".local/bin/hyprdori-logo-render"
 # The layout, as shares of the screen: the logo's bottom LOGO_GAP of the height above the middle
 # (where the lock screen's password field is), the text's top TEXT_GAP below it; the logo and
@@ -143,7 +158,92 @@ def split(value: str) -> list[str]:
     return [v.strip() for v in value.split(",") if v.strip()]
 
 
+PRESENT = HOME / ".local/bin/hyprdori-present"
+THEME_SET = HOME / ".local/bin/hyprdori-theme-set"
+# The theme's colors offered in the window, in this order
+CHOICES = ["dark_background", "darker_background", "background", "lighter_background", "selection", "muted",
+           "foreground", "dark_foreground", "accent", "magenta", "blue", "cyan", "green", "yellow", "orange",
+           "red", "brown"]
+
+
+def present(*args: str, capture: bool = False) -> subprocess.CompletedProcess:
+    return subprocess.run([str(PRESENT), *args], text=True, stdout=subprocess.PIPE if capture else None)
+
+
+def choose(header: str, options: list[str]) -> str:
+    return present("choose", header, *options, capture=True).stdout.strip()
+
+
+def in_window() -> int:
+    """The window: what it does, Yes / No, the colors and size, then the wallpaper drawn into the
+    theme's folder and made the theme's background."""
+    try:
+        theme = json.loads(THEME_COLORS.read_text())
+    except (OSError, json.JSONDecodeError):
+        theme = {}
+    colors, slug, title = theme.get("colors", {}), theme.get("theme", ""), theme.get("name", "")
+    present("header")
+    if not slug or not colors:
+        print("  No theme yet: run hyprdori-theme-set first.")
+        present("done", "1")
+        return 1
+    folder = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "hyprdori/backgrounds/default" / slug
+    present("box", f"A wallpaper for {title}: the logo above the middle of the screen, where the lock",
+            "screen's password field is, and HYPRDORI below it, in the theme's colors you choose.", "",
+            f"It's saved in {str(folder).replace(str(HOME), '~')}/ and becomes {title}'s",
+            "background: the desktop and the lock screen show it while they follow the theme. The",
+            "wallpaper picker lists this folder while the theme is on; picking another dori image",
+            "there makes that one the background instead.")
+    if present("confirm", "Make a wallpaper now?").returncode != 0:
+        print("  Nothing made.")
+        present("done", "0")
+        return 0
+    names = [c for c in CHOICES if c in colors]
+    # the colors to choose from, each as a swatch
+    print()
+    for n in names:
+        r, g, b = (int(colors[n][i:i + 2], 16) for i in (1, 3, 5))
+        print(f"  \x1b[38;2;{r};{g};{b}m\u2588\u2588\u2588\u2588\x1b[0m  {n:<20} {colors[n]}")
+    print()
+    bg = choose("Background", names)
+    # magenta first: the standard logo's color
+    inks = sorted((n for n in names if n != bg), key=lambda n: n != "magenta")
+    fg = bg and choose("Logo (the dog)", inks)
+    text_fg = fg and choose("Text logo (HYPRDORI)", ["Same as the logo", *inks, "No text logo"])
+    size = text_fg and choose("Size: the logo and text together, of the screen's height", ["20%", "30%", "40%", "50%"])
+    if not size:
+        print("  Nothing made.")
+        present("done", "0")
+        return 0
+    text_name = {"Same as the logo": fg, "No text logo": "none"}.get(text_fg, text_fg)
+    both = fg if text_name == fg else f"{fg}-{'notext' if text_name == 'none' else text_name}"
+    share = int(size.rstrip("%"))
+    out = folder / f"dori-{both}-on-{bg}-{share}.png"
+    present("step", f"Drawing {out.name}")
+    folder.mkdir(parents=True, exist_ok=True)
+    width, height = largest_monitor()
+    logo = DEFAULT_LOGO
+    text = None if text_name == "none" else DEFAULT_TEXT
+    try:
+        render(logo, text if text and text.is_file() else None, colors[fg], colors.get(text_name, colors[fg]),
+               colors[bg], width, height, share / 100, out)
+    except (subprocess.CalledProcessError, OSError) as e:
+        print(f"  Couldn't draw it: {e}")
+        present("done", "1")
+        return 1
+    present("step", f"{title}'s background")
+    status = subprocess.run([str(THEME_SET), "--theme-default", str(out)]).returncode
+    subprocess.run([str(THEME_SET), "--follow-wallpaper"])
+    print(f"  {out}")
+    present("done", str(status))
+    return status
+
+
 def main(argv: list[str]) -> int:
+    if argv[:1] == ["--window"]:
+        os.execv(str(PRESENT), [str(PRESENT), "window", "hyprdori-window", "Wallpaper", str(Path(__file__).resolve()), "--in-window"])
+    if argv[:1] == ["--in-window"]:
+        return in_window()
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--bg", default="dark_background")
     parser.add_argument("--fg", default="magenta")

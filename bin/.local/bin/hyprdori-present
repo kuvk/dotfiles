@@ -11,6 +11,7 @@
 #   hyprdori-present box LINE...      the lines framed in the accent
 #   hyprdori-present confirm QUESTION  Yes / No buttons; exits 0 for Yes
 #   hyprdori-present choose HEADER OPTION...   one of the options, printed; nothing for Esc
+#   hyprdori-present input PROMPT [PLACEHOLDER]   a line of text, printed; nothing for Esc
 #   hyprdori-present step TEXT        a heading between the steps of what runs
 #   hyprdori-present done [STATUS]    "Done" (or that it failed, with STATUS not 0), then any key
 #                                     closes the window; exits with STATUS, so the window's script
@@ -74,6 +75,15 @@ case $1 in
             for option; do printf '   %d. %s\n' "$i" "$option"; ((i++)); done
             read -rp "  Number (Enter cancels): " n
             [[ $n =~ ^[0-9]+$ ]] && ((n >= 1 && n <= $#)) && printf '%s\n' "${!n}"
+        fi
+        ;;
+    input)
+        prompt=${2:?prompt}
+        if has_gum; then
+            gum input --prompt "  $prompt: " --placeholder "${3:-}" --prompt.foreground "$accent" \
+                --cursor.foreground "$accent" --placeholder.foreground "$subtext" --width 0
+        else
+            read -rp "  $prompt: " line && printf '%s\n' "$line"
         fi
         ;;
     step)

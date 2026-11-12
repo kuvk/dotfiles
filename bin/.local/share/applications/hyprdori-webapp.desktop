@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Manage WebApps
+GenericName=Web apps
+Comment=List, install or uninstall web apps: sites in their own window, with a launcher entry
+Exec=hyprdori-webapp --window
+Icon=applications-internet
+Categories=X-Hyprdori;Settings;
+Keywords=hyprdori;webapp;web;site;pwa;browser;install;uninstall;remove;
+Terminal=false

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Keybindings
+GenericName=Keyboard shortcuts
+Comment=Every Hyprland key binding
+Exec=qs ipc call keybinds toggle
+Icon=preferences-desktop-keyboard-shortcuts
+Categories=X-Hyprdori;Settings;
+Keywords=hyprdori;keys;shortcuts;bindings;
+Terminal=false

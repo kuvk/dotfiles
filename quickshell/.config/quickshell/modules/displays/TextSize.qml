@@ -32,6 +32,7 @@ ColumnLayout {
         valueText: `${root.panel.textSize}px`
         to: root.stops.length - 1
         value: root.index
+        ticks: root.stops.length
         onChanged: v => {
             const step = Math.round(v);
             if (root.stops[step] !== root.panel.textSize) {

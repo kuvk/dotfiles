@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Update
+GenericName=System update
+Comment=The full system, the boot menu and splash, or maintenance
+Exec=hyprdori-update --window
+Icon=system-software-update
+Categories=X-Hyprdori;Settings;
+Keywords=hyprdori;upgrade;packages;pacman;paru;boot;limine;plymouth;splash;maintenance;clean;cache;
+Terminal=false

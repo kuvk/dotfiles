@@ -2,8 +2,9 @@
 """Wallpapers and live (video) wallpapers, used by the Quickshell carousel, and the lock
 screen's background.
 
-Static wallpapers live in ~/.local/share/hyprdori/backgrounds/default (the themes' own
-backgrounds too, drawn by hyprdori-theme-set) and are shown with hyprpaper. Live wallpapers live
+Static wallpapers live in ~/.local/share/hyprdori/backgrounds/default and are shown with
+hyprpaper; each theme's own (hyprdori-theme-set, hyprdori-logo-wallpaper --window) are in a folder
+named after it there, and only the current theme's is listed. Live wallpapers live
 in ~/.local/share/hyprdori/backgrounds/live and play with mpvpaper, one process per
 monitor. More folders for either go in ~/.config/hyprdori/backgrounds.json:
   {"static": ["~/Pictures/Wallpapers"], "live": ["~/Videos/Wallpapers"]}
@@ -138,13 +139,28 @@ def roots(kind: str) -> list[Path]:
     return out
 
 
+def other_themes() -> set[str]:
+    """The themes' folders in backgrounds/default to leave out: every theme's but the current
+    one's (their generated wallpapers, hyprdori-theme-set and hyprdori-logo-wallpaper)."""
+    try:
+        current = json.loads(THEME_JSON.read_text()).get("theme", "")
+    except (OSError, json.JSONDecodeError):
+        current = ""
+    themes = {d.name for d in (HOME / ".config/theme/themes").glob("*") if d.is_dir()}
+    return themes - {current}
+
+
 def collect(kind: str) -> list[Path]:
     files, seen = [], set()
+    skip_themes = other_themes() if kind == "static" else set()
     for root in roots(kind):
         if not root.is_dir():
             continue
         for p in root.rglob("*"):
-            if p.is_file() and p.suffix.lower() in EXTS[kind] and not SKIP_DIRS & set(p.relative_to(root).parts[:-1]):
+            parts = p.relative_to(root).parts[:-1]
+            if root == DIRS["static"] and parts and parts[0] in skip_themes:
+                continue
+            if p.is_file() and p.suffix.lower() in EXTS[kind] and not SKIP_DIRS & set(parts):
                 if p not in seen:
                     seen.add(p)
                     files.append(p)

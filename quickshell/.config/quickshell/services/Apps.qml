@@ -14,6 +14,8 @@ Singleton {
 
     // Menu groups: label, icon and the freedesktop categories they take
     readonly property var groups: [
+        // Hyprdori's own windows (bin/.local/share/applications: Categories has X-Hyprdori)
+        { id: "shell", label: "Shell", icon: Icons.sliders, cats: ["X-Hyprdori"] },
         { id: "internet", label: "Internet", icon: Icons.globe, cats: ["Network", "WebBrowser", "Email", "Chat", "InstantMessaging"] },
         { id: "multimedia", label: "Multimedia", icon: Icons.music, cats: ["AudioVideo", "Audio", "Video", "Player", "Recorder"] },
         { id: "graphics", label: "Graphics", icon: Icons.image, cats: ["Graphics", "Photography", "2DGraphics", "3DGraphics", "RasterGraphics", "VectorGraphics"] },
@@ -28,7 +30,7 @@ Singleton {
 
     // Matched most specific first, so an app listing several categories lands
     // where it's expected (Steam: Network;FileTransfer;Game -> Games)
-    readonly property var matchOrder: ["games", "development", "graphics", "office", "multimedia", "education", "settings", "system", "internet", "utilities"]
+    readonly property var matchOrder: ["shell", "games", "development", "graphics", "office", "multimedia", "education", "settings", "system", "internet", "utilities"]
 
     function groupOf(app: var): string {
         const cats = app.categories ?? [];

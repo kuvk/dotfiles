@@ -39,6 +39,7 @@ Rectangle {
         echoMode: field.password ? TextInput.Password : TextInput.Normal
         clip: true
         onAccepted: field.accepted(text)
+        activeFocusOnTab: true
         onEditingFinished: field.edited(text.trim())
         Keys.onEscapePressed: field.canceled()
 

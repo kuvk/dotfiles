@@ -81,7 +81,8 @@ FloatingWindow {
     visible: shown
     title: "Settings"
     color: Theme.panelBg
-    implicitWidth: Math.round(780 * Theme.textScale)
+    // 20 more for the pages' inset (see `page`)
+    implicitWidth: Math.round(780 * Theme.textScale) + 20
     // one height for every page, enough for Displays without scrolling, but never taller than
     // the Control Center on the most scaled screen (Displays scrolls there)
     implicitHeight: Math.min(Math.round(880 * Theme.textScale), ...Quickshell.screens.map(s => Theme.popupHeight(s)))
@@ -94,10 +95,17 @@ FloatingWindow {
     onClosed: Panels.settings = false
 
     Rectangle {
+        id: content
+
         anchors.fill: parent
         color: Theme.panelBg
         focus: root.shown
         Keys.onEscapePressed: Panels.settings = false
+        // the keyboard: Up / Down (Ctrl+K / J) through the pages and their controls (Nav)
+        Keys.onPressed: event => {
+            if (Nav.handle(event, content))
+                event.accepted = true;
+        }
 
         ColumnLayout {
             anchors.fill: parent
@@ -163,6 +171,18 @@ FloatingWindow {
                                 hoverEnabled: true
                                 cursorShape: Qt.PointingHandCursor
                                 onClicked: Panels.settingsPage = modelData.id
+                                // the keyboard: the page shows as the focus reaches its entry
+                                activeFocusOnTab: true
+                                onActiveFocusChanged: if (activeFocus) Panels.settingsPage = modelData.id
+                                // Right, Ctrl+L or Enter: into the page
+                                Keys.onPressed: event => {
+                                    if (Nav.isActivate(event) || event.key === Qt.Key_Right || (event.key === Qt.Key_L && (event.modifiers & Qt.ControlModifier))) {
+                                        Qt.callLater(() => Nav.first(page));
+                                        event.accepted = true;
+                                    }
+                                }
+
+                                FocusRing {}
 
                                 Rectangle {
                                     anchors.fill: parent
@@ -242,9 +262,12 @@ FloatingWindow {
                             flick: settingsFlick
                         }
 
+                        // 10 px in from each side: room for the keyboard's outline around a
+                        // section's title (FocusRing), which the scrolling area would cut
                         ColumnLayout {
                             id: page
-                            width: settingsFlick.width
+                            x: 10
+                            width: settingsFlick.width - 20
                             spacing: 12
 
                             StylePage {

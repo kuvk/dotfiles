@@ -15,6 +15,10 @@ ColumnLayout {
     property real to: 1
     // shown as a percentage unless set
     property string valueText: `${(value * 100).toFixed(1)}%`
+    // a key press or wheel step: a tenth of a percent, as shown (or as set)
+    property real step: 0.001
+    // fixed values (StyledSlider's ticks)
+    property int ticks: 0
     // Only used in normal mode: dimmed and locked in Work and Game
     property bool normalOnly: false
     signal changed(real value)
@@ -34,6 +38,8 @@ ColumnLayout {
     SliderRow {
         value: root.value
         to: root.to
+        step: root.step
+        ticks: root.ticks
         onMoved: v => root.changed(Math.round(Math.max(root.from, v) * 1000) / 1000)
     }
 

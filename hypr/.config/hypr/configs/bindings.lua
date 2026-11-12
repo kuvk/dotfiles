@@ -65,9 +65,11 @@ hl.bind(mainMod .. " + CONTROL + N", hl.dsp.exec_cmd(nightlight)) -- Night light
 hl.bind(mainMod .. " + slash", hl.dsp.exec_cmd(keybinds)) -- This list of keybindings
 
 -- Screenshots
-hl.bind("PRINT", hl.dsp.exec_cmd("hyprshot -m output -o ~/Pictures/Screenshots")) -- Screenshot of a monitor
-hl.bind("CONTROL + PRINT", hl.dsp.exec_cmd("hyprshot -m window -o ~/Pictures/Screenshots")) -- Screenshot of a window
-hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd("hyprshot -m region -o ~/Pictures/Screenshots")) -- Screenshot of a region
+-- Screenshots freeze the screen first (-z), so the shell's panels, dropdowns and launchers are in
+-- them: the picker takes the keyboard and they close, but the capture is of the frozen frame
+hl.bind("PRINT", hl.dsp.exec_cmd("hyprshot -z -m output -o ~/Pictures/Screenshots")) -- Screenshot of a monitor
+hl.bind("CONTROL + PRINT", hl.dsp.exec_cmd("hyprshot -z -m window -o ~/Pictures/Screenshots")) -- Screenshot of a window
+hl.bind("SHIFT + PRINT", hl.dsp.exec_cmd("hyprshot -z -m region -o ~/Pictures/Screenshots")) -- Screenshot of a region
 
 -- Wallpapers
 hl.bind(mainMod .. " + W", hl.dsp.exec_cmd("qs ipc call wallpaper toggle")) -- Wallpaper picker (Tab: live wallpapers)

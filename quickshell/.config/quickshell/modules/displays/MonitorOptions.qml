@@ -145,6 +145,7 @@ ColumnLayout {
         enabled: level !== undefined
         label: "Brightness"
         valueText: `${level ?? 0}%`
+        step: 0.01
         value: (level ?? 0) / 100
         onChanged: v => Displays.setBrightness(panel.current.name, Math.max(1, Math.round(v * 100)))
     }

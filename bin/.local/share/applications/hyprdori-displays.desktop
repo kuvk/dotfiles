@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Displays
+GenericName=Monitor layout
+Comment=Monitors: arrangement, resolution, scale, text size
+Exec=qs ipc call settings open displays
+Icon=preferences-desktop-display
+Categories=X-Hyprdori;Settings;
+Keywords=hyprdori;monitor;screen;resolution;scale;
+Terminal=false

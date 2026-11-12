@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import qs.config
+import qs.services
 
 // An icon that does something when clicked: no background, the icon turns the text color
 // under the cursor, and a tooltip says what it does (`tooltip`)
@@ -16,6 +17,18 @@ MouseArea {
     implicitHeight: size
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
+
+    activeFocusOnTab: true
+    Keys.onPressed: event => {
+        if (Nav.isActivate(event)) {
+            root.clicked(null);
+            event.accepted = true;
+        }
+    }
+
+    FocusRing {
+        outset: 3
+    }
 
     Icon {
         id: label

@@ -75,23 +75,13 @@ PanelWindow {
                 color: Osd.entry.dim ? Theme.dimText : Theme.foreground
             }
 
-            // a level: one bar, or one per step (the keyboard light) with an equal gap between
-            RowLayout {
+            // a level: one bar; with fixed steps (the keyboard light) a mark at each, from off to
+            // full
+            OsdBar {
                 Layout.fillWidth: true
                 visible: Osd.entry.level >= 0
-                spacing: 6
-
-                Repeater {
-                    model: Osd.entry.steps > 1 ? Osd.entry.steps : 1
-
-                    OsdBar {
-                        required property int index
-
-                        Layout.fillWidth: true
-                        // this bar's share of the level
-                        fill: Osd.entry.steps > 1 ? Math.max(0, Math.min(1, Osd.entry.level * Osd.entry.steps - index)) : Math.max(0, Osd.entry.level)
-                    }
-                }
+                fill: Math.max(0, Osd.entry.level)
+                ticks: Osd.entry.steps > 1 ? Osd.entry.steps + 1 : 0
             }
 
             // a state: its name

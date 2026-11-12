@@ -54,6 +54,12 @@ Singleton {
         Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-update", "--window"]);
     }
 
+    // Manage WebApps: list, install or uninstall web apps (hyprdori-webapp --window)
+    function showWebapp(): void {
+        Panels.closeAll();
+        Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-webapp", "--window"]);
+    }
+
     // System Information: fastfetch in a kitty window (hyprdori-sysinfo), opened or closed
     function showSysinfo(): void {
         Panels.closeAll();

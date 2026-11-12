@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Settings
+GenericName=Hyprdori settings
+Comment=Style, fonts, bar, displays, screen and sleep
+Exec=qs ipc call settings open style
+Icon=preferences-system
+Categories=X-Hyprdori;Settings;
+Keywords=hyprdori;shell;style;theme;fonts;bar;lock;
+Terminal=false

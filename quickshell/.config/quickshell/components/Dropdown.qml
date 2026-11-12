@@ -106,7 +106,12 @@ PanelWindow {
 
             focus: root.shown
             Keys.onEscapePressed: Panels.closeDropdown(root.name)
-            Keys.onPressed: event => root.keyPressed(event)
+            Keys.onPressed: event => {
+                root.keyPressed(event);
+                // the keyboard: arrows and Ctrl+H / J / K / L through the controls (Nav)
+                if (!event.accepted && Nav.handle(event, panel))
+                    event.accepted = true;
+            }
 
             // Inside the border: while the height slides, content is cut there, not drawn over it;
             // past the Control Center's height it scrolls

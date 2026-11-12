@@ -67,6 +67,7 @@ PanelWindow {
         clip: true
 
         Rectangle {
+            id: card
             width: parent.width
             height: parent.height - root.gap
             y: Math.round(root.gap - (height + root.gap) * (1 - reveal.value))
@@ -78,9 +79,14 @@ PanelWindow {
             focus: root.shown
             Keys.onEscapePressed: Panels.controlCenter = false
             Keys.onPressed: event => {
-                // Left/Right switch between media players
-                if (event.key === Qt.Key_Left || event.key === Qt.Key_Right) {
+                // Left/Right switch between media players while no control has the keyboard
+                if ((event.key === Qt.Key_Left || event.key === Qt.Key_Right) && card.activeFocus) {
                     Media.step(event.key === Qt.Key_Left ? -1 : 1);
+                    event.accepted = true;
+                    return;
+                }
+                // the keyboard: arrows and Ctrl+H / J / K / L through the controls (Nav)
+                if (Nav.handle(event, card)) {
                     event.accepted = true;
                     return;
                 }

@@ -179,10 +179,11 @@ PanelWindow {
                         }
                     }
 
-                    // Settings, Displays, Keybindings, System information
+                    // Settings (the rest are in the Control Center)
                     ShellShortcuts {
                         id: shortcuts
 
+                        only: ["settings"]
                         anchors.left: parent.left
                         anchors.right: parent.right
                         anchors.bottom: parent.bottom

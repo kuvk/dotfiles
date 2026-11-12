@@ -4,10 +4,17 @@ address bar, no extension icons) with a launcher entry and an icon, so it
 shows up in the search launcher and the app menu (Internet).
 
   hyprdori-webapp                                  ask for name, URL and icon
-  hyprdori-webapp install NAME URL [ICON]          create (or update) a web app
+  hyprdori-webapp --window                         a window (Manage WebApps: the Control Center,
+                                                   the app launcher): list them, install (the
+                                                   browser, then name, URL and icon for as many
+                                                   as needed) or uninstall, until Close
+  hyprdori-webapp install NAME URL [ICON] [--browser B]   create (or update) a web app
   hyprdori-webapp list                             installed web apps
   hyprdori-webapp remove NAME                      remove one
-  hyprdori-webapp launch URL                       open URL as a web app (used by the entries)
+  hyprdori-webapp launch [--browser B] URL         open URL as a web app (used by the entries)
+
+B is a Chromium-based browser's command (brave, chromium, google-chrome-stable,
+vivaldi-stable); without it, the first of those installed.
 
 ICON is optional: a PNG URL, a local image file, or a name from
 https://dashboardicons.com (e.g. "whatsapp"). Without one, the app's name is
@@ -55,10 +62,19 @@ def normalize_url(url: str) -> str:
     return url
 
 
-def browser() -> str:
-    for b in BROWSERS:
-        if shutil.which(b):
-            return b
+def installed_browsers() -> list[str]:
+    """The Chromium-based browsers installed (web apps need --app), one command per browser."""
+    found = [b for b in BROWSERS if shutil.which(b)]
+    return [b for b in found if not (b == "brave-browser" and "brave" in found)]
+
+
+def browser(preferred: str | None = None) -> str:
+    if preferred:
+        if preferred not in BROWSERS or not shutil.which(preferred):
+            raise SystemExit(f"Not an installed Chromium-based browser: {preferred} ({', '.join(installed_browsers()) or 'none'})")
+        return preferred
+    for b in installed_browsers():
+        return b
     raise SystemExit("Web apps need a Chromium-based browser (Brave, Chromium, Chrome)")
 
 
@@ -115,18 +131,19 @@ def fetch_icon(name: str, url: str, icon: str | None) -> Path | None:
 
 
 def window_class(b: str, url: str) -> str:
-    """Chromium names --app windows <browser>-<host><path, / as _>-Default."""
+    """Chromium-based browsers name --app windows <prefix>-<host><path, / as _>-Default: Brave
+    "brave", Chromium and Chrome "chrome"."""
     parts = urllib.parse.urlparse(url)
     path = (parts.path or "/").replace("/", "_")
-    base = {"brave-browser": "brave", "google-chrome-stable": "chrome"}.get(b, b)
+    base = {"brave-browser": "brave", "google-chrome-stable": "chrome", "chromium": "chrome"}.get(b, b)
     return f"{base}-{parts.netloc}_{path}-Default"
 
 
-def install(name: str, url: str, icon: str | None) -> None:
+def install(name: str, url: str, icon: str | None, preferred: str | None = None) -> None:
     if "/" in name or not slug(name):
         raise SystemExit(f"Not a usable app name: {name!r}")
     url = normalize_url(url)
-    b = browser()
+    b = browser(preferred)
     icon_path = fetch_icon(name, url, icon)
     if icon_path is None:
         print("No icon found; the entry uses a generic web icon")
@@ -138,7 +155,7 @@ def install(name: str, url: str, icon: str | None) -> None:
         "Type=Application\n"
         f"Name={name}\n"
         f"Comment=Web app: {url}\n"
-        f'Exec="{SELF}" launch {url}\n'
+        f'Exec="{SELF}" launch --browser {b} {url}\n'
         # full path: Quickshell (Qt) doesn't see icons added to the theme
         # after it started; GTK apps find it in the hicolor theme too
         f"Icon={icon_path if icon_path else 'web-browser'}\n"
@@ -146,6 +163,7 @@ def install(name: str, url: str, icon: str | None) -> None:
         "Categories=Network;WebBrowser;\n"
         f"StartupWMClass={window_class(b, url)}\n"
         f"X-WebApp-URL={url}\n"
+        f"X-WebApp-Browser={b}\n"
     )
     entry.chmod(0o755)
     print(f"Installed {name}: {entry}")
@@ -171,8 +189,9 @@ def remove(name: str) -> None:
     raise SystemExit(f"No web app named {name!r} (see: hyprdori-webapp list)")
 
 
-def launch(url: str) -> None:
-    b = browser()
+def launch(url: str, preferred: str | None = None) -> None:
+    # the entry's browser, or the first installed if that one's gone
+    b = browser(preferred) if preferred and shutil.which(preferred) else browser()
     # own session: the window outlives whatever started it
     subprocess.Popen([b, f"--app={normalize_url(url)}"], start_new_session=True,
                      stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
@@ -190,20 +209,114 @@ def ask() -> None:
         install(name, url, icon)
 
 
+PRESENT = HOME / ".local/bin/hyprdori-present"
+
+
+def present(*args: str, capture: bool = False) -> subprocess.CompletedProcess:
+    return subprocess.run([str(PRESENT), *args], text=True, stdout=subprocess.PIPE if capture else None)
+
+
+def install_some() -> int:
+    """The browser, then name, address and icon for as many apps as wanted."""
+    browsers = installed_browsers()
+    if not browsers:
+        print("  Web apps need a Chromium-based browser (Brave, Chromium, Chrome or Vivaldi).")
+        return 1
+    b = browsers[0] if len(browsers) == 1 else present("choose", "Browser", *browsers, capture=True).stdout.strip()
+    status = 0
+    while b:
+        name = present("input", "Name", "e.g. WhatsApp", capture=True).stdout.strip()
+        url = name and present("input", "Web address", "e.g. web.whatsapp.com", capture=True).stdout.strip()
+        if not url:
+            break
+        icon = present("input", "Icon (empty: find one)", "PNG address, image file or dashboardicons.com name",
+                       capture=True).stdout.strip() or None
+        present("step", f"{name} in {b}")
+        try:
+            install(name, url, icon, b)
+        except SystemExit as e:
+            print(f"  {e}")
+            status = 1
+        if present("confirm", "Install another?").returncode != 0:
+            break
+    return status
+
+
+def list_apps() -> None:
+    apps = installed()
+    if not apps:
+        print("  No web apps yet.")
+        return
+    width = max(len(name) for name, _, _ in apps)
+    for name, url, entry in apps:
+        browser_name = re.search(r"^X-WebApp-Browser=(.*)$", entry.read_text(), re.M)
+        print(f"  {name:<{width}}  {url}  ({browser_name.group(1) if browser_name else 'the first browser found'})")
+
+
+def uninstall_some() -> int:
+    """One of the installed apps, asked for and then removed, as long as wanted."""
+    while True:
+        apps = installed()
+        if not apps:
+            print("  No web apps to remove.")
+            return 0
+        name = present("choose", "Remove which?", *[n for n, _, _ in apps], "Back", capture=True).stdout.strip()
+        if not name or name == "Back":
+            return 0
+        if present("confirm", f"Remove {name} (its entry and icon)?").returncode == 0:
+            try:
+                remove(name)
+            except SystemExit as e:
+                print(f"  {e}")
+                return 1
+
+
+def in_window() -> int:
+    """The window: what a web app is, then list, install or uninstall, until Close."""
+    present("header")
+    present("box", "A web app is a site in its own window: no tabs, no address bar, no extension",
+            "icons, with an entry and an icon in the app launcher and the app menu (Internet).", "",
+            "List them, install new ones (the browser they open in, then a name and a web address",
+            "for each; the icon is found by the app's name on dashboardicons.com or is the site's",
+            "own, or give one), or uninstall them (their entry and icon go).")
+    status = 0
+    actions = {"List web apps": lambda: list_apps() or 0, "Install": install_some, "Uninstall": uninstall_some}
+    while True:
+        choice = present("choose", "What to do?", *actions, "Close", capture=True).stdout.strip()
+        if not choice or choice == "Close":
+            break
+        present("step", choice)
+        status = actions[choice]() or status
+    present("done", str(status))
+    return status
+
+
 def main(argv: list[str]) -> int:
+    if argv[:1] == ["--window"]:
+        os.execv(str(PRESENT), [str(PRESENT), "window", "hyprdori-window", "Manage WebApps", str(SELF), "--in-window"])
+    if argv[:1] == ["--in-window"]:
+        return in_window()
+    preferred = None
+    if "--browser" in argv:
+        i = argv.index("--browser")
+        if i + 1 >= len(argv):
+            print("--browser needs a browser's command", file=sys.stderr)
+            return 1
+        preferred = argv[i + 1]
+        argv = argv[:i] + argv[i + 2:]
     if not argv:
         ask()
     elif argv[0] in ("-h", "--help"):
         print(__doc__.strip())
     elif argv[0] == "install" and len(argv) in (3, 4):
-        install(argv[1], argv[2], argv[3] if len(argv) == 4 else None)
+        install(argv[1], argv[2], argv[3] if len(argv) == 4 else None, preferred)
     elif argv[0] == "list":
         for name, url, _ in installed():
             print(f"{name}\t{url}")
     elif argv[0] == "remove" and len(argv) == 2:
         remove(argv[1])
     elif argv[0] == "launch" and len(argv) == 2:
-        launch(argv[1])
+        launch(argv[1], preferred)
     else:
         print(__doc__.strip(), file=sys.stderr)
         return 1

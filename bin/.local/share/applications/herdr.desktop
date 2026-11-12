@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=herdr
+GenericName=Terminal workspace for coding agents
+Comment=herdr in kitty
+Exec=kitty --class herdr -e herdr
+Icon=utilities-terminal
+Categories=Development;
+Keywords=tmux;agents;terminal;
+Terminal=false

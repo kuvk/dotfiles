@@ -33,6 +33,16 @@ ColumnLayout {
                     Panels.closeAll();
                     System.runAction(modelData.id);
                 }
+                // the keyboard: Enter or Space runs it
+                activeFocusOnTab: true
+                Keys.onPressed: event => {
+                    if (Nav.isActivate(event)) {
+                        action.clicked(null);
+                        event.accepted = true;
+                    }
+                }
+
+                FocusRing {}
 
                 Rectangle {
                     anchors.fill: parent

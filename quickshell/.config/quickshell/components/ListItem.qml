@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.config
+import qs.services
 
 // Row used in dropdown lists (networks, devices, sinks): the current one filled and bold,
 // the one under the cursor framed
@@ -16,6 +17,13 @@ MouseArea {
     Layout.fillWidth: true
     implicitHeight: 44
     hoverEnabled: true
+    activeFocusOnTab: true
+    Keys.onPressed: event => {
+        if (Nav.isActivate(event)) {
+            root.clicked(null);
+            event.accepted = true;
+        }
+    }
     cursorShape: Qt.PointingHandCursor
 
     Rectangle {
@@ -65,4 +73,6 @@ MouseArea {
             spacing: 2
         }
     }
+
+    FocusRing {}
 }

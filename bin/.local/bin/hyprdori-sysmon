@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# System monitor: btop (through ~/.local/bin/btop, which keeps a sleeping NVIDIA card asleep) in a
+# kitty window of its own, floated and centered by a Hyprland rule (rules.lua, class
+# hyprdori-sysmon). There's only ever one: run again while it's open, it's brought to the front.
+# btop's own launcher entry is hidden, so this is the system monitor in the app launcher.
+#
+#   hyprdori-sysmon        open it, or focus the one that's open (the Control Center, the launcher)
+
+# -h, --help: the comment above, then nothing else runs
+case ${1:-} in -h | --help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
+
+class=hyprdori-sysmon
+address=$(hyprctl clients -j | jq -r --arg c "$class" 'first(.[] | select(.class == $c) | .address) // empty')
+if [[ -n $address ]]; then
+    hyprctl dispatch "hl.dsp.focus({ window = \"address:$address\" })" >/dev/null
+    exit 0
+fi
+exec kitty --class "$class" --title "System monitor" btop

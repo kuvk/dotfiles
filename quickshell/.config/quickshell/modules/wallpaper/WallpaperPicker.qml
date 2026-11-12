@@ -175,6 +175,9 @@ PanelWindow {
         thumbsProc.running = true;
     }
 
+    // The current theme's own wallpapers
+    readonly property string themeFolder: `${Quickshell.env("XDG_DATA_HOME") || Quickshell.env("HOME") + "/.local/share"}/hyprdori/backgrounds/default/${Theme.theme}`
+
     function move(delta: int): void {
         moved = true;
         if (shownItems.length > 0)
@@ -185,9 +188,15 @@ PanelWindow {
         const item = shownItems[selected];
         if (!item)
             return;
-        // Settings > Style > Background follows the theme: on with the theme's own background
-        // (hyprdori-theme-set) on every monitor, off with anything else
-        Config.wallpaperFollowsTheme = kind === "static" && !thisMonitorOnly && item.path === Theme.backgroundImage;
+        // Settings > Style > Background follows the theme: on with one of the theme's own
+        // backgrounds (a dori* image in its folder, backgrounds/default/<theme>/) on every
+        // monitor, which becomes the theme's background (hyprdori-theme-set --theme-default);
+        // off with anything else
+        const name = item.path.split("/").pop();
+        const themesOwn = kind === "static" && item.path === `${themeFolder}/${name}` && name.startsWith("dori");
+        Config.wallpaperFollowsTheme = themesOwn && !thisMonitorOnly;
+        if (themesOwn && !thisMonitorOnly && item.path !== Theme.backgroundImage)
+            Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-theme-set", "--theme-default", item.path]);
         const cmd = [script, "set", kind, item.path];
         if (thisMonitorOnly && screen)
             cmd.push(screen.name);

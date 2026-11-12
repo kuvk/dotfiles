@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.config
+import qs.services
 
 // Compact font chooser: shows the current family in its own font; a click
 // unfolds the list of `options` (each drawn in its font), a pick folds it.
@@ -11,6 +12,8 @@ ColumnLayout {
     property var options: []
     property string sample: ""
     property bool open: false
+    // the entry the keyboard is on while unfolded
+    property int cursor: 0
     signal picked(string family)
 
     readonly property bool installed: Qt.fontFamilies().includes(value)
@@ -29,6 +32,36 @@ ColumnLayout {
         hoverEnabled: true
         cursorShape: root.enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
         onClicked: root.open = !root.open
+
+        // the keyboard: Enter or Space unfolds the list; in it Up / Down (Ctrl+K / J) move, Enter
+        // picks, Esc folds it (Nav moves on from the button while it's folded)
+        activeFocusOnTab: true
+        Keys.onPressed: event => {
+            const ctrl = event.modifiers & Qt.ControlModifier;
+            if (!root.open) {
+                if (Nav.isActivate(event)) {
+                    root.cursor = Math.max(0, root.options.indexOf(root.value));
+                    root.open = true;
+                    event.accepted = true;
+                }
+                return;
+            }
+            if (event.key === Qt.Key_Down || (ctrl && event.key === Qt.Key_J))
+                root.cursor = Math.min(root.options.length - 1, root.cursor + 1);
+            else if (event.key === Qt.Key_Up || (ctrl && event.key === Qt.Key_K))
+                root.cursor = Math.max(0, root.cursor - 1);
+            else if (Nav.isActivate(event)) {
+                root.picked(root.options[root.cursor]);
+                root.open = false;
+            } else if (event.key === Qt.Key_Escape)
+                root.open = false;
+            else
+                return;
+            list.positionViewAtIndex(root.cursor, ListView.Contain);
+            event.accepted = true;
+        }
+
+        FocusRing {}
 
         Rectangle {
             anchors.fill: parent
@@ -83,6 +116,7 @@ ColumnLayout {
                 id: entry
 
                 required property string modelData
+                required property int index
 
                 width: list.width - 10
                 height: 28
@@ -96,7 +130,7 @@ ColumnLayout {
                 Rectangle {
                     anchors.fill: parent
                     radius: Theme.smallRadius
-                    color: entry.modelData === root.value ? Theme.selectedFill : entry.containsMouse ? Theme.hoverBg : "transparent"
+                    color: entry.modelData === root.value ? Theme.selectedFill : entry.containsMouse || (entry.index === root.cursor && button.activeFocus) ? Theme.hoverBg : "transparent"
                 }
 
                 StyledText {

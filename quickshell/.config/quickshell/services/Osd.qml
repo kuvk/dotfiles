@@ -12,8 +12,8 @@ import qs.config
 Singleton {
     id: root
 
-    // Each OSD by name: an icon, then a `level` (0..1, drawn as a bar; `steps` splits it into
-    // that many parts) or a `label`; `dim` greys it all while it's off (muted, a light at 0),
+    // Each OSD by name: an icon, then a `level` (0..1, drawn as a bar; with `steps`, a mark at
+    // each of them) or a `label`; `dim` greys it all while it's off (muted, a light at 0),
     // and `quiet` while a panel with its own control for it is open. Brightness and the keyboard light get their level from their
     // source.
     readonly property var kinds: ({

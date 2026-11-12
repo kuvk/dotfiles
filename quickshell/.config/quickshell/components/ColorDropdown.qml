@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.config
+import qs.services
 
 // A theme color by name: the label on the left, the current color (swatch and name) on the
 // right; a click unfolds the list below, a pick folds it. `value` is the color's name in
@@ -18,6 +19,8 @@ ColumnLayout {
     property var names: ["accent", ...palette]
     readonly property var palette: ["red", "orange", "yellow", "green", "cyan", "blue", "magenta", "brown", "bright_red", "bright_yellow", "bright_green", "bright_cyan", "bright_blue", "bright_magenta", "foreground", "light_foreground", "bright_foreground", "dark_foreground", "muted", "selection", "lighter_background", "background", "dark_background", "darker_background"]
     property bool open: false
+    // the entry the keyboard is on while unfolded
+    property int cursor: 0
     signal picked(string name)
 
     readonly property var entries: defaultLabel ? ["", ...names] : names
@@ -45,6 +48,36 @@ ColumnLayout {
             hoverEnabled: true
             cursorShape: Qt.PointingHandCursor
             onClicked: root.open = !root.open
+
+            // the keyboard: Enter or Space unfolds the list; in it Up / Down (Ctrl+K / J) move, Enter
+            // picks, Esc folds it (Nav moves on from the button while it's folded)
+            activeFocusOnTab: true
+            Keys.onPressed: event => {
+                const ctrl = event.modifiers & Qt.ControlModifier;
+                if (!root.open) {
+                    if (Nav.isActivate(event)) {
+                        root.cursor = Math.max(0, root.entries.indexOf(root.value));
+                        root.open = true;
+                        event.accepted = true;
+                    }
+                    return;
+                }
+                if (event.key === Qt.Key_Down || (ctrl && event.key === Qt.Key_J))
+                    root.cursor = Math.min(root.entries.length - 1, root.cursor + 1);
+                else if (event.key === Qt.Key_Up || (ctrl && event.key === Qt.Key_K))
+                    root.cursor = Math.max(0, root.cursor - 1);
+                else if (Nav.isActivate(event)) {
+                    root.picked(root.entries[root.cursor]);
+                    root.open = false;
+                } else if (event.key === Qt.Key_Escape)
+                    root.open = false;
+                else
+                    return;
+                list.positionViewAtIndex(root.cursor, ListView.Contain);
+                event.accepted = true;
+            }
+
+            FocusRing {}
 
             Rectangle {
                 anchors.fill: parent
@@ -107,6 +140,7 @@ ColumnLayout {
                 id: entry
 
                 required property string modelData
+                required property int index
 
                 width: list.width - 10
                 height: 28
@@ -120,7 +154,7 @@ ColumnLayout {
                 Rectangle {
                     anchors.fill: parent
                     radius: Theme.smallRadius
-                    color: entry.modelData === root.value ? Theme.selectedFill : entry.containsMouse ? Theme.hoverBg : "transparent"
+                    color: entry.modelData === root.value ? Theme.selectedFill : entry.containsMouse || (entry.index === root.cursor && button.activeFocus) ? Theme.hoverBg : "transparent"
                 }
 
                 Swatch {

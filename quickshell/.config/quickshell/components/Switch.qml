@@ -1,5 +1,6 @@
 import QtQuick
 import qs.config
+import qs.services
 
 // On/off: on is the selected fill without a border, off the idle fill with a hairline border;
 // the knob in the text color (darkened while off). Round, square with the square shape.
@@ -13,6 +14,18 @@ MouseArea {
     implicitHeight: Math.max(18, Math.round(22 * Theme.textScale))
     cursorShape: enabled ? Qt.PointingHandCursor : Qt.ArrowCursor
     onClicked: toggled()
+
+    activeFocusOnTab: true
+    Keys.onPressed: event => {
+        if (Nav.isActivate(event)) {
+            root.toggled();
+            event.accepted = true;
+        }
+    }
+
+    FocusRing {
+        cornerRadius: Theme.radius > 0 ? root.height / 2 : 0
+    }
 
     Rectangle {
         anchors.fill: parent

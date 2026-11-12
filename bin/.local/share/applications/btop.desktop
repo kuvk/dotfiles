@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=btop++
+Comment=Hidden: the System monitor entry opens btop (hyprdori-sysmon)
+Exec=btop
+NoDisplay=true

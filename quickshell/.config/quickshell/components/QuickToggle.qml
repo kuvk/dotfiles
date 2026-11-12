@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Layouts
 import qs.config
+import qs.services
 
 // Control center tile: icon + label, highlighted when on
 MouseArea {
@@ -14,6 +15,13 @@ MouseArea {
     Layout.fillWidth: true
     implicitHeight: 56
     hoverEnabled: true
+    activeFocusOnTab: true
+    Keys.onPressed: event => {
+        if (Nav.isActivate(event)) {
+            root.clicked(null);
+            event.accepted = true;
+        }
+    }
     cursorShape: Qt.PointingHandCursor
 
     Rectangle {
@@ -61,4 +69,6 @@ MouseArea {
             }
         }
     }
+
+    FocusRing {}
 }

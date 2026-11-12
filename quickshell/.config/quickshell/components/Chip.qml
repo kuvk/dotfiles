@@ -17,6 +17,13 @@ MouseArea {
     Layout.preferredWidth: chipLabel.implicitWidth + 20
     Layout.preferredHeight: icon !== "" ? 52 : 28
     hoverEnabled: true
+    activeFocusOnTab: true
+    Keys.onPressed: event => {
+        if (Nav.isActivate(event)) {
+            chip.clicked(null);
+            event.accepted = true;
+        }
+    }
     cursorShape: Qt.PointingHandCursor
 
     Rectangle {
@@ -53,4 +60,6 @@ MouseArea {
         font.pixelSize: Theme.smallSize
         font.weight: Font.DemiBold
     }
+
+    FocusRing {}
 }

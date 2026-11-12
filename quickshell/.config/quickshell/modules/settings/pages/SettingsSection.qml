@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Layouts
 import qs.config
 import qs.components
+import qs.services
 
 // A section of a Settings page: its heading in capitals in the text color (as a dropdown's
 // section, a step above its options' labels), its hint below if any, then its options.
@@ -90,10 +91,27 @@ ColumnLayout {
         }
 
         MouseArea {
+            id: foldButton
+
             anchors.fill: parent
             enabled: section.folds
             cursorShape: Qt.PointingHandCursor
             onClicked: section.open = !section.open
+            // the keyboard: Enter or Space folds or unfolds it
+            activeFocusOnTab: section.folds
+            Keys.onPressed: event => {
+                if (Nav.isActivate(event)) {
+                    section.open = !section.open;
+                    event.accepted = true;
+                }
+            }
+
+            // around the title, which starts at the edge
+            FocusRing {
+                leftOutset: 8
+                topOutset: 4
+                bottomOutset: 4
+            }
         }
     }
 
@@ -102,6 +120,8 @@ ColumnLayout {
     Item {
         Layout.fillWidth: true
         implicitHeight: section.showsBody ? reveal.implicitHeight : 0
+        // shut, its controls are out of the keyboard's reach too (Nav)
+        enabled: section.showsBody
         opacity: implicitHeight > 0.5 ? 1 : 0
         clip: true
 

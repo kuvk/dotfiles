@@ -252,9 +252,9 @@ FloatingWindow {
                     Panels.keybinds = false;
             } else if (event.key === Qt.Key_Backspace) {
                 root.query = root.query.slice(0, -1);
-            } else if (event.key === Qt.Key_Down) {
+            } else if (event.key === Qt.Key_Down || (event.key === Qt.Key_J && (event.modifiers & Qt.ControlModifier))) {
                 bindsFlick.contentY = Math.min(Math.max(0, bindsFlick.contentHeight - bindsFlick.height), bindsFlick.contentY + 60);
-            } else if (event.key === Qt.Key_Up) {
+            } else if (event.key === Qt.Key_Up || (event.key === Qt.Key_K && (event.modifiers & Qt.ControlModifier))) {
                 bindsFlick.contentY = Math.max(0, bindsFlick.contentY - 60);
             } else if (event.text.length === 1 && event.text >= " " && !(event.modifiers & (Qt.ControlModifier | Qt.AltModifier))) {
                 root.query += event.text;

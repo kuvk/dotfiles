@@ -10,6 +10,9 @@ Rectangle {
     property real value: 0
     property real to: 1
     property bool muted: false
+    // a key press or wheel step: 1% (volume, brightness), or as set
+    property real step: 0.01
+    property int ticks: 0
     signal moved(real value)
 
     Layout.fillWidth: true
@@ -31,6 +34,8 @@ Rectangle {
         anchors.rightMargin: 10
         value: root.value
         to: root.to
+        step: root.step
+        ticks: root.ticks
         opacity: root.muted ? 0.5 : 1
         onMoved: v => root.moved(v)
     }

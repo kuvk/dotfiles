@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Wallpaper generator
+GenericName=Theme wallpaper
+Comment=A logo wallpaper in the current theme's colors, made its background
+Exec=hyprdori-logo-wallpaper --window
+Icon=preferences-desktop-wallpaper
+Categories=X-Hyprdori;Settings;
+Keywords=hyprdori;wallpaper;background;logo;theme;
+Terminal=false

@@ -7,8 +7,9 @@
 #   hyprdori-update           all of it, asking before each package transaction
 #   hyprdori-update --yes     no questions from paru, pacman or flatpak
 #   hyprdori-update --window  in a window (hyprdori-present, the Control Center's update button):
-#                             choose this, or the boot menu and splash (hyprdori-theme-boot),
-#                             then the output, and any key closes it
+#                             choose this, the boot menu and splash (hyprdori-theme-boot) or
+#                             maintenance (hyprdori-maintenance), then the output, and any key
+#                             closes it
 
 # -h, --help: the comment above, then nothing else runs
 case ${1:-} in -h | --help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
@@ -30,13 +31,18 @@ if [[ ${1:-} == --in-window ]]; then
         "Hyprdori's migrations. It asks before each package transaction." \
         "" "Boot menu and splash: Limine's menu and the Plymouth splash in the current theme," \
         "logos and password field, and the login screen's layout." \
-        "" "Both need your password (sudo). Keep the laptop on power for a full update."
-    full="Full system update" boot="Boot menu and splash"
-    choice=$("$bin/hyprdori-present" choose "What to update?" "$full" "$boot" "Cancel")
+        "" "Maintenance: clean up what builds up (old packages in pacman's cache, AUR build" \
+        "folders, orphaned packages, unused Flatpak runtimes, download caches, crash dumps, the" \
+        "journal), each showing what it frees and asking first; then failed services and config" \
+        "files to merge." \
+        "" "They need your password (sudo). Keep the laptop on power for a full update."
+    full="Full system update" boot="Boot menu and splash" clean="Maintenance (clean up)"
+    choice=$("$bin/hyprdori-present" choose "What to do?" "$full" "$boot" "$clean" "Cancel")
     status=0
     case $choice in
         "$full") "$(readlink -f "$0")" || status=$? ;;
         "$boot") "$bin/hyprdori-present" step "Boot screens"; "$bin/hyprdori-theme-boot" --force || status=$? ;;
+        "$clean") "$bin/hyprdori-maintenance" || status=$? ;;
         *) echo "  Nothing updated." ;;
     esac
     "$bin/hyprdori-present" done "$status"

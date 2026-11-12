@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=System monitor
+GenericName=Task manager
+Comment=Processes, CPU, memory, disks and network (btop)
+Exec=hyprdori-sysmon
+Icon=utilities-system-monitor
+Categories=X-Hyprdori;System;Monitor;
+Keywords=hyprdori;btop;top;htop;processes;task;cpu;memory;
+Terminal=false

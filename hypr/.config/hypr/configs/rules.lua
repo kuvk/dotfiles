@@ -47,7 +47,7 @@ hl.window_rule({
 -- Browsers opaque: pages and video behind a see-through window don't read well
 hl.window_rule({
   name = "browsers-opaque",
-  match = { class = "^(brave-browser|chromium|google-chrome|firefox|zen|librewolf|vivaldi-stable|brave-.*)$" },
+  match = { class = "^(brave-browser|chromium|google-chrome|firefox|zen|librewolf|vivaldi-stable|brave-.*|chrome-.*)$" },
   opacity = "1.0 override 1.0 override",
 })
 
@@ -65,6 +65,15 @@ hl.window_rule({
   match = { class = "^hyprdori-sysinfo$" },
   float = true,
   center = true,
+})
+
+-- System monitor (hyprdori-sysmon): btop in kitty, one at a time
+hl.window_rule({
+  name = "sysmon",
+  match = { class = "^hyprdori-sysmon$" },
+  float = true,
+  center = true,
+  size = "1200 760",
 })
 
 -- XDG Desktop Portal GTK
@@ -179,11 +188,11 @@ local apps = {
   },
   { name = "remmina-sessions", class = "org.remmina.Remmina", no_blur = true, opaque = true },
   { name = "davinci", class = "resolve", no_blur = true, opaque = true },
-  { name = "netflix", class = "brave-netflix.*", no_blur = true, opaque = true },
-  { name = "eontv", class = "brave-eon.*", no_blur = true, opaque = true },
+  { name = "netflix", class = "(brave|chrome)-netflix.*", no_blur = true, opaque = true },
+  { name = "eontv", class = "(brave|chrome)-eon.*", no_blur = true, opaque = true },
   {
     name = "whatsapp",
-    class = "^(brave|chromium)-web\\.whatsapp\\.com__.*",
+    class = "^(brave|chrome)-web\\.whatsapp\\.com__.*",
     float = true,
     center = true,
     size = "1100 700",

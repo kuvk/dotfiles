@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=System information
+GenericName=About this computer
+Comment=The system, hardware and theme at a glance
+Exec=hyprdori-sysinfo
+Icon=hwinfo
+Categories=X-Hyprdori;Settings;
+Keywords=hyprdori;fastfetch;about;info;
+Terminal=false

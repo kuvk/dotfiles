@@ -1,5 +1,6 @@
 import QtQuick
 import qs.config
+import qs.services
 
 MouseArea {
     id: root
@@ -12,6 +13,16 @@ MouseArea {
     hoverEnabled: true
     cursorShape: Qt.PointingHandCursor
     opacity: enabled ? 1 : 0.4
+
+    activeFocusOnTab: true
+    Keys.onPressed: event => {
+        if (Nav.isActivate(event)) {
+            root.clicked(null);
+            event.accepted = true;
+        }
+    }
+
+    FocusRing {}
 
     Rectangle {
         anchors.fill: parent
