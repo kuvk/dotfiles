@@ -4,8 +4,8 @@ import Quickshell
 import qs.config
 import qs.services
 
-// What the lock screen shows on one screen: the background, and on the main screen the avatar
-// and the password field in the middle. Laid out like the login screen
+// What the lock screen shows on one screen: the background, and on the main screen (the one the
+// mouse is on) the avatar and the password field in the middle. Laid out like the login screen
 // (sddm/hyprdori/Main.qml), in the theme's colors; the field as on the boot splash: the
 // background at Settings > Style > Lock screen's opacity, a 2 px accent outline, its corners rounded or
 // square there.
@@ -106,9 +106,13 @@ Item {
             hoverEnabled: !root.preview
             cursorShape: idle ? Qt.BlankCursor : Qt.ArrowCursor
             onClicked: root.takeFocus()
+            // the avatar and password come to the monitor the mouse is on
+            onEntered: if (!root.preview && Lock.locked) Lock.mainScreen = root.screen.name
             onPositionChanged: {
                 idle = false;
                 idleTimer.restart();
+                if (!root.preview && Lock.locked)
+                    Lock.mainScreen = root.screen.name;
             }
 
             Timer {
@@ -239,18 +243,24 @@ Item {
                 }
             }
 
-            // The typed password as dots
-            Text {
+            // The typed password as dots, drawn as the boot splash and login screen draw them
+            // (9 px, 4 apart) rather than a font's character, so their size never follows the
+            // font; as many as fit
+            Row {
                 anchors.centerIn: parent
-                width: parent.width - 32
-                horizontalAlignment: Text.AlignHCenter
-                visible: !root.preview && Lock.password !== ""
-                text: "●".repeat(Lock.password.length)
-                color: Theme.foreground
-                font.family: Theme.font
-                font.pixelSize: Theme.smallSize
-                font.letterSpacing: 3
-                elide: Text.ElideLeft
+                visible: !root.preview
+                spacing: 4
+
+                Repeater {
+                    model: Math.min(Lock.password.length, Math.floor((field.width - 32) / 13))
+
+                    Rectangle {
+                        width: 9
+                        height: 9
+                        radius: 4.5
+                        color: Theme.foreground
+                    }
+                }
             }
         }
 

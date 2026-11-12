@@ -31,7 +31,8 @@ Singleton {
     property bool locked: false
     // The session lock is up on every screen (WlSessionLock.secure)
     property bool secure: false
-    // The monitor with the clock and password: the one focused when locking
+    // The monitor with the avatar and password: the one focused when locking, then whichever
+    // the mouse moves to (LockView), as on the login screen
     property string mainScreen: ""
 
     // The background: the theme's own (Theme.backgroundImage, hyprdori-theme-set) unless the user chose an

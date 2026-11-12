@@ -189,17 +189,33 @@ Rectangle {
                 verticalAlignment: TextInput.AlignVCenter
                 horizontalAlignment: TextInput.AlignHCenter
                 echoMode: TextInput.Password
-                passwordCharacter: "●"
-                color: root.c.dots
+                // the typed text stays invisible: the dots below stand for it
+                color: "transparent"
+                cursorVisible: false
                 selectByMouse: false
-                font.family: root.c.font
-                font.pixelSize: 11
-                font.letterSpacing: 3
                 clip: true
                 focus: true
                 onTextEdited: root.failed = false
                 onAccepted: root.login()
                 Keys.onEscapePressed: text = ""
+            }
+
+            // The password as dots, as the lock screen and boot splash draw them (9 px, 4 apart),
+            // whatever the font; as many as fit
+            Row {
+                anchors.centerIn: parent
+                spacing: 4
+
+                Repeater {
+                    model: Math.min(password.text.length, Math.floor((field.width - 32) / 13))
+
+                    Rectangle {
+                        width: 9
+                        height: 9
+                        radius: 4.5
+                        color: root.c.dots
+                    }
+                }
             }
         }
 
