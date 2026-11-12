@@ -104,6 +104,8 @@ EXTRA_DESTINATIONS = {
 ONLY_IF_PRESENT = {"tmux.conf", "cliamp.toml"}
 
 FASTFETCH_SOURCE = HOME / ".config/fastfetch/base.jsonc"
+# there or not: browsers keep the display font with Monospace everywhere (hyprdori-browser-theme-setup)
+BROWSER_DISPLAY_FONT = Path(os.environ.get("XDG_CONFIG_HOME", HOME / ".config")) / "hyprdori/browser-display-font"
 FASTFETCH_OUTPUT = HOME / ".config/fastfetch/config.jsonc"
 STARSHIP_SOURCE = HOME / ".config/starship/base.toml"
 STARSHIP_OUTPUT = HOME / ".config/starship.toml"
@@ -404,6 +406,11 @@ def load_theme(name: str) -> dict:
         # Settings > Fonts: the terminals' font (also monospace), and what apps show text in
         "nerd_font": shell["font"],
         "text_font": shell["font"] if shell["monoEverywhere"] else shell["displayFont"],
+        # the browsers' own text (tabs, address bar, menus; fontconfig.conf): the display font
+        # with Monospace everywhere when chosen (hyprdori-browser-theme-setup
+        # --keep-display-font), else the same as everything else (the rule changes nothing)
+        "browser_font": shell["displayFont"] if shell["monoEverywhere"] and BROWSER_DISPLAY_FONT.exists()
+                        else (shell["font"] if shell["monoEverywhere"] else shell["displayFont"]),
         "font_hinting": hinting,
         "font_antialiasing": antialiasing,
         "gtk_font_pt": gtk_font_pt(),

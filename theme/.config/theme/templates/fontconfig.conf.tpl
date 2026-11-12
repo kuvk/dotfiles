@@ -19,4 +19,27 @@
     <test name="prgname" compare="not_eq"><string>zen</string></test>
     <edit name="family" mode="prepend_first" binding="strong"><string>{{ nerd_font }}</string></edit>
   </match>
+  <!-- The browsers' own text (tabs, address bar, menus: GTK's font): the display font with
+       Monospace everywhere when chosen (hyprdori-browser-theme-setup, its keep-display-font);
+       otherwise browser_font is text_font and these change nothing -->
+  <match target="pattern">
+    <test name="prgname"><string>chromium</string></test>
+    <test name="family"><string>{{ text_font }}</string></test>
+    <edit name="family" mode="assign" binding="strong"><string>{{ browser_font }}</string></edit>
+  </match>
+  <match target="pattern">
+    <test name="prgname"><string>brave</string></test>
+    <test name="family"><string>{{ text_font }}</string></test>
+    <edit name="family" mode="assign" binding="strong"><string>{{ browser_font }}</string></edit>
+  </match>
+  <match target="pattern">
+    <test name="prgname"><string>firefox</string></test>
+    <test name="family"><string>{{ text_font }}</string></test>
+    <edit name="family" mode="assign" binding="strong"><string>{{ browser_font }}</string></edit>
+  </match>
+  <match target="pattern">
+    <test name="prgname"><string>zen</string></test>
+    <test name="family"><string>{{ text_font }}</string></test>
+    <edit name="family" mode="assign" binding="strong"><string>{{ browser_font }}</string></edit>
+  </match>
 </fontconfig>

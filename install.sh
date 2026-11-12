@@ -82,6 +82,17 @@ if ask "Virtual machines and Docker (packages/vm.txt)?" "$($guest && echo n || e
 fi
 flatpak=false
 ask "Flatpak apps (packages/flatpak.txt)?" y && flatpak=true
+# With Monospace everywhere on by default (Settings > Fonts, the saved defaults), the browsers'
+# own text (tabs, address bar, menus) can keep the display font: a monospace one is wide there
+browser_font=
+# (grep: jq isn't installed yet when this asks)
+if grep -qE '"monoEverywhere": *true' "$hyprdori/quickshell/.config/quickshell/config/defaults.json"; then
+    if ask "Monospace everywhere is on: should browsers keep the display font for their tabs, address bar and menus?" y; then
+        browser_font=--keep-display-font
+    else
+        browser_font=--follow-font
+    fi
+fi
 # A btrfs root laid out as the install guide's (@ and @snapshots): snapshots, also in the boot menu
 snapshots=false
 if [[ $(findmnt -no FSTYPE /) == btrfs ]] &&
@@ -252,6 +263,8 @@ tmux_theme="$HOME/.tmux/plugins/catppuccin/tmux"
 [[ -d $tmux_theme ]] || git clone -q -b v2.3.2 https://github.com/catppuccin/tmux.git "$tmux_theme"
 # The browsers' color policy helper, so the theme below colors Chromium and Brave too
 sudo "$HOME/.local/bin/hyprdori-browser-theme-setup" >/dev/null
+# and the browsers' font, if asked above (no sudo: a per-user setting)
+[[ -n $browser_font ]] && "$HOME/.local/bin/hyprdori-browser-theme-setup" "$browser_font" >/dev/null
 "$HOME/.local/bin/hyprdori-theme-set"
 # Backgrounds: ~/.local/share/hyprdori/backgrounds/default (wallpapers) and /live, and
 # ~/.config/hyprdori/backgrounds.json for more folders. The desktop, lock screen and login
