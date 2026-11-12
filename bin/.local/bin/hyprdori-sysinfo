@@ -11,6 +11,9 @@
 # right), from the cell size kitty reports. The size that fit is remembered and set as a
 # window rule before the next launch, so the window opens at it.
 
+# -h, --help: the comment above, then nothing else runs
+case ${1:-} in -h | --help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
+
 class=hyprdori-sysinfo
 fit_file=${XDG_STATE_HOME:-$HOME/.local/state}/hyprdori/sysinfo.fit
 

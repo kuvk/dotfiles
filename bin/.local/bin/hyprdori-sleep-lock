@@ -7,6 +7,9 @@
 # what's left of that window: InhibitDelayMaxSec (15 s with install.sh's drop-in, 5 s by
 # default) less a fifth of it (at least 1 s) for logind itself, at most 12 s.
 
+# -h, --help: the comment above, then nothing else runs
+case ${1:-} in -h | --help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
+
 delay_us=$(timeout 1 busctl get-property org.freedesktop.login1 /org/freedesktop/login1 \
     org.freedesktop.login1.Manager InhibitDelayMaxUSec 2>/dev/null)
 delay_us=${delay_us##* }

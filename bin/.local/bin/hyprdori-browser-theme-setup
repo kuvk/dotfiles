@@ -4,22 +4,26 @@
 # goes into the browsers' managed policy (BrowserThemeColor). Those folders
 # belong to root, so this installs a small root-owned helper that only accepts
 # a 6-digit hex color, and a sudoers rule that lets the user run exactly that
-# without a password. Nothing else gets root.
+# without a password. Nothing else gets root. Run it without sudo: it asks for the password
+# (sudo), and the rule is for the user who ran it.
 #
-#   sudo ~/.local/bin/hyprdori-browser-theme-setup            install
-#   sudo ~/.local/bin/hyprdori-browser-theme-setup --unlock   drop the color policy for
-#        now, e.g. to switch Appearance > Theme to Classic; the next theme
-#        switch (or hyprdori-theme-set) puts it back
-#   sudo ~/.local/bin/hyprdori-browser-theme-setup --remove   undo everything
+#   hyprdori-browser-theme-setup            install
+#   hyprdori-browser-theme-setup --unlock   drop the color policy for now, e.g. to switch
+#                                           Appearance > Theme to Classic; the next theme
+#                                           switch (or hyprdori-theme-set) puts it back
+#   hyprdori-browser-theme-setup --remove   undo everything
+
+# -h, --help: the comment above, then nothing else runs
+case ${1:-} in -h | --help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
 set -euo pipefail
 
 HELPER=/usr/local/bin/browser-theme-policy
 SUDOERS=/etc/sudoers.d/browser-theme-policy
 POLICY_DIRS=(/etc/chromium/policies/managed /etc/brave/policies/managed)
 
+# Run without root: again through sudo, by its full path (sudo's PATH has no ~/.local/bin)
 if ((EUID != 0)); then
-    echo "Run with sudo: sudo $0 ${*:-}" >&2
-    exit 1
+    exec sudo "$(readlink -f "$0")" "$@"
 fi
 
 user="${SUDO_USER:-}"

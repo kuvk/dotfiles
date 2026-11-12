@@ -1,6 +1,17 @@
 #!/bin/python3
+"""zsh's plugins, cloned into ~/.local/share/zsh-plugins (where .zshrc loads them from): vi mode,
+syntax highlighting, completions, autosuggestions and history substring search. One already
+there is left as it is. install.sh runs it.
+
+  hyprdori-zsh-plugins
+"""
 import os
 import subprocess
+import sys
+
+if sys.argv[1:2] in (["-h"], ["--help"]):
+    print(__doc__.strip())
+    raise SystemExit(0)
 
 BASE_DIR = os.path.expanduser("~/.local/share/zsh-plugins")
 
@@ -26,4 +37,4 @@ for repo in REPOSITORIES:
     else:
         print(f"{repo} already cloned. Skipping...")
 
-print("DONE")
+print(f"Zsh plugins installed at: {BASE_DIR}")

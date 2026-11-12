@@ -810,6 +810,9 @@ def lid() -> int:
 
 
 def main(argv: list[str]) -> int:
+    if argv and argv[0] in ("-h", "--help"):
+        print(__doc__.strip())
+        return 0
     if argv and argv[0] in ("hotplug", "startup"):
         return hotplug(startup=argv[0] == "startup")
     if argv == ["lid"]:

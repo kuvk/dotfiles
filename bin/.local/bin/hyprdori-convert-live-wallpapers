@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
+"""Lighter copies of videos for live wallpapers (ffmpeg, H.264): each video in
+~/.local/share/hyprdori/backgrounds/live/source (the wallpaper picker skips that folder) into
+~/.local/share/hyprdori/backgrounds/live, 2560 px wide at 30 fps. Settings by environment:
+LIVE_WALLPAPER_SRC and LIVE_WALLPAPER_OUT (the folders), TARGET_W, TARGET_FPS, CRF, PRESET.
+
+  hyprdori-convert-live-wallpapers
+"""
 import os
+import sys
 import subprocess
 from pathlib import Path
 
@@ -47,6 +55,9 @@ def convert_one(src: Path, dst: Path) -> None:
     subprocess.run(cmd, check=False)
 
 def main() -> int:
+    if sys.argv[1:2] in (["-h"], ["--help"]):
+        print(__doc__.strip())
+        return 0
     if not SRC_DIR.exists():
         print(f"Source dir does not exist: {SRC_DIR}")
         return 1

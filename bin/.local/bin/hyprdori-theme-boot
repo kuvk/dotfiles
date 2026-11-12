@@ -15,6 +15,9 @@
 #
 # What they were last built from is kept as a checksum in /var/lib/hyprdori/boot-theme:
 # the theme's colors, the logo and the installers themselves.
+
+# -h, --help: the comment above, then nothing else runs
+case ${1:-} in -h | --help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
 set -euo pipefail
 
 self=$(readlink -f "$0")

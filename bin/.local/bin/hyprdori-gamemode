@@ -13,6 +13,9 @@
 #                             reloads its config, which brings back the normal look)
 #
 # /tmp/hypr-gamemode holds the mode; it exists in both, as other scripts only check that.
+
+# -h, --help: the comment above, then nothing else runs
+case ${1:-} in -h | --help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
 set -euo pipefail
 
 FLAG="/tmp/hypr-gamemode"
