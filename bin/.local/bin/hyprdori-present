@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# The look of Hyprdori's terminal windows that explain something, ask, then run it (the boot
+# screens' and the system's updates), in the theme's colors: the text logo on top, a framed
+# explanation, buttons to answer, and a line to close. Drawn with gum when it's installed,
+# plain text and Y/n questions without it. After Omarchy's presentation windows
+# (https://github.com/basecamp/omarchy, MIT).
+#
+#   hyprdori-present window CLASS TITLE COMMAND...   COMMAND in a floating kitty window
+#                                                      (CLASS: hyprdori-window has the rule)
+#   hyprdori-present header           clear the window, the text logo (dori-text) in magenta
+#   hyprdori-present box LINE...      the lines framed in the accent
+#   hyprdori-present confirm QUESTION  Yes / No buttons; exits 0 for Yes
+#   hyprdori-present choose HEADER OPTION...   one of the options, printed; nothing for Esc
+#   hyprdori-present step TEXT        a heading between the steps of what runs
+#   hyprdori-present done [STATUS]    "Done" (or that it failed, with STATUS not 0), then any key
+#                                     closes the window; exits with STATUS, so the window's script
+#                                     ends with: hyprdori-present done "$status"; exit "$status"
+
+# -h, --help: the comment above, then nothing else runs
+case ${1:-} in -h | --help | "") awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
+set -uo pipefail
+
+# The theme's colors (Catppuccin Mocha before hyprdori-theme-set has run)
+accent="#89b4fa" magenta="#cba6f7" foreground="#cdd6f4" background="#1e1e2e" subtext="#a2a8c2"
+selection="#45475a" red="#f38ba8" green="#a6e3a1"
+# shellcheck source=/dev/null
+. "$HOME/.config/theme/current/colors.sh" 2>/dev/null
+has_gum() { command -v gum >/dev/null; }
+rgb() { printf '38;2;%d;%d;%d' "0x${1:1:2}" "0x${1:3:2}" "0x${1:5:2}"; }
+
+case $1 in
+    window)
+        class=${2:?class} title=${3:?title}
+        shift 3
+        exec kitty --class "$class" --title "$title" "$@"
+        ;;
+    header)
+        clear
+        printf '\n\e[%sm' "$(rgb "$magenta")"
+        # every character of the logo, spaces included, two columns in
+        sed 's/^/  /' "$HOME/.config/theme/logo/dori-text" 2>/dev/null
+        printf '\e[0m\n\n'
+        ;;
+    box)
+        shift
+        if has_gum; then
+            gum style --border rounded --border-foreground "$accent" --foreground "$foreground" \
+                --padding "1 2" --margin "0 2" "$@"
+        else
+            printf '  %s\n' "$@"
+        fi
+        echo
+        ;;
+    confirm)
+        if has_gum; then
+            gum confirm "${2:?question}" --prompt.foreground "$foreground" \
+                --selected.background "$accent" --selected.foreground "$background" \
+                --unselected.background "$selection" --unselected.foreground "$foreground"
+        else
+            read -rp "  $2 [Y/n] " answer
+            [[ ${answer:-y} =~ ^[yY] ]]
+        fi
+        ;;
+    choose)
+        header=${2:?header}
+        shift 2
+        if has_gum; then
+            gum choose --header "  $header" --header.foreground "$foreground" \
+                --cursor "  › " --cursor.foreground "$accent" --item.foreground "$subtext" \
+                --selected.foreground "$accent" "$@"
+        else
+            echo "  $header"
+            i=1
+            for option; do printf '   %d. %s\n' "$i" "$option"; ((i++)); done
+            read -rp "  Number (Enter cancels): " n
+            [[ $n =~ ^[0-9]+$ ]] && ((n >= 1 && n <= $#)) && printf '%s\n' "${!n}"
+        fi
+        ;;
+    step)
+        printf '\n\e[1;%sm  ==> %s\e[0m\n' "$(rgb "$accent")" "${2:?text}"
+        ;;
+    done)
+        status=${2:-0}
+        echo
+        if ((status == 0)); then
+            title="Done. Press any key to close"
+            printf '\e[%sm' "$(rgb "$green")"
+        else
+            title="Something went wrong (see above). Press any key to close"
+            printf '\e[%sm' "$(rgb "$red")"
+        fi
+        if has_gum; then
+            printf '\e[0m'
+            gum spin --spinner dot --spinner.foreground "$accent" --title "$title" \
+                --title.foreground "$subtext" -- bash -c 'read -rsn1'
+        else
+            printf '  %s\e[0m' "$title"
+            read -rsn1 _
+        fi
+        exit "$status"
+        ;;
+    *)
+        echo "hyprdori-present: unknown part '$1' (see --help)" >&2
+        exit 2
+        ;;
+esac

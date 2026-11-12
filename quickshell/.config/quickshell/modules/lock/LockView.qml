@@ -125,19 +125,23 @@ Item {
         }
     }
 
-    // Avatar and password, at the login screen's positions: the avatar's center 45 px above the
-    // screen's center, the field's 85 px below
+    // Avatar and password, at the login screen's positions: the field centered on the screen,
+    // the avatar's center 130 px above the field's. Sized for each screen as the default
+    // background is (hyprdori-logo-wallpaper, made for the largest screen and shown to cover):
+    // as given on a 1920x1080 screen, larger or smaller with the screen, so the field keeps its
+    // size against the logos on every monitor.
     Item {
         anchors.centerIn: parent
         visible: root.main
         width: 380
         height: 300
+        scale: Math.max(root.width / 1920, root.height / 1200)
 
         // Settings > Style > Lock screen > Avatar: ~/.face
         Item {
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            anchors.verticalCenterOffset: -45
+            anchors.verticalCenterOffset: -130
             visible: Config.lockAvatar
             width: 139
             height: 139
@@ -197,11 +201,11 @@ Item {
 
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            anchors.verticalCenterOffset: 85
-            width: 300
-            height: 40
-            // Settings > Style > Lock screen > Rounded corners: the windows' radius (8 with it at 0), or square
-            radius: Config.lockRounded ? (Config.radius || 8) : 0
+            anchors.verticalCenterOffset: 0
+            width: 338
+            height: 38
+            // the windows' corner radius (Settings > Style), square at 0
+            radius: Config.radius
             // the background with 5% of the text color (Omarchy's field), at Settings' opacity
             color: Theme.alpha(Theme.mix(Theme.background, Theme.foreground, 0.05), Config.lockInputOpacity / 100)
             border.width: 2

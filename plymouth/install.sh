@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Installs Hyprdori's boot splash: the fastfetch logo, a password field for the encrypted
-# drives and a progress bar after it. Plymouth reads it from the initramfs, so this
-# rebuilds the initramfs; run it again to change colors.
+# Installs Hyprdori's boot splash: the logo above a password field for the encrypted
+# drives, a progress bar after it and the text logo at the bottom. Plymouth reads it from the
+# initramfs, so this rebuilds the initramfs; run it again to change colors.
 #
 #   sudo plymouth/install.sh               the current theme's colors, accents included
 #                                          (hyprdori-theme-set; Catppuccin Mocha before it has run)
@@ -9,6 +9,8 @@
 #   plymouth/install.sh --preview FILE     draw the password step to an image, without installing
 #   plymouth/install.sh --preview-progress FILE   the same for the progress bar (at 60%)
 #   plymouth/install.sh --preview-farewell FILE   the same for the farewell before powering off
+#   --radius PX                            with any of these: the password field's and progress
+#                                          bar's corners (0 square) instead of Settings > Style's
 #
 # Also installs the luks-poweroff mkinitcpio hook (after sd-encrypt): failing to unlock the
 # drives powers off. The limits come from the kernel options in /etc/kernel/cmdline:
@@ -21,13 +23,19 @@ here=$(dirname "$(readlink -f "$0")")
 mode=install
 use_theme=false
 preview=
+radius=
 while (($#)); do
     case $1 in
         --theme) use_theme=true ;;
         --preview) mode=preview; preview=${2:?--preview needs a file}; shift ;;
         --preview-progress) mode=preview-progress; preview=${2:?--preview-progress needs a file}; shift ;;
         --preview-farewell) mode=preview-farewell; preview=${2:?--preview-farewell needs a file}; shift ;;
-        *) echo "usage: $0 [--theme] [--preview FILE | --preview-progress FILE | --preview-farewell FILE]" >&2; exit 1 ;;
+        --radius)
+            [[ ${2:-} =~ ^[0-9]+$ ]] || { echo "--radius takes pixels, e.g. 0 or 8" >&2; exit 1; }
+            radius=$2
+            shift
+            ;;
+        *) echo "usage: $0 [--theme] [--radius PX] [--preview FILE | --preview-progress FILE | --preview-farewell FILE]" >&2; exit 1 ;;
     esac
     shift
 done
@@ -53,8 +61,11 @@ elif $use_theme; then
     echo "No $colors; run hyprdori-theme-set first" >&2
     exit 1
 fi
+# Settings > Style > Corner radius (square at 0), or --radius
+[[ -n $radius ]] && field_radius=$radius
 
-logo_text="$home/.config/theme/logo/ascii-dori"
+logo_text="$home/.config/theme/logo/dori-logo"
+words_text="$home/.config/theme/logo/dori-text"
 font=$(fc-match -f '%{file}' "JetBrainsMono Nerd Font")
 [[ -r $logo_text ]] || { echo "No logo at $logo_text" >&2; exit 1; }
 
@@ -64,17 +75,26 @@ rgb() { awk -v r=$((16#${1:1:2})) -v g=$((16#${1:3:2})) -v b=$((16#${1:5:2})) 'B
 build=$(mktemp -d)
 trap 'rm -rf "$build"' EXIT
 
-# Images, in the lock and login screens' look: the logo in magenta; the password field (the
-# background with 5% of the text color) with an accent outline, dots in the text color; the hint under the field in the
-# secondary text color (yellow, then red after wrong passwords); the progress bar in the text
-# color on a faint track; the farewell line in red, large, alone on the screen
-# The logo drawn like kitty draws it, in 24px rows (bin/.local/bin/hyprdori-logo-render)
+# Images, in the lock and login screens' look: the logo and the text logo in magenta; the
+# password field (the background with 5% of the text color) with an accent outline, dots in the
+# text color; the hint under the field in the secondary text color (yellow, then red after wrong
+# passwords); the progress bar in the accent on a faint track; the farewell line in red,
+# large, alone on the screen
+# The logos drawn like kitty draws them, in 24px rows (bin/.local/bin/hyprdori-logo-render); no
+# text logo, an empty image
 "$here/../bin/.local/bin/hyprdori-logo-render" --logo "$logo_text" --color "$magenta" --cell-height 24 --out "$build/logo.png"
-# The password field and progress bar are 40 px wider than the logo; the field is 52 px high, a
-# box with a 2 px outline and the lock and login screens' corners (Settings > Style > Lock screen >
-# Rounded corners)
-ew=$(($(magick identify -format %w "$build/logo.png") + 40))
-eh=52
+if [[ -r $words_text ]]; then
+    "$here/../bin/.local/bin/hyprdori-logo-render" --logo "$words_text" --color "$magenta" --cell-height 24 --out "$build/text.png"
+else
+    magick -size 1x1 xc:none "$build/text.png"
+fi
+# The password field and progress bar are 338 px wide (the logo's width), or as wide as a wider
+# logo; the field 38 px high, as the lock and login screens' field: a box with a 2 px outline and
+# their corners (Settings > Style > Corner radius). Plymouth draws them larger on a screen it
+# scales.
+ew=$(magick identify -format %w "$build/logo.png")
+((ew < 338)) && ew=338
+eh=38
 if ((field_radius > 0)); then
     field_shape="roundrectangle 1,1 $((ew - 2)),$((eh - 2)) $field_radius,$field_radius"
 else
@@ -87,8 +107,20 @@ magick -background none -fill "$yellow" -font "$font" -pointsize 16 label:"Tell 
 magick -background none -fill "$red" -font "$font" -pointsize 16 label:"You shall not pass!" "$build/wrong2.png"
 magick -background none -fill "$magenta" -font "$font" -pointsize 60 label:"Go back to the Shadow!" "$build/farewell.png"
 magick -size 14x14 xc:none -fill "$foreground" -draw "circle 7,7 7,1" "$build/bullet.png"
-magick -size "${ew}x10" xc:none -fill "${foreground}2e" -draw "roundrectangle 0,0 $((ew - 1)),9 5,5" "$build/progress_box.png"
-magick -size "${ew}x10" xc:none -fill "$accent" -draw "roundrectangle 0,0 $((ew - 1)),9 5,5" "$build/progress_bar.png"
+# The progress bar 14 px high, rounded (fully) or square as the field: its track, and the bar in
+# three parts, its ends and a middle the script stretches, so the ends keep their shape
+ph=14 pr=7
+if ((field_radius > 0)); then
+    track_shape="roundrectangle 0,0 $((ew - 1)),$((ph - 1)) $pr,$pr" end_shape="circle $pr,$pr $pr,0"
+else
+    track_shape="rectangle 0,0 $((ew - 1)),$((ph - 1))" end_shape="rectangle 0,0 $((2 * pr - 1)),$((ph - 1))"
+fi
+magick -size "${ew}x$ph" xc:none -fill "${foreground}2e" -draw "$track_shape" "$build/progress_box.png"
+magick -size "$((2 * pr))x$ph" xc:none -fill "$accent" -draw "$end_shape" "$build/end.png"
+magick "$build/end.png" -crop "${pr}x$ph+0+0" +repage "$build/progress_left.png"
+magick "$build/end.png" -crop "${pr}x$ph+$pr+0" +repage "$build/progress_right.png"
+magick -size "1x$ph" "xc:$accent" "$build/progress_middle.png"
+rm "$build/end.png"
 # Encrypted drives get the password field first; without them the progress bar shows from the start
 encrypted=0
 grep -qE '^HOOKS=.*\b(sd-)?encrypt\b' /etc/mkinitcpio.conf && encrypted=1
@@ -103,21 +135,25 @@ if [[ $mode == preview-farewell ]]; then
     exit 0
 fi
 if [[ $mode == preview* ]]; then
-    # 1920x1080, laid out like the script does it
+    # 1920x1080, laid out like the script does it: the field centered, the logo 40 px above it,
+    # the text logo 60 px from the bottom
     lw=$(magick identify -format %w "$build/logo.png"); lh=$(magick identify -format %h "$build/logo.png")
-    ly=$((540 - lh / 2)); ey=$((ly + lh + 40)); ex=$((960 - ew / 2))
+    tw=$(magick identify -format %w "$build/text.png"); th=$(magick identify -format %h "$build/text.png")
+    ex=$((960 - ew / 2)); ey=$((540 - eh / 2)); ly=$((ey - 40 - lh))
+    logos=("$build/logo.png" -geometry +$((960 - lw / 2))+$ly -composite
+        "$build/text.png" -geometry +$((960 - tw / 2))+$((1080 - 60 - th)) -composite)
     if [[ $mode == preview-progress ]]; then
-        py=$((ey + eh / 2 - 5))
-        magick -size 1920x1080 "xc:$background" \
-            "$build/logo.png" -geometry +$((960 - lw / 2))+$ly -composite \
+        py=$((ey + eh / 2 - ph / 2)) bw=$((ew * 6 / 10))
+        magick -size 1920x1080 "xc:$background" "${logos[@]}" \
             "$build/progress_box.png" -geometry +$ex+$py -composite \
-            \( "$build/progress_bar.png" -resize "$((ew * 6 / 10))x10!" \) -geometry +$ex+$py -composite \
+            "$build/progress_left.png" -geometry +$ex+$py -composite \
+            \( "$build/progress_middle.png" -resize "$((bw - 2 * pr))x$ph!" \) -geometry +$((ex + pr))+$py -composite \
+            "$build/progress_right.png" -geometry +$((ex + bw - pr))+$py -composite \
             "$preview"
         echo "Preview: $preview"
         exit 0
     fi
-    magick -size 1920x1080 "xc:$background" \
-        "$build/logo.png" -geometry +$((960 - lw / 2))+$ly -composite \
+    magick -size 1920x1080 "xc:$background" "${logos[@]}" \
         "$build/entry.png" -geometry +$ex+$ey -composite \
         \( "$build/bullet.png" -resize 9x9 \) -geometry +$((ex + ew / 2 - 17))+$((ey + eh / 2 - 5)) -composite \
         \( "$build/bullet.png" -resize 9x9 \) -geometry +$((ex + ew / 2 - 4))+$((ey + eh / 2 - 5)) -composite \

@@ -108,8 +108,10 @@ Item {
             cursorShape: Qt.PointingHandCursor
             onClicked: {
                 const def = root.notification.actions.find(a => a.identifier === "default");
-                if (def)
+                if (def) {
+                    Panels.closeAll();
                     def.invoke();
+                }
                 root.close();
             }
         }
@@ -292,8 +294,11 @@ Item {
                         hoverEnabled: true
                         cursorShape: Qt.PointingHandCursor
                         onClicked: {
-                            // the action can close the notification, and this card with it
+                            // the action can close the notification, and this card with it;
+                            // the Control Center closes too, so a window the action opens
+                            // (the boot screens' Update) gets the keyboard
                             const notification = root.notification;
+                            Panels.closeAll();
                             modelData.invoke();
                             if (notification && !notification.resident)
                                 notification.dismiss();

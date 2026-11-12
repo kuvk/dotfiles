@@ -70,6 +70,7 @@ glib2
 gtk3
 python
 pacman-contrib           # paccache, pacdiff (hyprdori-maintenance, hyprdori-update)
+gum                      # the update windows' boxes, buttons and spinner (hyprdori-present)
 reflector                # ranks mirrors; enable reflector.timer
 flatpak
 mpvpaper                 # AUR, video wallpapers

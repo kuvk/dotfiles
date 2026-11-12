@@ -39,6 +39,7 @@ out. After Omarchy's omarchy-theme-color and omarchy-theme-set-templates
                           (quickshell sets it: square in Work-Game or at radius 0)
 """
 
+import hashlib
 import json
 import os
 import re
@@ -216,8 +217,7 @@ def shell_settings() -> dict:
         "fontAntialiasing": "rgba",
         "windowButtons": False,
         "wallpaperFollowsTheme": True,
-        "lockAvatar": True,
-        "lockRounded": True,
+        "lockAvatar": False,
         "lockPowerOpacity": 85,
         "accentOverrides": {},
         "lockInputOpacity": 75,
@@ -443,9 +443,9 @@ def load_theme(name: str) -> dict:
         "login_power_outline": colors["accent"],
         "login_power_hover_outline": mix(colors["accent"], colors["foreground"], 0.4),
         "login_input_opacity": str(shell["lockInputOpacity"] / 100),
-        # Settings > Style > Lock screen > Rounded corners: the password field's (lock, login and boot
-        # screens) and the login screen's buttons; the windows' corner radius, or 8 with it at 0
-        "login_radius": str((int(shell["radius"]) or 8) if shell["lockRounded"] else 0),
+        # the password field's corners (lock, login and boot screens) and the login screen's
+        # buttons: the windows' corner radius (Settings > Style), square at 0
+        "login_radius": str(int(shell["radius"])),
         "icon_theme": icon_theme_for(shell["iconTheme"], mode),
         "prefer_dark": "0" if mode == "light" else "1",
         # adw-gtk3, when installed, follows gtk.css in plain GTK3 and GTK4 apps too;
@@ -593,20 +593,36 @@ def icons_dir(name: str) -> str:
     return ""
 
 
+LOGOS = (HOME / ".config/theme/logo/dori-logo", HOME / ".config/theme/logo/dori-text")
+
+
+def logo_checksum(*commands: Path) -> str:
+    """The logo files and the commands that draw them, so a changed logo is drawn again."""
+    drawn = hashlib.sha256()
+    for part in (*LOGOS, HOME / ".local/bin/hyprdori-logo-render", *commands):
+        try:
+            drawn.update(part.read_bytes())
+        except OSError:
+            pass
+    return drawn.hexdigest()[:8]
+
+
 def theme_background(theme: dict) -> Path | None:
-    """This theme's own background: the logo in magenta on the dark background (hyprdori-logo-wallpaper), drawn
-    once per theme and colors into ~/.local/share/hyprdori/backgrounds/default. The wallpaper
-    and the lock screen show it while they follow the theme (Settings)."""
+    """This theme's own background: the logo and text in magenta on the dark background
+    (hyprdori-logo-wallpaper), drawn once per theme, colors and logo into
+    ~/.local/share/hyprdori/backgrounds/default. The wallpaper and the lock screen show it while
+    they follow the theme (Settings)."""
     colors, name = theme["colors"], theme["strings"]["theme"]
     folder = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "hyprdori/backgrounds/default"
-    path = folder / f"dori-theme-{name}-{colors['magenta'][1:]}-on-{colors['dark_background'][1:]}.png"
+    drawn = logo_checksum(HOME / ".local/bin/hyprdori-logo-wallpaper")
+    path = folder / f"dori-theme-{name}-{colors['magenta'][1:]}-on-{colors['dark_background'][1:]}-{drawn}.png"
     if path.exists():
         return path
     folder.mkdir(parents=True, exist_ok=True)
     for old in folder.glob(f"dori-theme-{name}-*.png"):  # this theme in older colors
         old.unlink(missing_ok=True)
     run_quiet([str(HOME / ".local/bin/hyprdori-logo-wallpaper"), "--bg", colors["dark_background"], "--fg", colors["magenta"],
-               "--size", "30", "--output", str(path)])
+               "--output", str(path)])
     return path if path.exists() else None
 
 

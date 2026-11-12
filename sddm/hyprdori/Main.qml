@@ -61,8 +61,9 @@ Rectangle {
         cache: false
     }
 
-    // Avatar and password, at the lock screen's positions: the avatar's center 45 px above the
-    // screen's center, the field's 85 px below
+    // Avatar and password, at the lock screen's positions: the field centered on the screen,
+    // the avatar's center 130 px above the field's; sized for each screen as the lock screen's
+    // (as given on a 1920x1080 screen, with the screen as the default background)
     Item {
         id: card
 
@@ -70,6 +71,7 @@ Rectangle {
         visible: Window.active
         width: 380
         height: 300
+        scale: Math.max(root.width / 1920, root.height / 1200)
 
         // Fades in
         opacity: 0
@@ -98,7 +100,7 @@ Rectangle {
 
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            anchors.verticalCenterOffset: -45
+            anchors.verticalCenterOffset: -130
             visible: String(root.c.showAvatar) !== "false"
             implicitWidth: 139
             implicitHeight: 139
@@ -159,9 +161,9 @@ Rectangle {
 
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            anchors.verticalCenterOffset: 85
-            implicitWidth: 300
-            implicitHeight: 40
+            anchors.verticalCenterOffset: 0
+            implicitWidth: 338
+            implicitHeight: 38
             radius: Number(root.c.radius)
             color: Qt.alpha(root.c.input, Number(root.c.inputOpacity))
             border.width: 2

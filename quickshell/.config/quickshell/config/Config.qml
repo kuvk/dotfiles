@@ -49,7 +49,6 @@ Singleton {
     property alias lockImage: adapter.lockImage
     property alias lockAvatar: adapter.lockAvatar
     // the password field's corners, also on the login and boot screens, and the login screen's buttons
-    property alias lockRounded: adapter.lockRounded
     // percent, to a tenth
     property alias lockInputOpacity: adapter.lockInputOpacity
     // the login screen's power buttons
@@ -221,8 +220,7 @@ Singleton {
             // Style > Lock screen
             property bool lockFollowsTheme: true
             property string lockImage: ""
-            property bool lockAvatar: true
-            property bool lockRounded: true
+            property bool lockAvatar: false
             property real lockInputOpacity: 75
             property real lockPowerOpacity: 85
 

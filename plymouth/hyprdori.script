@@ -4,9 +4,16 @@
 Window.SetBackgroundTopColor(@BG_RGB@);
 Window.SetBackgroundBottomColor(@BG_RGB@);
 
-logo.image = Image("logo.png");
+logo.original_image = Image("logo.png");
+logo.image = logo.original_image;
 logo.sprite = Sprite(logo.image);
 logo.sprite.SetOpacity(1);
+
+# The text logo, at the bottom
+words.original_image = Image("text.png");
+words.image = words.original_image;
+words.sprite = Sprite(words.image);
+words.sprite.SetOpacity(1);
 
 # Use these to adjust the progress bar timing
 global.fake_progress_limit = 1; # Target percentage for fake progress (0.0 to 1.0)
@@ -69,27 +76,46 @@ Plymouth.SetRefreshFunction(refresh_callback);
 
 #----------------------------------------- Helper Functions --------------------------------
 
+# The bar's two ends at its start and end, the middle stretched between them: at least both ends
+fun draw_progress_bar() {
+  ends = progress_left.image.GetWidth() + progress_right.image.GetWidth();
+  width = Math.Int(progress_box.image.GetWidth() * global.max_progress);
+  if (width < ends) width = ends;
+  middle = width - ends;
+  progress_left.sprite.SetPosition(progress_box.x, progress_box.y, 1);
+  progress_middle.sprite.SetPosition(progress_box.x + progress_left.image.GetWidth(), progress_box.y, 1);
+  progress_right.sprite.SetPosition(progress_box.x + width - progress_right.image.GetWidth(), progress_box.y, 1);
+  if (middle >= 1) {
+    progress_middle.sprite.SetImage(progress_middle.original_image.Scale(middle, progress_middle.original_image.GetHeight()));
+    progress_middle.shown = 1;
+  } else {
+    progress_middle.shown = 0;
+  }
+  if (global.progress_shown == 1) progress_middle.sprite.SetOpacity(progress_middle.shown);
+}
+
 fun update_progress_bar(progress) {
   # Only update if progress is moving forward
   if (progress > global.max_progress) {
     global.max_progress = progress;
-
-    width = Math.Int(progress_bar.original_image.GetWidth() * progress);
-    if (width < 1) width = 1;  # Ensure minimum width of 1 pixel
-
-    progress_bar.image = progress_bar.original_image.Scale(width, progress_bar.original_image.GetHeight());
-    progress_bar.sprite.SetImage(progress_bar.image);
+    draw_progress_bar();
   }
 }
 
 fun show_progress_bar() {
+  global.progress_shown = 1;
   progress_box.sprite.SetOpacity(1);
-  progress_bar.sprite.SetOpacity(1);
+  progress_left.sprite.SetOpacity(1);
+  progress_right.sprite.SetOpacity(1);
+  progress_middle.sprite.SetOpacity(progress_middle.shown);
 }
 
 fun hide_progress_bar() {
+  global.progress_shown = 0;
   progress_box.sprite.SetOpacity(0);
-  progress_bar.sprite.SetOpacity(0);
+  progress_left.sprite.SetOpacity(0);
+  progress_right.sprite.SetOpacity(0);
+  progress_middle.sprite.SetOpacity(0);
 }
 
 fun show_password_dialog() {
@@ -145,8 +171,7 @@ fun set_hint(image) {
 bullet.sprites = [];
 global.bullet_count = 0;
 
-# Dots are 9px with 4px gaps, centered in the field as a group: the lock and login screens'
-# dots (11px "●" with 3px spacing in a 36px field) at this 48px field's size
+# Dots are 9px with 4px gaps, centered in the field as a group, as on the lock and login screens
 bullet.size = 9;
 bullet.gap = 4;
 
@@ -247,10 +272,17 @@ progress_box.image = Image("progress_box.png");
 progress_box.sprite = Sprite(progress_box.image);
 progress_box.sprite.SetOpacity(0);
 
-progress_bar.original_image = Image("progress_bar.png");
-progress_bar.sprite = Sprite();
-progress_bar.image = progress_bar.original_image.Scale(1, progress_bar.original_image.GetHeight());
-progress_bar.sprite.SetOpacity(0);
+progress_left.image = Image("progress_left.png");
+progress_left.sprite = Sprite(progress_left.image);
+progress_left.sprite.SetOpacity(0);
+progress_right.image = Image("progress_right.png");
+progress_right.sprite = Sprite(progress_right.image);
+progress_right.sprite.SetOpacity(0);
+progress_middle.original_image = Image("progress_middle.png");
+progress_middle.sprite = Sprite();
+progress_middle.sprite.SetOpacity(0);
+progress_middle.shown = 0;
+global.progress_shown = 0;
 
 fun progress_callback(duration, progress) {
   # Track when fake progress starts
@@ -272,17 +304,37 @@ Plymouth.SetBootProgressFunction(progress_callback);
 
 #----------------------------------------- Layout --------------------------------
 
-# Center the logo, dialogue and progress bar for the current window size
+# A copy of an image at most max_width by max_height, the same shape; the image itself if it fits
+fun fit_image(image, max_width, max_height) {
+  ratio = 1;
+  if (image.GetWidth() > max_width) ratio = max_width / image.GetWidth();
+  if (image.GetHeight() * ratio > max_height) ratio = max_height / image.GetHeight();
+  if (ratio >= 1) return image;
+  if (ratio <= 0) ratio = 0.01;
+  return image.Scale(Math.Int(image.GetWidth() * ratio), Math.Int(image.GetHeight() * ratio));
+}
+
+# The field (and the progress bar in its place) centered, the logo 40 px above it, the text logo
+# 60 px from the bottom; either drawn smaller where the window is too small for it
 fun layout() {
   global.layout_width = Window.GetWidth();
   global.layout_height = Window.GetHeight();
 
-  logo.sprite.SetX(global.layout_width / 2 - logo.image.GetWidth() / 2);
-  logo.sprite.SetY(global.layout_height / 2 - logo.image.GetHeight() / 2);
-
   entry.x = global.layout_width / 2 - entry.image.GetWidth() / 2;
-  entry.y = logo.sprite.GetY() + logo.image.GetHeight() + 40;
+  entry.y = global.layout_height / 2 - entry.image.GetHeight() / 2;
   entry.sprite.SetPosition(entry.x, entry.y, 10001);
+
+  logo.image = fit_image(logo.original_image, global.layout_width * 0.8, entry.y - 40 - 40);
+  logo.sprite.SetImage(logo.image);
+  logo.sprite.SetX(global.layout_width / 2 - logo.image.GetWidth() / 2);
+  logo.sprite.SetY(entry.y - 40 - logo.image.GetHeight());
+
+  # below the hint (16 px under the field, about 20 high) with 40 px to spare
+  words_room = global.layout_height - 60 - (entry.y + entry.image.GetHeight() + 16 + 20 + 40);
+  words.image = fit_image(words.original_image, global.layout_width * 0.8, words_room);
+  words.sprite.SetImage(words.image);
+  words.sprite.SetX(global.layout_width / 2 - words.image.GetWidth() / 2);
+  words.sprite.SetY(global.layout_height - 60 - words.image.GetHeight());
 
   hint.x = global.layout_width / 2 - hint.image.GetWidth() / 2;
   hint.y = entry.y + entry.image.GetHeight() + 16;
@@ -296,9 +348,7 @@ fun layout() {
   progress_box.y = entry.y + entry.image.GetHeight() / 2 - progress_box.image.GetHeight() / 2;
   progress_box.sprite.SetPosition(progress_box.x, progress_box.y, 0);
 
-  progress_bar.x = global.layout_width / 2 - progress_bar.original_image.GetWidth() / 2;
-  progress_bar.y = progress_box.y + (progress_box.image.GetHeight() - progress_bar.original_image.GetHeight()) / 2;
-  progress_bar.sprite.SetPosition(progress_bar.x, progress_bar.y, 1);
+  draw_progress_bar();
 
   if (global.farewell == 1) {
     position_farewell();
@@ -329,6 +379,7 @@ fun show_farewell() {
   hide_password_dialog();
   message_sprite.SetOpacity(0);
   logo.sprite.SetOpacity(0);
+  words.sprite.SetOpacity(0);
   hint.sprite.SetImage(farewell_line.image);
   position_farewell();
   hint.sprite.SetOpacity(1);
@@ -363,7 +414,7 @@ if (@ENCRYPTED@ == 0) {
 
 #----------------------------------------- Shutdown --------------------------------
 
-# Shutdown and reboot: the logo with the progress bar from the start, filling in a few seconds
+# Shutdown and reboot: the logos with the progress bar from the start, filling in a few seconds
 if (Plymouth.GetMode() == "shutdown" || Plymouth.GetMode() == "reboot") {
   global.fake_progress_limit = 1.0;
   global.fake_progress_duration = 4.0;

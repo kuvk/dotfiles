@@ -1,29 +1,35 @@
 #!/usr/bin/env python3
-"""Wallpapers with the logo (~/.config/theme/logo/ascii-dori) centered on a plain color.
+"""Wallpapers on a plain color with the middle left for the lock and login screens' password
+field: the logo (~/.config/theme/logo/dori-logo) above it and the text logo (dori-text) below,
+both centered across and drawn on the same grid.
 
 Colors are theme color names from the current theme (background, accent, magenta, ...)
-or hex values (#1e1e2e). --bg, --fg and --size take comma-separated lists, and every
+or hex values (#1e1e2e). --bg, --fg, --text-fg and --size take comma-separated lists, and every
 combination is drawn, so one run can make a set to pick from.
 
   hyprdori-logo-wallpaper                                   magenta on the dark background, 30% high
   hyprdori-logo-wallpaper --fg accent,magenta,blue --size 20,30,45
+  hyprdori-logo-wallpaper --fg magenta --text-fg accent      the text in another color
   hyprdori-logo-wallpaper --bg '#000000' --fg red --res 3840x2160 --output-dir ~/tmp
 
 Options:
   --bg COLORS          background (default: dark_background)
-  --fg COLORS          logo color (default: magenta)
-  --size PERCENTS      logo height as a share of the screen height (default: 30); a wide
-                       logo is made smaller to fit 80% of the width
+  --fg COLORS          the logo's color (default: magenta)
+  --text-fg COLORS     the text's color (default: the logo's)
+  --size PERCENTS      the logo and text together, as a share of the screen height (default:
+                       30); with the space between never more than 50% of the height, nor 60%
+                       of the width
   --res WxH            image size (default: the highest resolution any connected monitor
                        has, else 2560x1440; works from a console too)
   --output-dir DIR     where the images go (default: ~/.local/share/hyprdori/backgrounds/
                        default, which the wallpaper picker lists)
-  --logo FILE          another text logo (default: ~/.config/theme/logo/ascii-dori)
-  --output FILE        one file at this path instead (one color and size only; hyprdori-theme-set
-                       uses it for the wallpaper that follows the theme)
+  --logo FILE          another logo (default: ~/.config/theme/logo/dori-logo)
+  --text FILE          another text logo (default: ~/.config/theme/logo/dori-text), or none
+  --output FILE        one file at this path instead (one of each color and one size only;
+                       hyprdori-theme-set uses it for the wallpaper that follows the theme)
 
-Files are named dori-FG-on-BG-SIZE.png (hex colors without the #); an existing file
-with the same name is replaced.
+Files are named dori-FG-on-BG-SIZE.png, or dori-FG-TEXTFG-on-BG-SIZE.png with a text color of
+its own (hex colors without the #); an existing file with the same name is replaced.
 """
 
 from __future__ import annotations
@@ -41,9 +47,20 @@ from pathlib import Path
 
 HOME = Path.home()
 THEME_COLORS = HOME / ".config/theme/current/quickshell.json"
-DEFAULT_LOGO = HOME / ".config/theme/logo/ascii-dori"
+DEFAULT_LOGO = HOME / ".config/theme/logo/dori-logo"
+DEFAULT_TEXT = HOME / ".config/theme/logo/dori-text"
 DEFAULT_DIR = Path(os.environ.get("XDG_DATA_HOME", HOME / ".local/share")) / "hyprdori/backgrounds/default"
 RENDER = HOME / ".local/bin/hyprdori-logo-render"
+# The layout, as shares of the screen: the logo's bottom LOGO_GAP of the height above the middle
+# (where the lock screen's password field is), the text's top TEXT_GAP below it; the logo and
+# text together at most MAX_HEIGHT of the height (with the space between) and MAX_WIDTH of the
+# width. Their size is --size (DEFAULT_SIZE percent of the height); their proportions are
+# kitty's, from hyprdori-logo-render (CELL_RATIO)
+LOGO_GAP = 0.06
+TEXT_GAP = 0.10
+MAX_HEIGHT = 0.7
+MAX_WIDTH = 0.7
+DEFAULT_SIZE = "35"
 HEX_RE = re.compile(r"^#?[0-9a-fA-F]{6}$")
 
 
@@ -82,28 +99,44 @@ def largest_monitor() -> tuple[int, int]:
     return max(sizes, key=lambda s: s[0] * s[1]) if sizes else (2560, 1440)
 
 
-def render(logo: Path, fg: str, bg: str, width: int, height: int, share: float, out: Path) -> None:
-    # The logo drawn like kitty draws it (hyprdori-logo-render), then centered on the color; a
-    # wide logo is drawn smaller, to at most 80% of the width
+def rows(path: Path) -> int:
+    """Lines, as hyprdori-logo-render counts them: only the file's last line break goes."""
+    text = path.read_text(encoding="utf-8")
+    return len((text[:-1] if text.endswith("\n") else text).split("\n"))
+
+
+def draw(path: Path, color: str, cell_h: int, out: Path) -> tuple[int, int]:
+    """One logo drawn like kitty draws it (hyprdori-logo-render); its width and height."""
+    subprocess.run([str(RENDER), "--logo", str(path), "--color", color, "--cell-height", str(cell_h), "--out", str(out)],
+                   check=True)
+    size = subprocess.run(["magick", "identify", "-format", "%w %h", str(out)], check=True, capture_output=True, text=True)
+    w, h = size.stdout.split()
+    return int(w), int(h)
+
+
+def render(logo: Path, text: Path | None, fg: str, text_fg: str, bg: str, width: int, height: int, share: float,
+           out: Path) -> None:
+    # The middle is the lock and login screens' password field: the logo ends LOGO_GAP of the
+    # height above the middle and the text starts TEXT_GAP below it, both centered across and on
+    # one grid. Their rows set the size (SHARE of the height for both); never wider than
+    # MAX_WIDTH of the screen nor, with the space between, higher than MAX_HEIGHT.
+    logo_gap, text_gap = round(height * LOGO_GAP), round(height * TEXT_GAP)
+    total = rows(logo) + (rows(text) if text else 0)
+    cell_h = max(2, round(height * min(share, MAX_HEIGHT) / total))
     with tempfile.TemporaryDirectory() as tmp:
-        mark = Path(tmp) / "logo.png"
-        rows = len(logo.read_text(encoding="utf-8").rstrip("\n").split("\n"))
-        cell_h = max(2, round(height * share / rows))
-        for _ in range(2):
-            subprocess.run(
-                [str(RENDER), "--logo", str(logo), "--color", fg, "--cell-height", str(cell_h), "--out", str(mark)],
-                check=True,
-            )
-            drawn = int(subprocess.run(["magick", "identify", "-format", "%w", str(mark)],
-                                       check=True, capture_output=True, text=True).stdout)
-            if drawn <= width * 0.8:
+        mark, words = Path(tmp) / "logo.png", Path(tmp) / "text.png"
+        for _ in range(3):
+            lw, lh = draw(logo, fg, cell_h, mark)
+            tw, th = draw(text, text_fg, cell_h, words) if text else (0, 0)
+            fit = min(width * MAX_WIDTH / max(lw, tw), (height * MAX_HEIGHT - logo_gap - text_gap) / (lh + th))
+            if fit >= 1:
                 break
-            cell_h = max(2, int(cell_h * width * 0.8 / drawn) // 2 * 2)
-        subprocess.run(
-            ["magick", "-size", f"{width}x{height}", f"xc:{bg}", str(mark), "-gravity", "center",
-             "-composite", str(out)],
-            check=True,
-        )
+            cell_h = max(2, int(cell_h * fit))
+        command = ["magick", "-size", f"{width}x{height}", f"xc:{bg}",
+                   str(mark), "-geometry", f"+{(width - lw) // 2}+{height // 2 - logo_gap - lh}", "-composite"]
+        if text:
+            command += [str(words), "-geometry", f"+{(width - tw) // 2}+{height // 2 + text_gap}", "-composite"]
+        subprocess.run(command + [str(out)], check=True)
 
 
 def split(value: str) -> list[str]:
@@ -114,10 +147,12 @@ def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--bg", default="dark_background")
     parser.add_argument("--fg", default="magenta")
-    parser.add_argument("--size", default="30")
+    parser.add_argument("--size", default=DEFAULT_SIZE)
     parser.add_argument("--res")
     parser.add_argument("--output-dir", default=str(DEFAULT_DIR))
+    parser.add_argument("--text-fg")
     parser.add_argument("--logo", default=str(DEFAULT_LOGO))
+    parser.add_argument("--text", default=str(DEFAULT_TEXT))
     parser.add_argument("--output")
     parser.add_argument("-h", "--help", action="store_true")
     args, rest = parser.parse_known_args(argv)
@@ -134,6 +169,10 @@ def main(argv: list[str]) -> int:
     logo = Path(args.logo).expanduser()
     if not logo.is_file():
         print(f"No logo at {logo}", file=sys.stderr)
+        return 1
+    text = None if args.text == "none" else Path(args.text).expanduser()
+    if text and not text.is_file():
+        print(f"No text logo at {text} (--text none draws the logo alone)", file=sys.stderr)
         return 1
     if args.res:
         m = re.match(r"^(\d+)x(\d+)$", args.res)
@@ -157,22 +196,26 @@ def main(argv: list[str]) -> int:
     colors = theme_colors()
     bgs = [resolve(c, colors) for c in split(args.bg)]
     fgs = [resolve(c, colors) for c in split(args.fg)]
+    text_fgs = [resolve(c, colors) for c in split(args.text_fg)] if args.text_fg else [None]
 
     if args.output:
-        if len(bgs) * len(fgs) * len(sizes) != 1:
+        if len(bgs) * len(fgs) * len(text_fgs) * len(sizes) != 1:
             print("--output takes one color and size; use --output-dir for a set", file=sys.stderr)
             return 2
         out = Path(args.output).expanduser()
         out.parent.mkdir(parents=True, exist_ok=True)
-        render(logo, fgs[0][0], bgs[0][0], width, height, sizes[0] / 100, out)
+        text_fg = (text_fgs[0] or fgs[0])[0]
+        render(logo, text, fgs[0][0], text_fg, bgs[0][0], width, height, sizes[0] / 100, out)
         print(out)
         return 0
 
     out_dir = Path(args.output_dir).expanduser()
     out_dir.mkdir(parents=True, exist_ok=True)
-    for (bg, bg_name), (fg, fg_name), size in itertools.product(bgs, fgs, sizes):
-        out = out_dir / f"dori-{fg_name}-on-{bg_name}-{size:g}.png"
-        render(logo, fg, bg, width, height, size / 100, out)
+    for (bg, bg_name), (fg, fg_name), text_fg, size in itertools.product(bgs, fgs, text_fgs, sizes):
+        text_fg, text_name = text_fg or (fg, fg_name)
+        both = fg_name if text_name == fg_name else f"{fg_name}-{text_name}"
+        out = out_dir / f"dori-{both}-on-{bg_name}-{size:g}.png"
+        render(logo, text, fg, text_fg, bg, width, height, size / 100, out)
         print(out)
     return 0
 

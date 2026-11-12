@@ -7,8 +7,11 @@
 #   hyprdori-theme-boot            update, unless they're already built from the current theme
 #   hyprdori-theme-boot --force    update anyway
 #   hyprdori-theme-boot --check    say whether an update is needed (exit 0 yes, 1 no); no root
-#   hyprdori-theme-boot --window   in a kitty window: the logo, what this does, a Y/n question, the
-#                            output, then any key closes it (the notification's Update button)
+#   hyprdori-theme-boot --window   in a window (hyprdori-present): the text logo, what this
+#                                  does, Yes / No, the output, then any key closes it (the
+#                                  notification's Update button, Settings, the update window)
+#   --radius PX                    with any of these: the boot splash's password field with
+#                                  these corners (0 square) instead of Settings > Style's
 #
 # Asks for the password in a terminal (sudo) or, started from the desktop, in the polkit
 # dialog (pkexec). Plymouth rebuilds every initramfs, which takes a while.
@@ -30,7 +33,7 @@ note() { printf '%s\n' "$1"; command -v notify-send >/dev/null && [[ ! -t 1 ]] &
 # Checksum of everything the two installers draw from (run as the user whose theme it is)
 fingerprint() {
     local home=$1
-    cat "$home/.config/theme/current/colors.sh" "$home/.config/theme/logo/ascii-dori" \
+    cat "$home/.config/theme/current/colors.sh" "$home"/.config/theme/logo/dori-{logo,text} \
         "$hyprdori"/plymouth/* "$hyprdori/limine/install.sh" "$scripts/hyprdori-logo-render" \
         "$hyprdori"/sddm/hyprdori/* 2>/dev/null |
         sha256sum | cut -d' ' -f1
@@ -41,7 +44,8 @@ if [[ ${1:-} == --as-root ]]; then
     user=${2:?user}
     home=$(getent passwd "$user" | cut -d: -f6)
     export SUDO_USER=$user
-    "$hyprdori/plymouth/install.sh"
+    shift 2
+    "$hyprdori/plymouth/install.sh" "$@"
     # Limine with the options it was installed with (hyprdori-update does the same)
     options=()
     if [[ -r /efi/EFI/limine/limine.conf ]]; then
@@ -61,37 +65,45 @@ if [[ ${1:-} == --as-root ]]; then
     exit 0
 fi
 
-# --- In a window: the logo, what this does, a Y/n question, then the output ----------------------
-if [[ ${1:-} == --window ]]; then
-    exec kitty --class theme-boot --title "Boot screens" "$self" --in-window
-fi
-if [[ ${1:-} == --in-window ]]; then
-    # The logo in magenta, from the current theme
-    magenta="#cba6f7"
-    # shellcheck source=/dev/null
-    . "$HOME/.config/theme/current/colors.sh" 2>/dev/null
-    color=$(printf '38;2;%d;%d;%d' "0x${magenta:1:2}" "0x${magenta:3:2}" "0x${magenta:5:2}")
-    printf '\n\e[%sm' "$color"
-    sed 's/^/  /' "$HOME/.config/theme/logo/ascii-dori" 2>/dev/null
-    printf '\e[0m\n'
-    cat <<'MSG'
-  The boot menu (Limine) and boot splash (Plymouth) keep the colors they were installed
-  with. This runs both installers again with the current theme, accents and logo, and
-  updates the login screen's layout, so they match the desktop from the next start. It
-  needs the sudo password and takes about a minute, as the splash is rebuilt into
-  every initramfs.
+# --- Options: --radius goes to the boot splash; the rest says what to do ---------------------------
+action=update
+splash=()
+while (($#)); do
+    case $1 in
+        --force) action=force ;;
+        --check) action=check ;;
+        --window) action=window ;;
+        --in-window) action=in-window ;;
+        --radius)
+            [[ ${2:-} =~ ^[0-9]+$ ]] || { echo "hyprdori-theme-boot: --radius takes pixels, e.g. 0 or 8" >&2; exit 2; }
+            splash=(--radius "$2")
+            shift
+            ;;
+        *) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 2 ;;
+    esac
+    shift
+done
 
-MSG
+# --- In a window: the text logo, what this does, Yes / No, then the output ------------------------
+present="$scripts/hyprdori-present"
+if [[ $action == window ]]; then
+    exec "$present" window hyprdori-window "Boot screens" "$self" --in-window "${splash[@]}"
+fi
+if [[ $action == in-window ]]; then
+    "$present" header
+    "$present" box "The boot menu (Limine) and the boot splash (Plymouth) keep the look they were" \
+        "installed with. This installs both again with the current theme, logos and password" \
+        "field, and the login screen's layout, so they match the desktop from the next start." \
+        "" "It needs your password (sudo) and takes about a minute: the splash is rebuilt into" \
+        "every initramfs."
     status=0
-    read -rp "  Update the boot screens now? [Y/n] " answer
-    if [[ ${answer:-y} =~ ^[yY] ]]; then
-        echo
-        "$self" || status=$?
+    if "$present" confirm "Update the boot screens now?"; then
+        "$present" step "Boot screens"
+        "$self" --force "${splash[@]}" || status=$?
     else
         echo "  Left as they are."
     fi
-    printf '\n\e[2m  Press any key to close\e[0m'
-    read -rsn1 _
+    "$present" done "$status"
     exit "$status"
 fi
 
@@ -100,20 +112,19 @@ fi
 current=$(fingerprint "$HOME")
 installed=$(cat "$stamp" 2>/dev/null || true)
 
-case ${1:-} in
-    --check) [[ $current != "$installed" ]]; exit ;;
-    --force | "") ;;
-    *) sed -n '2,16p' "$0" | sed 's/^# \{0,1\}//'; exit 2 ;;
-esac
+if [[ $action == check ]]; then
+    [[ $current != "$installed" ]]
+    exit
+fi
 
-if [[ ${1:-} != --force && $current == "$installed" ]]; then
+if [[ $action != force && $current == "$installed" ]]; then
     note "The boot screens already match the theme."
     exit 0
 fi
 
 if [[ -t 0 ]]; then
-    sudo "$self" --as-root "$USER"
+    sudo "$self" --as-root "$USER" "${splash[@]}"
 else
-    pkexec "$self" --as-root "$USER"
+    pkexec "$self" --as-root "$USER" "${splash[@]}"
 fi && note "Boot screens updated, from the next boot." \
     || { note "Boot screens not updated."; exit 1; }

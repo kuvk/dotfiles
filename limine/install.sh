@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Installs Limine on the ESP and writes its menu: one entry per kernel in /efi/arch
 # (mkinitcpio's presets put kernels and images there), styled like the boot splash:
-# the fastfetch logo in magenta above an "Arch Linux" tree of kernels in accent.
+# the logo in magenta above an "Arch Linux" tree of kernels in accent, the text logo below.
 # Run it again after a Limine update, a new kernel, or to change colors.
 #
 #   sudo limine/install.sh             the current theme's colors, accents included
 #                                      (hyprdori-theme-set; Catppuccin Mocha before it has run)
 #   sudo limine/install.sh --theme     the same, but stop if there's no theme yet
 #   limine/install.sh --print          print the config instead, without installing
-#   limine/install.sh --preview FILE   draw the wallpaper (the logo, no menu text) to FILE
+#   limine/install.sh --preview FILE   draw the wallpaper (the logos, no menu text) to FILE
 #   --resolution WxH                   the menu's resolution; by default the native mode of the
 #                                      boot display's screen (the logo is placed for it)
 #
@@ -96,8 +96,9 @@ fi
 [[ ${resolution:-} =~ ^([0-9]+)x([0-9]+)$ ]] || { echo "No resolution found; pass --resolution WxH" >&2; exit 1; }
 res_w=${BASH_REMATCH[1]} res_h=${BASH_REMATCH[2]}
 
-# Limine doubles its 8x16 font from 2560x1440 up; each cell also has a 1 pixel letter gap.
-# The logo goes above the tree, centered on the screen like the HYPRDORI branding.
+# Limine doubles its 8x16 font from 2560x1440 up. It centers the kernel tree on the screen; the
+# logo goes just above it and the text logo near the bottom, above the countdown; both
+# centered across the screen.
 scale=1
 ((res_w >= 2560 && res_h >= 1440)) && scale=2
 cell_h=$((16 * scale))
@@ -105,15 +106,26 @@ build=$(mktemp -d)
 trap 'rm -rf "$build"' EXIT
 
 wallpaper() {
-    local logo_text lw lh top
-    logo_text="$home/.config/theme/logo/ascii-dori"
-    [[ -r $logo_text ]] || { echo "No logo at $logo_text" >&2; exit 1; }
-    # drawn like kitty draws it, in 12px rows (24 on large screens), by Hyprdori's hyprdori-logo-render
-    "$here/../bin/.local/bin/hyprdori-logo-render" --logo "$logo_text" --color "$magenta" --cell-height $((12 * scale)) --out "$build/logo.png"
+    local logo_file text_file lw lh tw th tree_top logo_top text_top
+    logo_file="$home/.config/theme/logo/dori-logo" text_file="$home/.config/theme/logo/dori-text"
+    [[ -r $logo_file ]] || { echo "No logo at $logo_file" >&2; exit 1; }
+    # drawn like kitty draws them, in 12px rows (24 on large screens), by hyprdori-logo-render
+    "$here/../bin/.local/bin/hyprdori-logo-render" --logo "$logo_file" --color "$magenta" --cell-height $((12 * scale)) --out "$build/logo.png"
     lw=$(magick identify -format %w "$build/logo.png"); lh=$(magick identify -format %h "$build/logo.png")
-    top=$(((res_h / cell_h - ${#found[@]} - 1) / 2 * cell_h))
-    magick -size "${res_w}x$res_h" "xc:$background" \
-        "$build/logo.png" -geometry +$(((res_w - lw) / 2))+$((top - 32 * scale - lh)) -composite "$1"
+    # the tree's first row, as Limine centers it (the entries and "Arch Linux")
+    tree_top=$(((res_h / cell_h - ${#found[@]} - 1) / 2 * cell_h))
+    # the logo ending 2 rows above the tree
+    logo_top=$((tree_top - 2 * cell_h - lh))
+    ((logo_top < 0)) && logo_top=0
+    local layers=("$build/logo.png" -geometry +$(((res_w - lw) / 2))+$logo_top -composite)
+    if [[ -r $text_file ]]; then
+        "$here/../bin/.local/bin/hyprdori-logo-render" --logo "$text_file" --color "$magenta" --cell-height $((12 * scale)) --out "$build/text.png"
+        tw=$(magick identify -format %w "$build/text.png"); th=$(magick identify -format %h "$build/text.png")
+        # its bottom 4 rows from the screen's bottom, a row clear of the countdown line
+        text_top=$((res_h - 4 * cell_h - th))
+        layers+=("$build/text.png" -geometry +$(((res_w - tw) / 2))+$text_top -composite)
+    fi
+    magick -size "${res_w}x$res_h" "xc:$background" "${layers[@]}" "$1"
 }
 
 config() {
@@ -124,8 +136,7 @@ timeout: 3
 default_entry: 2
 terse: yes
 interface_resolution: ${res_w}x$res_h
-interface_branding: HYPRDORI
-interface_branding_colour: $(hex "$accent")
+interface_branding:
 interface_help_hidden: yes
 interface_help_colour: $(hex "$accent")
 interface_help_colour_bright: $(hex "$bright_foreground")

@@ -1,6 +1,6 @@
 [Plymouth Theme]
 Name=hyprdori
-Description=Hyprdori's boot splash: the fastfetch logo, a password field and a progress bar
+Description=Hyprdori's boot splash: the logo, a password field, a progress bar and the text logo
 ModuleName=script
 
 [script]

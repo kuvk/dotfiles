@@ -3,7 +3,7 @@ import QtQuick.Layouts
 import qs.config
 import qs.services
 
-// Settings, Displays, Keybindings and System information as a row of icon
+// Settings, Displays, Keybindings, Update and System information as a row of icon
 // buttons (app menu sidebar, Control Center). Each opens its window and
 // closes the menu it sits in.
 RowLayout {
@@ -18,6 +18,7 @@ RowLayout {
             { icon: Icons.cog, label: "Settings", run: () => Panels.toggleSettings() },
             { icon: Icons.display, label: "Displays", run: () => Panels.openSettings("displays") },
             { icon: Icons.keyboard, label: "Keybindings", run: () => Panels.toggleKeybinds() },
+            { icon: Icons.update, label: "Update", run: () => System.showUpdate() },
             { icon: Icons.info, label: "System information", run: () => System.showSysinfo() }
         ]
 

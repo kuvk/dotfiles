@@ -121,13 +121,19 @@ ColumnLayout {
             }
         }
 
+        // Also the password field's corners: the lock screen follows at once, the login screen
+        // when theme-set --login has run, the boot splash after "Update boot splash"
         SettingRow {
             label: "Corner radius"
             normalOnly: true
 
             Stepper {
                 text: `${Config.radius} px`
-                onStep: d => Config.radius = settings.clamp(Config.radius + d, 0, 20)
+                onStep: d => {
+                    Config.radius = settings.clamp(Config.radius + d, 0, 20);
+                    loginApply.restart();
+                    settings.bootStale = true;
+                }
             }
         }
 
@@ -353,20 +359,6 @@ ColumnLayout {
                 onToggled: {
                     Config.lockAvatar = !Config.lockAvatar;
                     loginApply.restart();
-                }
-            }
-        }
-
-        // The boot splash draws its field when it's built: hyprdori-theme-boot, which the button runs
-        SettingRow {
-            label: "Rounded corners"
-
-            Switch {
-                checked: Config.lockRounded
-                onToggled: {
-                    Config.lockRounded = !Config.lockRounded;
-                    loginApply.restart();
-                    settings.bootStale = true;
                 }
             }
         }

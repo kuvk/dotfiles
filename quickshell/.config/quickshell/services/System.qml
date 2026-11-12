@@ -48,6 +48,12 @@ Singleton {
         Hypr.applyLook();
     }
 
+    // The update window: the full system or the boot screens (hyprdori-update --window)
+    function showUpdate(): void {
+        Panels.closeAll();
+        Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-update", "--window"]);
+    }
+
     // System Information: fastfetch in a kitty window (hyprdori-sysinfo), opened or closed
     function showSysinfo(): void {
         Panels.closeAll();

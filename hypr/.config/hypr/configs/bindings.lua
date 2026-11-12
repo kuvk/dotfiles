@@ -18,6 +18,7 @@ local powermenu = "qs ipc call power toggle"
 local settings = "qs ipc call settings toggle"
 local keybinds = "qs ipc call keybinds toggle"
 local sysinfo = "~/.local/bin/hyprdori-sysinfo"
+local update = "~/.local/bin/hyprdori-update --window"
 local music = "kitty --class cliamp -e cliamp"
 local email = "thunderbird"
 local gamemode = "~/.local/bin/hyprdori-gamemode"
@@ -47,6 +48,7 @@ hl.bind(mainMod .. " + CONTROL + T", hl.dsp.exec_cmd(themes)) -- Theme carousel
 hl.bind(mainMod .. " + CONTROL + M", hl.dsp.exec_cmd(displays)) -- the Displays dropdown
 hl.bind(mainMod .. " + CONTROL + S", hl.dsp.exec_cmd(settings)) -- Settings
 hl.bind(mainMod .. " + SHIFT + I", hl.dsp.exec_cmd(sysinfo)) -- System information
+hl.bind(mainMod .. " + CONTROL + U", hl.dsp.exec_cmd(update)) -- Update: the system, or the boot menu and splash
 hl.bind(mainMod .. " + M", hl.dsp.exec_cmd(music)) -- Music player (cliamp)
 hl.bind(mainMod .. " + Q", hl.dsp.window.close()) -- Close window
 hl.bind(mainMod .. " + CONTROL + Q", hl.dsp.exec_cmd(powermenu)) -- Power menu

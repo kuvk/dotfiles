@@ -77,10 +77,11 @@ hl.window_rule({
   size = "800 600",
 })
 
--- hyprdori-theme-boot --window: updating the boot screens after a theme change
+-- hyprdori-present windows: the boot screens' and the system's updates (hyprdori-theme-boot
+-- --window, hyprdori-update --window)
 hl.window_rule({
-  name = "theme-boot",
-  match = { class = "^(theme-boot)$" },
+  name = "hyprdori-window",
+  match = { class = "^(hyprdori-window)$" },
   float = true,
   center = true,
   size = "900 600",

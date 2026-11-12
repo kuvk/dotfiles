@@ -104,6 +104,8 @@ Singleton {
     readonly property string gauge: g(0xf0e4)
     readonly property string plus: g(0xf067)
     readonly property string info: g(0xf05a)
+    // an arrow down into a tray (md-update)
+    readonly property string update: g(0xf06b0)
 
     // Bluetooth
     readonly property string bluetooth: g(0xf00af)

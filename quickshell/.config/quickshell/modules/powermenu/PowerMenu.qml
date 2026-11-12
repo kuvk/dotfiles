@@ -149,7 +149,9 @@ Scope {
                             SessionIcon {
                                 anchors.centerIn: parent
                                 entry: button.modelData
-                                size: 44
+                                // a quarter of the box, so icon and box keep their proportion
+                                // on every screen (the boxes follow the screen's size)
+                                size: Math.round(Math.min(button.width, button.height) * 0.25)
                                 scale: button.selected ? 1.1 : 1
 
                                 Behavior on scale {
