@@ -212,7 +212,7 @@ def shell_settings() -> dict:
     settings = {
         "font": "JetBrainsMono Nerd Font",
         "displayFont": "SF Pro Display",
-        "monoEverywhere": True,
+        "monoEverywhere": False,
         "fontHinting": "slight",
         "fontAntialiasing": "rgba",
         "windowButtons": False,

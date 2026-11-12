@@ -227,7 +227,7 @@ Singleton {
             // Fonts
             property string font: "JetBrainsMono Nerd Font"
             property string displayFont: "SF Pro Display"
-            property bool monoEverywhere: true
+            property bool monoEverywhere: false
             property string fontHinting: "slight"
             property string fontAntialiasing: "rgba"
 

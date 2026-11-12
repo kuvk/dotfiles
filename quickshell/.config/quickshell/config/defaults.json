@@ -36,7 +36,7 @@
   "lockImage": "",
   "lockInputOpacity": 75,
   "lockPowerOpacity": 85,
-  "monoEverywhere": true,
+  "monoEverywhere": false,
   "nightlightEnd": "07:00",
   "nightlightSchedule": false,
   "nightlightStart": "20:00",
