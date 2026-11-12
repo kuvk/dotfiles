@@ -97,29 +97,23 @@ fi
 res_w=${BASH_REMATCH[1]} res_h=${BASH_REMATCH[2]}
 
 # Limine doubles its 8x16 font from 2560x1440 up; each cell also has a 1 pixel letter gap.
-# The logo goes above the tree, centered on it.
+# The logo goes above the tree, centered on the screen like the HYPRDORI branding.
 scale=1
 ((res_w >= 2560 && res_h >= 1440)) && scale=2
-cell_w=$((9 * scale)) cell_h=$((16 * scale))
+cell_h=$((16 * scale))
 build=$(mktemp -d)
 trap 'rm -rf "$build"' EXIT
 
 wallpaper() {
-    local logo_text lw lh top k line max_len=0 cols prefix center
+    local logo_text lw lh top
     logo_text="$home/.config/theme/logo/ascii-dori"
     [[ -r $logo_text ]] || { echo "No logo at $logo_text" >&2; exit 1; }
     # drawn like kitty draws it, in 12px rows (24 on large screens), by Hyprdori's hyprdori-logo-render
     "$here/../bin/.local/bin/hyprdori-logo-render" --logo "$logo_text" --color "$magenta" --cell-height $((12 * scale)) --out "$build/logo.png"
     lw=$(magick identify -format %w "$build/logo.png"); lh=$(magick identify -format %h "$build/logo.png")
     top=$(((res_h / cell_h - ${#found[@]} - 1) / 2 * cell_h))
-    # Limine's centering (menu.c): each line is its tree marks plus " name ", the widest
-    # sets the indent (cols - widest - 3) / 2; "[-] Arch Linux " is 15, "  ──► kernel " is 7 + name.
-    max_len=15
-    for k in "${found[@]}"; do line=$((7 + ${#k})); ((line > max_len)) && max_len=$line; done
-    cols=$((res_w / cell_w)); prefix=$(((cols - max_len - 3) / 2))
-    center=$(((res_w - cols * cell_w) / 2 + prefix * cell_w + (max_len - 1) * cell_w / 2))
     magick -size "${res_w}x$res_h" "xc:$background" \
-        "$build/logo.png" -geometry +$((center - lw / 2))+$((top - 32 * scale - lh)) -composite "$1"
+        "$build/logo.png" -geometry +$(((res_w - lw) / 2))+$((top - 32 * scale - lh)) -composite "$1"
 }
 
 config() {
