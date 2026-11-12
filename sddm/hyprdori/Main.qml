@@ -189,9 +189,9 @@ Rectangle {
                 verticalAlignment: TextInput.AlignVCenter
                 horizontalAlignment: TextInput.AlignHCenter
                 echoMode: TextInput.Password
-                // the typed text stays invisible: the dots below stand for it
+                // the typed text and its cursor stay invisible: the dots below stand for them
                 color: "transparent"
-                cursorVisible: false
+                cursorDelegate: Item {}
                 selectByMouse: false
                 clip: true
                 focus: true
