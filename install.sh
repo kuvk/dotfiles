@@ -227,6 +227,10 @@ else
 fi
 # zsh's plugins (vi mode, highlighting, suggestions, completions, history search)
 "$HOME/.local/bin/hyprdori-zsh-plugins"
+# herdr's Ctrl+H/J/K/L across its panes and Neovim's splits (herdr/.config/herdr/config.toml)
+if command -v herdr >/dev/null && ! herdr plugin list 2>/dev/null | grep -q vim-herdr-navigation; then
+    herdr plugin install --yes paulbkim-dev/vim-herdr-navigation >/dev/null || note "Couldn't install herdr's navigation plugin"
+fi
 
 step "Theme"
 # The login screen first: hyprdori-theme-set writes its colors to the folder this makes
@@ -235,15 +239,16 @@ sudo "$hyprdori/sddm/install.sh" "$autologin" >/dev/null
 # the theme's colors into it now
 tmux_theme="$HOME/.tmux/plugins/catppuccin/tmux"
 [[ -d $tmux_theme ]] || git clone -q -b v2.3.2 https://github.com/catppuccin/tmux.git "$tmux_theme"
+# The browsers' color policy helper, so the theme below colors Chromium and Brave too
+sudo "$HOME/.local/bin/hyprdori-browser-theme-setup" >/dev/null
 "$HOME/.local/bin/hyprdori-theme-set"
 # Backgrounds: ~/.local/share/hyprdori/backgrounds/default (wallpapers) and /live, and
 # ~/.config/hyprdori/backgrounds.json for more folders. The desktop, lock screen and login
-# screen get the theme's background, which hyprdori-theme-set just drew (the logo in accent2 on
-# base, like the boot splash and menu), unless a wallpaper is chosen already. Both follow
+# screen get the theme's background, which hyprdori-theme-set just drew (the logo in magenta on
+# the dark background), unless a wallpaper is chosen already. Both follow
 # the theme from then on.
 wall=$(jq -r '.background // empty' "$HOME/.config/theme/current/quickshell.json" 2>/dev/null) || wall=
 "$HOME/.local/bin/hyprdori-wallpaper" default ${wall:+"$wall"}
-sudo "$HOME/.local/bin/hyprdori-browser-theme-setup"
 
 # --- Boot: initramfs, kernel options, splash, menu -------------------------------------------------------------
 step "Boot"

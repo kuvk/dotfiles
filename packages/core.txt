@@ -99,6 +99,7 @@ eza
 bat
 direnv
 tmux
+herdr-bin                # AUR, tmux for coding agents (herdr/: its config)
 btop
 htop                     # on battery: btop wakes the dGPU
 cava
