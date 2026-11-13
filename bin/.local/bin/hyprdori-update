@@ -123,13 +123,14 @@ EOF
 fi
 
 # --- spicetify: Spotify updates itself on launch, which undoes the theme -------------------
-if command -v spicetify >/dev/null && ! pgrep -x spotify >/dev/null; then
+if command -v spicetify >/dev/null && "$bin/hyprdori-spicetify" --check; then
     step "spicetify"
-    if ! spicetify -q apply 2>/dev/null; then
-        echo "Spotify was updated; applying the theme again"
-        spicetify -q restore backup apply
+    if pgrep -x spotify >/dev/null; then
+        note "Spotify is open: close it, then run hyprdori-spicetify --force to style it again."
+    elif "$bin/hyprdori-spicetify" --force >/dev/null; then
+        echo "Spotify styled again (the theme's colors)."
     else
-        echo "Applied."
+        note "Spotify couldn't be styled; run hyprdori-spicetify --force to see why."
     fi
 fi
 

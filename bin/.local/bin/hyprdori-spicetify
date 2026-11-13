@@ -8,7 +8,8 @@
 # nothing. Spotify's own updates undo the patch: hyprdori-update applies it again.
 #
 #   hyprdori-spicetify           set it up if it isn't, Spotify ready and closed (a notification)
-#   hyprdori-spicetify --force   set it up again, also if done
+#   hyprdori-spicetify --force   set it up again, also if done (hyprdori-update, after Spotify
+#                                updated itself)
 #   hyprdori-spicetify --check   exit 0 if set up, 1 if not; nothing changes
 
 # -h, --help: the comment above, then nothing else runs
@@ -56,10 +57,17 @@ spicetify -q config spotify_path "$spotify" prefs_path "$prefs" \
     current_theme hyprdori color_scheme hyprdori \
     inject_css 1 replace_colors 1 overwrite_assets 0 inject_theme_js 0
 
-# A backup from an older Spotify (it updated itself since) can't be applied: made again
-if backed_up; then
-    spicetify -q apply 2>/dev/null || spicetify -q restore backup apply
-else
-    spicetify -q backup apply
-fi && note "Spotify follows the theme now" "Its colors change with every theme switch (restart Spotify to see a new one)." ||
+# Patched: with a backup of this Spotify, applied; Spicetify's preprocessing outdated (a newer
+# Spicetify), restored and backed up again; the backup from an older Spotify (it updated itself,
+# which also undid the patch), cleared and made again from the new one
+patch() {
+    if ! backed_up; then
+        spicetify -q backup apply
+    else
+        spicetify -q apply 2>/dev/null ||
+            spicetify -q restore backup apply 2>/dev/null ||
+            { spicetify -q clear && spicetify -q backup apply; }
+    fi
+}
+patch && note "Spotify follows the theme now" "Its colors change with every theme switch (restart Spotify to see a new one)." ||
     { note "Spotify couldn't be styled" "Run hyprdori-spicetify --force in a terminal to see why."; exit 1; }
