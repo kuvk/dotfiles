@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# In a virtual machine: the clipboard between X11 and Wayland apps, so the one shared with the host
+# (spice-vdagent, which only knows X11's) reaches every app. Hyprland's own bridge between the two
+# doesn't carry it there. Text only, both ways, each copied only when it differs from the other
+# side's (no loops). Waits for changes (clipnotify, wl-paste --watch): no polling.
+# hyprdori-autostart starts it in a VM; remove it there to go without.
+#
+#   hyprdori-vm-clipboard            keep the two in step (until logout)
+#   hyprdori-vm-clipboard --to-x11   one Wayland text from stdin to X11 (wl-paste --watch runs this)
+
+# -h, --help: the comment above, then nothing else runs
+case ${1:-} in -h | --help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
+set -uo pipefail
+
+if [[ ${1:-} == --to-x11 ]]; then
+    text=$(cat)
+    [[ -n $text && $text != "$(xclip -o -selection clipboard 2>/dev/null)" ]] || exit 0
+    printf '%s' "$text" | xclip -selection clipboard -i
+    exit 0
+fi
+
+for tool in xclip clipnotify wl-copy wl-paste; do
+    command -v "$tool" >/dev/null || { echo "hyprdori-vm-clipboard: $tool is missing" >&2; exit 1; }
+done
+[[ -n ${DISPLAY:-} && -n ${WAYLAND_DISPLAY:-} ]] || { echo "hyprdori-vm-clipboard: needs Hyprland's DISPLAY and WAYLAND_DISPLAY" >&2; exit 1; }
+
+# Wayland to X11: every new text
+wl-paste --type text --watch "$(readlink -f "$0")" --to-x11 &
+
+# X11 to Wayland: after every X11 change (from the host, or an X11 app)
+while clipnotify; do
+    text=$(xclip -o -selection clipboard 2>/dev/null) || continue
+    [[ -n $text && $text != "$(wl-paste --no-newline 2>/dev/null)" ]] || continue
+    printf '%s' "$text" | wl-copy
+done

@@ -5,3 +5,5 @@ vulkan-virtio
 lib32-vulkan-virtio
 qemu-guest-agent
 spice-vdagent            # its daemon starts by itself (udev); hyprdori-autostart starts the agent
+xclip                    # X11's clipboard, and
+clipnotify               # its changes: hyprdori-vm-clipboard carries them to Wayland apps and back

@@ -55,6 +55,9 @@ fi
 # text both ways. Its daemon starts by itself when the VM's Spice channel is there.
 if command -v spice-vdagent >/dev/null && systemd-detect-virt --vm --quiet 2>/dev/null; then
     GDK_BACKEND=x11 spice-vdagent
+    # and between X11 and Wayland apps, which Hyprland's bridge doesn't carry in a VM: the
+    # host's text reaches every app (remove this line to go without)
+    command -v clipnotify >/dev/null && "$HOME/.local/bin/hyprdori-vm-clipboard" &
 fi
 
 # ROG Control Center
