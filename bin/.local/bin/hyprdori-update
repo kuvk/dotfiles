@@ -190,8 +190,17 @@ fi
 # --- Neovim: plugins, then Mason's tools -----------------------------------------------------
 if command -v nvim >/dev/null; then
     step "Neovim plugins"
-    "$bin/hyprdori-present" spin "Installing, updating and cleaning them (Lazy sync)" \
-        bash -c 'nvim --headless "+Lazy! sync" +qa 2>&1 | tail -n 3'
+    # One machine updates the plugins and commits lazy-lock.json (marked by
+    # ~/.config/hyprdori/plugin-updates); the others install the committed versions and leave the
+    # file as it is, so pulling never clashes on it
+    if [[ -e ${XDG_CONFIG_HOME:-$HOME/.config}/hyprdori/plugin-updates ]]; then
+        "$bin/hyprdori-present" spin "Installing, updating and cleaning them (Lazy sync)" \
+            bash -c 'nvim --headless "+Lazy! sync" +qa 2>&1 | tail -n 3'
+        echo "  lazy-lock.json has the new versions, to commit"
+    else
+        "$bin/hyprdori-present" spin "Installing lazy-lock.json's versions (Lazy restore, then clean)" \
+            bash -c 'nvim --headless "+Lazy! restore" "+Lazy! clean" +qa 2>&1 | tail -n 3'
+    fi
     step "Mason tools"
     mason=$(mktemp --suffix=.lua)
     cat >"$mason" <<'EOF'

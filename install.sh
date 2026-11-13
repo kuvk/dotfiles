@@ -32,7 +32,7 @@ ask() {
 }
 # Package names from a list: comments and blank lines dropped
 list() { sed 's/#.*//; s/[[:space:]]//g; /^$/d' "$hyprdori/packages/$1.txt"; }
-# Where an extra package (packages/user_pkg.txt) comes from: the repos (pacman's, or
+# Where an extra package (~/.config/hyprdori/user_pkg.txt) comes from: the repos (pacman's, or
 # archlinux.org's for a repo not enabled yet, such as multilib), the AUR or Flathub; nothing
 # printed when it's in none of them (or the lookup can't be made). Flathub IDs (two dots or more)
 # are tried there first.
@@ -130,13 +130,30 @@ first app to use it asks for a keyring password, then every boot. Left empty, it
 encrypted disk still protects it)."
 fi
 
-# Extra packages (packages/user_pkg.txt), with Hyprdori's: each looked up first. One found
+# Extra packages (~/.config/hyprdori/user_pkg.txt), with Hyprdori's: each looked up first. One found
 # nowhere leaves the whole list out, so a misspelled name never installs part of it; one already
 # in a chosen list is reported and installed once, with that list
 user_native=() user_flatpak=()
+# The list is this machine's, outside the repo; missing, it's made with these notes and nothing
+# to install, to fill in for a later run
+user_pkg_file=${XDG_CONFIG_HOME:-$HOME/.config}/hyprdori/user_pkg.txt
+if [[ ! -e $user_pkg_file ]]; then
+    mkdir -p "${user_pkg_file%/*}"
+    cat >"$user_pkg_file" <<'EOF'
+# Extra packages that Hyprdori's install.sh offers to install with its own lists, on this machine
+# only (the file stays out of the repo). One per line: a package from the Arch repos, an AUR
+# package, or a Flathub app ID (com.example.App). Text after # and blank lines are skipped.
+#
+# Each entry is looked up before the question (the installed repos, archlinux.org, the AUR,
+# Flathub). An entry found in none of them leaves the whole list out, so a misspelled name never
+# installs part of it. An entry already in a chosen Hyprdori list is reported and installed once,
+# with that list. A package only in a repo outside Arch's (g14, a custom one) is found only once
+# that repo is in pacman.conf, which on a first install happens after this check.
+EOF
+fi
 user_pkgs=()
-[[ -f $hyprdori/packages/user_pkg.txt ]] && mapfile -t user_pkgs < <(list user_pkg)
-if ((${#user_pkgs[@]})) && ask "Extra packages (packages/user_pkg.txt: ${#user_pkgs[@]})?" y; then
+mapfile -t user_pkgs < <(sed 's/#.*//; s/[[:space:]]//g; /^$/d' "$user_pkg_file")
+if ((${#user_pkgs[@]})) && ask "Extra packages (~/.config/hyprdori/user_pkg.txt: ${#user_pkgs[@]})?" y; then
     echo "Looking them up in the repos, the AUR and Flathub..."
     chosen=("${groups[@]}")
     $flatpak && chosen+=(flatpak)
@@ -159,7 +176,7 @@ if ((${#user_pkgs[@]})) && ask "Extra packages (packages/user_pkg.txt: ${#user_p
     done
     if ((${#unknown[@]})); then
         note "Not in the repos, the AUR or Flathub (or the lookup failed): ${unknown[*]}.
-packages/user_pkg.txt is left out; correct it and run install.sh again, or install them by hand."
+~/.config/hyprdori/user_pkg.txt is left out; correct it and run install.sh again, or install them by hand."
     else
         user_native=("${found_native[@]}") user_flatpak=("${found_flatpak[@]}")
     fi
@@ -261,7 +278,7 @@ if ! paru -Syu --needed "${wanted[@]}"; then
     fi
 fi
 
-# Hyprdori's Flatpak apps if chosen, and the extra ones from packages/user_pkg.txt
+# Hyprdori's Flatpak apps if chosen, and the extra ones from ~/.config/hyprdori/user_pkg.txt
 if $flatpak || ((${#user_flatpak[@]})); then
     step "Flatpak"
     sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
