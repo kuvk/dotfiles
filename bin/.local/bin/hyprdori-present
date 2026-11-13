@@ -6,9 +6,11 @@
 # (https://github.com/basecamp/omarchy, MIT).
 #
 #   hyprdori-present window CLASS TITLE COMMAND...   COMMAND in a floating kitty window
-#                                                      (CLASS: hyprdori-window has the rule)
+#                                                      (CLASS: hyprdori-window has the rule);
+#                                    header, box and the questions grow it when they don't fit
+#                                    (up to the screen's height), so all of it is seen at once
 #   hyprdori-present header           clear the window, the text logo (dori-text) in magenta
-#   hyprdori-present box LINE...      the lines framed in the accent
+#   hyprdori-present box LINE...      the lines framed in muted (Neovim's window borders)
 #   hyprdori-present confirm QUESTION  Yes / No buttons; exits 0 for Yes
 #   hyprdori-present choose HEADER OPTION...   one of the options, printed; nothing for Esc
 #   hyprdori-present input PROMPT [PLACEHOLDER]   a line of text, printed; nothing for Esc
@@ -23,11 +25,67 @@ set -uo pipefail
 
 # The theme's colors (Catppuccin Mocha before hyprdori-theme-set has run)
 accent="#89b4fa" magenta="#cba6f7" foreground="#cdd6f4" background="#1e1e2e" subtext="#a2a8c2"
-selection="#45475a" red="#f38ba8" green="#a6e3a1"
+selection="#45475a" red="#f38ba8" green="#a6e3a1" muted="#585b70"
 # shellcheck source=/dev/null
 . "$HOME/.config/theme/current/colors.sh" 2>/dev/null
 has_gum() { command -v gum >/dev/null; }
 rgb() { printf '38;2;%d;%d;%d' "0x${1:1:2}" "0x${1:3:2}" "0x${1:5:2}"; }
+
+# The terminal's answer to a query (CSI ... ending in END), asked on the terminal itself: the
+# parts run with their output captured
+ask() {
+    local old reply="" c
+    old=$(stty -g </dev/tty) || return 1
+    stty -echo -icanon </dev/tty
+    printf '%s' "$1" >/dev/tty
+    while IFS= read -rsn1 -t 1 c </dev/tty; do
+        reply+=$c
+        [[ $c == "$2" ]] && break
+    done
+    stty "$old" </dev/tty
+    printf '%s' "$reply"
+}
+
+# Room for LINES more lines from the cursor down, so the logo, the explanation and the choices
+# are all seen at once: a window opened by "window" (kitty, class hyprdori-window) grows by the
+# rows missing, centered, up to its screen's height without the bar and gaps. Other terminals
+# are left as they are. Costs a few queries, only when it doesn't fit.
+room() {
+    local need=$1 reply row rows _cols ch address monitor w h max scale grow
+    [[ -n ${KITTY_PID:-} ]] && command -v jq >/dev/null && { : </dev/tty; } 2>/dev/null || return 0
+    reply=$(ask $'\e[6n' R)
+    [[ $reply =~ \[([0-9]+)\;[0-9]+R ]] || return 0
+    row=${BASH_REMATCH[1]}
+    read -r rows _cols < <(stty size </dev/tty)
+    ((row - 1 + need > rows)) || return 0
+    read -r address monitor w h < <(hyprctl clients -j | jq -r --argjson pid "$KITTY_PID" \
+        'first(.[] | select(.pid == $pid and .class == "hyprdori-window") | "\(.address) \(.monitor) \(.size[0]) \(.size[1])") // empty')
+    [[ -n $address ]] || return 0
+    # reserved: left, top, right, bottom (the bar); 20 for the gaps above and below
+    read -r scale max < <(hyprctl monitors -j | jq -r --argjson id "$monitor" \
+        'first(.[] | select(.id == $id) | "\(.scale) \((.height / .scale - .reserved[1] - .reserved[3] - 20) | floor)") // empty')
+    [[ -n $max ]] && ((h < max)) || return 0
+    # kitty's cell height in pixels (CSI 16 t), the window's in logical ones
+    reply=$(ask $'\e[16t' t)
+    [[ $reply =~ \[6\;([0-9]+)\;[0-9]+t ]] || return 0
+    ch=${BASH_REMATCH[1]}
+    grow=$(awk -v n="$((row - 1 + need - rows))" -v ch="$ch" -v s="$scale" 'BEGIN { print int(n * ch / s + 0.999) + 1 }')
+    h=$((h + grow > max ? max : h + grow))
+    hyprctl dispatch "hl.dsp.window.resize({ window = \"address:$address\", x = $w, y = $h })" >/dev/null
+    hyprctl dispatch "hl.dsp.window.center({ window = \"address:$address\" })" >/dev/null
+    # Hyprland animates the resize and kitty reflows at every step: wait for the rows to hold still
+    local current previous="" held=0
+    for _ in {1..30}; do
+        current=$(stty size </dev/tty)
+        if [[ $current == "$previous" && $current != "$rows $_cols" ]]; then
+            ((++held == 3)) && return 0
+        else
+            held=0
+            previous=$current
+        fi
+        sleep 0.05
+    done
+}
 
 case $1 in
     window)
@@ -37,22 +95,33 @@ case $1 in
         ;;
     header)
         clear
+        logo=$HOME/.config/theme/logo/dori-text
+        # a blank line, the logo, two blank lines
+        room $(($(wc -l <"$logo" 2>/dev/null || echo 0) + 3))
         printf '\n\e[%sm' "$(rgb "$magenta")"
         # every character of the logo, spaces included, two columns in
-        sed 's/^/  /' "$HOME/.config/theme/logo/dori-text" 2>/dev/null
+        sed 's/^/  /' "$logo" 2>/dev/null
         printf '\e[0m\n\n'
         ;;
     box)
         shift
+        # room for its lines, the border and padding above and below, and the blank line after
+        # (counted, not drawn first: gum drops its colors when its output is captured)
+        lines=$(printf '%s\n' "$@" | wc -l)
         if has_gum; then
-            gum style --border rounded --border-foreground "$accent" --foreground "$foreground" \
+            room $((lines + 5))
+            # the border in muted, as Neovim's window borders (nvim/lua/theme.lua)
+            gum style --border rounded --border-foreground "$muted" --foreground "$foreground" \
                 --padding "1 2" --margin "0 2" "$@"
         else
+            room $((lines + 1))
             printf '  %s\n' "$@"
         fi
         echo
         ;;
     confirm)
+        # the question, a blank line, the buttons, gum's help line
+        room 6
         if has_gum; then
             gum confirm "${2:?question}" --prompt.foreground "$foreground" \
                 --selected.background "$accent" --selected.foreground "$background" \
@@ -65,6 +134,8 @@ case $1 in
     choose)
         header=${2:?header}
         shift 2
+        # the header, the options (gum shows 10 at a time), a blank line and gum's help line
+        room $(($# > 10 ? 14 : $# + 4))
         if has_gum; then
             gum choose --header "  $header" --header.foreground "$foreground" \
                 --cursor "  › " --cursor.foreground "$accent" --item.foreground "$subtext" \
@@ -79,6 +150,7 @@ case $1 in
         ;;
     input)
         prompt=${2:?prompt}
+        room 3
         if has_gum; then
             gum input --prompt "  $prompt: " --placeholder "${3:-}" --prompt.foreground "$accent" \
                 --cursor.foreground "$accent" --placeholder.foreground "$subtext" --width 0
