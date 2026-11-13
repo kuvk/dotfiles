@@ -289,7 +289,10 @@ if $snapshots && command -v snapper >/dev/null; then
         fi
     fi
     sudo chmod 750 /.snapshots
-    sudo systemctl enable --now snapper-timeline.timer snapper-cleanup.timer
+    # Only the update snapshots (snap-pac's pre and post pairs), the newest 5 and 5 important
+    # ones (pacman's own updates): no hourly timeline, so the boot menu's Snapshots stay short
+    sudo snapper -c root set-config TIMELINE_CREATE=no NUMBER_LIMIT=5 NUMBER_LIMIT_IMPORTANT=5
+    sudo systemctl enable --now snapper-cleanup.timer
     # The boot menu's snapshots: their entries in /efi/limine.conf (limine/install.sh adds the
     # place), booted read-only with a throwaway layer on top (systemd.volatile=overlay: the
     # initramfs gets systemd's volatile-root service, which the systemd hook leaves out, and the
@@ -402,9 +405,7 @@ fi
 
 step "Done"
 cat <<MSG
-Reboot. After the first login, from the desktop:
-
-  ~/.local/bin/hyprdori-monitors export-greeter   the login screen's monitor layout
+Reboot. The login screen gets your monitor layout by itself, at every login and monitor change.
 
 Backups of what this changed: /etc/pacman.conf.bak, /etc/mkinitcpio.conf.bak, the presets'
 .bak files and /etc/pacman.d/mirrorlist.bak.
