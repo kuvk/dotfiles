@@ -142,10 +142,9 @@ hl.window_rule({
   name = "bitwarden",
   match = { initial_title = "_crx_.*" },
   float = true,
-  pin = true,
   center = true,
-  stay_focused = true,
-  size = "500 600",
+  min_size = { 370, 565 },
+  max_size = { 370, 565 },
 })
 
 -- Applications
