@@ -68,11 +68,11 @@ shopt -u nullglob dotglob
 install -m 0644 "$here/hyprdori.conf" /etc/sddm.conf.d/hyprdori.conf
 # The local file: written once (also over the /etc/sddm.conf Hyprdori used to install, which hyprdori.conf
 # now holds), then left as edited
-if [[ -f /etc/sddm.conf ]] && ! grep -qE '^# (Local|Your own) SDDM settings' /etc/sddm.conf &&
+if [[ -f /etc/sddm.conf ]] && ! grep -qE '^# Local SDDM settings' /etc/sddm.conf &&
     ! grep -q '^# /etc/sddm.conf, installed by sddm/install.sh' /etc/sddm.conf; then
     set_aside /etc/sddm.conf
 fi
-grep -qsE '^# (Local|Your own) SDDM settings' /etc/sddm.conf || install -m 0644 "$here/sddm.conf" /etc/sddm.conf
+grep -qsE '^# Local SDDM settings' /etc/sddm.conf || install -m 0644 "$here/sddm.conf" /etc/sddm.conf
 
 [[ -f $home/.face ]] && install -m 0644 "$home/.face" "/usr/share/sddm/faces/$SUDO_USER.face.icon"
 
