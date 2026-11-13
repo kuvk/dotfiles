@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Asks for the sudo password once (sudo -v; not at all while sudo still has it), then keeps sudo's
+# hold on it fresh until a long script ends, so slow downloads and builds don't make sudo ask
+# again halfway. Every 60 s it renews sudo's timestamp (sudo -n -v: never asks, nothing else
+# runs), which is kept for this terminal only and ends with the script, or at most a minute
+# later. Sudo already keeps a password 5 minutes after it's typed; this only stretches that to
+# the script's run. install.sh and hyprdori-update (and the update window's choices) use it.
+#
+#   hyprdori-sudo-hold PID   ask now, then hold until PID (the calling script, $$) exits;
+#                            exits 1 when the password isn't given
+
+# -h, --help: the comment above, then nothing else runs
+case ${1:-} in -h | --help | "") awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
+set -uo pipefail
+
+pid=$1
+sudo -v || exit 1
+# In the background, off the terminal's input and output (sudo finds the terminal by itself)
+(
+    while sleep 60 && kill -0 "$pid" 2>/dev/null; do
+        sudo -n -v || exit 0
+    done
+) </dev/null >/dev/null 2>&1 &
+disown

@@ -97,6 +97,9 @@ fi
 step() { "$bin/hyprdori-present" step "$1"; }
 note() { printf '\e[33m%s\e[0m\n' "$1"; }
 
+# The password once: sudo keeps it until the update ends, however long the downloads and builds take
+"$bin/hyprdori-sudo-hold" $$ || { echo "No password, nothing updated."; exit 1; }
+
 # --- A snapshot of / first (snapper's root config, install.sh on a btrfs root): one per update,
 # the newest 5 kept (cleaned up at once); limine-snapper-sync puts it in the boot menu. /home
 # isn't in it: work in the home folders is never rolled back ------------------------------------

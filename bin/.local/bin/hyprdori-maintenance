@@ -30,6 +30,8 @@ confirm() { read -r -p "$1 [y/N] " answer </dev/tty; [[ $answer =~ ^[yY]([eE][sS
 size() { du -sh "$@" 2>/dev/null | tail -1 | cut -f1; }
 
 echo "Maintenance started $(date)"
+# the password once: sudo keeps it until the cleanup ends, however long the questions take
+"$HOME/.local/bin/hyprdori-sudo-hold" $$ || { echo "No password, nothing cleaned up."; exit 1; }
 
 if $upgrade; then
     "$HOME/.local/bin/hyprdori-update"

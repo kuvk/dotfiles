@@ -36,7 +36,8 @@ list() { sed 's/#.*//; s/[[:space:]]//g; /^$/d' "$hyprdori/packages/$1.txt"; }
 ((EUID != 0)) || { echo "Run this as yourself, not root: it asks for sudo when needed." >&2; exit 1; }
 [[ -f /etc/arch-release ]] || { echo "This is for Arch Linux." >&2; exit 1; }
 curl -fsI --max-time 10 https://archlinux.org >/dev/null || { echo "No internet connection." >&2; exit 1; }
-sudo -v
+# the password once: sudo keeps it until the install ends, however long the downloads take
+"$hyprdori/bin/.local/bin/hyprdori-sudo-hold" $$ || { echo "No password, nothing installed." >&2; exit 1; }
 
 # --- Hardware -----------------------------------------------------------------------------------
 gpus=() boot_gpu= boot_driver=
@@ -87,11 +88,11 @@ ask "Flatpak apps (packages/flatpak.txt)?" y && flatpak=true
 # font being wide there. hyprdori-browser-theme-setup --follow-font true|false changes it later.
 browser_font=true
 ask "Browsers: should their tabs, address bar and menus follow the font everything else uses (also monospace, if you turn that on)?" y ||
-    browser_font=false
+browser_font=false
 # A btrfs root laid out as the install guide's (@ and @snapshots): snapshots, also in the boot menu
 snapshots=false
 if [[ $(findmnt -no FSTYPE /) == btrfs ]] &&
-    ask "Snapshots: before and after every update, bootable from the boot menu (packages/snapshots.txt)?" y; then
+ask "Snapshots: before and after every update, bootable from the boot menu (packages/snapshots.txt)?" y; then
     snapshots=true
     groups+=(snapshots)
 fi
