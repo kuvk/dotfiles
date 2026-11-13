@@ -57,11 +57,7 @@ elif [[ $autologin == off ]]; then
     rm -f /etc/sddm.conf.d/autologin.conf
 fi
 
-cat <<MSG
-Installed. It takes effect at your next logout. Now run these without sudo, from your session:
+# Its colors, background and monitor layout follow on their own: hyprdori-theme-set,
+# hyprdori-wallpaper and hyprdori-monitors write them into /var/lib/hyprdori as they change
+echo "Installed. It takes effect at your next logout."
 
-  ~/.local/bin/hyprdori-theme-set
-  ~/.local/bin/hyprdori-wallpaper export-greeter
-  ~/.local/bin/hyprdori-monitors export-greeter
-
-MSG
