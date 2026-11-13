@@ -1,5 +1,7 @@
 return {
   "mfussenegger/nvim-dap",
+  -- Loaded on first use: the debug keys (config/keymaps.lua) require("dap")
+  lazy = true,
   dependencies = {
     "nvim-neotest/nvim-nio",
     "rcarriga/nvim-dap-ui",

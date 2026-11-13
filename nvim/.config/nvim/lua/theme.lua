@@ -199,6 +199,13 @@ function M.border()
   return M.square() and "single" or "rounded"
 end
 
+-- Telescope's corners for the current shape: set when it loads (plugins/telescope.lua) and
+-- when the shape changes while it's loaded (apply_shape)
+function M.telescope_borders()
+  return M.border() == "single" and { "─", "│", "─", "│", "┌", "┐", "┘", "└" }
+    or { "─", "│", "─", "│", "╭", "╮", "╯", "╰" }
+end
+
 function M.apply_shape()
   local border = M.border()
   vim.o.winborder = border
@@ -212,9 +219,7 @@ function M.apply_shape()
     lazy_config.options.ui.border = border
   end
   if package.loaded["telescope.config"] then
-    require("telescope.config").values.borderchars = border == "single"
-        and { "─", "│", "─", "│", "┌", "┐", "┘", "└" }
-      or { "─", "│", "─", "│", "╭", "╮", "╯", "╰" }
+    require("telescope.config").values.borderchars = M.telescope_borders()
   end
   local which_key = package.loaded["which-key.config"] and require("which-key.config").options
   if which_key then
