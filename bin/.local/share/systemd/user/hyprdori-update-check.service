@@ -1,0 +1,10 @@
+# Hyprdori: the weekly update check (hyprdori-update-check.timer); counts what's waiting and, with
+# anything, shows a notification whose Update opens the update window
+[Unit]
+Description=Check for system updates
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/hyprdori-update --notify
+# it waits for the notification to be answered or closed
+TimeoutStartSec=infinity

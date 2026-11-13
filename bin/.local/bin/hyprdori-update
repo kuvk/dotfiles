@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Updates everything: pacman and AUR packages (paru shows Arch news first), Flatpak apps, the
+# Updates everything: with snapshots (a btrfs root, install.sh), first a snapshot of / to go
+# back to from the boot menu (the newest 5 kept); then pacman and AUR packages (paru shows Arch news first), Flatpak apps, the
 # Limine menu when Limine or the kernels changed, Neovim plugins and Mason tools, spicetify, and
 # Hyprdori's new migrations (hyprdori-migrate). Then lists new .pacnew files and says when a
 # reboot is needed.
@@ -10,6 +11,9 @@
 #                             choose this, the boot menu and splash (hyprdori-theme-boot),
 #                             maintenance (hyprdori-maintenance) or Spotify's theme
 #                             (hyprdori-spicetify --force), then the output, and any key closes it
+#   hyprdori-update --notify  count the updates waiting (repos, AUR, Flatpak; nothing installed) and,
+#                             with any, a notification whose Update opens the window (the weekly
+#                             timer, hyprdori-update-check.timer: Saturdays)
 
 # -h, --help: the comment above, then nothing else runs
 case ${1:-} in -h | --help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
@@ -19,6 +23,27 @@ hyprdori=$(cd "$(dirname "$(readlink -f "$0")")/../../.." && pwd)
 yes=false
 [[ ${1:-} == --yes || ${1:-} == -y ]] && yes=true
 bin="$hyprdori/bin/.local/bin"
+
+# --- Waiting updates, for the weekly timer: counted, nothing installed; a notification with any.
+# Waits up to an hour for the shell to take notifications (the timer can fire before login) ---
+if [[ ${1:-} == --notify ]]; then
+    repo=$(checkupdates 2>/dev/null | wc -l)
+    aur=$(paru -Qua 2>/dev/null | wc -l)
+    flat=0
+    command -v flatpak >/dev/null && flat=$(flatpak remote-ls --updates 2>/dev/null | wc -l)
+    total=$((repo + aur + flat))
+    ((total)) || exit 0
+    parts=()
+    ((repo)) && parts+=("$repo from the repos")
+    ((aur)) && parts+=("$aur from the AUR")
+    ((flat)) && parts+=("$flat Flatpak")
+    body=$(IFS=,; echo "${parts[*]}" | sed 's/,/, /g')
+    gdbus wait --session --timeout 3600 org.freedesktop.Notifications >/dev/null 2>&1 || exit 0
+    action=$(notify-send -a "System update" -i system-software-update -A update=Update \
+        "$total updates available" "$body. Update opens the update window.")
+    [[ $action == update ]] && exec "$(readlink -f "$0")" --window
+    exit 0
+fi
 
 # --- In a window: what can be updated, the choice, then its output ---------------------------
 if [[ ${1:-} == --window ]]; then
@@ -62,6 +87,19 @@ fi
 
 step() { "$bin/hyprdori-present" step "$1"; }
 note() { printf '\e[33m%s\e[0m\n' "$1"; }
+
+# --- A snapshot of / first (snapper's root config, install.sh on a btrfs root): one per update,
+# the newest 5 kept (cleaned up at once); limine-snapper-sync puts it in the boot menu. /home
+# isn't in it: work in the home folders is never rolled back ------------------------------------
+if command -v snapper >/dev/null && sudo snapper list-configs 2>/dev/null | grep -q '^root '; then
+    step "Snapshot"
+    if sudo snapper -c root create -c number -d "Before update $(date '+%F %H:%M')"; then
+        sudo snapper -c root cleanup number
+        echo "Taken; the boot menu's Snapshots has it."
+    else
+        note "No snapshot taken; the update goes on."
+    fi
+fi
 
 # --- System packages (repos, the g14 repo, AUR) ---------------------------------------------
 step "Packages"

@@ -12,7 +12,7 @@
 # Steps: pacman.conf (multilib, the g14 repo on ASUS laptops), mirrors (reflector), config links
 # (stow; files in the way go to ~/.hyprdori-backup), packages (packages/*.txt by detected
 # hardware, packages/guest.txt in a virtual machine), Flatpak, services, zsh and its plugins,
-# the theme, snapshots on a btrfs root (snapper, snap-pac, limine-snapper-sync), then boot:
+# the theme, snapshots on a btrfs root (snapper, limine-snapper-sync), then boot:
 # initramfs and kernel options, Plymouth, Limine. The login screen (SDDM) comes with the theme, or autologin if chosen (the
 # default with encrypted drives).
 set -euo pipefail
@@ -168,6 +168,9 @@ for name in "${packages[@]}"; do
     done < <(find "$hyprdori/$name" \( -type f -o -type l \) -print0)
 done
 ((moved)) && note "Moved $moved file(s) that were in the way to $backup"
+# Folders apps write into themselves made real first, so stow links the files in them rather
+# than the whole folder (systemd keeps its timers' state next to the user units)
+mkdir -p "$HOME/.local/share/systemd/user"
 stow -d "$hyprdori" -t "$HOME" --restow "${packages[@]}"
 echo "Linked: ${packages[*]}"
 # A fresh install has nothing to migrate: hyprdori-update runs only migrations added later
@@ -218,6 +221,13 @@ vm=false
 for unit in "${services[@]}"; do
     if sudo systemctl enable "$unit" &>/dev/null; then echo "Enabled $unit"; else note "Couldn't enable $unit"; fi
 done
+# Per user: the weekly update check (Saturdays; a notification when updates wait), linked from bin
+systemctl --user daemon-reload
+if systemctl --user enable --now hyprdori-update-check.timer &>/dev/null; then
+    echo "Enabled the weekly update check"
+else
+    note "Couldn't enable the weekly update check (systemctl --user enable --now hyprdori-update-check.timer)"
+fi
 # The lock screen gets up to 15 s, not logind's 5, to come up before a suspend
 # (hyprdori-sleep-lock). logind reads it on reload.
 sudo install -Dm644 /dev/stdin /etc/systemd/logind.conf.d/20-inhibit-delay.conf <<'EOF'
@@ -289,9 +299,10 @@ if $snapshots && command -v snapper >/dev/null; then
         fi
     fi
     sudo chmod 750 /.snapshots
-    # Only the update snapshots (snap-pac's pre and post pairs), the newest 5 and 5 important
-    # ones (pacman's own updates): no hourly timeline, so the boot menu's Snapshots stay short
-    sudo snapper -c root set-config TIMELINE_CREATE=no NUMBER_LIMIT=5 NUMBER_LIMIT_IMPORTANT=5
+    # Only the update snapshots: one before every hyprdori-update, the newest 5 kept, cleaned up
+    # at once (no minimum age); no hourly timeline, so the boot menu's Snapshots stay short. Only
+    # /: /home holds the user's work, never rolled back
+    sudo snapper -c root set-config TIMELINE_CREATE=no NUMBER_LIMIT=5 NUMBER_LIMIT_IMPORTANT=5 NUMBER_MIN_AGE=0
     sudo systemctl enable --now snapper-cleanup.timer
     # The boot menu's snapshots: their entries in /efi/limine.conf (limine/install.sh adds the
     # place), booted read-only with a throwaway layer on top (systemd.volatile=overlay: the

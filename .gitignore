@@ -51,3 +51,6 @@ hypr/.config/hypr/monitors.json
 cliamp/.config/cliamp/*
 !cliamp/.config/cliamp/config.toml
 fastfetch/.config/fastfetch/config.jsonc
+
+# systemd's state for the user timers (~/.local/share/systemd/timers), should the folder be linked
+bin/.local/share/systemd/timers/

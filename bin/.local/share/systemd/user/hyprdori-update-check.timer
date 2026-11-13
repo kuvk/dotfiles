@@ -1,0 +1,12 @@
+# Hyprdori: a check for system updates every Saturday morning, or at the next login when the
+# machine was off then (Persistent)
+[Unit]
+Description=Check for system updates every Saturday
+
+[Timer]
+OnCalendar=Sat *-*-* 10:00:00
+RandomizedDelaySec=30min
+Persistent=true
+
+[Install]
+WantedBy=timers.target
