@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # Installs the login screen. SDDM reads from root-owned places, which stow can't manage.
 #
-#   sudo sddm/install.sh                  install or update; the previous config goes to *.bak
+#   sudo sddm/install.sh                  install or update: Hyprdori's settings in
+#                                         /etc/sddm.conf.d/hyprdori.conf, local ones in /etc/sddm.conf
+#                                         (read last; options to uncomment); other settings
+#                                         files set aside in /etc/sddm.hyprdori-backup/<date>/
 #   sudo sddm/install.sh --autologin      also log in to Hyprland without the login screen (after
 #                                         the disk password, with encrypted drives)
 #   sudo sddm/install.sh --no-autologin   the login screen again
@@ -42,10 +45,34 @@ install -m 0644 "$here/hyprland.lua" /usr/share/sddm/hypr/hyprland.lua
 install -D -m 0644 "$here/../hypr/.config/hypr/cursors/hyprdori-startup/index.theme" /usr/share/sddm/hypr/cursors/hyprdori-startup/index.theme
 install -D -m 0644 "$here/../hypr/.config/hypr/cursors/hyprdori-startup/cursors/left_ptr" /usr/share/sddm/hypr/cursors/hyprdori-startup/cursors/left_ptr
 
-[[ -f /etc/sddm.conf ]] && cp -n /etc/sddm.conf /etc/sddm.conf.bak
-install -m 0644 "$here/sddm.conf" /etc/sddm.conf
-# KDE's settings module wrote this; it would override the theme chosen above
-[[ -f /etc/sddm.conf.d/kde_settings.conf ]] && mv /etc/sddm.conf.d/kde_settings.conf /etc/sddm.conf.d/kde_settings.conf.bak
+# SDDM's settings: Hyprdori's in /etc/sddm.conf.d (hyprdori.conf, and autologin.conf when on);
+# local ones in /etc/sddm.conf, which SDDM reads last, so what's set there wins (it starts as a
+# list of options to uncomment). Anything else in sddm.conf.d (another desktop's settings: SDDM
+# reads every file there, a .bak too, and a later one can undo autologin or the theme) and an
+# /etc/sddm.conf not written here move to /etc/sddm.hyprdori-backup/<date>/, out of SDDM's way.
+backup=/etc/sddm.hyprdori-backup/$(date +%Y%m%d-%H%M%S)
+set_aside() {
+    install -d -m 0755 "$backup"
+    mv "$1" "$backup/"
+    echo "Moved $1 to $backup/"
+}
+install -d -m 0755 /etc/sddm.conf.d
+shopt -s nullglob dotglob
+for file in /etc/sddm.conf.d/*; do
+    case ${file##*/} in
+        hyprdori.conf | autologin.conf) ;;
+        *) set_aside "$file" ;;
+    esac
+done
+shopt -u nullglob dotglob
+install -m 0644 "$here/hyprdori.conf" /etc/sddm.conf.d/hyprdori.conf
+# The local file: written once (also over the /etc/sddm.conf Hyprdori used to install, which hyprdori.conf
+# now holds), then left as edited
+if [[ -f /etc/sddm.conf ]] && ! grep -qE '^# (Local|Your own) SDDM settings' /etc/sddm.conf &&
+    ! grep -q '^# /etc/sddm.conf, installed by sddm/install.sh' /etc/sddm.conf; then
+    set_aside /etc/sddm.conf
+fi
+grep -qsE '^# (Local|Your own) SDDM settings' /etc/sddm.conf || install -m 0644 "$here/sddm.conf" /etc/sddm.conf
 
 [[ -f $home/.face ]] && install -m 0644 "$home/.face" "/usr/share/sddm/faces/$SUDO_USER.face.icon"
 
