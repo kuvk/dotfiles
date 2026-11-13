@@ -4,7 +4,9 @@ draws it in a terminal: every character on a grid of cells as kitty's (JetBrains
 as wide as tall), braille as 2x4 dots, block characters (▄ ▌ ▙ ...) as exact rectangles and
 Nerd Font's triangles (◢ ◣ ◤ ◥, U+E0B8 to U+E0BE) as exact triangles filling their cell. Font glyphs
 for these don't fit the cell exactly, so text renderers leave seams and overlap rows; drawn
-as shapes the logo is sharp at any size and the same everywhere: the wallpaper
+as shapes the logo is sharp at any size and the same everywhere. Shades (░ ▒ ▓), which kitty
+draws as dot patterns, are see-through fills of their cell (25, 50 and 75%), smooth at any
+size; the middle dot (·) is a small square where the font puts it. Used by the wallpaper
 (hyprdori-logo-wallpaper), the boot splash (plymouth/install.sh) and the boot menu
 (limine/install.sh), like fastfetch in kitty and the System Information window.
 
@@ -46,6 +48,11 @@ TRIANGLES = {
     0xE0B8: ((0, 0), (0, 1), (1, 1)), 0xE0BA: ((1, 0), (1, 1), (0, 1)),
     0xE0BC: ((0, 0), (1, 0), (0, 1)), 0xE0BE: ((0, 0), (1, 0), (1, 1)),
 }
+# Shades by how much of the cell they cover, drawn as see-through fills: ░ ▒ ▓
+SHADES = {0x2591: 0.25, 0x2592: 0.5, 0x2593: 0.75}
+# The middle dot (·): its size for the cell's width, its center's height in the cell, as
+# JetBrains Mono has it
+MIDDLE_DOT, MIDDLE_DOT_SIZE, MIDDLE_DOT_Y = 0x00B7, 0.25, 0.56
 # Braille bit order: dots 1-3 down the left, 4-6 down the right, then 7 and 8 at the bottom
 BRAILLE = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (0, 3), (1, 3)]
 # A cell's width for its height, as kitty draws JetBrains Mono: 600 by 1320 font units
@@ -54,15 +61,34 @@ CELL_RATIO = 600 / 1320
 
 def shapes(lines: list[str], w: float, h: int) -> list[str]:
     """ImageMagick draw commands for every filled shape, cell by cell. Cells start and end at
-    whole pixels, so neighbouring blocks meet without a seam whatever the width."""
+    whole pixels, so neighbouring blocks meet without a seam whatever the width. Shades set
+    their opacity, and the next shape sets it back."""
     out = []
     dot = max(1, round(min(w / 2, h / 4) * 0.55))
+    middle = max(1, round(w * MIDDLE_DOT_SIZE))
+    opacity = 1.0
+
+    def fill(alpha: float) -> None:
+        nonlocal opacity
+        if alpha != opacity:
+            out.append(f"fill-opacity {alpha}")
+            opacity = alpha
+
     for row, line in enumerate(lines):
         for col, ch in enumerate(line):
             code = ord(ch)
             xs = (round(col * w), round((col + 0.5) * w), round((col + 1) * w))
             ys = (row * h, row * h + h // 2, (row + 1) * h)
-            if 0x2801 <= code <= 0x28FF:
+            if code in SHADES:
+                fill(SHADES[code])
+                out.append(f"rectangle {xs[0]},{ys[0]} {xs[2] - 1},{ys[2] - 1}")
+                continue
+            fill(1.0)
+            if code == MIDDLE_DOT:
+                x = round(col * w + (w - middle) / 2)
+                y = round(row * h + h * MIDDLE_DOT_Y - middle / 2)
+                out.append(f"rectangle {x},{y} {x + middle - 1},{y + middle - 1}")
+            elif 0x2801 <= code <= 0x28FF:
                 bits = code - 0x2800
                 for b, (cx, cy) in enumerate(BRAILLE):
                     if bits & (1 << b):
