@@ -32,17 +32,23 @@ if command -v cliphist >/dev/null; then
     fi
 fi
 
-# Snapshots (limine-snapper-sync; Hyprland doesn't run its autostart entries): after booting a
-# snapshot from the boot menu, an offer to restore it; and a notification when syncing the
-# menu's snapshots fails (it follows the journal's errors, idle otherwise)
-if command -v limine-snapper-restore >/dev/null; then
-    limine-snapper-restore --notify &
-    limine-snapper-notify &
-fi
+# These notify, so they wait (in the background, up to 20 s) for the shell to take
+# notifications: started with it at login, notify-send would fail before the shell is up
+(
+    gdbus wait --session --timeout 20 org.freedesktop.Notifications >/dev/null 2>&1
 
-# Spotify in the theme's colors: set up once Spotify has run with an account logged in (a few file
-# checks, then nothing once done)
-command -v spicetify >/dev/null && "$HOME/.local/bin/hyprdori-spicetify" &
+    # Snapshots (limine-snapper-sync; Hyprland doesn't run its autostart entries): after booting
+    # a snapshot from the boot menu, an offer to restore it; and a notification when syncing the
+    # menu's snapshots fails (it follows the journal's errors, idle otherwise)
+    if command -v limine-snapper-restore >/dev/null; then
+        limine-snapper-restore --notify &
+        limine-snapper-notify &
+    fi
+
+    # Spotify in the theme's colors: set up once Spotify has run with an account logged in (a few file
+    # checks, then nothing once done)
+    command -v spicetify >/dev/null && "$HOME/.local/bin/hyprdori-spicetify" &
+) &
 
 # In a virtual machine: the clipboard shared with the host (virt-manager's Spice). The agent
 # speaks X11 only, so it works through Xwayland, whose clipboard Hyprland shares with Wayland apps:
