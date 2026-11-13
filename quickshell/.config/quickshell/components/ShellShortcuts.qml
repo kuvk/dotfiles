@@ -29,6 +29,9 @@ RowLayout {
             id: button
 
             required property var modelData
+            // Update, with updates waiting (the weekly check): peach, with a dot as the Control
+            // Center's icon has for unread notifications
+            readonly property bool alert: modelData.id === "update" && System.updatesWaiting > 0
 
             Layout.fillWidth: true
             implicitHeight: root.buttonHeight
@@ -55,7 +58,19 @@ RowLayout {
             Icon {
                 anchors.centerIn: parent
                 text: button.modelData.icon
-                color: button.containsMouse ? Theme.accent : Theme.subtext
+                color: button.alert ? Theme.orange : button.containsMouse ? Theme.accent : Theme.subtext
+
+                Rectangle {
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.rightMargin: -4
+                    anchors.topMargin: -1
+                    width: 7
+                    height: 7
+                    radius: 4
+                    color: Theme.orange
+                    visible: button.alert
+                }
             }
         }
     }

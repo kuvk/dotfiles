@@ -57,6 +57,19 @@ Singleton {
             Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-spicetify", "--wait"]);
     }
 
+    // Updates the weekly check found (hyprdori-update --notify keeps the count in
+    // ~/.local/state/hyprdori/updates-waiting until they're installed): the update button's dot
+    property int updatesWaiting: 0
+
+    FileView {
+        path: `${Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state"}/hyprdori/updates-waiting`
+        watchChanges: true
+        printErrors: false
+        onFileChanged: reload()
+        onLoaded: root.updatesWaiting = parseInt(text().trim()) || 0
+        onLoadFailed: root.updatesWaiting = 0
+    }
+
     // The update window: the full system or the boot screens (hyprdori-update --window)
     function showUpdate(): void {
         Panels.closeAll();

@@ -13,7 +13,9 @@
 #                             (hyprdori-spicetify --force), then the output, and any key closes it
 #   hyprdori-update --notify  count the updates waiting (repos, AUR, Flatpak; nothing installed) and,
 #                             with any, a notification whose Update opens the window (the weekly
-#                             timer, hyprdori-update-check.timer: Saturdays)
+#                             timer, hyprdori-update-check.timer: Saturdays); the count is kept in
+#                             ~/.local/state/hyprdori/updates-waiting for the shell's update button
+#                             until the packages are updated
 
 # -h, --help: the comment above, then nothing else runs
 case ${1:-} in -h | --help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
@@ -23,6 +25,8 @@ hyprdori=$(cd "$(dirname "$(readlink -f "$0")")/../../.." && pwd)
 yes=false
 [[ ${1:-} == --yes || ${1:-} == -y ]] && yes=true
 bin="$hyprdori/bin/.local/bin"
+# How many updates the last check found, for the shell's update button (its dot); gone when none
+waiting=${XDG_STATE_HOME:-$HOME/.local/state}/hyprdori/updates-waiting
 
 # --- Waiting updates, for the weekly timer: counted, nothing installed; a notification with any.
 # Waits up to an hour for the shell to take notifications (the timer can fire before login) ---
@@ -32,7 +36,12 @@ if [[ ${1:-} == --notify ]]; then
     flat=0
     command -v flatpak >/dev/null && flat=$(flatpak remote-ls --updates 2>/dev/null | wc -l)
     total=$((repo + aur + flat))
-    ((total)) || exit 0
+    if ((total == 0)); then
+        rm -f "$waiting"
+        exit 0
+    fi
+    mkdir -p "${waiting%/*}"
+    echo "$total" >"$waiting"
     parts=()
     ((repo)) && parts+=("$repo from the repos")
     ((aur)) && parts+=("$aur from the AUR")
@@ -107,7 +116,7 @@ if $yes; then
     paru -Syu --noconfirm
 else
     paru -Syu
-fi || note "The package upgrade didn't finish; the steps below still run."
+fi && rm -f "$waiting" || note "The package upgrade didn't finish; the steps below still run."
 
 # --- Flatpak --------------------------------------------------------------------------------
 if command -v flatpak >/dev/null; then
