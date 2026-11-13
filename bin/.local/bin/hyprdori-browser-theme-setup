@@ -54,7 +54,10 @@ case ${1:-} in
 esac
 
 HELPER=/usr/local/bin/browser-theme-policy
-SUDOERS=/etc/sudoers.d/browser-theme-policy
+# sudo reads /etc/sudoers.d in name order and the last rule that matches wins: last, so a broader
+# rule for this user (e.g. %wheel's, which asks for the password) can't override it
+SUDOERS=/etc/sudoers.d/zz-hyprdori-browser-theme
+OLD_SUDOERS=/etc/sudoers.d/browser-theme-policy
 POLICY_DIRS=(/etc/chromium/policies/managed /etc/brave/policies/managed)
 
 # Run without root: again through sudo, by its full path (sudo's PATH has no ~/.local/bin)
@@ -80,7 +83,7 @@ MSG
 fi
 
 if [[ ${1:-} == --remove ]]; then
-    rm -f "$HELPER" "$SUDOERS"
+    rm -f "$HELPER" "$SUDOERS" "$OLD_SUDOERS"
     for dir in "${POLICY_DIRS[@]}"; do rm -f "$dir/color.json"; done
     echo "Removed. Restart the browsers to drop the theme color."
     exit 0
@@ -111,7 +114,7 @@ tmp=$(mktemp)
 printf '# Lets hyprdori-theme-set write the browser theme color (hyprdori-browser-theme-setup)\n%s\n' "$rule" >"$tmp"
 if visudo -cf "$tmp" >/dev/null; then
     install -m 0440 -o root -g root -T "$tmp" "$SUDOERS"
-    rm -f "$tmp"
+    rm -f "$tmp" "$OLD_SUDOERS"
 else
     rm -f "$tmp"
     echo "visudo rejected the rule; nothing installed." >&2
