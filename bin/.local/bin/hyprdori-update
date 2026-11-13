@@ -236,6 +236,31 @@ if command -v spicetify >/dev/null && "$bin/hyprdori-spicetify" --check; then
 fi
 
 # --- Hyprdori's one-time changes since the last update --------------------------------------
+# --- Links: the repo's folders stowed again, as install.sh does, so files added to them since
+# this machine was installed get their links and removed ones lose theirs. With a file in the
+# way stow changes nothing; it's listed to move aside, and the next update links the rest ------
+step "Links"
+not_stowed=(limine migrations packages plymouth sddm)   # the same as install.sh's
+stowed=()
+for dir in "$hyprdori"/*/; do
+    name=$(basename "$dir")
+    [[ " ${not_stowed[*]} " == *" $name "* ]] || stowed+=("$name")
+done
+# a folder systemd writes into itself stays a real one (as install.sh makes it)
+mkdir -p "$HOME/.local/share/systemd/user"
+if out=$(stow -v -d "$hyprdori" -t "$HOME" --restow "${stowed[@]}" 2>&1); then
+    # re-made links say "(reverts previous action)": only the others are new or gone
+    changes=$(printf '%s\n' "$out" | awk '
+        /^LINK: / && !/reverts previous action/ { sub(/ =>.*/, ""); print "  linked   ~/" substr($0, 7); next }
+        /^UNLINK: / { u[substr($0, 9)] = 1 }
+        /^LINK: .*reverts previous action/ { l = $0; sub(/^LINK: /, "", l); sub(/ =>.*/, "", l); delete u[l] }
+        END { for (f in u) print "  unlinked ~/" f }')
+    if [[ -n $changes ]]; then printf '%s\n' "$changes"; else echo "Up to date."; fi
+else
+    printf '%s\n' "$out" | grep -iE "existing target|conflict|cannot" | sed 's/^/  /'
+    note "Nothing was linked: files are in the way (above). Move them aside, then update again."
+fi
+
 step "Migrations"
 "$hyprdori/bin/.local/bin/hyprdori-migrate" || note "A migration failed; hyprdori-update tries it again."
 

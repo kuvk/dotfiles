@@ -18,6 +18,7 @@
 set -euo pipefail
 
 hyprdori=$(dirname "$(readlink -f "$0")")
+# Not stowed; hyprdori-update's Links step has the same list (hyprdori-check compares them)
 not_stowed=(limine migrations packages plymouth sddm)
 
 step() { printf '\n\e[1;34m==> %s\e[0m\n' "$1"; }

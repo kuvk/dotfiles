@@ -20,6 +20,11 @@ mapfile -t tracked < <(git ls-files --cached --others --exclude-standard)
 # folder); migrations/ is empty until one is needed
 mapfile -t current < <(printf '%s\n' "${tracked[@]}" | grep -vE '^migrations/|^bin/\.local/bin/hyprdori-check$')
 
+# The folders install.sh doesn't stow and hyprdori-update's Links step skips: the same list
+stow_list() { grep -o '^not_stowed=([^)]*)' "$1"; }
+[[ $(stow_list install.sh) == "$(stow_list bin/.local/bin/hyprdori-update)" ]] ||
+    fail "not_stowed differs between install.sh and bin/.local/bin/hyprdori-update"
+
 # Files parse: shell, Python, Lua, TOML and JSON, by their first line or extension
 for file in "${tracked[@]}"; do
     [[ -f $file ]] || continue
