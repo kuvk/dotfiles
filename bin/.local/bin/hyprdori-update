@@ -8,7 +8,8 @@
 #   hyprdori-update           all of it, asking before each package transaction
 #   hyprdori-update --yes     no questions from paru, pacman or flatpak
 #   hyprdori-update --window  in a window (hyprdori-present, the Control Center's update button):
-#                             choose this, the boot menu and splash (hyprdori-theme-boot),
+#                             check for updates (listed, then asks to update), this, the boot
+#                             menu and splash (hyprdori-theme-boot),
 #                             maintenance (hyprdori-maintenance) or Spotify's theme
 #                             (hyprdori-spicetify --force), then the output, and any key closes it
 #   hyprdori-update --notify  count the updates waiting (repos, AUR, Flatpak; nothing installed) and,
@@ -28,20 +29,31 @@ bin="$hyprdori/bin/.local/bin"
 # How many updates the last check found, for the shell's update button (its dot); gone when none
 waiting=${XDG_STATE_HOME:-$HOME/.local/state}/hyprdori/updates-waiting
 
-# --- Waiting updates, for the weekly timer: counted, nothing installed; a notification with any.
-# Waits up to an hour for the shell to take notifications (the timer can fire before login) ---
-if [[ ${1:-} == --notify ]]; then
-    repo=$(checkupdates 2>/dev/null | wc -l)
-    aur=$(paru -Qua 2>/dev/null | wc -l)
-    flat=0
-    command -v flatpak >/dev/null && flat=$(flatpak remote-ls --updates 2>/dev/null | wc -l)
+# The updates waiting, nothing installed and no password: their lists (repo_list, aur_list,
+# flat_list) and counts (repo, aur, flat, total); the count kept for the shell's update button
+# (gone when none). The weekly check and the window's "Check for updates" use it.
+count_updates() {
+    repo_list=$(checkupdates 2>/dev/null)
+    aur_list=$(paru -Qua 2>/dev/null)
+    flat_list=""
+    command -v flatpak >/dev/null && flat_list=$(flatpak remote-ls --updates 2>/dev/null)
+    repo=$(grep -c . <<<"$repo_list")
+    aur=$(grep -c . <<<"$aur_list")
+    flat=$(grep -c . <<<"$flat_list")
     total=$((repo + aur + flat))
     if ((total == 0)); then
         rm -f "$waiting"
-        exit 0
+    else
+        mkdir -p "${waiting%/*}"
+        echo "$total" >"$waiting"
     fi
-    mkdir -p "${waiting%/*}"
-    echo "$total" >"$waiting"
+}
+
+# --- Waiting updates, for the weekly timer: counted, nothing installed; a notification with any.
+# Waits up to an hour for the shell to take notifications (the timer can fire before login) ---
+if [[ ${1:-} == --notify ]]; then
+    count_updates
+    ((total == 0)) && exit 0
     parts=()
     ((repo)) && parts+=("$repo from the repos")
     ((aur)) && parts+=("$aur from the AUR")
@@ -60,7 +72,9 @@ if [[ ${1:-} == --window ]]; then
 fi
 if [[ ${1:-} == --in-window ]]; then
     "$bin/hyprdori-present" header
-    "$bin/hyprdori-present" box "Full system: packages (repos and AUR, with Arch news first), Flatpak apps," \
+    "$bin/hyprdori-present" box "Check for updates: lists what can be updated (repos, AUR, Flatpak) without" \
+        "installing anything or asking for your password, then asks whether to update all of it." \
+        "" "Full system: packages (repos and AUR, with Arch news first), Flatpak apps," \
         "the boot menu when Limine or a kernel changed, Neovim's plugins, spicetify and" \
         "Hyprdori's migrations. It asks before each package transaction." \
         "" "Boot menu and splash: Limine's menu and the Plymouth splash in the current theme," \
@@ -71,11 +85,29 @@ if [[ ${1:-} == --in-window ]]; then
         "files to merge." \
         "" "Spotify's theme: Spotify in the theme's colors again (Spicetify), e.g. after Spotify" \
         "updated itself. Spotify has to be closed; no password needed." \
-        "" "The first three need your password (sudo). Keep the laptop on power for a full update."
-    full="Full system update" boot="Boot menu and splash" clean="Maintenance (clean up)" spotify="Spotify's theme"
-    choice=$("$bin/hyprdori-present" choose "What to do?" "$full" "$boot" "$clean" "$spotify" "Cancel")
+        "" "Updating, the boot menu and maintenance need your password (sudo). Keep the laptop on" \
+        "power for a full update."
+    check="Check for updates" full="Full system update" boot="Boot menu and splash" clean="Maintenance (clean up)" spotify="Spotify's theme"
+    choice=$("$bin/hyprdori-present" choose "What to do?" "$check" "$full" "$boot" "$clean" "$spotify" "Cancel")
     status=0
     case $choice in
+        "$check")
+            "$bin/hyprdori-present" step "Checking for updates"
+            count_updates
+            if ((total == 0)); then
+                echo "  Everything is up to date."
+            else
+                ((repo)) && { echo "  From the repos ($repo):"; sed 's/^/    /' <<<"$repo_list"; }
+                ((aur)) && { echo "  From the AUR ($aur):"; sed 's/^/    /' <<<"$aur_list"; }
+                ((flat)) && { echo "  Flatpak ($flat):"; sed 's/^/    /' <<<"$flat_list"; }
+                echo
+                if "$bin/hyprdori-present" confirm "Update all $total now?"; then
+                    "$(readlink -f "$0")" || status=$?
+                else
+                    echo "  Nothing updated."
+                fi
+            fi
+            ;;
         "$full") "$(readlink -f "$0")" || status=$? ;;
         "$boot") "$bin/hyprdori-present" step "Boot screens"; "$bin/hyprdori-theme-boot" --force || status=$? ;;
         "$clean") "$bin/hyprdori-maintenance" || status=$? ;;
