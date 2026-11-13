@@ -12,11 +12,17 @@
 #   --radius PX                            with any of these: the password field's and progress
 #                                          bar's corners (0 square) instead of Settings > Style's
 #
+# The progress bar fills in the time this boot took from the drives unlocking (or the splash
+# starting, without encryption) to its end, read from the journal (3 to 20 s; 8 s without one),
+# so it matches each machine; run it again to measure again. The splash then stays on screen
+# until the login screen or the desktop draws over it, with no text console in between: a
+# plymouth-quit drop-in (/etc/systemd/system/plymouth-quit.service.d/hyprdori.conf) quits it
+# with --retain-splash. Should those fail to start, Ctrl+Alt+F2 gives a text login.
+#
 # Also installs the luks-poweroff mkinitcpio hook (after sd-encrypt): failing to unlock the
 # drives powers off. The limits come from the kernel options in /etc/kernel/cmdline:
 # rd.luks.options=timeout=90s,tries=3 systemd.default_device_timeout_sec=infinity
-#
-# Back to the previous splash: sudo plymouth-set-default-theme -R rog_2
+
 set -euo pipefail
 
 here=$(dirname "$(readlink -f "$0")")
@@ -124,8 +130,24 @@ rm "$build/end.png"
 # Encrypted drives get the password field first; without them the progress bar shows from the start
 encrypted=0
 grep -qE '^HOOKS=.*\b(sd-)?encrypt\b' /etc/mkinitcpio.conf && encrypted=1
+# The bar's duration: from the first drive unlocked (or the splash started) to the splash
+# ending, in this boot's journal; 3 to 20 s, 8 s when the journal has neither (a first install)
+boot_seconds=8.0
+if [[ $mode == install ]]; then
+    boot_seconds=$(journalctl -b 0 -o short-monotonic _PID=1 2>/dev/null | awk -v enc="$encrypted" '
+        { line = $0; sub(/^\[ */, "", line); t = line + 0 }
+        !start && enc == 1 && /Finished Cryptography Setup for / { start = t }
+        !start && enc == 0 && /Started Show Plymouth Boot Screen/ { start = t }
+        start && /Starting Terminate Plymouth Boot Screen/ { end = t }
+        END {
+            d = (start && end > start) ? end - start : 8
+            if (d < 3) d = 3
+            if (d > 20) d = 20
+            printf "%.1f", d
+        }')
+fi
 sed -e "s/@BG_RGB@/$(rgb "$background")/" -e "s/@TEXT_RGB@/$(rgb "$subtext")/" -e "s/@ENCRYPTED@/$encrypted/" \
-    "$here/hyprdori.script" >"$build/hyprdori.script"
+    -e "s/@BOOT_SECONDS@/$boot_seconds/" "$here/hyprdori.script" >"$build/hyprdori.script"
 sed -e "s/@BG@/${background#\#}/" "$here/hyprdori.plymouth" >"$build/hyprdori.plymouth"
 
 if [[ $mode == preview-farewell ]]; then
@@ -141,7 +163,7 @@ if [[ $mode == preview* ]]; then
     tw=$(magick identify -format %w "$build/text.png"); th=$(magick identify -format %h "$build/text.png")
     ex=$((960 - ew / 2)); ey=$((540 - eh / 2)); ly=$((ey - 40 - lh))
     logos=("$build/logo.png" -geometry +$((960 - lw / 2))+$ly -composite
-        "$build/text.png" -geometry +$((960 - tw / 2))+$((1080 - 60 - th)) -composite)
+    "$build/text.png" -geometry +$((960 - tw / 2))+$((1080 - 60 - th)) -composite)
     if [[ $mode == preview-progress ]]; then
         py=$((ey + eh / 2 - ph / 2)) bw=$((ew * 6 / 10))
         magick -size 1920x1080 "xc:$background" "${logos[@]}" \
@@ -171,5 +193,15 @@ install -D -m 0644 "$here/luks-poweroff" /etc/initcpio/install/luks-poweroff
 if ! grep -q '^HOOKS=.*\bluks-poweroff\b' /etc/mkinitcpio.conf; then
     sed -i '/^HOOKS=/s/\bsd-encrypt\b/sd-encrypt luks-poweroff/' /etc/mkinitcpio.conf
 fi
+# The splash kept on screen until the login screen or the desktop replaces it (sddm.service
+# starts after plymouth-quit.service), so no text console shows in between
+install -D -m 0644 /dev/stdin /etc/systemd/system/plymouth-quit.service.d/hyprdori.conf <<'EOF'
+# Written by plymouth/install.sh in Hyprdori: the splash stays on screen until the login
+# screen or the desktop draws over it, with no text console in between
+[Service]
+ExecStart=
+ExecStart=-/usr/bin/plymouth quit --retain-splash
+EOF
+systemctl daemon-reload
 plymouth-set-default-theme -R hyprdori
-echo "Installed. The boot splash shows at the next boot."
+echo "Installed (the progress bar fills in ${boot_seconds} s). The boot splash shows at the next boot."

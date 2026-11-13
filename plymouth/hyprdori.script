@@ -15,16 +15,17 @@ words.image = words.original_image;
 words.sprite = Sprite(words.image);
 words.sprite.SetOpacity(1);
 
-# Use these to adjust the progress bar timing
-global.fake_progress_limit = 1; # Target percentage for fake progress (0.0 to 1.0)
-global.fake_progress_duration = 15.0;  # Duration in seconds to reach limit
+# The progress bar's timing: it fills to the limit (0.0 to 1.0) in the duration, fast at first
+# and slower towards the end, and completely when the boot is done (quit_callback). The duration
+# is how long this machine's boot took from the drives unlocking (or the splash starting,
+# without encrypted drives) to the end, measured by install.sh from the boot it ran in.
+global.fake_progress_limit = 0.9;
+global.fake_progress_duration = @BOOT_SECONDS@;  # seconds
 
 # Progress bar animation variables
 global.animation_frame = 0;
 global.fake_progress = 0.0;
-global.real_progress = 0.0;
 global.fake_progress_active = 0;
-global.fake_progress_start_time = 0.0;  # Track when fake progress started
 global.password_shown = 0;  # Track if password dialog has been shown
 global.password_sent = 0;  # A password was entered; asked again means it was wrong
 global.wrong_count = 0;  # Wrong passwords so far
@@ -139,7 +140,6 @@ fun start_fake_progress() {
   global.animation_frame = 0;
   global.max_progress = 0.0;
   global.fake_progress = 0.0;
-  global.fake_progress_start_time = 0.0;
 }
 
 fun stop_fake_progress() {
@@ -284,23 +284,16 @@ progress_middle.sprite.SetOpacity(0);
 progress_middle.shown = 0;
 global.progress_shown = 0;
 
-fun progress_callback(duration, progress) {
-  # Track when fake progress starts
-  # Needed because duration and progress freeze during drive decryption
-  if (global.fake_progress_start_time == 0.0) {
-    global.fake_progress_start_time = duration;
-  }
-
-  global.real_progress = progress;
-
-  # Use real progress once its unfrozen and exceeds fake progress
-  if (duration > global.fake_progress_start_time && progress > global.fake_progress) {
+# The boot is done: the bar full, and left on screen until the login screen or the desktop
+# draws over it (plymouth quit --retain-splash, plymouth/install.sh)
+fun quit_callback() {
+  if (global.farewell == 0 && global.progress_shown == 1) {
     stop_fake_progress();
-    update_progress_bar(progress);
+    update_progress_bar(1.0);
   }
 }
 
-Plymouth.SetBootProgressFunction(progress_callback);
+Plymouth.SetQuitFunction(quit_callback);
 
 #----------------------------------------- Layout --------------------------------
 
