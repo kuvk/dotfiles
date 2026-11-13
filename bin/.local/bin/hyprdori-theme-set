@@ -856,7 +856,7 @@ def reload_apps(theme: dict) -> None:
         restart_yazi()
     # Spotify: the new colors into its files (a second); an open Spotify shows them when restarted
     if {"spicetify-color.ini", "spicetify-user.css"} & theme.get("changed", set()) and spicetify_follows():
-        run_quiet(["spicetify", "-q", "refresh"])
+        run_quiet(["spicetify", "-n", "-q", "refresh"])
     redraw_prompts()
     if shutil.which("tmux") and subprocess.run(["tmux", "info"], capture_output=True).returncode == 0:
         run_quiet(["tmux", "source-file", str(HOME / ".tmux.conf")])

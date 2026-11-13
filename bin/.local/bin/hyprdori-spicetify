@@ -74,10 +74,10 @@ fi
 
 # Spicetify's config (made on its first run), then the theme's files (hyprdori-theme-set writes
 # them once Spicetify's Themes folder exists)
-spicetify -q config >/dev/null 2>&1
+spicetify -n -q config >/dev/null 2>&1
 mkdir -p "$config_dir/Themes/hyprdori"
 "$HOME/.local/bin/hyprdori-theme-set" --login >/dev/null 2>&1
-spicetify -q config spotify_path "$spotify" prefs_path "$prefs" \
+spicetify -n -q config spotify_path "$spotify" prefs_path "$prefs" \
     current_theme hyprdori color_scheme hyprdori \
     inject_css 1 replace_colors 1 overwrite_assets 0 inject_theme_js 0
 
@@ -86,11 +86,11 @@ spicetify -q config spotify_path "$spotify" prefs_path "$prefs" \
 # which also undid the patch), cleared and made again from the new one
 patch() {
     if ! backed_up; then
-        spicetify -q backup apply
+        spicetify -n -q backup apply
     else
-        spicetify -q apply 2>/dev/null ||
-            spicetify -q restore backup apply 2>/dev/null ||
-            { spicetify -q clear && spicetify -q backup apply; }
+        spicetify -n -q apply 2>/dev/null ||
+            spicetify -n -q restore backup apply 2>/dev/null ||
+            { spicetify -n -q clear && spicetify -n -q backup apply; }
     fi
 }
 patch && note "Spotify follows the theme now" "Its colors change with every theme switch (restart Spotify to see a new one)." ||
