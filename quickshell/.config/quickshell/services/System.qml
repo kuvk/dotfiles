@@ -3,6 +3,7 @@ pragma Singleton
 import QtQuick
 import Quickshell
 import Quickshell.Io
+import Quickshell.Wayland
 import qs.config
 
 // Small bits of system state driven by Hyprdori's commands in ~/.local/bin
@@ -46,6 +47,14 @@ Singleton {
             awakeForGamemode = false;
         }
         Hypr.applyLook();
+    }
+
+    // Spotify's theme (hyprdori-spicetify): set up as soon as Spotify closes, once it has run
+    // with an account logged in; it waits for Spotify to exit, and does nothing once done
+    readonly property bool spotifyOpen: ToplevelManager.toplevels.values.some(t => (t.appId ?? "").toLowerCase() === "spotify")
+    onSpotifyOpenChanged: {
+        if (!spotifyOpen)
+            Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/hyprdori-spicetify", "--wait"]);
     }
 
     // The update window: the full system or the boot screens (hyprdori-update --window)

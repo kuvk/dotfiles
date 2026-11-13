@@ -4,13 +4,16 @@
 # user.css) and refreshes on every switch. This sets it up once: Spicetify pointed at Spotify (as
 # spotify-launcher installs it) and at that theme, then Spotify patched (spicetify backup apply).
 # Spotify has to have run once with an account logged in (its files and settings exist then), and be
-# closed. At login (hyprdori-autostart) it checks and does it when it can; once done, it does
-# nothing. Spotify's own updates undo the patch: hyprdori-update applies it again.
+# closed. At login (hyprdori-autostart) and when Spotify's window closes (the shell) it checks and
+# does it when it can; once done (and still current), it does nothing. Spotify's own updates undo
+# the patch: the next close of Spotify (or hyprdori-update) applies it again.
 #
 #   hyprdori-spicetify           set it up if it isn't, Spotify ready and closed (a notification)
 #   hyprdori-spicetify --force   set it up again, also if done (hyprdori-update, after Spotify
 #                                updated itself)
 #   hyprdori-spicetify --check   exit 0 if set up, 1 if not; nothing changes
+#   hyprdori-spicetify --wait    as without options, after up to 20 s for Spotify to exit (the
+#                                shell runs it when Spotify's window closes)
 
 # -h, --help: the comment above, then nothing else runs
 case ${1:-} in -h | --help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
@@ -19,6 +22,7 @@ set -uo pipefail
 config_dir=${XDG_CONFIG_HOME:-$HOME/.config}/spicetify
 spotify=${XDG_DATA_HOME:-$HOME/.local/share}/spotify-launcher/install/usr/share/spotify
 prefs=${XDG_CONFIG_HOME:-$HOME/.config}/spotify/prefs
+launcher_state=${XDG_DATA_HOME:-$HOME/.local/share}/spotify-launcher/state.json
 
 note() {
     printf '%s\n' "$1"
@@ -28,21 +32,41 @@ note() {
 
 # Spotify's files backed up (Spicetify notes the version it backed up in its config)
 backed_up() { grep -qE '^version\s*=\s*\S' "$config_dir/config-xpui.ini" 2>/dev/null; }
+# Done: our theme, a backup, and that backup from the Spotify installed now (spotify-launcher
+# notes its version; an update replaces Spotify's files, which undoes the patch)
 set_up() {
-    grep -qE '^current_theme\s*=\s*hyprdori\s*$' "$config_dir/config-xpui.ini" 2>/dev/null && backed_up
+    local backup installed
+    grep -qE '^current_theme\s*=\s*hyprdori\s*$' "$config_dir/config-xpui.ini" 2>/dev/null || return 1
+    backup=$(sed -n 's/^version\s*=\s*//p' "$config_dir/config-xpui.ini" 2>/dev/null | head -1)
+    [[ -n $backup ]] || return 1
+    # "1:1.3.8.620.g39b276d5d7ac": the package's epoch, then Spotify's version as Spicetify notes it
+    installed=$(sed -n 's/.*"version":"\([^"]*\)".*/\1/p' "$launcher_state" 2>/dev/null)
+    installed=${installed#*:}
+    [[ -z $installed || $installed == "$backup" ]]
 }
 
 case ${1:-} in
     --check) set_up; exit ;;
-    --force | "") ;;
+    --force | --wait | "") ;;
     *) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0" >&2; exit 2 ;;
 esac
 
 [[ ${1:-} != --force ]] && set_up && exit 0
-command -v spicetify >/dev/null || exit 0
+# What's missing, said in a terminal (the update window); quiet at login and from the shell
+missing() {
+    [[ -t 1 ]] && echo "$1"
+    exit 0
+}
+command -v spicetify >/dev/null || missing "Spicetify isn't installed (spicetify-cli)."
 # Spotify installed (spotify-launcher downloads it on the first start), run, logged in
-[[ -x $spotify/spotify ]] || exit 0
-grep -q '^autologin\.' "$prefs" 2>/dev/null || exit 0
+[[ -x $spotify/spotify ]] || missing "Spotify isn't there yet: open it once (it downloads itself), log in, close it."
+grep -q '^autologin\.' "$prefs" 2>/dev/null || missing "Log in to Spotify once, then close it."
+if [[ ${1:-} == --wait ]]; then
+    for _ in {1..20}; do
+        pgrep -x spotify >/dev/null || break
+        sleep 1
+    done
+fi
 if pgrep -x spotify >/dev/null; then
     [[ -t 1 ]] && echo "Close Spotify first: it can't be patched while it runs."
     exit 0
