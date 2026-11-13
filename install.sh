@@ -406,6 +406,8 @@ fi
 step "Done"
 cat <<MSG
 Reboot. The login screen gets your monitor layout by itself, at every login and monitor change.
+$(command -v spotify-launcher >/dev/null && printf '\n%s\n' "Spotify follows the theme once you've opened it and logged in: at the next login after that
+it's styled by itself (hyprdori-spicetify; or run that with Spotify closed).")
 
 Backups of what this changed: /etc/pacman.conf.bak, /etc/mkinitcpio.conf.bak, the presets'
 .bak files and /etc/pacman.d/mirrorlist.bak.

@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# Spotify in the theme's colors, through Spicetify: its "hyprdori" theme, which
+# hyprdori-theme-set writes for every theme (~/.config/spicetify/Themes/hyprdori: color.ini and
+# user.css) and refreshes on every switch. This sets it up once: Spicetify pointed at Spotify (as
+# spotify-launcher installs it) and at that theme, then Spotify patched (spicetify backup apply).
+# Spotify has to have run once with an account logged in (its files and settings exist then), and be
+# closed. At login (hyprdori-autostart) it checks and does it when it can; once done, it does
+# nothing. Spotify's own updates undo the patch: hyprdori-update applies it again.
+#
+#   hyprdori-spicetify           set it up if it isn't, Spotify ready and closed (a notification)
+#   hyprdori-spicetify --force   set it up again, also if done
+#   hyprdori-spicetify --check   exit 0 if set up, 1 if not; nothing changes
+
+# -h, --help: the comment above, then nothing else runs
+case ${1:-} in -h | --help) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
+set -uo pipefail
+
+config_dir=${XDG_CONFIG_HOME:-$HOME/.config}/spicetify
+spotify=${XDG_DATA_HOME:-$HOME/.local/share}/spotify-launcher/install/usr/share/spotify
+prefs=${XDG_CONFIG_HOME:-$HOME/.config}/spotify/prefs
+
+note() {
+    printf '%s\n' "$1"
+    [[ ! -t 1 ]] && command -v notify-send >/dev/null && notify-send -a Spotify "$1" "${2:-}" 2>/dev/null
+    true
+}
+
+# Spotify's files backed up (Spicetify notes the version it backed up in its config)
+backed_up() { grep -qE '^version\s*=\s*\S' "$config_dir/config-xpui.ini" 2>/dev/null; }
+set_up() {
+    grep -qE '^current_theme\s*=\s*hyprdori\s*$' "$config_dir/config-xpui.ini" 2>/dev/null && backed_up
+}
+
+case ${1:-} in
+    --check) set_up; exit ;;
+    --force | "") ;;
+    *) awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0" >&2; exit 2 ;;
+esac
+
+[[ ${1:-} != --force ]] && set_up && exit 0
+command -v spicetify >/dev/null || exit 0
+# Spotify installed (spotify-launcher downloads it on the first start), run, logged in
+[[ -x $spotify/spotify ]] || exit 0
+grep -q '^autologin\.' "$prefs" 2>/dev/null || exit 0
+if pgrep -x spotify >/dev/null; then
+    [[ -t 1 ]] && echo "Close Spotify first: it can't be patched while it runs."
+    exit 0
+fi
+
+# Spicetify's config (made on its first run), then the theme's files (hyprdori-theme-set writes
+# them once Spicetify's Themes folder exists)
+spicetify -q config >/dev/null 2>&1
+mkdir -p "$config_dir/Themes/hyprdori"
+"$HOME/.local/bin/hyprdori-theme-set" --login >/dev/null 2>&1
+spicetify -q config spotify_path "$spotify" prefs_path "$prefs" \
+    current_theme hyprdori color_scheme hyprdori \
+    inject_css 1 replace_colors 1 overwrite_assets 0 inject_theme_js 0
+
+# A backup from an older Spotify (it updated itself since) can't be applied: made again
+if backed_up; then
+    spicetify -q apply 2>/dev/null || spicetify -q restore backup apply
+else
+    spicetify -q backup apply
+fi && note "Spotify follows the theme now" "Its colors change with every theme switch (restart Spotify to see a new one)." ||
+    { note "Spotify couldn't be styled" "Run hyprdori-spicetify --force in a terminal to see why."; exit 1; }

@@ -1,7 +1,7 @@
 #!/bin/bash
 # What else starts at login (autostart.lua runs this once): clipboard history, the snapshot
-# notifications and ROG Control Center when installed; more can be added below. Running it again
-# would start them twice.
+# notifications, Spotify's theme setup (hyprdori-spicetify) and ROG Control Center when
+# installed; more can be added below. Running it again would start them twice.
 #
 #   hyprdori-autostart
 
@@ -39,6 +39,10 @@ if command -v limine-snapper-restore >/dev/null; then
     limine-snapper-restore --notify &
     limine-snapper-notify &
 fi
+
+# Spotify in the theme's colors: set up once Spotify has run with an account logged in (a few file
+# checks, then nothing once done)
+command -v spicetify >/dev/null && "$HOME/.local/bin/hyprdori-spicetify" &
 
 # ROG Control Center
 if command -v rog-control-center >/dev/null; then

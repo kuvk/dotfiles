@@ -68,6 +68,7 @@ STATE_FILE = CURRENT_DIR / "theme"
 DEFAULT_THEME = "catppuccin"
 
 # Rendered files that also need a copy somewhere an app can find them
+SPICETIFY_DIR = Path(os.environ.get("XDG_CONFIG_HOME", HOME / ".config")) / "spicetify"
 EXTRA_DESTINATIONS = {
     "hyprland.lua": HOME / ".config/hypr/configs/generated/theme.lua",
     # btop and bat find themes by name in their own themes folders
@@ -82,6 +83,9 @@ EXTRA_DESTINATIONS = {
         HOME / ".tmux/plugins/tmux/themes/catppuccin_current_tmux.conf",
     ],
     "cliamp.toml": HOME / ".config/cliamp/themes/system.toml",
+    # Spotify's colors and look (Spicetify's "hyprdori" theme; hyprdori-spicetify sets it up)
+    "spicetify-color.ini": SPICETIFY_DIR / "Themes/hyprdori/color.ini",
+    "spicetify-user.css": SPICETIFY_DIR / "Themes/hyprdori/user.css",
     # eza's icons, the same as yazi's (theme/eza-icons.py writes the template)
     "eza-theme.yml": HOME / ".config/eza/theme.yml",
     # GTK adds these to whatever theme is set
@@ -101,7 +105,8 @@ EXTRA_DESTINATIONS = {
     "sddm-theme.conf": Path("/var/lib/hyprdori/theme.conf"),
 }
 # Written only when the app's folder exists (don't create a half plugin dir)
-ONLY_IF_PRESENT = {"tmux.conf", "cliamp.toml"}
+# only where the app's folder is there already (Spicetify's Themes: once it has run)
+ONLY_IF_PRESENT = {"tmux.conf", "cliamp.toml", "spicetify-color.ini", "spicetify-user.css"}
 
 FASTFETCH_SOURCE = HOME / ".config/fastfetch/base.jsonc"
 # there or not: browsers keep the display font with Monospace everywhere (hyprdori-browser-theme-setup)
@@ -827,6 +832,15 @@ def reload_visible(theme: dict) -> None:
     run_quiet(["pkill", "-USR1", "-x", "kitty"])
 
 
+def spicetify_follows() -> bool:
+    """Spicetify set up with the "hyprdori" theme (hyprdori-spicetify)."""
+    try:
+        config = (SPICETIFY_DIR / "config-xpui.ini").read_text()
+    except OSError:
+        return False
+    return shutil.which("spicetify") is not None and re.search(r"^current_theme\s*=\s*hyprdori\s*$", config, re.M) is not None
+
+
 def reload_apps(theme: dict) -> None:
     """The rest, after the switch is shown (in the background): the other apps, GTK,
     browsers and the theme's own wallpaper."""
@@ -840,6 +854,9 @@ def reload_apps(theme: dict) -> None:
         run_quiet(["bat", "cache", "--build"])
     if "yazi-theme.toml" in theme.get("changed", ()):
         restart_yazi()
+    # Spotify: the new colors into its files (a second); an open Spotify shows them when restarted
+    if {"spicetify-color.ini", "spicetify-user.css"} & theme.get("changed", set()) and spicetify_follows():
+        run_quiet(["spicetify", "-q", "refresh"])
     redraw_prompts()
     if shutil.which("tmux") and subprocess.run(["tmux", "info"], capture_output=True).returncode == 0:
         run_quiet(["tmux", "source-file", str(HOME / ".tmux.conf")])
