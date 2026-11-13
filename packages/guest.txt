@@ -1,6 +1,7 @@
 # Inside a virtual machine (install.sh finds one with systemd-detect-virt): Vulkan for the
-# virtio GPU (Venus; Mesa is in core.txt), and the agent the host talks to (a clean shutdown
-# from virt-manager, the guest's IP).
+# virtio GPU (Venus; Mesa is in core.txt), the agent the host talks to (a clean shutdown from
+# virt-manager, the guest's IP), and the clipboard shared with the host through Spice.
 vulkan-virtio
 lib32-vulkan-virtio
 qemu-guest-agent
+spice-vdagent            # its daemon starts by itself (udev); hyprdori-autostart starts the agent
