@@ -1,0 +1,9 @@
+# Extra packages that install.sh offers to install with Hyprdori's lists. One per line: a package
+# from the Arch repos, an AUR package, or a Flathub app ID (com.example.App). Text after # and
+# blank lines are skipped, as in the other lists.
+#
+# Each entry is looked up before the question (the installed repos, archlinux.org, the AUR,
+# Flathub). An entry found in none of them leaves the whole list out, so a misspelled name never
+# installs part of it. An entry already in a chosen Hyprdori list is reported and installed once,
+# with that list. A package only in a repo outside Arch's (g14, a custom one) is found only once
+# that repo is in pacman.conf, which on a first install happens after this check.

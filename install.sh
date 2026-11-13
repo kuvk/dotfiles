@@ -31,6 +31,27 @@ ask() {
 }
 # Package names from a list: comments and blank lines dropped
 list() { sed 's/#.*//; s/[[:space:]]//g; /^$/d' "$hyprdori/packages/$1.txt"; }
+# Where an extra package (packages/user_pkg.txt) comes from: the repos (pacman's, or
+# archlinux.org's for a repo not enabled yet, such as multilib), the AUR or Flathub; nothing
+# printed when it's in none of them (or the lookup can't be made). Flathub IDs (two dots or more)
+# are tried there first.
+source_of() {
+    local name=$1
+    on_flathub() { [[ $(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "https://flathub.org/api/v2/appstream/$name") == 200 ]]; }
+    if [[ $name =~ ^[A-Za-z][A-Za-z0-9_-]*(\.[A-Za-z0-9_-]+){2,}$ ]] && on_flathub; then
+        echo flatpak
+    elif pacman -Si -- "$name" &>/dev/null ||
+        curl -fsS --max-time 10 --get --data-urlencode "name=$name" https://archlinux.org/packages/search/json/ 2>/dev/null |
+        grep -qF "\"pkgname\": \"$name\""; then
+        echo repo
+    elif curl -fsS --max-time 10 --get --data-urlencode "arg[]=$name" https://aur.archlinux.org/rpc/v5/info 2>/dev/null |
+        grep -q '"resultcount":[1-9]'; then
+        echo aur
+    elif on_flathub; then
+        echo flatpak
+    fi
+    return 0
+}
 
 # --- Checks -------------------------------------------------------------------------------------
 ((EUID != 0)) || { echo "Run this as yourself, not root: it asks for sudo when needed." >&2; exit 1; }
@@ -108,8 +129,43 @@ first app to use it asks for a keyring password, then every boot. Left empty, it
 encrypted disk still protects it)."
 fi
 
+# Extra packages (packages/user_pkg.txt), with Hyprdori's: each looked up first. One found
+# nowhere leaves the whole list out, so a misspelled name never installs part of it; one already
+# in a chosen list is reported and installed once, with that list
+user_native=() user_flatpak=()
+user_pkgs=()
+[[ -f $hyprdori/packages/user_pkg.txt ]] && mapfile -t user_pkgs < <(list user_pkg)
+if ((${#user_pkgs[@]})) && ask "Extra packages (packages/user_pkg.txt: ${#user_pkgs[@]})?" y; then
+    echo "Looking them up in the repos, the AUR and Flathub..."
+    chosen=("${groups[@]}")
+    $flatpak && chosen+=(flatpak)
+    unknown=() found_native=() found_flatpak=()
+    for pkg in "${user_pkgs[@]}"; do
+        lists=()
+        for group in "${chosen[@]}"; do
+            grep -qxF -- "$pkg" < <(list "$group") && lists+=("packages/$group.txt")
+        done
+        if ((${#lists[@]})); then
+            note "$pkg is already in ${lists[*]}: installed with it"
+            continue
+        fi
+        case $(source_of "$pkg") in
+            repo) found_native+=("$pkg"); echo "  $pkg: repos" ;;
+            aur) found_native+=("$pkg"); echo "  $pkg: AUR" ;;
+            flatpak) found_flatpak+=("$pkg"); echo "  $pkg: Flathub" ;;
+            *) unknown+=("$pkg") ;;
+        esac
+    done
+    if ((${#unknown[@]})); then
+        note "Not in the repos, the AUR or Flathub (or the lookup failed): ${unknown[*]}.
+packages/user_pkg.txt is left out; correct it and run install.sh again, or install them by hand."
+    else
+        user_native=("${found_native[@]}") user_flatpak=("${found_flatpak[@]}")
+    fi
+fi
+
 echo
-echo "Package lists: ${groups[*]}$($flatpak && echo ", flatpak")$([[ $autologin == --autologin ]] && echo "; autologin")"
+echo "Package lists: ${groups[*]}$($flatpak && echo ", flatpak")$(((${#user_native[@]} + ${#user_flatpak[@]})) && echo ", extra ($((${#user_native[@]} + ${#user_flatpak[@]})))")$([[ $autologin == --autologin ]] && echo "; autologin")"
 ask "Continue?" y || exit 0
 
 # --- pacman.conf ----------------------------------------------------------------------------------
@@ -186,7 +242,10 @@ if ! command -v paru >/dev/null; then
     (cd "$build/paru" && makepkg -si --needed --noconfirm)
     rm -rf "$build"
 fi
-mapfile -t wanted < <(for group in "${groups[@]}"; do list "$group"; done | sort -u)
+mapfile -t wanted < <({
+    for group in "${groups[@]}"; do list "$group"; done
+    ((${#user_native[@]})) && printf '%s\n' "${user_native[@]}"
+} | sort -u)
 # paru installs repo and AUR packages alike, and asks once. When that fails (an AUR package
 # that doesn't build), the rest go one at a time and the failures are listed: the install goes on
 if ! paru -Syu --needed "${wanted[@]}"; then
@@ -201,10 +260,13 @@ if ! paru -Syu --needed "${wanted[@]}"; then
     fi
 fi
 
-if $flatpak; then
+# Hyprdori's Flatpak apps if chosen, and the extra ones from packages/user_pkg.txt
+if $flatpak || ((${#user_flatpak[@]})); then
     step "Flatpak"
     sudo flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-    mapfile -t apps < <(list flatpak)
+    apps=()
+    $flatpak && mapfile -t apps < <(list flatpak)
+    apps+=("${user_flatpak[@]}")
     sudo flatpak install -y --noninteractive flathub "${apps[@]}"
 fi
 
