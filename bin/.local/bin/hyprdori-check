@@ -15,7 +15,9 @@ failed=0
 fail() { printf '\e[31m%s\e[0m\n' "$1"; failed=1; }
 
 mapfile -t tracked < <(git ls-files --cached --others --exclude-standard)
-# migrations and this check name the old paths on purpose
+# Old paths and removed commands are named on purpose by this check and by migrations (one-time
+# fixes for systems installed before an update, which may delete an old link or rename an old
+# folder); migrations/ is empty until one is needed
 mapfile -t current < <(printf '%s\n' "${tracked[@]}" | grep -vE '^migrations/|^bin/\.local/bin/hyprdori-check$')
 
 # Files parse: shell, Python, Lua, TOML and JSON, by their first line or extension

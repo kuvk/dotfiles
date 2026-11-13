@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Runs the migrations in Hyprdori's migrations/ that haven't run on this machine yet, oldest
 # first: one-time changes an update needs, like moving a renamed folder. Done ones are listed
-# in ~/.local/state/hyprdori/migrations/.
+# in ~/.local/state/hyprdori/migrations/. The folder is empty (or missing) until an update needs
+# one; then this says there's none to run.
 #
 #   hyprdori-migrate               run the new ones (hyprdori-update does)
 #   hyprdori-migrate --mark-done   count them all as done (a fresh install, install.sh)
@@ -15,6 +16,7 @@ done_dir=${XDG_STATE_HOME:-$HOME/.local/state}/hyprdori/migrations
 mkdir -p "$done_dir"
 
 shopt -s nullglob
+ran=0
 for migration in "$hyprdori"/migrations/*.sh; do
     name=$(basename "$migration")
     [[ -e $done_dir/$name ]] && continue
@@ -23,6 +25,7 @@ for migration in "$hyprdori"/migrations/*.sh; do
         continue
     fi
     printf '\e[1;34m==> Migration %s\e[0m\n' "$name"
+    ran=$((ran + 1))
     if HYPRDORI_PATH=$hyprdori bash "$migration"; then
         touch "$done_dir/$name"
     else
@@ -30,3 +33,4 @@ for migration in "$hyprdori"/migrations/*.sh; do
         exit 1
     fi
 done
+[[ ${1:-} == --mark-done ]] || ((ran)) || echo "None to run."
