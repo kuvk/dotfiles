@@ -15,6 +15,12 @@
 #   hyprdori-present choose HEADER OPTION...   one of the options, printed; nothing for Esc
 #   hyprdori-present input PROMPT [PLACEHOLDER]   a line of text, printed; nothing for Esc
 #   hyprdori-present step TEXT        a heading between the steps of what runs
+#   hyprdori-present spin TITLE COMMAND...   COMMAND with a spinner and TITLE beside it, as the
+#                                     end's line has, while it runs; its output (kept aside) shown
+#                                     after, its exit status returned. For commands that print
+#                                     nothing meanwhile and ask nothing
+#   hyprdori-present spin TITLE       the same until its input closes, for work done by the caller
+#                                     itself (a function, Python): it holds a pipe and closes it
 #   hyprdori-present done [STATUS]    "Done" (or that it failed, with STATUS not 0), then any key
 #                                     closes the window; exits with STATUS, so the window's script
 #                                     ends with: hyprdori-present done "$status"; exit "$status"
@@ -160,6 +166,35 @@ case $1 in
         ;;
     step)
         printf '\n\e[1;%sm  ==> %s\e[0m\n' "$(rgb "$accent")" "${2:?text}"
+        ;;
+    spin)
+        title=${2:?title}
+        shift 2
+        # what to wait for: the command, its output kept for after; or this input to close
+        out=""
+        if (($#)); then
+            out=$(mktemp)
+            "$@" </dev/null >"$out" 2>&1 &
+        else
+            cat <&0 >/dev/null &
+        fi
+        pid=$!
+        # the spinner while it lasts (gum draws it on the terminal and clears it after); a plain
+        # line without gum or a terminal
+        if has_gum && { : </dev/tty; } 2>/dev/null; then
+            gum spin --spinner dot --spinner.foreground "$accent" --title "$title" \
+                --title.foreground "$subtext" -- bash -c 'while kill -0 "$1" 2>/dev/null; do sleep 0.1; done' _ "$pid" \
+                </dev/tty >/dev/tty 2>&1
+        else
+            printf '  %s\n' "$title"
+        fi
+        wait "$pid"
+        status=$?
+        if [[ -n $out ]]; then
+            cat "$out"
+            rm -f "$out"
+        fi
+        exit "$status"
         ;;
     done)
         status=${2:-0}

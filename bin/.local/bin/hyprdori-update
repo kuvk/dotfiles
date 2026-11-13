@@ -93,7 +93,12 @@ if [[ ${1:-} == --in-window ]]; then
     case $choice in
         "$check")
             "$bin/hyprdori-present" step "Checking for updates"
+            # a spinner while it counts (hyprdori-present spin, until this pipe closes)
+            exec 3> >("$bin/hyprdori-present" spin "Asking the repos, the AUR and Flatpak")
+            spinner=$!
             count_updates
+            exec 3>&-
+            wait "$spinner"
             if ((total == 0)); then
                 echo "  Everything is up to date."
             else
@@ -137,8 +142,10 @@ note() { printf '\e[33m%s\e[0m\n' "$1"; }
 # isn't in it: work in the home folders is never rolled back ------------------------------------
 if command -v snapper >/dev/null && sudo snapper list-configs 2>/dev/null | grep -q '^root '; then
     step "Snapshot"
-    if sudo snapper -c root create -c number -d "Before update $(date '+%F %H:%M')"; then
-        sudo snapper -c root cleanup number
+    # with a spinner (sudo has the password: hyprdori-sudo-hold above)
+    if "$bin/hyprdori-present" spin "Taking a snapshot of /" \
+        sudo -n snapper -c root create -c number -d "Before update $(date '+%F %H:%M')"; then
+        "$bin/hyprdori-present" spin "Removing the oldest beyond 5" sudo -n snapper -c root cleanup number
         echo "Taken; the boot menu's Snapshots has it."
     else
         note "No snapshot taken; the update goes on."
@@ -183,7 +190,8 @@ fi
 # --- Neovim: plugins, then Mason's tools -----------------------------------------------------
 if command -v nvim >/dev/null; then
     step "Neovim plugins"
-    nvim --headless "+Lazy! sync" +qa 2>&1 | tail -n 3
+    "$bin/hyprdori-present" spin "Installing, updating and cleaning them (Lazy sync)" \
+        bash -c 'nvim --headless "+Lazy! sync" +qa 2>&1 | tail -n 3'
     step "Mason tools"
     mason=$(mktemp --suffix=.lua)
     cat >"$mason" <<'EOF'
@@ -220,7 +228,7 @@ if command -v spicetify >/dev/null && "$bin/hyprdori-spicetify" --check; then
     step "spicetify"
     if pgrep -x spotify >/dev/null; then
         note "Spotify is open: close it, then run hyprdori-spicetify --force to style it again."
-    elif "$bin/hyprdori-spicetify" --force >/dev/null; then
+    elif "$bin/hyprdori-present" spin "Styling Spotify" bash -c '"$1" --force >/dev/null' _ "$bin/hyprdori-spicetify"; then
         echo "Spotify styled again (the theme's colors)."
     else
         note "Spotify couldn't be styled; run hyprdori-spicetify --force to see why."

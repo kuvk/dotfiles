@@ -216,6 +216,32 @@ def present(*args: str, capture: bool = False) -> subprocess.CompletedProcess:
     return subprocess.run([str(PRESENT), *args], text=True, stdout=subprocess.PIPE if capture else None)
 
 
+def busy(title: str, work):
+    """work() with hyprdori-present's spinner and TITLE beside it (spin, until its input closes);
+    what it prints, its commands' output too, held back and shown after it's done."""
+    sys.stdout.flush()
+    sys.stderr.flush()
+    spinner = subprocess.Popen([str(PRESENT), "spin", title], stdin=subprocess.PIPE)
+    saved = os.dup(1), os.dup(2)
+    with tempfile.TemporaryFile() as out:
+        os.dup2(out.fileno(), 1)
+        os.dup2(out.fileno(), 2)
+        try:
+            return work()
+        finally:
+            sys.stdout.flush()
+            sys.stderr.flush()
+            os.dup2(saved[0], 1)
+            os.dup2(saved[1], 2)
+            os.close(saved[0])
+            os.close(saved[1])
+            spinner.stdin.close()
+            spinner.wait()
+            out.seek(0)
+            sys.stdout.buffer.write(out.read())
+            sys.stdout.flush()
+
+
 def install_some() -> int:
     """The browser, then name, address and icon for as many apps as wanted."""
     browsers = installed_browsers()
@@ -233,7 +259,7 @@ def install_some() -> int:
                        capture=True).stdout.strip() or None
         present("step", f"{name} in {b}")
         try:
-            install(name, url, icon, b)
+            busy("Fetching its icon and adding it", lambda: install(name, url, icon, b))
         except SystemExit as e:
             print(f"  {e}")
             status = 1
