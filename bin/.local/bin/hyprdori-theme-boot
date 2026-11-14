@@ -125,6 +125,9 @@ if [[ $action != force && $current == "$installed" ]]; then
     exit 0
 fi
 
+# Awake while it runs (the splash rebuilds every initramfs); on battery it asks first
+"$(dirname "$self")/hyprdori-awake" $$ "updating the boot screens" || { note "Boot screens not updated."; exit 0; }
+
 if [[ -t 0 ]]; then
     sudo "$self" --as-root "$USER" "${splash[@]}"
 else

@@ -58,7 +58,10 @@ source_of() {
 ((EUID != 0)) || { echo "Run this as yourself, not root: it asks for sudo when needed." >&2; exit 1; }
 [[ -f /etc/arch-release ]] || { echo "This is for Arch Linux." >&2; exit 1; }
 curl -fsI --max-time 10 https://archlinux.org >/dev/null || { echo "No internet connection." >&2; exit 1; }
-# the password once: sudo keeps it until the install ends, however long the downloads take
+# awake while it runs (on battery it asks first), then the password once: sudo keeps it until
+# the install ends, however long the downloads take
+"$hyprdori/bin/.local/bin/hyprdori-awake" $$ "the install" || { echo "Nothing installed."; exit 0; }
+export HYPRDORI_AWAKE_ASKED=1
 "$hyprdori/bin/.local/bin/hyprdori-sudo-hold" $$ || { echo "No password, nothing installed." >&2; exit 1; }
 
 # --- Hardware -----------------------------------------------------------------------------------

@@ -2,6 +2,7 @@ pragma Singleton
 
 import QtQuick
 import Quickshell
+import Quickshell.Io
 import Quickshell.Services.UPower
 import Quickshell.Wayland
 import qs.config
@@ -11,7 +12,9 @@ import qs.config
 // go off when the machine sleeps (services/Lock.qml says why). After Omarchy's idle service (shell/plugins/services/idle,
 // github.com/basecamp/omarchy, MIT): Hyprland reports the idle time (ext-idle-notify,
 // apps' own idle inhibitors respected), one cycle per idle stretch with its deadlines set when
-// it starts, any input cancels it. Stay Awake and playing media hold it off.
+// it starts, any input cancels it. Stay Awake and playing media hold it off, and a program
+// holding logind's idle lock (systemd-inhibit --what=idle: hyprdori-awake for Hyprdori's long
+// scripts) postpones the lock and the sleep while it holds it.
 Singleton {
     id: root
 
@@ -58,6 +61,9 @@ Singleton {
         inCycle = false;
         lockTimer.stop();
         sleepTimer.stop();
+        lockDue = false;
+        sleepDue = false;
+        idleLockRetry.stop();
     }
 
     onEnabledChanged: if (!enabled) cancelCycle()
@@ -67,8 +73,60 @@ Singleton {
         return JSON.stringify({
             enabled, started, stayAwake: System.stayAwake, mediaPlaying: System.mediaPlaying, onBattery,
             lockMinutes, sleepMinutes, idleAfterSeconds: monitor.timeout, idle: monitor.isIdle, inCycle,
-            lockIn: lockTimer.running ? lockTimer.interval / 1000 : null, sleepIn: sleepTimer.running ? sleepTimer.interval / 1000 : null
+            lockIn: lockTimer.running ? lockTimer.interval / 1000 : null, sleepIn: sleepTimer.running ? sleepTimer.interval / 1000 : null,
+            heldByIdleLock: idleLockRetry.running
         });
+    }
+
+    // A due lock or sleep waits while a program holds logind's idle lock: asked once when it's
+    // due (one systemd-inhibit --list), then every minute until the lock is let go; nothing runs
+    // before a deadline. When the list can't be read, it goes ahead as before.
+    property bool lockDue: false
+    property bool sleepDue: false
+
+    function due(lock: bool): void {
+        if (lock)
+            lockDue = true;
+        else
+            sleepDue = true;
+        if (!idleLockCheck.running)
+            idleLockCheck.running = true;
+    }
+
+    Process {
+        id: idleLockCheck
+
+        command: ["systemd-inhibit", "--list", "--json=short", "--no-pager"]
+        stdout: StdioCollector {
+            id: idleLocks
+        }
+        onExited: {
+            if (!root.inCycle)
+                return;
+            let held = false;
+            try {
+                held = JSON.parse(idleLocks.text || "[]").some(i => i.mode === "block" && String(i.what).split(":").includes("idle"));
+            } catch (e) {}
+            if (held) {
+                idleLockRetry.restart();
+                return;
+            }
+            if (root.lockDue) {
+                root.lockDue = false;
+                Lock.lock();
+            }
+            if (root.sleepDue) {
+                root.sleepDue = false;
+                Quickshell.execDetached(["systemctl", "suspend"]);
+            }
+        }
+    }
+
+    Timer {
+        id: idleLockRetry
+
+        interval: 60000
+        onTriggered: if (root.inCycle && !idleLockCheck.running) idleLockCheck.running = true
     }
 
     IdleMonitor {
@@ -83,13 +141,13 @@ Singleton {
     Timer {
         id: lockTimer
 
-        onTriggered: if (root.inCycle) Lock.lock()
+        onTriggered: if (root.inCycle) root.due(true)
     }
 
     // The lock comes first: hyprdori-sleep-lock locks before every suspend
     Timer {
         id: sleepTimer
 
-        onTriggered: if (root.inCycle) Quickshell.execDetached(["systemctl", "suspend"])
+        onTriggered: if (root.inCycle) root.due(false)
     }
 }

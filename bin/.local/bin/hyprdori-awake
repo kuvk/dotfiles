@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Keeps the machine awake while a long script runs (an update, a clean-up, the boot screens'
+# rebuild, the install): holds logind's idle lock (systemd-inhibit --what=idle), which the
+# shell's idle timer waits for before locking or sleeping, until the script ends. On a laptop
+# running on battery it first says so and asks whether to go on; machines without a battery
+# (peripherals' batteries don't count) are never asked. While it holds the lock it checks the
+# script's process once a second (tail --pid); nothing is left running after.
+#
+#   hyprdori-awake PID WHAT   ask on battery, then hold until PID (the calling script, $$) exits;
+#                             WHAT names the task in the question ("the update"); exits 1 when
+#                             the answer is no. With HYPRDORI_AWAKE_ASKED set (a script that
+#                             already asked, running another) it doesn't ask again.
+
+# -h, --help: the comment above, then nothing else runs
+case ${1:-} in -h | --help | "") awk 'NR > 1 && /^#/ { sub(/^# ?/, ""); print; next } NR > 1 { exit }' "$0"; exit 0 ;; esac
+set -uo pipefail
+
+pid=$1 what=${2:-this}
+here=$(dirname "$(readlink -f "$0")")
+
+# On battery: the machine's own battery discharging (a mouse's or keyboard's battery, scope
+# Device, doesn't count; plugged in, by any port, it isn't discharging)
+on_battery() {
+    local supply
+    for supply in /sys/class/power_supply/*; do
+        [[ $(cat "$supply/type" 2>/dev/null) == Battery && $(cat "$supply/scope" 2>/dev/null) != Device ]] || continue
+        [[ $(cat "$supply/status" 2>/dev/null) == Discharging ]] && return 0
+    done
+    return 1
+}
+
+if [[ -z ${HYPRDORI_AWAKE_ASKED:-} ]] && on_battery; then
+    if { : </dev/tty; } 2>/dev/null; then
+        "$here/hyprdori-present" confirm "On battery: $what can take a while and drain it. Go on anyway?" </dev/tty || exit 1
+    else
+        echo "On battery: $what goes on (nothing to ask on)." >&2
+    fi
+fi
+
+command -v systemd-inhibit >/dev/null || exit 0
+systemd-inhibit --what=idle --who=Hyprdori --why="Running $what" --mode=block \
+    tail --pid="$pid" -f /dev/null </dev/null >/dev/null 2>&1 &
+disown
