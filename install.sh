@@ -247,8 +247,10 @@ for name in "${packages[@]}"; do
 done
 ((moved)) && note "Moved $moved file(s) that were in the way to $backup"
 # Folders apps write into themselves made real first, so stow links the files in them rather
-# than the whole folder (systemd keeps its timers' state next to the user units)
-mkdir -p "$HOME/.local/share/systemd/user"
+# than the whole folder into the repo: systemd keeps its timers' state next to the user units,
+# hyprdori-webapp writes web apps' entries, herdr its sessions, plugins and logs. On a fresh
+# install they don't exist yet; existing ones are left as they are
+mkdir -p "$HOME/.local/share/systemd/user" "$HOME/.local/share/applications" "$HOME/.config/herdr"
 stow -d "$hyprdori" -t "$HOME" --restow "${packages[@]}"
 echo "Linked: ${packages[*]}"
 # A fresh install has nothing to migrate: hyprdori-update runs only migrations added later
