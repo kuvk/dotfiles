@@ -18,6 +18,15 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
     vim.fn.getchar()
     os.exit(1)
   end
+  -- lazy.nvim at lazy-lock.json's commit (the clone above takes its stable branch), so a
+  -- machine's first start leaves the lock file as it is; without a readable lock, as cloned
+  local ok, commit = pcall(function()
+    local lock = vim.fn.readfile(vim.fn.stdpath("config") .. "/lazy-lock.json")
+    return vim.json.decode(table.concat(lock, "\n"))["lazy.nvim"].commit
+  end)
+  if ok and commit then
+    vim.fn.system({ "git", "-C", lazypath, "checkout", "--quiet", commit })
+  end
 end
 vim.opt.rtp:prepend(lazypath)
 

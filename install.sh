@@ -344,6 +344,12 @@ command -v ya >/dev/null && { ya pkg install >/dev/null || note "Couldn't instal
 if command -v herdr >/dev/null && ! herdr plugin list 2>/dev/null | grep -q vim-herdr-navigation; then
     herdr plugin install --yes paulbkim-dev/vim-herdr-navigation >/dev/null || note "Couldn't install herdr's navigation plugin"
 fi
+# Neovim's plugins at lazy-lock.json's versions (the lock file stays as it is), so its first
+# start has nothing to download; without them now, Neovim installs them when it first starts
+if command -v nvim >/dev/null; then
+    echo "Installing Neovim's plugins (lazy-lock.json's versions)"
+    nvim --headless "+Lazy! restore" +qa >/dev/null 2>&1 || note "Couldn't install Neovim's plugins now; Neovim installs them when it first starts"
+fi
 
 step "Theme"
 # The login screen first: hyprdori-theme-set writes its colors to the folder this makes
