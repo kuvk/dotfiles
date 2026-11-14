@@ -54,3 +54,6 @@ fastfetch/.config/fastfetch/config.jsonc
 
 # systemd's state for the user timers (~/.local/share/systemd/timers), should the folder be linked
 bin/.local/share/systemd/timers/
+
+# Local prettier settings for the Markdown files (each machine that edits them sets its own)
+.prettierrc
