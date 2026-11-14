@@ -163,6 +163,10 @@ fi && rm -f "$waiting" || note "The package upgrade didn't finish; the steps bel
 # --- Flatpak --------------------------------------------------------------------------------
 if command -v flatpak >/dev/null; then
     step "Flatpak"
+    # The app catalogue first, with a spinner: on a slow connection it takes a while and prints
+    # nothing meanwhile. Then the apps, which ask before changing anything (not with --yes); the
+    # catalogue they check again is the one just fetched
+    "$bin/hyprdori-present" spin "Refreshing Flathub's app catalogue (appstream data)" flatpak update --appstream
     if $yes; then flatpak update -y; else flatpak update; fi
 fi
 
